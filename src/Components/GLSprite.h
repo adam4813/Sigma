@@ -11,8 +11,8 @@ public:
 
 	unsigned int VERTEX_BUFFER() const { return pVERTEX_BUFFER; }
 	void VERTEX_BUFFER(unsigned int val) { pVERTEX_BUFFER = val; }
-	unsigned int COLOUR_BUFFER() const { return pCOLOUR_BUFFER; }
-	void COLOUR_BUFFER(unsigned int val) { pCOLOUR_BUFFER = val; }
+	unsigned int COLOR_BUFFER() const { return pCOLOUR_BUFFER; }
+	void COLOR_BUFFER(unsigned int val) { pCOLOUR_BUFFER = val; }
 private:
 	unsigned int pVERTEX_BUFFER;    // will point to where GL put the buffer
 	unsigned int pCOLOUR_BUFFER;    // will point to where GL put the buffer
