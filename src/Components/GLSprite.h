@@ -9,11 +9,14 @@ class GLSprite : public IComponent {
 public:
 	GLSprite(const int entityID = 0);
 
-	unsigned int VERTEX_BUFFER() const { return pVERTEX_BUFFER; }
-	void VERTEX_BUFFER(unsigned int val) { pVERTEX_BUFFER = val; }
-	unsigned int COLOR_BUFFER() const { return pCOLOUR_BUFFER; }
-	void COLOR_BUFFER(unsigned int val) { pCOLOUR_BUFFER = val; }
+	unsigned int VertBuf() const { return vertBuf; }
+	void VertBuf(unsigned int val) { vertBuf = val; }
+	unsigned int ColBuf() const { return colBuf; }
+	void ColBuf(unsigned int val) { colBuf = val; }
+	unsigned int Vao() const { return vao; }
+	void Vao(unsigned int val) { vao = val; }
 private:
-	unsigned int pVERTEX_BUFFER;    // will point to where GL put the buffer
-	unsigned int pCOLOUR_BUFFER;    // will point to where GL put the buffer
+	unsigned int vertBuf;    // will point to where GL put the buffer
+	unsigned int colBuf;    // will point to where GL put the buffer
+	unsigned int vao;
 };
