@@ -36,3 +36,16 @@ LRESULT CALLBACK win32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 	}
 	return DefWindowProc(hWnd, message, wParam, lParam);  
 }  
+
+bool win32::MessageLoop() {
+	MSG msg;
+	if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) { // If we have a message to process, process it
+		if (msg.message == WM_QUIT) {
+			return false;
+		} else {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}
+	return true;
+}

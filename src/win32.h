@@ -7,6 +7,8 @@ public:
 
 	HWND CreateWin32Window();
 
+	bool MessageLoop();
+
 private:
 
 	HINSTANCE hInstance; // The HINSTANCE of this application  
