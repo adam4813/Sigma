@@ -2,11 +2,11 @@
 
 #include "SceneManager.h"
 
-void SceneManager::SetEntity(int id, TRANSFORMATION position) {
+void SceneManager::SetEntity(int id, TRANSFORM position) {
 	this->entitySRT[id] = position;
 }
 
-TRANSFORMATION* SceneManager::GetEntity(int id) {
+TRANSFORM* SceneManager::GetEntity(int id) {
 	if (this->entitySRT.find(id) != this->entitySRT.end()) {
 		return &this->entitySRT.at(id);
 	}

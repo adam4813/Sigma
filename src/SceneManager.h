@@ -3,7 +3,7 @@
 //#include <matrix>
 #include <map>
 
-struct TRANSFORMATION {
+struct TRANSFORM {
 	float scale[3];
 	float rotation[3];
 	float translation[3];
@@ -11,8 +11,8 @@ struct TRANSFORMATION {
 
 class SceneManager {
 public:
-	void SetEntity(int id, TRANSFORMATION position); // Adds an entity with ID to the scene at the given TRANSFORMATION. 
-	TRANSFORMATION* GetEntity(int id); // Returns the TRANSFORMATION stored for the given entity.
+	void SetEntity(int id, TRANSFORM position); // Adds an entity with ID to the scene at the given TRANSFORM. 
+	TRANSFORM* GetEntity(int id); // Returns the TRANSFORM stored for the given entity.
 private:
-	std::map<int, TRANSFORMATION> entitySRT;
+	std::map<int, TRANSFORM> entitySRT;
 };
