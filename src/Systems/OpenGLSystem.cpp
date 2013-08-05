@@ -17,85 +17,59 @@ OpenGLSystem::~OpenGLSystem() {
 	ReleaseDC(this->hwnd, this->hdc); // Release the device context from our window  
 }
 
-struct VERTEX {
-	float x,y;
-};
-
-struct COLOR {
-	float r,g,b,a;
-};
-
-
 IComponent* OpenGLSystem::Factory(const std::string type, const unsigned int entityID) {
 	if (type == "GLSprite") {
 		this->sprShade.LoadFromFile(GL_VERTEX_SHADER, "vert.shade");
 		this->sprShade.LoadFromFile(GL_FRAGMENT_SHADER, "frag.shade");
 		this->sprShade.CreateAndLinkProgram();
-
-		// TODO* Wrap this into the shader class to provide built in error detection.
-		GLsizei success;
-		glGetProgramiv(this->sprShade.GetProgram(),GL_VALIDATE_STATUS,&success);
-		if (!success) {
-			GLchar infolog[8192];   // make an 8k buffer to store any messages
-			glGetProgramInfoLog(this->sprShade.GetProgram(),8192,NULL,infolog);
-			fprintf(stderr,"Error in program validation!\nInfo log: \n%s\n",infolog);
-			return false;
-		}
-		this->sprShade.Use();
-
+		this->sprShade.Use(); // This will need to be moved into the rendering loop once components are rendered based on type..
 
 		GLSprite* spr = new GLSprite(entityID);
+		
+		static const GLfloat vert[] = {
+			-1.0f, -1.0f, 0.0f,
+			1.0f, -1.0f, 0.0f,
+			0.0f,  1.0f, 0.0f,
+		};
 
-		// First simple object
-		float* vert = new float[9];     // vertex array
-		float* col  = new float[9];     // color array
+		static const GLfloat col[] = {
+			1.0f, 0.0f, 0.0f,
+			0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 1.0f,
+		};
 
-		vert[0] =-0.3; vert[1] = 0.5; vert[2] =-1.0;
-		vert[3] =-0.8; vert[4] =-0.5; vert[5] =-1.0;
-		vert[6] = 0.2; vert[7] =-0.5; vert[8]= -1.0;
-
-		col[0] = 1.0; col[1] = 0.0; col[2] = 0.0;
-		col[3] = 0.0; col[4] = 1.0; col[5] = 0.0;
-		col[6] = 0.0; col[7] = 0.0; col[8] = 1.0;
-
+		// We must create a vao and then store it in our GLSprite.
 		GLuint vaoID;
 		glGenVertexArrays(1, &vaoID);
-		
-		/** create a vertex buffer for the sprites **/
-		GLuint vertbuf;
-		// Bind the first vertex array
 		glBindVertexArray(vaoID);
-		// create a buffer for my vertices
-		glGenBuffers(1, &vertbuf);
-		// put an ID number for it in pVERTEX_BUFFER
-		glBindBuffer(GL_ARRAY_BUFFER, vertbuf);
-		// fill it with 48 bytes of data
-		glBufferData(GL_ARRAY_BUFFER, 9*sizeof(GLfloat), vert, GL_STATIC_DRAW);
-		glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, 0); 
-		glEnableVertexAttribArray(0);
 
-		/** create a color buffer for the sprites **/
+		GLuint vertbuf;
+		glGenBuffers(1, &vertbuf);
+		glBindBuffer(GL_ARRAY_BUFFER, vertbuf);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vert), vert, GL_STATIC_DRAW);
+		GLint posLocation = glGetAttribLocation(this->sprShade.GetProgram(), "in_Position");
+		glVertexAttribPointer(posLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(posLocation);
+
 		GLuint colorbuf;
-		// create a buffer for my colors
 		glGenBuffers(1, &colorbuf);
-		// put an ID number for it in pcolor_BUFFER
 		glBindBuffer(GL_ARRAY_BUFFER, colorbuf);
-		// fill it with 96 bytes of data
-		glBufferData(GL_ARRAY_BUFFER, 9*sizeof(GLfloat), col, GL_STATIC_DRAW);
-		glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(1);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(col), col, GL_STATIC_DRAW);
+		GLint colLocation = glGetAttribLocation(this->sprShade.GetProgram(), "in_Color");
+		glVertexAttribPointer(colLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(colLocation);
+		glBindVertexArray(0);
 
 		spr->Vao(vaoID);
 		spr->VertBuf(vertbuf);
 		spr->ColBuf(colorbuf);
-
 		this->components[entityID].push_back(spr);
 	}
 	return nullptr;
 }
 
 void OpenGLSystem::Update(const float delta) {
-	glClearColor (1.0, 1.0, 1.0, 0.0);
+	glClearColor (0.0f,0.0f,1.0f,0.0f);
 	glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window  
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
@@ -104,7 +78,7 @@ void OpenGLSystem::Update(const float delta) {
 			try {
 				GLSprite* sprite = dynamic_cast<GLSprite*>(*vecitr);
 				glBindVertexArray(sprite->Vao());
-				glDrawArrays(GL_TRIANGLES,0,3); 
+				glDrawArrays(GL_TRIANGLES,0,3);
 				glBindVertexArray(0);
 			} catch (std::bad_cast b) {
 
