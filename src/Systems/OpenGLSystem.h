@@ -7,6 +7,7 @@
 
 #include "GL\glew.h"
 #include "GL\wglew.h"
+#include "GLSLShader.h"
 
 class OpenGLSystem : public ISystem {
 public:
@@ -64,11 +65,10 @@ private:
 	int windowWidth; // Store the width of our window  
 	int windowHeight; // Store the height of our window 
 
-	GLuint m_pProgram; // Program
-	GLuint m_pVertSh; // Vertex shader
-	GLuint m_pFragSh; // Fragment shader
-
 	GLuint m_vaoID[2]; // two vertex array objects, one for each drawn object
 	GLuint m_vboID[3]; // three VBOs
 	int OpenGLVersion[2];
+
+
+	GLSLShader sprShade;
 };
