@@ -1,7 +1,8 @@
 #include "OpenGLSystem.h"
 #include "..\Components\GLSprite.h"
+#include "GLSLShader.h"
 
-OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight() { }
+OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600) { }
 
 OpenGLSystem::~OpenGLSystem() {
 	for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {
@@ -24,98 +25,87 @@ struct COLOR {
 	float r,g,b,a;
 };
 
+
 IComponent* OpenGLSystem::Factory(const std::string type, const unsigned int entityID) {
 	if (type == "GLSprite") {
-		    /** create some buffers to fill our array buffers with
-                (this data is empty, just a placeholder) **/
+		this->sprShade.LoadFromFile(GL_VERTEX_SHADER, "vert.shade");
+		this->sprShade.LoadFromFile(GL_FRAGMENT_SHADER, "frag.shade");
+		this->sprShade.CreateAndLinkProgram();
 
-		VERTEX vert[6];      // vert data
-		COLOR color[6];      // color data
-		// point 1
-		//vert[0].x=xd;
-		//vert[0].y=yd;
-		//color[0].r=r;
-		//color[0].g=g;
-		//color[0].b=b;
-		//color[0].a=a;
-		//// point 2
-		//vert[1].x=xs;
-		//vert[1].y=yd;
-		//color[1].r=r;
-		//color[1].g=g;
-		//color[1].b=b;
-		//color[1].a=a;
-		//// point 3
-		//vert[2].x=xs;
-		//vert[2].y=ys;
-		//color[2].r=r;
-		//color[2].g=g;
-		//color[2].b=b;
-		//color[2].a=a;
-		//// point 4
-		//vert[3].x=xd;
-		//vert[3].y=yd;
-		//color[3].r=r;
-		//color[3].g=g;
-		//color[3].b=b;
-		//color[3].a=a;
-		//// point 5
-		//vert[4].x=xs;
-		//vert[4].y=ys;
-		//color[4].r=r;
-		//color[4].g=g;
-		//color[4].b=b;
-		//color[4].a=a;
-		//// point 6
-		//vert[5].x=xd;
-		//vert[5].y=ys;
-		//color[5].r=r;
-		//color[5].g=g;
-		//color[5].b=b;
-		//color[5].a=a;
+		// TODO* Wrap this into the shader class to provide built in error detection.
+		GLsizei success;
+		glGetProgramiv(this->sprShade.GetProgram(),GL_VALIDATE_STATUS,&success);
+		if (!success) {
+			GLchar infolog[8192];   // make an 8k buffer to store any messages
+			glGetProgramInfoLog(this->sprShade.GetProgram(),8192,NULL,infolog);
+			fprintf(stderr,"Error in program validation!\nInfo log: \n%s\n",infolog);
+			return false;
+		}
+		this->sprShade.Use();
 
+
+		GLSprite* spr = new GLSprite(entityID);
+
+		// First simple object
+		float* vert = new float[9];     // vertex array
+		float* col  = new float[9];     // color array
+
+		vert[0] =-0.3; vert[1] = 0.5; vert[2] =-1.0;
+		vert[3] =-0.8; vert[4] =-0.5; vert[5] =-1.0;
+		vert[6] = 0.2; vert[7] =-0.5; vert[8]= -1.0;
+
+		col[0] = 1.0; col[1] = 0.0; col[2] = 0.0;
+		col[3] = 0.0; col[4] = 1.0; col[5] = 0.0;
+		col[6] = 0.0; col[7] = 0.0; col[8] = 1.0;
+
+		GLuint vaoID;
+		glGenVertexArrays(1, &vaoID);
+		
 		/** create a vertex buffer for the sprites **/
 		GLuint vertbuf;
+		// Bind the first vertex array
+		glBindVertexArray(vaoID);
 		// create a buffer for my vertices
-		glGenBuffersARB(1, &vertbuf);
+		glGenBuffers(1, &vertbuf);
 		// put an ID number for it in pVERTEX_BUFFER
-		glBindBufferARB(GL_ARRAY_BUFFER_ARB, vertbuf);
+		glBindBuffer(GL_ARRAY_BUFFER, vertbuf);
 		// fill it with 48 bytes of data
-		glBufferDataARB(GL_ARRAY_BUFFER_ARB, 48, vert, GL_STREAM_DRAW_ARB);
+		glBufferData(GL_ARRAY_BUFFER, 9*sizeof(GLfloat), vert, GL_STATIC_DRAW);
+		glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, 0); 
+		glEnableVertexAttribArray(0);
 
 		/** create a color buffer for the sprites **/
 		GLuint colorbuf;
 		// create a buffer for my colors
-		glGenBuffersARB(1, &colorbuf);
+		glGenBuffers(1, &colorbuf);
 		// put an ID number for it in pcolor_BUFFER
-		glBindBufferARB(GL_ARRAY_BUFFER_ARB, colorbuf);
+		glBindBuffer(GL_ARRAY_BUFFER, colorbuf);
 		// fill it with 96 bytes of data
-		glBufferDataARB(GL_ARRAY_BUFFER_ARB, 96, color, GL_STREAM_DRAW_ARB);
+		glBufferData(GL_ARRAY_BUFFER, 9*sizeof(GLfloat), col, GL_STATIC_DRAW);
+		glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(1);
+
+		spr->Vao(vaoID);
+		spr->VertBuf(vertbuf);
+		spr->ColBuf(colorbuf);
+
+		this->components[entityID].push_back(spr);
 	}
 	return nullptr;
 }
-struct attribs {
-	unsigned int pVERTEX;
-	unsigned int pCOLOUR;
-};
 
 void OpenGLSystem::Update(const float delta) {
+	glClearColor (1.0, 1.0, 1.0, 0.0);
 	glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window  
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
-
 
 	for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {
 		for (auto vecitr = mapitr->second.begin(); vecitr < mapitr->second.end(); ++vecitr) {
 			try {
 				GLSprite* sprite = dynamic_cast<GLSprite*>(*vecitr);
-				attribs attrib;
-				attrib.pVERTEX = sprite->VERTEX_BUFFER();
-				attrib.pCOLOUR = sprite->COLOUR_BUFFER();
-
-				// set the shader up
-				//shd->bSetShader(&attrib);
-
-				glDrawArrays(GL_TRIANGLES,0,6);
+				glBindVertexArray(sprite->Vao());
+				glDrawArrays(GL_TRIANGLES,0,3); 
+				glBindVertexArray(0);
 			} catch (std::bad_cast b) {
 
 			}
@@ -198,10 +188,5 @@ const int* OpenGLSystem::Start(HWND hwnd) {
 	glGetIntegerv(GL_MAJOR_VERSION, &OpenGLVersion[0]);
 	glGetIntegerv(GL_MINOR_VERSION, &OpenGLVersion[1]);
 
-	if (!this->hrc) {
-		return OpenGLVersion;
-	}
-
 	return OpenGLVersion;
 }
-
