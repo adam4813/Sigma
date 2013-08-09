@@ -19,8 +19,8 @@ OpenGLSystem::~OpenGLSystem() {
 
 IComponent* OpenGLSystem::Factory(const std::string type, const unsigned int entityID) {
 	if (type == "GLSprite") {
-		this->sprShade.LoadFromFile(GL_VERTEX_SHADER, "vert.shade");
-		this->sprShade.LoadFromFile(GL_FRAGMENT_SHADER, "frag.shade");
+		this->sprShade.LoadFromFile(GL_VERTEX_SHADER, "..\\..\\shaders\\vert.shade");
+		this->sprShade.LoadFromFile(GL_FRAGMENT_SHADER, "..\\..\\shaders\\frag.shade");
 		this->sprShade.CreateAndLinkProgram();
 		this->sprShade.Use(); // This will need to be moved into the rendering loop once components are rendered based on type..
 
