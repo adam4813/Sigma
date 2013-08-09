@@ -2,6 +2,7 @@
 * text=auto
 
 # Custom for Visual Studio
+*.shade  text
 *.cs     diff=csharp
 *.sln    merge=union
 *.csproj merge=union
