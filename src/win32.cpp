@@ -47,5 +47,6 @@ bool win32::MessageLoop() {
 			DispatchMessage(&msg);
 		}
 	}
+	Sleep(100);
 	return true;
 }
