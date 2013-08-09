@@ -26,16 +26,24 @@ IComponent* OpenGLSystem::Factory(const std::string type, const unsigned int ent
 
 		GLSprite* spr = new GLSprite(entityID);
 		
-		static const GLfloat vert[] = {
+		/*static const GLfloat vert[] = {
 			-1.0f, -1.0f, 0.0f,
 			1.0f, -1.0f, 0.0f,
 			0.0f,  1.0f, 0.0f,
+		};*/
+		
+		static const GLfloat vert[] = {
+			-0.5f, -0.5f,
+			0.5f, -0.5f,
+			-0.5f,  0.5f,
+			0.5f,  0.5f
 		};
 
 		static const GLfloat col[] = {
 			1.0f, 0.0f, 0.0f,
 			0.0f, 1.0f, 0.0f,
 			0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 1.0f,
 		};
 
 		// We must create a vao and then store it in our GLSprite.
@@ -48,8 +56,14 @@ IComponent* OpenGLSystem::Factory(const std::string type, const unsigned int ent
 		glBindBuffer(GL_ARRAY_BUFFER, vertbuf);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vert), vert, GL_STATIC_DRAW);
 		GLint posLocation = glGetAttribLocation(this->sprShade.GetProgram(), "in_Position");
-		glVertexAttribPointer(posLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(posLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(posLocation);
+
+		GLuint elembuf;
+		static const GLushort elem[] = { 0, 1, 2, 3 };
+		glGenBuffers(1, &elembuf);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elembuf);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elem), elem, GL_STATIC_DRAW);
 
 		GLuint colorbuf;
 		glGenBuffers(1, &colorbuf);
@@ -63,6 +77,7 @@ IComponent* OpenGLSystem::Factory(const std::string type, const unsigned int ent
 		spr->Vao(vaoID);
 		spr->VertBuf(vertbuf);
 		spr->ColBuf(colorbuf);
+		spr->ElemBuf(elembuf);
 		this->components[entityID].push_back(spr);
 	}
 	return nullptr;
@@ -77,8 +92,14 @@ void OpenGLSystem::Update(const float delta) {
 		for (auto vecitr = mapitr->second.begin(); vecitr < mapitr->second.end(); ++vecitr) {
 			try {
 				GLSprite* sprite = dynamic_cast<GLSprite*>(*vecitr);
+				sprite->OffsetX(0.05f);
+				sprite->OffsetY(0.05f);
 				glBindVertexArray(sprite->Vao());
-				glDrawArrays(GL_TRIANGLES,0,3);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite->ElemBuf());
+				glUniform2d(glGetUniformLocation(this->sprShade.GetProgram(), "in_Offset"), sprite->OffsetX(), sprite->OffsetY());
+				glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, (void*)0);
+				//glDrawArrays(GL_TRIANGLES,0,6);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 				glBindVertexArray(0);
 			} catch (std::bad_cast b) {
 
