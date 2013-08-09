@@ -19,66 +19,9 @@ OpenGLSystem::~OpenGLSystem() {
 
 IComponent* OpenGLSystem::Factory(const std::string type, const unsigned int entityID) {
 	if (type == "GLSprite") {
-		this->sprShade.LoadFromFile(GL_VERTEX_SHADER, "..\\..\\shaders\\vert.shade");
-		this->sprShade.LoadFromFile(GL_FRAGMENT_SHADER, "..\\..\\shaders\\frag.shade");
-		this->sprShade.CreateAndLinkProgram();
-		this->sprShade.Use(); // This will need to be moved into the rendering loop once components are rendered based on type..
-
-		GLSprite* spr = new GLSprite(entityID);
-		
-		/*static const GLfloat vert[] = {
-			-1.0f, -1.0f, 0.0f,
-			1.0f, -1.0f, 0.0f,
-			0.0f,  1.0f, 0.0f,
-		};*/
-		
-		static const GLfloat vert[] = {
-			-0.5f, -0.5f,
-			0.5f, -0.5f,
-			-0.5f,  0.5f,
-			0.5f,  0.5f
-		};
-
-		static const GLfloat col[] = {
-			1.0f, 0.0f, 0.0f,
-			0.0f, 1.0f, 0.0f,
-			0.0f, 0.0f, 1.0f,
-			1.0f, 0.0f, 1.0f,
-		};
-
-		// We must create a vao and then store it in our GLSprite.
-		GLuint vaoID;
-		glGenVertexArrays(1, &vaoID);
-		glBindVertexArray(vaoID);
-
-		GLuint vertbuf;
-		glGenBuffers(1, &vertbuf);
-		glBindBuffer(GL_ARRAY_BUFFER, vertbuf);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vert), vert, GL_STATIC_DRAW);
-		GLint posLocation = glGetAttribLocation(this->sprShade.GetProgram(), "in_Position");
-		glVertexAttribPointer(posLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(posLocation);
-
-		GLuint elembuf;
-		static const GLushort elem[] = { 0, 1, 2, 3 };
-		glGenBuffers(1, &elembuf);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elembuf);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elem), elem, GL_STATIC_DRAW);
-
-		GLuint colorbuf;
-		glGenBuffers(1, &colorbuf);
-		glBindBuffer(GL_ARRAY_BUFFER, colorbuf);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(col), col, GL_STATIC_DRAW);
-		GLint colLocation = glGetAttribLocation(this->sprShade.GetProgram(), "in_Color");
-		glVertexAttribPointer(colLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(colLocation);
-		glBindVertexArray(0);
-
-		spr->Vao(vaoID);
-		spr->VertBuf(vertbuf);
-		spr->ColBuf(colorbuf);
-		spr->ElemBuf(elembuf);
+		GLSprite* spr = GLSprite::Factory(entityID);
 		this->components[entityID].push_back(spr);
+		return spr;
 	}
 	return nullptr;
 }
@@ -88,6 +31,7 @@ void OpenGLSystem::Update(const float delta) {
 	glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window  
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
+	GLSprite::shader.Use();
 	for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {
 		for (auto vecitr = mapitr->second.begin(); vecitr < mapitr->second.end(); ++vecitr) {
 			try {
@@ -96,9 +40,8 @@ void OpenGLSystem::Update(const float delta) {
 				sprite->OffsetY(0.05f);
 				glBindVertexArray(sprite->Vao());
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite->ElemBuf());
-				glUniform2d(glGetUniformLocation(this->sprShade.GetProgram(), "in_Offset"), sprite->OffsetX(), sprite->OffsetY());
+				glUniform2d(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Offset"), sprite->OffsetX(), sprite->OffsetY());
 				glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, (void*)0);
-				//glDrawArrays(GL_TRIANGLES,0,6);
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 				glBindVertexArray(0);
 			} catch (std::bad_cast b) {
@@ -106,6 +49,7 @@ void OpenGLSystem::Update(const float delta) {
 			}
 		}
 	}
+	GLSprite::shader.UnUse();
 
 	SwapBuffers(hdc); // Swap buffers so we can see our rendering  
 }
@@ -182,6 +126,9 @@ const int* OpenGLSystem::Start(HWND hwnd) {
 	//Or better yet, use the GL3 way to get the version number
 	glGetIntegerv(GL_MAJOR_VERSION, &OpenGLVersion[0]);
 	glGetIntegerv(GL_MINOR_VERSION, &OpenGLVersion[1]);
+
+	// Now that GL is up and running load the shaders
+	GLSprite::LoadShader();
 
 	return OpenGLVersion;
 }
