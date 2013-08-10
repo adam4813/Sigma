@@ -22,7 +22,7 @@ GLSLShader::~GLSLShader(void)
 	_uniformLocationList.clear();
 }
 
-void GLSLShader::LoadFromString(GLenum type, const string source) {
+void GLSLShader::LoadFromString(GLenum type, const std::string source) {
 	GLuint shader = glCreateShader (type);
 
 	const char * ptmp = source.c_str();
@@ -37,7 +37,7 @@ void GLSLShader::LoadFromString(GLenum type, const string source) {
 		glGetShaderiv (shader, GL_INFO_LOG_LENGTH, &infoLogLength);
 		GLchar *infoLog= new GLchar[infoLogLength];
 		glGetShaderInfoLog (shader, infoLogLength, NULL, infoLog);
-		cerr<<"Compile log: "<<infoLog<<endl;
+		std::cerr<<"Compile log: "<<infoLog<<std::endl;
 		delete [] infoLog;
 	}
 	_shaders[_totalShaders++]=shader;
@@ -66,7 +66,7 @@ void GLSLShader::CreateAndLinkProgram() {
 		glGetProgramiv (_program, GL_INFO_LOG_LENGTH, &infoLogLength);
 		GLchar *infoLog= new GLchar[infoLogLength];
 		glGetProgramInfoLog (_program, infoLogLength, NULL, infoLog);
-		cerr<<"Link log: "<<infoLog<<endl;
+		std::cerr<<"Link log: "<<infoLog<<std::endl;
 		delete [] infoLog;
 	}
 
@@ -83,34 +83,34 @@ void GLSLShader::UnUse() {
 	glUseProgram(0);
 }
 
-void GLSLShader::AddAttribute(const string attribute) {
+void GLSLShader::AddAttribute(const std::string attribute) {
 	_attributeList[attribute]= glGetAttribLocation(_program, attribute.c_str());
 }
 
 //An indexer that returns the location of the attribute
-GLuint GLSLShader::operator [](const string attribute) {
+GLuint GLSLShader::operator [](const std::string attribute) {
 	return _attributeList[attribute];
 }
 
-void GLSLShader::AddUniform(const string uniform) {
+void GLSLShader::AddUniform(const std::string uniform) {
 	_uniformLocationList[uniform] = glGetUniformLocation(_program, uniform.c_str());
 }
 
-GLuint GLSLShader::operator()(const string uniform){
+GLuint GLSLShader::operator()(const std::string uniform){
 	return _uniformLocationList[uniform];
 }
 GLuint GLSLShader::GetProgram() const {
 	return _program;
 }
 #include <fstream>
-void GLSLShader::LoadFromFile(GLenum whichShader, const string filename){
-	ifstream fp;
-	fp.open(filename.c_str(), ios_base::in);
+void GLSLShader::LoadFromFile(GLenum whichShader, const std::string filename){
+	std::ifstream fp;
+	fp.open(filename.c_str(), std::ios_base::in);
 	if(fp) {
-		string buffer(std::istreambuf_iterator<char>(fp), (std::istreambuf_iterator<char>()));
+		std::string buffer(std::istreambuf_iterator<char>(fp), (std::istreambuf_iterator<char>()));
 		//copy to source
 		LoadFromString(whichShader, buffer);
 	} else {
-		cerr<<"Error loading shader: "<<filename<<endl;
+		std::cerr<<"Error loading shader: "<<filename<<std::endl;
 	}
 }

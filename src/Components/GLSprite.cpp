@@ -1,5 +1,5 @@
 #include "GLSprite.h"
-#include "GL\glew.h"
+#include "GL/glew.h"
 
 GLSprite::GLSprite( const int entityID /*= 0*/ ) : IComponent(entityID), offsetX(0.0f), offsetY(0.0f) { }
 

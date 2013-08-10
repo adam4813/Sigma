@@ -7,24 +7,22 @@
 #include <map>
 #include <string>
 
-using namespace std;
-
 class GLSLShader
 {
 public:
 	GLSLShader(void);
 	~GLSLShader(void);
-	void LoadFromString(GLenum whichShader, const string source);
-	void LoadFromFile(GLenum whichShader, const string filename);
+	void LoadFromString(GLenum whichShader, const std::string source);
+	void LoadFromFile(GLenum whichShader, const std::string filename);
 	void CreateAndLinkProgram();
 	void Use();
 	void UnUse();
-	void AddAttribute(const string attribute);
-	void AddUniform(const string uniform);
+	void AddAttribute(const std::string attribute);
+	void AddUniform(const std::string uniform);
 	GLuint GetProgram() const;
 	//An indexer that returns the location of the attribute/uniform
-	GLuint operator[](const string attribute);
-	GLuint operator()(const string uniform);
+	GLuint operator[](const std::string attribute);
+	GLuint operator()(const std::string uniform);
 	//Program deletion
 	void DeleteProgram() {glDeleteProgram(_program);_program=-1;}
 private:
@@ -32,6 +30,6 @@ private:
 	GLuint	_program;
 	int _totalShaders;
 	GLuint _shaders[3];//0->vertexshader, 1->fragmentshader, 2->geometryshader
-	map<string,GLuint> _attributeList;
-	map<string,GLuint> _uniformLocationList;
+	std::map<std::string,GLuint> _attributeList;
+	std::map<std::string,GLuint> _uniformLocationList;
 };

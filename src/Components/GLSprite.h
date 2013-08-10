@@ -1,11 +1,7 @@
 #pragma once
 
-#include <string>
-#include <queue>
-
 #include "../IComponent.h"
-#include "..\Systems\GLSLShader.h"
-
+#include "../Systems/GLSLShader.h"
 
 class GLSprite : public IComponent {
 private:

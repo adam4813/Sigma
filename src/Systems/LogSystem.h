@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\ISystem.h"
+#include "../ISystem.h"
 
 class LogSystem : public ISystem {
 public:

@@ -1,7 +1,6 @@
 #include <iostream>
 
-#include "Systems\OpenGLSystem.h"
-#include "SceneManager.h"
+#include "Systems/OpenGLSystem.h"
 #include "win32.h"
 
 int main(int argCount, char **argValues) {

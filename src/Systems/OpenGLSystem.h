@@ -5,8 +5,8 @@
 
 #define GLEW_STATIC
 
-#include "GL\glew.h"
-#include "GL\wglew.h"
+#include "GL/glew.h"
+#include "GL/wglew.h"
 
 class OpenGLSystem : public ISystem {
 public:

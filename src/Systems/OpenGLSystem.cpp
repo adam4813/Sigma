@@ -1,5 +1,5 @@
 #include "OpenGLSystem.h"
-#include "..\Components\GLSprite.h"
+#include "../Components/GLSprite.h"
 #include "GLSLShader.h"
 
 OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600) { }
