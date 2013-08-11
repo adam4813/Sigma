@@ -5,13 +5,14 @@
 in  vec3 in_Position;
 in  vec3 in_Color;
 uniform  vec2 in_Offset;
+uniform  mat4 in_VP; // Just the View and Projection matrix (no need for a model in sprite drawing)
 out vec3 ex_Color;
  
 void main(void)
 {
 	in_Position.x += in_Offset.x;
 	in_Position.y += in_Offset.y;
-	gl_Position.xyz = in_Position;
-	gl_Position.w = 1.0;
+	vec4 v = vec4(in_Position,1);
+	gl_Position = in_VP * v;
         ex_Color = in_Color;
 }

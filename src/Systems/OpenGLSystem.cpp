@@ -27,11 +27,17 @@ IComponent* OpenGLSystem::Factory(const std::string type, const unsigned int ent
 }
 
 void OpenGLSystem::Update(const float delta) {
+	// Set up the scene to a "clean" state.
 	glClearColor (0.0f,0.0f,1.0f,0.0f);
 	glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window  
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
 	GLSprite::shader.Use();
+
+	// Set the ViewProjection matrix to be used in the shader.
+	glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_VP"), 1, GL_FALSE, &GetVPMatrix()[0][0]);
+
+	// Loop through and draw each component.
 	for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {
 		for (auto vecitr = mapitr->second.begin(); vecitr < mapitr->second.end(); ++vecitr) {
 			try {
@@ -130,5 +136,23 @@ const int* OpenGLSystem::Start(HWND hwnd) {
 	// Now that GL is up and running load the shaders
 	GLSprite::LoadShader();
 
+	this->CameraMatrix = glm::lookAt(
+		glm::vec3(4,3,3),
+		glm::vec3(0,0,0),
+		glm::vec3(0,1,0)
+		);
+
+	// Generates a really hard-to-read matrix, but a normal, standard 4x4 matrix nonetheless
+	this->projectionMatrix = glm::perspective(
+		45.0f,
+		4.0f / 3.0f,
+		0.1f,
+		100.0f
+		);
+
 	return OpenGLVersion;
+}
+
+glm::mat4 OpenGLSystem::GetVPMatrix() {
+	return this->projectionMatrix * this->CameraMatrix;;
 }

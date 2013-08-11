@@ -7,6 +7,8 @@
 
 #include "GL/glew.h"
 #include "GL/wglew.h"
+#include "glm/glm.hpp"
+#include "glm/ext.hpp"
 
 class OpenGLSystem : public ISystem {
 public:
@@ -52,6 +54,7 @@ public:
 	 */
 	IComponent* GetComponent(int entityID);
 
+	glm::mat4 GetVPMatrix();
 
 	SceneManager* GetScene();
 private:
@@ -67,4 +70,7 @@ private:
 	GLuint m_vaoID[2]; // two vertex array objects, one for each drawn object
 	GLuint m_vboID[3]; // three VBOs
 	int OpenGLVersion[2];
+
+	glm::mat4 CameraMatrix;
+	glm::mat4 projectionMatrix;
 };
