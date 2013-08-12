@@ -2,7 +2,7 @@
 #include "../Components/GLSprite.h"
 #include "GLSLShader.h"
 
-OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600) { }
+OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumulator(0.0) { }
 
 OpenGLSystem::~OpenGLSystem() {
 	for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {
@@ -20,44 +20,52 @@ OpenGLSystem::~OpenGLSystem() {
 IComponent* OpenGLSystem::Factory(const std::string type, const unsigned int entityID) {
 	if (type == "GLSprite") {
 		GLSprite* spr = GLSprite::Factory(entityID);
+		if (entityID == 2) {
+			spr->OffsetX(2);
+			spr->OffsetY(2);
+		}
 		this->components[entityID].push_back(spr);
 		return spr;
 	}
 	return nullptr;
 }
 
-void OpenGLSystem::Update(const float delta) {
-	// Set up the scene to a "clean" state.
-	glClearColor (0.0f,0.0f,1.0f,0.0f);
-	glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window  
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
+void OpenGLSystem::Update(const double delta) {
+	this->deltaAccumulator += delta;
+	TEST_MoveComponents(delta);
+	// Check if the deltaAccumulator is greater than 1/60 of a second.
+	if (deltaAccumulator > 16.7) {
+		// Set up the scene to a "clean" state.
+		glClearColor (0.0f,0.0f,1.0f,0.0f);
+		glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window  
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
-	GLSprite::shader.Use();
+		GLSprite::shader.Use();
 
-	// Set the ViewProjection matrix to be used in the shader.
-	glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_VP"), 1, GL_FALSE, &GetVPMatrix()[0][0]);
+		// Set the ViewProjection matrix to be used in the shader.
+		glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_VP"), 1, GL_FALSE, &GetVPMatrix()[0][0]);
 
-	// Loop through and draw each component.
-	for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {
-		for (auto vecitr = mapitr->second.begin(); vecitr < mapitr->second.end(); ++vecitr) {
-			try {
-				GLSprite* sprite = dynamic_cast<GLSprite*>(*vecitr);
-				sprite->OffsetX(0.05f);
-				sprite->OffsetY(0.05f);
-				glBindVertexArray(sprite->Vao());
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite->ElemBuf());
-				glUniform2d(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Offset"), sprite->OffsetX(), sprite->OffsetY());
-				glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, (void*)0);
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
-				glBindVertexArray(0);
-			} catch (std::bad_cast b) {
+		// Loop through and draw each component.
+		for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {
+			for (auto vecitr = mapitr->second.begin(); vecitr < mapitr->second.end(); ++vecitr) {
+				try {
+					GLSprite* sprite = dynamic_cast<GLSprite*>(*vecitr);
+					glBindVertexArray(sprite->Vao());
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite->ElemBuf());
+					glUniform2d(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Offset"), sprite->OffsetX(), sprite->OffsetY());
+					glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, (void*)0);
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+					glBindVertexArray(0);
+				} catch (std::bad_cast b) {
 
+				}
 			}
 		}
-	}
-	GLSprite::shader.UnUse();
+		GLSprite::shader.UnUse();
 
-	SwapBuffers(hdc); // Swap buffers so we can see our rendering  
+		SwapBuffers(hdc); // Swap buffers so we can see our rendering.
+		this->deltaAccumulator = 0.0;
+	}
 }
 
 IComponent* OpenGLSystem::GetComponent(int entityID) {
@@ -136,14 +144,14 @@ const int* OpenGLSystem::Start(HWND hwnd) {
 	// Now that GL is up and running load the shaders
 	GLSprite::LoadShader();
 
-	this->CameraMatrix = glm::lookAt(
+	this->DefaultViewMatrix = glm::lookAt(
 		glm::vec3(4,3,3),
 		glm::vec3(0,0,0),
 		glm::vec3(0,1,0)
 		);
 
 	// Generates a really hard-to-read matrix, but a normal, standard 4x4 matrix nonetheless
-	this->projectionMatrix = glm::perspective(
+	this->ProjectionMatrix = glm::perspective(
 		45.0f,
 		4.0f / 3.0f,
 		0.1f,
@@ -154,5 +162,27 @@ const int* OpenGLSystem::Start(HWND hwnd) {
 }
 
 glm::mat4 OpenGLSystem::GetVPMatrix() {
-	return this->projectionMatrix * this->CameraMatrix;;
+	return this->ProjectionMatrix * glm::inverse(this->ViewMatrix);
+}
+
+glm::vec3 camPos(0,0,-2);
+//glm::vec3 camDir(0,0,1);
+glm::mat4 camDirMat(1.0f);
+
+void OpenGLSystem::TEST_MoveComponents(const double delta) {
+	for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {
+		for (auto vecitr = mapitr->second.begin(); vecitr < mapitr->second.end(); ++vecitr) {
+			try {
+				GLSprite* sprite = dynamic_cast<GLSprite*>(*vecitr);
+				//sprite->OffsetX(1 * delta / 1000);
+				//sprite->OffsetY(1 * delta / 1000);
+			} catch (std::bad_cast b) {
+
+			}
+		}
+	}
+
+	camPos += glm::vec3(0.0f * (float)delta / 1000.0f, 0.0f * (float)delta / 1000.0f, 0.0f * (float)delta / 1000.0f);
+	camDirMat = glm::rotate(camDirMat, 45.0f * (float)delta / 1000.0f, glm::vec3(0.0f,1.0f,0.0f));
+	this->ViewMatrix = glm::lookAt(camPos, glm::vec3(camDirMat * glm::vec4(camPos, 1.0f)), glm::vec3(0,1,0));
 }

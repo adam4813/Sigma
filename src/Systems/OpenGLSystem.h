@@ -44,7 +44,7 @@ public:
 	 * \param[in] const float delta The change in time since the last update
 	 * \returns   void
 	 */
-	void Update(const float delta);
+	void Update(const double delta);
 
 	/**
 	 * \brief Retrieve the component that belongs to the given entity ID
@@ -57,6 +57,8 @@ public:
 	glm::mat4 GetVPMatrix();
 
 	SceneManager* GetScene();
+
+	void TEST_MoveComponents(const double delta); // TODO: Remove when a physics system is availbale.
 private:
 	SceneManager scene;
 
@@ -71,6 +73,9 @@ private:
 	GLuint m_vboID[3]; // three VBOs
 	int OpenGLVersion[2];
 
-	glm::mat4 CameraMatrix;
-	glm::mat4 projectionMatrix;
+	glm::mat4 ViewMatrix;
+	glm::mat4 DefaultViewMatrix;
+	glm::mat4 ProjectionMatrix;
+
+	double deltaAccumulator;
 };
