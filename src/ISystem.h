@@ -26,7 +26,7 @@ public:
 	 * \returns   void 
 	 * \exception  
 	 */
-	virtual void Update(const float delta) = 0;
+	virtual void Update(const double delta) = 0;
 
 	/**
 	 * \brief Retrieve the component that belongs to the given entity ID

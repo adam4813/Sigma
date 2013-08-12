@@ -47,6 +47,27 @@ bool win32::MessageLoop() {
 			DispatchMessage(&msg);
 		}
 	}
-	Sleep(100);
+	Sleep(1);
 	return true;
+}
+
+bool win32::SetupTimer() {
+	LARGE_INTEGER li;
+	if(!QueryPerformanceFrequency(&li)) {
+		return false;
+	}
+
+	this->frequency = static_cast<double>(li.QuadPart)/1000.0;
+
+	QueryPerformanceCounter(&li);
+	this->lastTime = li.QuadPart;
+	return true;
+}
+
+double win32::GetDeltaTime() {
+	LARGE_INTEGER li;
+	QueryPerformanceCounter(&li);
+	double delta = static_cast<double>(li.QuadPart - this->lastTime);
+	this->lastTime = li.QuadPart;
+	return delta/this->frequency;
 }
