@@ -144,12 +144,6 @@ const int* OpenGLSystem::Start(HWND hwnd) {
 	// Now that GL is up and running load the shaders
 	GLSprite::LoadShader();
 
-	this->DefaultViewMatrix = glm::lookAt(
-		glm::vec3(4,3,3),
-		glm::vec3(0,0,0),
-		glm::vec3(0,1,0)
-		);
-
 	// Generates a really hard-to-read matrix, but a normal, standard 4x4 matrix nonetheless
 	this->ProjectionMatrix = glm::perspective(
 		45.0f,
@@ -162,12 +156,9 @@ const int* OpenGLSystem::Start(HWND hwnd) {
 }
 
 glm::mat4 OpenGLSystem::GetVPMatrix() {
-	return this->ProjectionMatrix * glm::inverse(this->ViewMatrix);
+	return this->ProjectionMatrix * this->camera.GetViewInverse();
 }
 
-glm::vec3 camPos(0,0,-2);
-//glm::vec3 camDir(0,0,1);
-glm::mat4 camDirMat(1.0f);
 
 void OpenGLSystem::TEST_MoveComponents(const double delta) {
 	for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {
@@ -182,7 +173,7 @@ void OpenGLSystem::TEST_MoveComponents(const double delta) {
 		}
 	}
 
-	camPos += glm::vec3(0.0f * (float)delta / 1000.0f, 0.0f * (float)delta / 1000.0f, 0.0f * (float)delta / 1000.0f);
-	camDirMat = glm::rotate(camDirMat, 45.0f * (float)delta / 1000.0f, glm::vec3(0.0f,1.0f,0.0f));
-	this->ViewMatrix = glm::lookAt(camPos, glm::vec3(camDirMat * glm::vec4(camPos, 1.0f)), glm::vec3(0,1,0));
+	this->camera.Rotate(glm::vec3(10.0f * (float)delta / 10.0f,0.0f,0.0f));
+	this->camera.Translate(glm::vec3(0.0f,0.0f,1.0f * (float)delta / 1000.0f));
+	this->camera.UpdateViewMatrix();
 }

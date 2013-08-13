@@ -10,6 +10,51 @@
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 
+struct View {
+	glm::mat4 ViewMatrix;
+	glm::vec3 translation;
+	glm::quat orientation;
+
+	View() {
+		Translate(0.0f,0.0f,10.0f);
+		this->orientation = glm::quat(0.0f,0.0f,1.0f,0.0f);
+		Rotate(0.0f,0.0f,0.0f);
+		this->ViewMatrix = glm::translate(glm::mat4_cast(this->orientation), this->translation);
+	}
+
+	glm::mat4 GetViewInverse() {
+		return glm::inverse(this->ViewMatrix);
+	}
+
+	void UpdateViewMatrix() {
+		this->ViewMatrix = glm::translate(glm::mat4_cast(this->orientation), this->translation);
+	}
+
+	void Translate(float x, float y, float z) {
+		this->translation += glm::vec3(x,y,z);
+	}
+
+	void Translate(glm::vec3 trans) {
+		this->translation += trans;
+	}
+
+	void Rotate(float x, float y, float z) {
+		glm::quat qX = glm::angleAxis(x * 3.14159f/180.0f, 1.0f,0.0f,0.0f);
+		glm::quat qY = glm::angleAxis(y * 3.14159f/180.0f, 0.0f,1.0f,0.0f);
+		glm::quat qZ = glm::angleAxis(z * 3.14159f/180.0f, 0.0f,0.0f,1.0f);
+		glm::quat change = qX * qY * qZ;
+		this->orientation = change * this->orientation;
+	}
+	
+	void Rotate(glm::vec3 rot) {
+		glm::quat qX = glm::angleAxis(rot.x * 3.14159f/180.0f, 1.0f,0.0f,0.0f);
+		glm::quat qY = glm::angleAxis(rot.y * 3.14159f/180.0f, 0.0f,1.0f,0.0f);
+		glm::quat qZ = glm::angleAxis(rot.z * 3.14159f/180.0f, 0.0f,0.0f,1.0f);
+		glm::quat change = qX * qY * qZ;
+		this->orientation = change * this->orientation;
+	}
+};
+
 class OpenGLSystem : public ISystem {
 public:
 	OpenGLSystem();
@@ -73,9 +118,8 @@ private:
 	GLuint m_vboID[3]; // three VBOs
 	int OpenGLVersion[2];
 
-	glm::mat4 ViewMatrix;
-	glm::mat4 DefaultViewMatrix;
 	glm::mat4 ProjectionMatrix;
+	View camera;
 
 	double deltaAccumulator;
 };
