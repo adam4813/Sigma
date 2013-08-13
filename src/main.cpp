@@ -6,7 +6,6 @@
 int main(int argCount, char **argValues) {
 	OpenGLSystem glsys;
 	win32 win;
-	win.SetupTimer();
 	const int* version = glsys.Start(win.CreateWin32Window());
 	if (version[0] == -1) {
 		std::cout<< "Error starting OpenGL!"<<std::endl;
@@ -16,6 +15,7 @@ int main(int argCount, char **argValues) {
 	glsys.Factory("GLSprite", 1);
 	glsys.Factory("GLSprite", 2);
 
+	win.SetupTimer();
 	while (win.MessageLoop()) {
 		glsys.Update(win.GetDeltaTime()); // Render our scene (which also handles swapping of buffers)
 	}
