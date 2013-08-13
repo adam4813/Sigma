@@ -61,10 +61,10 @@ GLSprite* GLSprite::Factory(int entityID) {
 	GLSprite* spr = new GLSprite(entityID);
 
 	static const GLfloat vert[] = {
-		-0.5f, -0.5f,
-		0.5f, -0.5f,
-		-0.5f,  0.5f,
-		0.5f,  0.5f
+		-5.0f, 0.0f, 5.0f,
+		5.0f, 0.0f, 5.0f,
+		-5.0f,  0.0f, -5.0f,
+		5.0f,  0.0f, -5.0f
 	};
 
 	static const GLfloat col[] = {
@@ -84,7 +84,7 @@ GLSprite* GLSprite::Factory(int entityID) {
 	glBindBuffer(GL_ARRAY_BUFFER, vertbuf);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vert), vert, GL_STATIC_DRAW);
 	GLint posLocation = glGetAttribLocation(GLSprite::shader.GetProgram(), "in_Position");
-	glVertexAttribPointer(posLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(posLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(posLocation);
 
 	GLuint elembuf;
