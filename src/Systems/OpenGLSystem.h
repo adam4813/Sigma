@@ -16,13 +16,13 @@ struct View {
 	glm::quat orientation;
 
 	View() {
-		Translate(0.0f,0.0f,10.0f);
+		this->translation = glm::vec3(0.0f,0.0f,0.0f);
 		this->orientation = glm::quat(0.0f,0.0f,1.0f,0.0f);
-		Rotate(0.0f,0.0f,0.0f);
 		this->ViewMatrix = glm::translate(glm::mat4_cast(this->orientation), this->translation);
 	}
 
 	glm::mat4 GetViewInverse() {
+		glm::normalize(this->orientation);
 		return glm::inverse(this->ViewMatrix);
 	}
 
@@ -31,11 +31,13 @@ struct View {
 	}
 
 	void Translate(float x, float y, float z) {
-		this->translation += glm::vec3(x,y,z);
+		this->translation.x += x;
+		this->translation.y += y;
+		this->translation.z += z;
 	}
 
 	void Translate(glm::vec3 trans) {
-		this->translation += trans;
+		Translate(trans.x, trans.y, trans.z);
 	}
 
 	void Rotate(float x, float y, float z) {
@@ -47,11 +49,7 @@ struct View {
 	}
 	
 	void Rotate(glm::vec3 rot) {
-		glm::quat qX = glm::angleAxis(rot.x * 3.14159f/180.0f, 1.0f,0.0f,0.0f);
-		glm::quat qY = glm::angleAxis(rot.y * 3.14159f/180.0f, 0.0f,1.0f,0.0f);
-		glm::quat qZ = glm::angleAxis(rot.z * 3.14159f/180.0f, 0.0f,0.0f,1.0f);
-		glm::quat change = qX * qY * qZ;
-		this->orientation = change * this->orientation;
+		Rotate(rot.x, rot.y, rot.z);
 	}
 };
 

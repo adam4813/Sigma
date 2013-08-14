@@ -152,6 +152,12 @@ const int* OpenGLSystem::Start(HWND hwnd) {
 		100.0f
 		);
 
+	// Set options for depth tests.
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
+	this->camera.Translate(0.0f,0.0f,10.0f);
+
 	return OpenGLVersion;
 }
 
@@ -165,15 +171,15 @@ void OpenGLSystem::TEST_MoveComponents(const double delta) {
 		for (auto vecitr = mapitr->second.begin(); vecitr < mapitr->second.end(); ++vecitr) {
 			try {
 				GLSprite* sprite = dynamic_cast<GLSprite*>(*vecitr);
-				//sprite->OffsetX(1 * delta / 1000);
-				//sprite->OffsetY(1 * delta / 1000);
+				sprite->OffsetX(1 * delta / 1000);
+				sprite->OffsetY(1 * delta / 1000);
 			} catch (std::bad_cast b) {
 
 			}
 		}
 	}
 
-	this->camera.Rotate(glm::vec3(10.0f * (float)delta / 10.0f,0.0f,0.0f));
+	this->camera.Rotate(glm::vec3(90.0f * (float)delta / 100.0f,0.0f,0.0f));
 	this->camera.Translate(glm::vec3(0.0f,0.0f,1.0f * (float)delta / 1000.0f));
 	this->camera.UpdateViewMatrix();
 }
