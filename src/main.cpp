@@ -16,8 +16,34 @@ int main(int argCount, char **argValues) {
 	glsys.Factory("GLSprite", 2);
 
 	win.SetupTimer();
+	double delta;
 	while (win.MessageLoop()) {
-		glsys.Update(win.GetDeltaTime()); // Render our scene (which also handles swapping of buffers)
+		delta = win.GetDeltaTime();
+		glsys.Update(delta); // Render our scene (which also handles swapping of buffers)
+
+		// Translation keys
+		if (win.KeyDown('W')) { // Forward
+			glsys.Translate(0.0f,0.0f,10.0f * (float)delta / 1000.0f);
+		} else if (win.KeyDown('S')) { // Backward
+			glsys.Translate(0.0f,0.0f,-10.0f * (float)delta / 1000.0f);
+		}
+		if (win.KeyDown('A')) { 
+			//glsys.Translate(-10.0f * (float)delta / 1000.0f,0.0f,0.0f); // Strafe Left
+			glsys.Rotate(0.0f,-90.0f * (float)delta / 1000.0f,0.0f); // Yaw left.
+		} else if (win.KeyDown('D')) {
+			//glsys.Translate(10.0f * (float)delta / 1000.0f,0.0f,0.0f); // Strafe Right
+			glsys.Rotate(0.0f,90.0f * (float)delta / 1000.0f,0.0f); // Yaw right.
+		}
+		if (win.KeyDown('E')) { // Up
+			glsys.Translate(0.0f,10.0f * (float)delta / 1000.0f,0.0f);
+		} else if (win.KeyDown('C')) { // Down
+			glsys.Translate(0.0f,-10.0f * (float)delta / 1000.0f,0.0f);
+		}
+		if (win.KeyDown('Q')) { // Pitch Up
+			glsys.Rotate(90.0f * (float)delta / 1000.0f,0.0f,0.0f);
+		} else if (win.KeyDown('Z')) { // Pitch Down
+			glsys.Rotate(-90.0f * (float)delta / 1000.0f,0.0f,0.0f);
+		}
 	}
 
 	return 0;

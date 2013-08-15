@@ -71,3 +71,8 @@ double win32::GetDeltaTime() {
 	this->lastTime = li.QuadPart;
 	return delta/this->frequency;
 }
+
+bool win32::KeyDown(int key) {
+	short k = GetKeyState(key);
+	return (k & 0x80) > 0 ? true : false;
+}

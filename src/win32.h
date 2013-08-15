@@ -13,6 +13,8 @@ public:
 
 	double GetDeltaTime();
 
+	bool KeyDown(int key);
+
 private:
 
 	HINSTANCE hInstance; // The HINSTANCE of this application  
