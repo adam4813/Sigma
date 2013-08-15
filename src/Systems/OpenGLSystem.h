@@ -26,7 +26,7 @@ struct View {
 		this->UP_VECTOR = glm::vec3(0.0f,1.0f,.0f);
 		this->RIGHT_VECTOR = glm::cross(FORWARD_VECTOR, UP_VECTOR);
 
-		this->position = glm::vec3(4.0f,3.0f,-10.0f);
+		this->position = glm::vec3(0.0f,0.0f,0.0f);
 		this->orientation = glm::quat(0.0f,0.0f,1.0f,0.0f);
 		this->ViewMatrix = glm::lookAt(this->position, this->position + FORWARD_VECTOR * this->orientation, UP_VECTOR * this->orientation);
 	}

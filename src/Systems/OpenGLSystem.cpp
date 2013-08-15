@@ -157,6 +157,8 @@ const int* OpenGLSystem::Start(HWND hwnd) {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
+	this->camera.Translate(4.0f,3.0f,-10.f);
+
 	return OpenGLVersion;
 }
 
