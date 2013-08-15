@@ -32,7 +32,7 @@ IComponent* OpenGLSystem::Factory(const std::string type, const unsigned int ent
 
 void OpenGLSystem::Update(const double delta) {
 	this->deltaAccumulator += delta;
-	TEST_MoveComponents(delta);
+	this->camera.UpdateViewMatrix();
 	// Check if the deltaAccumulator is greater than 1/60 of a second.
 	if (deltaAccumulator > 16.7) {
 		// Set up the scene to a "clean" state.
@@ -156,30 +156,17 @@ const int* OpenGLSystem::Start(HWND hwnd) {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	this->camera.Translate(0.0f,0.0f,10.0f);
-
 	return OpenGLVersion;
 }
 
 glm::mat4 OpenGLSystem::GetVPMatrix() {
-	return this->ProjectionMatrix * this->camera.GetViewInverse();
+	return this->ProjectionMatrix * this->camera.ViewMatrix;
 }
 
+void OpenGLSystem::Translate(float x, float y, float z) {
+	this->camera.Translate(x,y,z);
+}
 
-void OpenGLSystem::TEST_MoveComponents(const double delta) {
-	for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {
-		for (auto vecitr = mapitr->second.begin(); vecitr < mapitr->second.end(); ++vecitr) {
-			try {
-				GLSprite* sprite = dynamic_cast<GLSprite*>(*vecitr);
-				sprite->OffsetX(1 * delta / 1000);
-				sprite->OffsetY(1 * delta / 1000);
-			} catch (std::bad_cast b) {
-
-			}
-		}
-	}
-
-	this->camera.Rotate(glm::vec3(90.0f * (float)delta / 100.0f,0.0f,0.0f));
-	this->camera.Translate(glm::vec3(0.0f,0.0f,1.0f * (float)delta / 1000.0f));
-	this->camera.UpdateViewMatrix();
+void OpenGLSystem::Rotate(float x, float y, float z) {
+	this->camera.Rotate(x,y,z);
 }

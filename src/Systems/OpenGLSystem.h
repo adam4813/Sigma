@@ -11,29 +11,35 @@
 #include "glm/ext.hpp"
 
 struct View {
+
+
 	glm::mat4 ViewMatrix;
-	glm::vec3 translation;
+	glm::vec3 position;
 	glm::quat orientation;
 
-	View() {
-		this->translation = glm::vec3(0.0f,0.0f,0.0f);
-		this->orientation = glm::quat(0.0f,0.0f,1.0f,0.0f);
-		this->ViewMatrix = glm::translate(glm::mat4_cast(this->orientation), this->translation);
-	}
+	glm::vec3 FORWARD_VECTOR;
+	glm::vec3 UP_VECTOR;
+	glm::vec3 RIGHT_VECTOR;
 
-	glm::mat4 GetViewInverse() {
-		glm::normalize(this->orientation);
-		return glm::inverse(this->ViewMatrix);
+	View() {
+		this->FORWARD_VECTOR = glm::vec3(0.0f,0.0f,-1.0f);
+		this->UP_VECTOR = glm::vec3(0.0f,1.0f,.0f);
+		this->RIGHT_VECTOR = glm::cross(FORWARD_VECTOR, UP_VECTOR);
+
+		this->position = glm::vec3(4.0f,3.0f,-10.0f);
+		this->orientation = glm::quat(0.0f,0.0f,1.0f,0.0f);
+		this->ViewMatrix = glm::mat4_cast(this->orientation) * this->ViewMatrix;
 	}
 
 	void UpdateViewMatrix() {
-		this->ViewMatrix = glm::translate(glm::mat4_cast(this->orientation), this->translation);
+		glm::normalize(this->orientation);
+		this->ViewMatrix = glm::lookAt(this->position, this->position + FORWARD_VECTOR * this->orientation, UP_VECTOR);
 	}
 
 	void Translate(float x, float y, float z) {
-		this->translation.x += x;
-		this->translation.y += y;
-		this->translation.z += z;
+		this->position += (FORWARD_VECTOR * z) * this->orientation;
+		this->position += (UP_VECTOR * y) * this->orientation;
+		this->position += (RIGHT_VECTOR * x) * this->orientation;
 	}
 
 	void Translate(glm::vec3 trans) {
@@ -41,9 +47,9 @@ struct View {
 	}
 
 	void Rotate(float x, float y, float z) {
-		glm::quat qX = glm::angleAxis(x * 3.14159f/180.0f, 1.0f,0.0f,0.0f);
-		glm::quat qY = glm::angleAxis(y * 3.14159f/180.0f, 0.0f,1.0f,0.0f);
-		glm::quat qZ = glm::angleAxis(z * 3.14159f/180.0f, 0.0f,0.0f,1.0f);
+		glm::quat qX = glm::angleAxis(x, 1.0f,0.0f,0.0f);
+		glm::quat qY = glm::angleAxis(y, 0.0f,1.0f,0.0f);
+		glm::quat qZ;// = glm::angleAxis(z, 0.0f,0.0f,1.0f); // TODO: Fix roll rotation.
 		glm::quat change = qX * qY * qZ;
 		this->orientation = change * this->orientation;
 	}
@@ -100,6 +106,10 @@ public:
 	glm::mat4 GetVPMatrix();
 
 	SceneManager* GetScene();
+
+	void Translate(float x, float y, float z);
+
+	void Rotate(float x, float y, float z);
 
 	void TEST_MoveComponents(const double delta); // TODO: Remove when a physics system is availbale.
 private:
