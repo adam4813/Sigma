@@ -22,27 +22,36 @@ int main(int argCount, char **argValues) {
 		glsys.Update(delta); // Render our scene (which also handles swapping of buffers)
 
 		// Translation keys
-		if (win.KeyDown('W')) { // Forward
+		if (win.KeyDown('W')) { // Move forward
 			glsys.Translate(0.0f,0.0f,10.0f * (float)delta / 1000.0f);
-		} else if (win.KeyDown('S')) { // Backward
+		} else if (win.KeyDown('S')) { // Move backward
 			glsys.Translate(0.0f,0.0f,-10.0f * (float)delta / 1000.0f);
 		}
 		if (win.KeyDown('A')) { 
-			//glsys.Translate(-10.0f * (float)delta / 1000.0f,0.0f,0.0f); // Strafe Left
 			glsys.Rotate(0.0f,-90.0f * (float)delta / 1000.0f,0.0f); // Yaw left.
 		} else if (win.KeyDown('D')) {
-			//glsys.Translate(10.0f * (float)delta / 1000.0f,0.0f,0.0f); // Strafe Right
 			glsys.Rotate(0.0f,90.0f * (float)delta / 1000.0f,0.0f); // Yaw right.
 		}
-		if (win.KeyDown('E')) { // Up
+		if (win.KeyDown('F')) { 
+			glsys.Translate(-10.0f * (float)delta / 1000.0f,0.0f,0.0f); // Strafe Left
+		} else if (win.KeyDown('G')) {
+			glsys.Translate(10.0f * (float)delta / 1000.0f,0.0f,0.0f); // Strafe Right
+		}
+		if (win.KeyDown('E')) { // Move up
 			glsys.Translate(0.0f,10.0f * (float)delta / 1000.0f,0.0f);
-		} else if (win.KeyDown('C')) { // Down
+		} else if (win.KeyDown('C')) { // Move down
 			glsys.Translate(0.0f,-10.0f * (float)delta / 1000.0f,0.0f);
 		}
 		if (win.KeyDown('Q')) { // Pitch Up
-			glsys.Rotate(90.0f * (float)delta / 1000.0f,0.0f,0.0f);
-		} else if (win.KeyDown('Z')) { // Pitch Down
 			glsys.Rotate(-90.0f * (float)delta / 1000.0f,0.0f,0.0f);
+		} else if (win.KeyDown('Z')) { // Pitch Down
+			glsys.Rotate(90.0f * (float)delta / 1000.0f,0.0f,0.0f);
+		}
+
+		if (win.KeyDown('R')) { // Roll left
+			glsys.Rotate(0.0f,0.0f,-90.0f * (float)delta / 1000.0f);
+		} else if (win.KeyDown('T')) { // Roll right
+			glsys.Rotate(0.0f,0.0f,90.0f * (float)delta / 1000.0f);
 		}
 	}
 

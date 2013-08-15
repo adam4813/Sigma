@@ -43,7 +43,8 @@ void OpenGLSystem::Update(const double delta) {
 		GLSprite::shader.Use();
 
 		// Set the ViewProjection matrix to be used in the shader.
-		glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_VP"), 1, GL_FALSE, &GetVPMatrix()[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_View"), 1, GL_FALSE, &this->camera.ViewMatrix[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
 
 		// Loop through and draw each component.
 		for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {

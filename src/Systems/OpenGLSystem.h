@@ -28,12 +28,12 @@ struct View {
 
 		this->position = glm::vec3(4.0f,3.0f,-10.0f);
 		this->orientation = glm::quat(0.0f,0.0f,1.0f,0.0f);
-		this->ViewMatrix = glm::mat4_cast(this->orientation) * this->ViewMatrix;
+		this->ViewMatrix = glm::lookAt(this->position, this->position + FORWARD_VECTOR * this->orientation, UP_VECTOR * this->orientation);
 	}
 
 	void UpdateViewMatrix() {
 		glm::normalize(this->orientation);
-		this->ViewMatrix = glm::lookAt(this->position, this->position + FORWARD_VECTOR * this->orientation, UP_VECTOR);
+		this->ViewMatrix = glm::lookAt(this->position, this->position + FORWARD_VECTOR * this->orientation, UP_VECTOR * this->orientation);
 	}
 
 	void Translate(float x, float y, float z) {
@@ -49,7 +49,7 @@ struct View {
 	void Rotate(float x, float y, float z) {
 		glm::quat qX = glm::angleAxis(x, 1.0f,0.0f,0.0f);
 		glm::quat qY = glm::angleAxis(y, 0.0f,1.0f,0.0f);
-		glm::quat qZ;// = glm::angleAxis(z, 0.0f,0.0f,1.0f); // TODO: Fix roll rotation.
+		glm::quat qZ = glm::angleAxis(z, 0.0f,0.0f,1.0f); // TODO: Fix roll rotation.
 		glm::quat change = qX * qY * qZ;
 		this->orientation = change * this->orientation;
 	}
