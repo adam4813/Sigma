@@ -1,11 +1,14 @@
 #include "OpenGLSystem.h"
-#include "../Components/GLSprite.h"
 #include "GLSLShader.h"
 #include "GLSixDOFView.h"
+#include "../Components/GLSprite.h"
+#include "../Components/GLIcoSphere.h"
 
 OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumulator(0.0) {
 	this->view = new GLSixDOFView(); 
 }
+
+GLIcoSphere* sphere;
 
 OpenGLSystem::~OpenGLSystem() {
 	delete this->view;
@@ -30,6 +33,11 @@ IComponent* OpenGLSystem::Factory(const std::string type, const unsigned int ent
 		}
 		this->components[entityID].push_back(spr);
 		return spr;
+	} else if (type == "GLIcoSphere") {
+		sphere = GLIcoSphere::Factory(entityID);
+		sphere->Transform().Scale(100.0f,100.0f,100.0f);
+		sphere->Transform().Translate(0.0f,0.0f,1000.0f);
+		return sphere;
 	}
 	return nullptr;
 }
@@ -40,21 +48,19 @@ void OpenGLSystem::Update(const double delta) {
 	// Check if the deltaAccumulator is greater than 1/60 of a second.
 	if (deltaAccumulator > 16.7) {
 		// Set up the scene to a "clean" state.
-		glClearColor (0.0f,0.0f,1.0f,0.0f);
+		glClearColor(0.0f,0.0f,1.0f,0.0f);
 		glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window  
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
 		GLSprite::shader.Use();
-
 		// Set the ViewProjection matrix to be used in the shader.
 		glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_View"), 1, GL_FALSE, &this->view->ViewMatrix[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
-
 		// Loop through and draw each component.
 		for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {
 			for (auto vecitr = mapitr->second.begin(); vecitr < mapitr->second.end(); ++vecitr) {
 				try {
-					GLSprite* sprite = dynamic_cast<GLSprite*>(*vecitr);
+					GLSprite* sprite = static_cast<GLSprite*>(*vecitr);
 					glBindVertexArray(sprite->Vao());
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite->ElemBuf());
 					glUniform2d(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Offset"), sprite->OffsetX(), sprite->OffsetY());
@@ -66,7 +72,20 @@ void OpenGLSystem::Update(const double delta) {
 				}
 			}
 		}
+		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 		GLSprite::shader.UnUse();
+		GLIcoSphere::shader.Use();
+		sphere->Transform().Rotate(0.0f,0.1f,0.0f);
+		glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &sphere->Transform().ModelMatrix()[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_View"), 1, GL_FALSE, &this->view->ViewMatrix[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
+		glBindVertexArray(sphere->Vao());
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphere->ElemBuf());
+		glDrawElements(GL_TRIANGLES, sphere->NumberElements(), GL_UNSIGNED_SHORT, (void*)0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+		glBindVertexArray(0);
+		GLIcoSphere::shader.UnUse();
+		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 		SwapBuffers(hdc); // Swap buffers so we can see our rendering.
 		this->deltaAccumulator = 0.0;
@@ -148,13 +167,14 @@ const int* OpenGLSystem::Start(HWND hwnd) {
 
 	// Now that GL is up and running load the shaders
 	GLSprite::LoadShader();
+	GLIcoSphere::LoadShader();
 
 	// Generates a really hard-to-read matrix, but a normal, standard 4x4 matrix nonetheless
 	this->ProjectionMatrix = glm::perspective(
 		45.0f,
 		4.0f / 3.0f,
 		0.1f,
-		100.0f
+		10000.0f
 		);
 
 	// Set options for depth tests.
