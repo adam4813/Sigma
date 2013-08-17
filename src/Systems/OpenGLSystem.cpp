@@ -53,7 +53,10 @@ void OpenGLSystem::Update(const double delta) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
 		GLSprite::shader.Use();
+		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		// Set the ViewProjection matrix to be used in the shader.
+		glm::mat4 ModelMatrix(1.0f);
+		glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &ModelMatrix[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_View"), 1, GL_FALSE, &this->view->ViewMatrix[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
 		// Loop through and draw each component.
@@ -72,8 +75,8 @@ void OpenGLSystem::Update(const double delta) {
 				}
 			}
 		}
-		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 		GLSprite::shader.UnUse();
+		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 		GLIcoSphere::shader.Use();
 		sphere->Transform().Rotate(0.0f,0.1f,0.0f);
 		glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &sphere->Transform().ModelMatrix()[0][0]);
