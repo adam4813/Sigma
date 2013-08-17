@@ -1,10 +1,14 @@
 #include "OpenGLSystem.h"
 #include "../Components/GLSprite.h"
 #include "GLSLShader.h"
+#include "GLSixDOFView.h"
 
-OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumulator(0.0) { }
+OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumulator(0.0) {
+	this->view = new GLSixDOFView(); 
+}
 
 OpenGLSystem::~OpenGLSystem() {
+	delete this->view;
 	for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {
 		for (auto vecitr = mapitr->second.begin(); vecitr < mapitr->second.end(); ++vecitr) {
 			delete *vecitr;
@@ -32,7 +36,7 @@ IComponent* OpenGLSystem::Factory(const std::string type, const unsigned int ent
 
 void OpenGLSystem::Update(const double delta) {
 	this->deltaAccumulator += delta;
-	this->camera.UpdateViewMatrix();
+	this->view->UpdateViewMatrix();
 	// Check if the deltaAccumulator is greater than 1/60 of a second.
 	if (deltaAccumulator > 16.7) {
 		// Set up the scene to a "clean" state.
@@ -43,7 +47,7 @@ void OpenGLSystem::Update(const double delta) {
 		GLSprite::shader.Use();
 
 		// Set the ViewProjection matrix to be used in the shader.
-		glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_View"), 1, GL_FALSE, &this->camera.ViewMatrix[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_View"), 1, GL_FALSE, &this->view->ViewMatrix[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
 
 		// Loop through and draw each component.
@@ -157,19 +161,15 @@ const int* OpenGLSystem::Start(HWND hwnd) {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	this->camera.Translate(4.0f,3.0f,-10.f);
+	this->view->Move(4.0f,3.0f,-10.f);
 
 	return OpenGLVersion;
 }
 
-glm::mat4 OpenGLSystem::GetVPMatrix() {
-	return this->ProjectionMatrix * this->camera.ViewMatrix;
-}
-
 void OpenGLSystem::Translate(float x, float y, float z) {
-	this->camera.Translate(x,y,z);
+	this->view->Move(x,y,z);
 }
 
 void OpenGLSystem::Rotate(float x, float y, float z) {
-	this->camera.Rotate(x,y,z);
+	this->view->Rotate(x,y,z);
 }

@@ -10,54 +10,7 @@
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 
-struct View {
-
-
-	glm::mat4 ViewMatrix;
-	glm::vec3 position;
-	glm::quat orientation;
-
-	glm::vec3 FORWARD_VECTOR;
-	glm::vec3 UP_VECTOR;
-	glm::vec3 RIGHT_VECTOR;
-
-	View() {
-		this->FORWARD_VECTOR = glm::vec3(0.0f,0.0f,-1.0f);
-		this->UP_VECTOR = glm::vec3(0.0f,1.0f,.0f);
-		this->RIGHT_VECTOR = glm::cross(FORWARD_VECTOR, UP_VECTOR);
-
-		this->position = glm::vec3(0.0f,0.0f,0.0f);
-		this->orientation = glm::quat(0.0f,0.0f,1.0f,0.0f);
-		this->ViewMatrix = glm::lookAt(this->position, this->position + FORWARD_VECTOR * this->orientation, UP_VECTOR * this->orientation);
-	}
-
-	void UpdateViewMatrix() {
-		glm::normalize(this->orientation);
-		this->ViewMatrix = glm::lookAt(this->position, this->position + FORWARD_VECTOR * this->orientation, UP_VECTOR * this->orientation);
-	}
-
-	void Translate(float x, float y, float z) {
-		this->position += (FORWARD_VECTOR * z) * this->orientation;
-		this->position += (UP_VECTOR * y) * this->orientation;
-		this->position += (RIGHT_VECTOR * x) * this->orientation;
-	}
-
-	void Translate(glm::vec3 trans) {
-		Translate(trans.x, trans.y, trans.z);
-	}
-
-	void Rotate(float x, float y, float z) {
-		glm::quat qX = glm::angleAxis(x, 1.0f,0.0f,0.0f);
-		glm::quat qY = glm::angleAxis(y, 0.0f,1.0f,0.0f);
-		glm::quat qZ = glm::angleAxis(z, 0.0f,0.0f,1.0f); // TODO: Fix roll rotation.
-		glm::quat change = qX * qY * qZ;
-		this->orientation = change * this->orientation;
-	}
-	
-	void Rotate(glm::vec3 rot) {
-		Rotate(rot.x, rot.y, rot.z);
-	}
-};
+struct IGLView;
 
 class OpenGLSystem : public ISystem {
 public:
@@ -103,15 +56,11 @@ public:
 	 */
 	IComponent* GetComponent(int entityID);
 
-	glm::mat4 GetVPMatrix();
-
 	SceneManager* GetScene();
 
 	void Translate(float x, float y, float z);
 
 	void Rotate(float x, float y, float z);
-
-	void TEST_MoveComponents(const double delta); // TODO: Remove when a physics system is availbale.
 private:
 	SceneManager scene;
 
@@ -127,7 +76,7 @@ private:
 	int OpenGLVersion[2];
 
 	glm::mat4 ProjectionMatrix;
-	View camera;
+	IGLView* view;
 
 	double deltaAccumulator;
 };
