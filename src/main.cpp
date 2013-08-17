@@ -14,6 +14,7 @@ int main(int argCount, char **argValues) {
 	}
 	glsys.Factory("GLSprite", 1);
 	glsys.Factory("GLSprite", 2);
+	glsys.Factory("GLIcoSphere", 0);
 
 	win.SetupTimer();
 	double delta;
