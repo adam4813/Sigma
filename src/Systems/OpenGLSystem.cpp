@@ -19,17 +19,17 @@ OpenGLSystem::~OpenGLSystem() {
 
 IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
 	if (type == "GLSprite") {
-		GLSprite* spr = GLSprite::Factory(entityID);
+		GLSprite* spr = new GLSprite(entityID);
+		spr->Initialize();
 		if (entityID == 2) {
-			spr->OffsetX(2);
-			spr->OffsetY(2);
+			spr->Transform().Translate(2,2,0);
 		}
-		//this->components[entityID].push_back(spr);
-		//return spr;
+		this->components[entityID].push_back(spr);
+		spr->Transform().Translate(0,0,0);
+		return spr;
 	} else if (type == "GLIcoSphere") {
-		//GLIcoSphere* sphere = GLIcoSphere.Factory(entityID);
 		GLIcoSphere* sphere = new GLIcoSphere(entityID);
-		sphere->Initialize(entityID);
+		sphere->Initialize();
 		float scale = 1.0f;
 		float x = 0.0f;
 		float y = 0.0f;
@@ -80,13 +80,12 @@ bool OpenGLSystem::Update(const double delta) {
 					glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 					GLSprite::shader.Use();
 					glm::mat4 ModelMatrix(1.0f);
-					glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &ModelMatrix[0][0]);
+					glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &sprite->Transform().ModelMatrix()[0][0]);
 					glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_View"), 1, GL_FALSE, &this->view->ViewMatrix[0][0]);
 					glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
 					glBindVertexArray(sprite->Vao());
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite->ElemBuf());
-					glUniform2d(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Offset"), sprite->OffsetX(), sprite->OffsetY());
-					glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, (void*)0);
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite->GetBuffer(sprite->ElemBufIndex));
+					glDrawElements(sprite->DrawMode(), 4, GL_UNSIGNED_SHORT, (void*)0);
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 					glBindVertexArray(0);
 					GLSprite::shader.UnUse();

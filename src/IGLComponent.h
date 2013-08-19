@@ -13,7 +13,7 @@ public:
 	 * \param[in] int entityID The entity this component belongs to.
 	 * \returns IGLCompoent* the newly created component.
 	 */
-	virtual void Initialize(int entityID) = 0;
+	virtual void Initialize() = 0;
 
 
 	/**

@@ -9,7 +9,7 @@ GLIcoSphere::GLIcoSphere( const int entityID /*= 0*/ ) : IGLComponent(entityID) 
 	this->VertBufIndex = 0;
 }
 
-void GLIcoSphere::Initialize(int entityID) {
+void GLIcoSphere::Initialize() {
 	// Create the verts to begin refining at.
 	double t = (1.0 + glm::sqrt(5.0)) / 2.0;
 	glm::vec2 coordPair = glm::normalize(glm::vec2(1,t));

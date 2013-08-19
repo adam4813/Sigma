@@ -29,7 +29,7 @@ public:
 	 * \param[in] int entityID The entity this component belongs to
 	 * \returns   GLIcoSphere* The newly creates GLIcoSphere
 	 */
-	void Initialize(int entityID);
+	void Initialize();
 
 	/**
 	 * \brief Refines a given set of faces into 4 smaller faces.
