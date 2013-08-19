@@ -17,17 +17,19 @@ OpenGLSystem::~OpenGLSystem() {
 	}
 }
 
-IComponent* OpenGLSystem::Factory(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
+IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
 	if (type == "GLSprite") {
 		GLSprite* spr = GLSprite::Factory(entityID);
 		if (entityID == 2) {
 			spr->OffsetX(2);
 			spr->OffsetY(2);
 		}
-		this->components[entityID].push_back(spr);
-		return spr;
+		//this->components[entityID].push_back(spr);
+		//return spr;
 	} else if (type == "GLIcoSphere") {
-		GLIcoSphere* sphere = GLIcoSphere::Factory(entityID);
+		//GLIcoSphere* sphere = GLIcoSphere.Factory(entityID);
+		GLIcoSphere* sphere = new GLIcoSphere(entityID);
+		sphere->Initialize(entityID);
 		float scale = 1.0f;
 		float x = 0.0f;
 		float y = 0.0f;
@@ -104,8 +106,8 @@ bool OpenGLSystem::Update(const double delta) {
 					glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_View"), 1, GL_FALSE, &this->view->ViewMatrix[0][0]);
 					glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
 					glBindVertexArray(sphere->Vao());
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphere->ElemBuf());
-					glDrawElements(GL_TRIANGLES, sphere->NumberElements(), GL_UNSIGNED_SHORT, (void*)0);
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphere->GetBuffer(sphere->ElemBufIndex));
+					glDrawElements(sphere->DrawMode(), sphere->NumberElements(), GL_UNSIGNED_SHORT, (void*)0);
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 					glBindVertexArray(0);
 					GLIcoSphere::shader.UnUse();
@@ -123,7 +125,7 @@ bool OpenGLSystem::Update(const double delta) {
 	return false;
 }
 
-IComponent* OpenGLSystem::GetComponent(int entityID) {
+IGLComponent* OpenGLSystem::GetComponent(int entityID) {
 	if (this->components.find(entityID) != this->components.end()) {
 		return this->components[entityID][0];
 	}

@@ -88,7 +88,7 @@ public:
 	 * \returns   IComponent* The newly create component
 	 * \exception  
 	 */
-	virtual IComponent* Factory(const std::string type, const unsigned int entityID, std::vector<Property> &properties) = 0;
+	//virtual IComponent* Factory(const std::string type, const unsigned int entityID, std::vector<Property> &properties) = 0;
 
 	/**
 	 * \brief Causes an update in the system based on the change in time.
@@ -98,7 +98,7 @@ public:
 	 * \returns bool Returns true if we had an update interval passed. 
 	 * \exception  
 	 */
-	virtual bool Update(const double delta) = 0;
+	//virtual bool Update(const double delta) = 0;
 
 	/**
 	 * \brief Retrieve the component that belongs to the given entity ID
@@ -107,7 +107,7 @@ public:
 	 * \returns   IComponent* The component that belongs to the entity ID or nullptr if no component exists for the given ID.
 	 * \exception  
 	 */
-	virtual IComponent* GetComponent(int entityID) = 0;
+	//virtual IComponent* GetComponent(int entityID) = 0;
 protected:
 	std::map<int, std::vector<IComponent*>> components; // A mapping of entity ID to a vector containing all of it's components.
 };

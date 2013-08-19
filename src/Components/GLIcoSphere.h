@@ -1,9 +1,10 @@
 #pragma once
 
-#include "../IComponent.h"
-#include "../Systems/GLSLShader.h"
 #include <vector>
+
+#include "../Systems/GLSLShader.h"
 #include "../GLTransform.h"
+#include "../IGLComponent.h"
 
 // A helper to store which index each of its verts are.
 struct face {
@@ -17,12 +18,10 @@ struct vertex {
 	float x,y,z;
 };
 
-class GLIcoSphere : public IComponent {
-private:
+class GLIcoSphere : public IGLComponent {
+public:
 	// We have a private ctor so the factory method must be used.
 	GLIcoSphere(const int entityID = 0);
-
-public:
 	/**
 	 * \brief Creates a new GLSprite
 	 *
@@ -30,7 +29,7 @@ public:
 	 * \param[in] int entityID The entity this component belongs to
 	 * \returns   GLIcoSphere* The newly creates GLIcoSphere
 	 */
-	static GLIcoSphere* Factory(int entityID);
+	void Initialize(int entityID);
 
 	/**
 	 * \brief Refines a given set of faces into 4 smaller faces.
@@ -49,32 +48,13 @@ public:
 	static void LoadShader();
 	static GLSLShader shader;
 
-
 	/**
 	 * \brief Returns the number of elements to draw for this component.
 	 *
-	 * \returns   unsigned int The number of elements to draw.
+	 * \returns unsigned int The number of elements to draw.
 	 */
 	unsigned int NumberElements() const { return this->faces.size() * 3; }
-
-	// Getters and Setters.
-	unsigned int VertBuf() const;
-	void VertBuf(unsigned int val);
-	unsigned int ColBuf() const;
-	void ColBuf(unsigned int val);
-	unsigned int Vao() const;
-	void Vao(unsigned int val);
-	unsigned int ElemBuf() const;
-	void ElemBuf(unsigned int val);
-	GLTransform& Transform() { return transform; }
-	void Transform(GLTransform val) { transform = val; }
 private:
-	unsigned int vertBuf; // The buffer ID that the verts are stored in.
-	unsigned int colBuf; // The buffer ID that the colors are stored in.
-	unsigned int elemBuf; // The buffer ID that the element indices are stored in.
-	unsigned int vao; // The VAO that describes this component's data.
-	GLTransform transform; //  Stores the transform data for this component.
-
 	std::vector<face> faces; // The faces for this IcoSphere. Can be used for later refinement.
 	std::vector<vertex> verts; // The verts that the faces refers to. Can be used for later refinement.
 };

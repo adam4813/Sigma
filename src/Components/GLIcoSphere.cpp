@@ -3,61 +3,31 @@
 #include <map>
 #include <stdint.h>
 
-GLIcoSphere::GLIcoSphere( const int entityID /*= 0*/ ) : IComponent(entityID) { }
-
-unsigned int GLIcoSphere::VertBuf() const {
-	return this->vertBuf;
+GLIcoSphere::GLIcoSphere( const int entityID /*= 0*/ ) : IGLComponent(entityID) {
+	this->drawMode = GL_TRIANGLES;
+	this->ElemBufIndex = 2;
+	this->VertBufIndex = 0;
 }
 
-void GLIcoSphere::VertBuf(unsigned int vb) {
-	this->vertBuf = vb;
-}
-
-unsigned int GLIcoSphere::ColBuf() const {
-	return this->colBuf;
-}
-
-void GLIcoSphere::ColBuf(unsigned int cb) {
-	this->colBuf = cb;
-}
-
-unsigned int GLIcoSphere::Vao() const {
-	return this->vao;
-}
-
-void GLIcoSphere::Vao(unsigned int v) {
-	this->vao = v;
-}
-
-unsigned int GLIcoSphere::ElemBuf() const {
-	return this->elemBuf;
-}
-
-void GLIcoSphere::ElemBuf(unsigned int eb) {
-	this->elemBuf = eb;
-}
-
-GLIcoSphere* GLIcoSphere::Factory(int entityID) {
-	GLIcoSphere* sphere = new GLIcoSphere(entityID);
-
+void GLIcoSphere::Initialize(int entityID) {
 	// Create the verts to begin refining at.
 	double t = (1.0 + glm::sqrt(5.0)) / 2.0;
 	glm::vec2 coordPair = glm::normalize(glm::vec2(1,t));
 
-	sphere->verts.push_back(vertex(-coordPair.r, coordPair.g, 0));
-	sphere->verts.push_back(vertex(coordPair.r, coordPair.g, 0));
-	sphere->verts.push_back(vertex(-coordPair.r, -coordPair.g, 0));
-	sphere->verts.push_back(vertex(coordPair.r, -coordPair.g, 0));
+	this->verts.push_back(vertex(-coordPair.r, coordPair.g, 0));
+	this->verts.push_back(vertex(coordPair.r, coordPair.g, 0));
+	this->verts.push_back(vertex(-coordPair.r, -coordPair.g, 0));
+	this->verts.push_back(vertex(coordPair.r, -coordPair.g, 0));
 
-	sphere->verts.push_back(vertex(0, -coordPair.r, coordPair.g));
-	sphere->verts.push_back(vertex(0, coordPair.r, coordPair.g));
-	sphere->verts.push_back(vertex(0, -coordPair.r, -coordPair.g));
-	sphere->verts.push_back(vertex(0, coordPair.r, -coordPair.g));
+	this->verts.push_back(vertex(0, -coordPair.r, coordPair.g));
+	this->verts.push_back(vertex(0, coordPair.r, coordPair.g));
+	this->verts.push_back(vertex(0, -coordPair.r, -coordPair.g));
+	this->verts.push_back(vertex(0, coordPair.r, -coordPair.g));
 
-	sphere->verts.push_back(vertex(coordPair.g, 0, -coordPair.r));
-	sphere->verts.push_back(vertex(coordPair.g, 0, coordPair.r));
-	sphere->verts.push_back(vertex(-coordPair.g, 0, -coordPair.r));
-	sphere->verts.push_back(vertex(-coordPair.g, 0, coordPair.r));
+	this->verts.push_back(vertex(coordPair.g, 0, -coordPair.r));
+	this->verts.push_back(vertex(coordPair.g, 0, coordPair.r));
+	this->verts.push_back(vertex(-coordPair.g, 0, -coordPair.r));
+	this->verts.push_back(vertex(-coordPair.g, 0, coordPair.r));
 
 	// Create the faces to begin refining at.
 	std::vector<face> faceLevelZero;
@@ -89,37 +59,27 @@ GLIcoSphere* GLIcoSphere::Factory(int entityID) {
 	// Refine the IcoSphere by 2 levels.
 	// We are using a temp face buffer as it will be replaced by a new set.
 	// The vertex buffer is the actual buffer as we will add to it.
-	sphere->Refine(sphere->verts, faceLevelZero, 2);
+	Refine(this->verts, faceLevelZero, 2);
 
 	// Store the new faces.
-	sphere->faces = faceLevelZero;
+	this->faces = faceLevelZero;
 
 	// We must create a vao and then store it in our GLIcoSphere.
-	GLuint vaoID;
-	glGenVertexArrays(1, &vaoID); // Generate the VAO
-	glBindVertexArray(vaoID); // Bind the VAO
+	glGenVertexArrays(1, &this->vao); // Generate the VAO
+	glBindVertexArray(this->vao); // Bind the VAO
 
-	GLuint vertbuf;
-	glGenBuffers(1, &vertbuf); 	// Generate the vertex buffer.
-	glBindBuffer(GL_ARRAY_BUFFER, vertbuf); // Bind the vertex buffer.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex) * sphere->verts.size(), &sphere->verts.front(), GL_STATIC_DRAW); // Stores the verts in the vertex buffer.
+	glGenBuffers(1, &this->buffers[0]); 	// Generate the vertex buffer.
+	glBindBuffer(GL_ARRAY_BUFFER, this->buffers[0]); // Bind the vertex buffer.
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex) * this->verts.size(), &this->verts.front(), GL_STATIC_DRAW); // Stores the verts in the vertex buffer.
 	GLint posLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Position"); // Find the location in the shader where the vertex buffer data will be placed.
 	glVertexAttribPointer(posLocation, 3, GL_FLOAT, GL_FALSE, 0, 0); // Tell the VAO the vertex data will be stored at the location we just found.
 	glEnableVertexAttribArray(posLocation); // Enable the VAO line for vertex data.
 
-	GLuint elembuf;
-	glGenBuffers(1, &elembuf); // Generate the element buffer.
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elembuf); // Bind the element buffer.
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(face) * sphere->faces.size(), &sphere->faces.front(), GL_STATIC_DRAW); // Store the faces in the element buffer.
+	glGenBuffers(1, &this->buffers[2]); // Generate the element buffer.
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buffers[2]); // Bind the element buffer.
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(face) * this->faces.size(), &this->faces.front(), GL_STATIC_DRAW); // Store the faces in the element buffer.
 
 	glBindVertexArray(0); // Reset the buffer binding because we are good programmers.
-
-	// Store the buffers in our component.
-	sphere->Vao(vaoID);
-	sphere->VertBuf(vertbuf);
-	sphere->ElemBuf(elembuf);
-
-	return sphere;
 }
 
 void GLIcoSphere::LoadShader() {

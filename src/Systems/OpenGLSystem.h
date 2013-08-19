@@ -10,6 +10,7 @@
 #include "glm/ext.hpp"
 
 struct IGLView;
+class IGLComponent;
 
 class OpenGLSystem : public ISystem {
 public:
@@ -37,7 +38,7 @@ public:
 	 * \param[in] std::vector<Property> &properties A vector containing the properties to apply to the created component.
 	 * \returns   IComponent* The newly create component
 	 */
-	IComponent* Factory(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
+	IGLComponent* Factory(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
 
 	/**
 	 * \brief Causes an update in the system based on the change in time.
@@ -54,7 +55,7 @@ public:
 	 * \param[in] int entityID
 	 * \returns   IComponent* The component that belongs to the entity ID or nullptr if no component exists for the given ID.
 	 */
-	IComponent* GetComponent(int entityID);
+	IGLComponent* GetComponent(int entityID);
 
 	SceneManager* GetScene();
 
@@ -93,4 +94,5 @@ private:
 	IGLView* view;
 
 	double deltaAccumulator;
+	std::map<int, std::vector<IGLComponent*>> components; // A mapping of entity ID to a vector containing all of it's components.
 };
