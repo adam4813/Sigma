@@ -19,6 +19,11 @@ class Property {
 private:
 	Property() {}
 public:
+	Property(const Property &other) {
+		this->name = other.name;
+		this->vholder = other.vholder;
+		const_cast<Property&>(other).vholder = nullptr;
+	}
 	Property(std::string name) : name(name), vholder(nullptr) {}
 	~Property() { delete this->vholder; }
 
@@ -76,5 +81,5 @@ public:
 	 */
 	virtual IComponent* GetComponent(int entityID) = 0;
 protected:
-	std::map<int, std::vector<IComponent*>> components; // A mapping of entity ID to a vector containing all of it's componenets.
+	std::map<int, std::vector<IComponent*>> components; // A mapping of entity ID to a vector containing all of it's components.
 };
