@@ -40,13 +40,7 @@ void GLIcoSphere::ElemBuf(unsigned int eb) {
 GLIcoSphere* GLIcoSphere::Factory(int entityID) {
 	GLIcoSphere* sphere = new GLIcoSphere(entityID);
 
-
-	// We must create a vao and then store it in our GLIcoSphere.
-	GLuint vaoID;
-	glGenVertexArrays(1, &vaoID);
-	glBindVertexArray(vaoID);
-
-	// Create the verts to begin our deforming at.
+	// Create the verts to begin refining at.
 	double t = (1.0 + glm::sqrt(5.0)) / 2.0;
 	glm::vec2 coordPair = glm::normalize(glm::vec2(1,t));
 
@@ -65,6 +59,7 @@ GLIcoSphere* GLIcoSphere::Factory(int entityID) {
 	sphere->verts.push_back(vertex(-coordPair.g, 0, -coordPair.r));
 	sphere->verts.push_back(vertex(-coordPair.g, 0, coordPair.r));
 
+	// Create the faces to begin refining at.
 	std::vector<face> faceLevelZero;
 
 	faceLevelZero.push_back(face(0,11,5));
@@ -91,36 +86,37 @@ GLIcoSphere* GLIcoSphere::Factory(int entityID) {
 	faceLevelZero.push_back(face(8,6,7));
 	faceLevelZero.push_back(face(9,8,1));
 
+	// Refine the IcoSphere by 2 levels.
+	// We are using a temp face buffer as it will be replaced by a new set.
+	// The vertex buffer is the actual buffer as we will add to it.
 	sphere->Refine(sphere->verts, faceLevelZero, 2);
+
+	// Store the new faces.
 	sphere->faces = faceLevelZero;
 
+	// We must create a vao and then store it in our GLIcoSphere.
+	GLuint vaoID;
+	glGenVertexArrays(1, &vaoID); // Generate the VAO
+	glBindVertexArray(vaoID); // Bind the VAO
+
 	GLuint vertbuf;
-	glGenBuffers(1, &vertbuf);
-	glBindBuffer(GL_ARRAY_BUFFER, vertbuf);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex) * sphere->verts.size(), &sphere->verts.front(), GL_STATIC_DRAW);
-	GLint posLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Position");
-	glVertexAttribPointer(posLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(posLocation);
+	glGenBuffers(1, &vertbuf); 	// Generate the vertex buffer.
+	glBindBuffer(GL_ARRAY_BUFFER, vertbuf); // Bind the vertex buffer.
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex) * sphere->verts.size(), &sphere->verts.front(), GL_STATIC_DRAW); // Stores the verts in the vertex buffer.
+	GLint posLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Position"); // Find the location in the shader where the vertex buffer data will be placed.
+	glVertexAttribPointer(posLocation, 3, GL_FLOAT, GL_FALSE, 0, 0); // Tell the VAO the vertex data will be stored at the location we just found.
+	glEnableVertexAttribArray(posLocation); // Enable the VAO line for vertex data.
 
 	GLuint elembuf;
-	glGenBuffers(1, &elembuf);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elembuf);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(face) * sphere->faces.size(), &sphere->faces.front(), GL_STATIC_DRAW);
+	glGenBuffers(1, &elembuf); // Generate the element buffer.
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elembuf); // Bind the element buffer.
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(face) * sphere->faces.size(), &sphere->faces.front(), GL_STATIC_DRAW); // Store the faces in the element buffer.
 
-	/*static const GLfloat col[1];
+	glBindVertexArray(0); // Reset the buffer binding because we are good programmers.
 
-	GLuint colorbuf;
-	glGenBuffers(1, &colorbuf);
-	glBindBuffer(GL_ARRAY_BUFFER, colorbuf);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(col), col, GL_STATIC_DRAW);
-	GLint colLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Color");
-	glVertexAttribPointer(colLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(colLocation);*/
-	glBindVertexArray(0);
-
+	// Store the buffers in our component.
 	sphere->Vao(vaoID);
 	sphere->VertBuf(vertbuf);
-	//sphere->ColBuf(colorbuf);
 	sphere->ElemBuf(elembuf);
 
 	return sphere;
