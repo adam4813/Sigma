@@ -20,7 +20,7 @@ int main(int argCount, char **argValues) {
 		prop1.Set<float>(100.0f);
 		props.push_back(prop1);
 		Property prop2("x");
-		prop2.Set<float>(0.0f);
+		prop2.Set(0.0f);
 		props.push_back(prop2);
 		Property prop3("y");
 		prop3.Set<float>(0.0f);
@@ -56,12 +56,12 @@ int main(int argCount, char **argValues) {
 		// Translation keys
 		if (win.KeyDown('W')) { // Move forward
 			if (win.KeyDown('B')) {
-				glsys.Translate(0.0f,0.0f,100.0f * (float)delta / 1000.0f);
+				glsys.Move(0.0f,0.0f,100.0f * (float)delta / 1000.0f);
 			} else {
-				glsys.Translate(0.0f,0.0f,10.0f * (float)delta / 1000.0f);
+				glsys.Move(0.0f,0.0f,10.0f * (float)delta / 1000.0f);
 			}
 		} else if (win.KeyDown('S')) { // Move backward
-			glsys.Translate(0.0f,0.0f,-10.0f * (float)delta / 1000.0f);
+			glsys.Move(0.0f,0.0f,-10.0f * (float)delta / 1000.0f);
 		}
 		if (win.KeyDown('A')) { 
 			glsys.Rotate(0.0f,-90.0f * (float)delta / 1000.0f,0.0f); // Yaw left.
@@ -69,14 +69,14 @@ int main(int argCount, char **argValues) {
 			glsys.Rotate(0.0f,90.0f * (float)delta / 1000.0f,0.0f); // Yaw right.
 		}
 		if (win.KeyDown('F')) { 
-			glsys.Translate(-10.0f * (float)delta / 1000.0f,0.0f,0.0f); // Strafe Left
+			glsys.Move(-10.0f * (float)delta / 1000.0f,0.0f,0.0f); // Strafe Left
 		} else if (win.KeyDown('G')) {
-			glsys.Translate(10.0f * (float)delta / 1000.0f,0.0f,0.0f); // Strafe Right
+			glsys.Move(10.0f * (float)delta / 1000.0f,0.0f,0.0f); // Strafe Right
 		}
 		if (win.KeyDown('E')) { // Move up
-			glsys.Translate(0.0f,10.0f * (float)delta / 1000.0f,0.0f);
+			glsys.Move(0.0f,10.0f * (float)delta / 1000.0f,0.0f);
 		} else if (win.KeyDown('C')) { // Move down
-			glsys.Translate(0.0f,-10.0f * (float)delta / 1000.0f,0.0f);
+			glsys.Move(0.0f,-10.0f * (float)delta / 1000.0f,0.0f);
 		}
 		if (win.KeyDown('Q')) { // Pitch Up
 			glsys.Rotate(-90.0f * (float)delta / 1000.0f,0.0f,0.0f);

@@ -221,7 +221,7 @@ const int* OpenGLSystem::Start(HWND hwnd) {
 	return OpenGLVersion;
 }
 
-void OpenGLSystem::Translate(float x, float y, float z) {
+void OpenGLSystem::Move(float x, float y, float z) {
 	this->view->Move(x,y,z);
 }
 

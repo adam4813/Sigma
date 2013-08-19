@@ -36,6 +36,7 @@ public:
 	 * A factory method to create various components and add them to the system. These components will be used during the system update method
 	 * \param[in] const std::string type The type of componenet to create
 	 * \param[in] const int entityID The ID of the entity this component belongs to.
+	 * \param[in] std::vector<Property> &properties A vector containing the properties to apply to the created component.
 	 * \returns   IComponent* The newly create component
 	 */
 	IComponent* Factory(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
@@ -59,8 +60,26 @@ public:
 
 	SceneManager* GetScene();
 
-	void Translate(float x, float y, float z);
+	/**
+	 * \brief Move the camera around the world.
+	 *
+	 * Moves the camera around by the specified amounts.
+	 * \param[in/out] float x
+	 * \param[in/out] float y
+	 * \param[in/out] float z
+	 * \returns   void 
+	 */
+	void Move(float x, float y, float z);
 
+	/**
+	 * \brief Rotates the camera around the world.
+	 *
+	 * Rotates the camera around by the specified amounts.
+	 * \param[in/out] float x
+	 * \param[in/out] float y
+	 * \param[in/out] float z
+	 * \returns   void
+	 */
 	void Rotate(float x, float y, float z);
 private:
 	SceneManager scene;
