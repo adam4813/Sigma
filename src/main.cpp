@@ -1,12 +1,17 @@
 #include <iostream>
 
 #include "Systems/OpenGLSystem.h"
+#ifdef WIN32
 #include "win32.h"
+#endif
 
 int main(int argCount, char **argValues) {
 	OpenGLSystem glsys;
-	win32 win;
-	const int* version = glsys.Start(win.CreateWin32Window());
+	IOpSys* os = nullptr;
+#ifdef WIN32
+	os = new win32();
+#endif
+	const int* version = glsys.Start(reinterpret_cast<HWND>(os->CreateGraphicsWindow()));
 	if (version[0] == -1) {
 		std::cout<< "Error starting OpenGL!"<<std::endl;
 	} else {
@@ -47,49 +52,50 @@ int main(int argCount, char **argValues) {
 		glsys.Factory("GLIcoSphere", 4, props);
 	}
 
-	win.SetupTimer();
+	os->SetupTimer();
 	double delta;
-	while (win.MessageLoop()) {
-		delta = win.GetDeltaTime();
+	while (os->MessageLoop()) {
+		delta = os->GetDeltaTime();
 		glsys.Update(delta); // Render our scene (which also handles swapping of buffers)
 
 		// Translation keys
-		if (win.KeyDown('W')) { // Move forward
-			if (win.KeyDown('B')) {
+		if (os->KeyDown('W')) { // Move forward
+			if (os->KeyDown('B')) {
 				glsys.Move(0.0f,0.0f,100.0f * (float)delta / 1000.0f);
 			} else {
 				glsys.Move(0.0f,0.0f,10.0f * (float)delta / 1000.0f);
 			}
-		} else if (win.KeyDown('S')) { // Move backward
+		} else if (os->KeyDown('S')) { // Move backward
 			glsys.Move(0.0f,0.0f,-10.0f * (float)delta / 1000.0f);
 		}
-		if (win.KeyDown('A')) { 
+		if (os->KeyDown('A')) { 
 			glsys.Rotate(0.0f,-90.0f * (float)delta / 1000.0f,0.0f); // Yaw left.
-		} else if (win.KeyDown('D')) {
+		} else if (os->KeyDown('D')) {
 			glsys.Rotate(0.0f,90.0f * (float)delta / 1000.0f,0.0f); // Yaw right.
 		}
-		if (win.KeyDown('F')) { 
+		if (os->KeyDown('F')) { 
 			glsys.Move(-10.0f * (float)delta / 1000.0f,0.0f,0.0f); // Strafe Left
-		} else if (win.KeyDown('G')) {
+		} else if (os->KeyDown('G')) {
 			glsys.Move(10.0f * (float)delta / 1000.0f,0.0f,0.0f); // Strafe Right
 		}
-		if (win.KeyDown('E')) { // Move up
+		if (os->KeyDown('E')) { // Move up
 			glsys.Move(0.0f,10.0f * (float)delta / 1000.0f,0.0f);
-		} else if (win.KeyDown('C')) { // Move down
+		} else if (os->KeyDown('C')) { // Move down
 			glsys.Move(0.0f,-10.0f * (float)delta / 1000.0f,0.0f);
 		}
-		if (win.KeyDown('Q')) { // Pitch Up
+		if (os->KeyDown('Q')) { // Pitch Up
 			glsys.Rotate(-90.0f * (float)delta / 1000.0f,0.0f,0.0f);
-		} else if (win.KeyDown('Z')) { // Pitch Down
+		} else if (os->KeyDown('Z')) { // Pitch Down
 			glsys.Rotate(90.0f * (float)delta / 1000.0f,0.0f,0.0f);
 		}
 
-		if (win.KeyDown('R')) { // Roll left
+		if (os->KeyDown('R')) { // Roll left
 			glsys.Rotate(0.0f,0.0f,-90.0f * (float)delta / 1000.0f);
-		} else if (win.KeyDown('T')) { // Roll right
+		} else if (os->KeyDown('T')) { // Roll right
 			glsys.Rotate(0.0f,0.0f,90.0f * (float)delta / 1000.0f);
 		}
 	}
+	delete os;
 
 	return 0;
 }

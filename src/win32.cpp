@@ -1,6 +1,6 @@
 #include "win32.h"
 
-HWND win32::CreateWin32Window() {
+void* win32::CreateGraphicsWindow() {
 	WNDCLASS windowClass;
 	HWND hwnd;
 	DWORD dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;

@@ -1,11 +1,13 @@
+#pragma  once
 #include <windows.h>
+#include "IOpSys.h"
 
-class win32 {
+class win32 : public IOpSys {
 public:
 	win32() { }
 	~win32() { }
 
-	HWND CreateWin32Window();
+	void* CreateGraphicsWindow();
 
 	bool MessageLoop();
 
