@@ -107,7 +107,7 @@ GLIcoSphere* GLIcoSphere::Factory(int entityID) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elembuf);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(face) * sphere->faces.size(), &sphere->faces.front(), GL_STATIC_DRAW);
 
-	static const GLfloat col[1];
+	/*static const GLfloat col[1];
 
 	GLuint colorbuf;
 	glGenBuffers(1, &colorbuf);
@@ -115,12 +115,12 @@ GLIcoSphere* GLIcoSphere::Factory(int entityID) {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(col), col, GL_STATIC_DRAW);
 	GLint colLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Color");
 	glVertexAttribPointer(colLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(colLocation);
+	glEnableVertexAttribArray(colLocation);*/
 	glBindVertexArray(0);
 
 	sphere->Vao(vaoID);
 	sphere->VertBuf(vertbuf);
-	sphere->ColBuf(colorbuf);
+	//sphere->ColBuf(colorbuf);
 	sphere->ElemBuf(elembuf);
 
 	return sphere;
