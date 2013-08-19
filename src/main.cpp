@@ -12,9 +12,13 @@ int main(int argCount, char **argValues) {
 	} else {
 		std::cout<<"OpenGL version: " << version[0] << "." << version[1] << std::endl;
 	}
-	glsys.Factory("GLSprite", 1);
-	glsys.Factory("GLSprite", 2);
-	glsys.Factory("GLIcoSphere", 0);
+	std::vector<Property> props;
+	glsys.Factory("GLSprite", 1, props);
+	glsys.Factory("GLSprite", 2, props);
+	Property prop1("scale");
+	prop1.Set<float>(10.0f);
+	props.push_back(prop1);
+	glsys.Factory("GLIcoSphere", 0, props);
 
 	win.SetupTimer();
 	double delta;

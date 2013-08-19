@@ -24,7 +24,7 @@ OpenGLSystem::~OpenGLSystem() {
 	ReleaseDC(this->hwnd, this->hdc); // Release the device context from our window  
 }
 
-IComponent* OpenGLSystem::Factory(const std::string type, const unsigned int entityID) {
+IComponent* OpenGLSystem::Factory(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
 	if (type == "GLSprite") {
 		GLSprite* spr = GLSprite::Factory(entityID);
 		if (entityID == 2) {
@@ -35,6 +35,14 @@ IComponent* OpenGLSystem::Factory(const std::string type, const unsigned int ent
 		return spr;
 	} else if (type == "GLIcoSphere") {
 		sphere = GLIcoSphere::Factory(entityID);
+		if (properties.size() > 0) {
+			Property p = properties[0];
+			if (p.GetName() == "scale") {
+				float scale = p.Get<float>();
+				int bad = p.Get<int>();
+				std::string error = p.Get<std::string>();
+			}
+		}
 		sphere->Transform().Scale(100.0f,100.0f,100.0f);
 		sphere->Transform().Translate(0.0f,0.0f,1000.0f);
 		return sphere;

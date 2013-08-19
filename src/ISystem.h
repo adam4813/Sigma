@@ -5,6 +5,45 @@
 
 class IComponent;
 
+template <typename t>
+class ValueHolder {
+public:
+	ValueHolder() {}
+	void Set(t value)  { this->value = value; }
+	t Get() { return this->value; }
+private:
+	t value;
+};
+
+class Property {
+private:
+	Property() {}
+public:
+	Property(std::string name) : name(name), vholder(nullptr) {}
+	~Property() { delete this->vholder; }
+
+	template <typename t>
+	t Get() { return static_cast<ValueHolder<t>*>(this->vholder)->Get(); }
+
+	template <typename t>
+	void Set(t value) {
+		if (this->vholder != nullptr) {
+			delete this->vholder;
+		}
+
+		ValueHolder<t>* v = new ValueHolder<t>();
+		v->Set(value);
+		this->vholder = v;
+	}
+
+	std::string GetName() {
+		return this->name;
+	}
+private:
+	std::string name;
+	void* vholder;
+};
+
 class ISystem {
 public:
 	/**
@@ -16,7 +55,7 @@ public:
 	 * \returns   IComponent* The newly create component
 	 * \exception  
 	 */
-	virtual IComponent* Factory(const std::string type, const unsigned int entityID) = 0;
+	virtual IComponent* Factory(const std::string type, const unsigned int entityID, std::vector<Property> &properties) = 0;
 
 	/**
 	 * \brief Causes an update in the system based on the change in time.

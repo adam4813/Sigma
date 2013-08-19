@@ -12,6 +12,7 @@
 
 struct IGLView;
 
+
 class OpenGLSystem : public ISystem {
 public:
 	OpenGLSystem();
@@ -37,7 +38,7 @@ public:
 	 * \param[in] const int entityID The ID of the entity this component belongs to.
 	 * \returns   IComponent* The newly create component
 	 */
-	IComponent* Factory(const std::string type, const unsigned int entityID) ;
+	IComponent* Factory(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
 
 	/**
 	 * \brief Causes an update in the system based on the change in time.
