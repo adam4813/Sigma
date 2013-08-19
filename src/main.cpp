@@ -11,7 +11,8 @@ int main(int argCount, char **argValues) {
 #ifdef WIN32
 	os = new win32();
 #endif
-	const int* version = glsys.Start(reinterpret_cast<HWND>(os->CreateGraphicsWindow()));
+	os->CreateGraphicsWindow();
+	const int* version = glsys.Start();
 	if (version[0] == -1) {
 		std::cout<< "Error starting OpenGL!"<<std::endl;
 	} else {
@@ -56,7 +57,9 @@ int main(int argCount, char **argValues) {
 	double delta;
 	while (os->MessageLoop()) {
 		delta = os->GetDeltaTime();
-		glsys.Update(delta); // Render our scene (which also handles swapping of buffers)
+		if (glsys.Update(delta)) {
+			os->Present();
+		}
 
 		// Translation keys
 		if (os->KeyDown('W')) { // Move forward

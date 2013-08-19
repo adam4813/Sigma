@@ -1,8 +1,19 @@
 #include "win32.h"
+#define GLEW_STATIC
+
+#include "GL/glew.h"
+#include "GL/wglew.h"
+
+win32::~win32() {
+	wglMakeCurrent(this->hdc, 0); // Remove the rendering context from our device context  
+	wglDeleteContext(this->hrc); // Delete our rendering context  
+
+	ReleaseDC(this->hwnd, this->hdc); // Release the device context from our window  
+}
 
 void* win32::CreateGraphicsWindow() {
 	WNDCLASS windowClass;
-	HWND hwnd;
+	//HWND hwnd;
 	DWORD dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 
 	hInstance = GetModuleHandle(NULL);
@@ -21,11 +32,14 @@ void* win32::CreateGraphicsWindow() {
 	if (!RegisterClass(&windowClass)) {
 		return false;
 	}
-	hwnd = CreateWindowEx(dwExStyle, windowClass.lpszClassName, windowClass.lpszClassName, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, 800, 600, NULL, NULL, hInstance, NULL);
+	this->hwnd = CreateWindowEx(dwExStyle, windowClass.lpszClassName, windowClass.lpszClassName, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, 800, 600, NULL, NULL, hInstance, NULL);
 
-	ShowWindow(hwnd, SW_SHOW);
-	UpdateWindow(hwnd);
-	return hwnd;
+	ShowWindow(this->hwnd, SW_SHOW);
+	UpdateWindow(this->hwnd);
+
+	StartOpengGL();
+
+	return this->hdc;
 }
 
 LRESULT CALLBACK win32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {  
@@ -75,4 +89,76 @@ double win32::GetDeltaTime() {
 bool win32::KeyDown(int key) {
 	short k = GetKeyState(key);
 	return (k & 0x80) > 0 ? true : false;
+}
+
+const int* win32::StartOpengGL() {
+	this->OpenGLVersion[0] = -1;
+	this->OpenGLVersion[1] = -1;
+
+	this->hdc = GetDC(this->hwnd); // Get the device context for our window  
+
+	PIXELFORMATDESCRIPTOR pfd;
+	memset(&pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
+	pfd.nSize  = sizeof(PIXELFORMATDESCRIPTOR);
+	pfd.nVersion   = 1;
+	pfd.dwFlags    = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
+	pfd.iPixelType = PFD_TYPE_RGBA;
+	pfd.cColorBits = 32;
+	pfd.cDepthBits = 32;
+	pfd.iLayerType = PFD_MAIN_PLANE;
+
+	int nPixelFormat = ChoosePixelFormat(this->hdc, &pfd);
+
+	if (nPixelFormat == 0) {
+		return this->OpenGLVersion;
+	}
+
+	BOOL bResult = SetPixelFormat (this->hdc, nPixelFormat, &pfd);
+
+	if (!bResult) {
+		return this->OpenGLVersion;
+	}
+
+	HGLRC tempContext = wglCreateContext(this->hdc);
+	wglMakeCurrent(this->hdc, tempContext);
+
+	GLenum error = glewInit();
+	if (error != GLEW_OK) {
+		return OpenGLVersion;
+	}
+
+	int attribs[] =
+	{
+		WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+		WGL_CONTEXT_MINOR_VERSION_ARB, 1,
+		WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+		0
+	};
+
+	if (wglewIsSupported("WGL_ARB_create_context") == 1) {
+		this->hrc = wglCreateContextAttribsARB(this->hdc, 0, attribs);
+		wglMakeCurrent(NULL,NULL);
+		wglDeleteContext(tempContext);
+		wglMakeCurrent(this->hdc, this->hrc);
+	} else {
+		//It's not possible to make a GL 3.x context. Use the old style context (GL 2.1 and before)
+		this->hrc = tempContext;
+	}
+
+	//Checking GL version
+	const GLubyte *GLVersionString = glGetString(GL_VERSION);
+
+	//Or better yet, use the GL3 way to get the version number
+	glGetIntegerv(GL_MAJOR_VERSION, &OpenGLVersion[0]);
+	glGetIntegerv(GL_MINOR_VERSION, &OpenGLVersion[1]);
+
+	// Set options for depth tests.
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
+	return OpenGLVersion;
+}
+
+void win32::Present() {
+	SwapBuffers(this->hdc); // Swap buffers so we can see our rendering.
 }

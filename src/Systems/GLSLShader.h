@@ -3,7 +3,7 @@
 //Last Modified: February 2, 2011
 
 #pragma once
-#include "gl/glew.h"
+#include "GL/glew.h"
 #include <map>
 #include <string>
 

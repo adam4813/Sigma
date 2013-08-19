@@ -15,11 +15,6 @@ OpenGLSystem::~OpenGLSystem() {
 			delete *vecitr;
 		}
 	}
-
-	wglMakeCurrent(this->hdc, 0); // Remove the rendering context from our device context  
-	wglDeleteContext(this->hrc); // Delete our rendering context  
-
-	ReleaseDC(this->hwnd, this->hdc); // Release the device context from our window  
 }
 
 IComponent* OpenGLSystem::Factory(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
@@ -61,7 +56,7 @@ IComponent* OpenGLSystem::Factory(const std::string type, const unsigned int ent
 	return nullptr;
 }
 
-void OpenGLSystem::Update(const double delta) {
+bool OpenGLSystem::Update(const double delta) {
 	this->deltaAccumulator += delta;
 	this->view->UpdateViewMatrix();
 	// Check if the deltaAccumulator is greater than 1/60 of a second.
@@ -122,9 +117,10 @@ void OpenGLSystem::Update(const double delta) {
 			}
 		}
 
-		SwapBuffers(hdc); // Swap buffers so we can see our rendering.
 		this->deltaAccumulator = 0.0;
+		return true;
 	}
+	return false;
 }
 
 IComponent* OpenGLSystem::GetComponent(int entityID) {
@@ -138,61 +134,7 @@ SceneManager* OpenGLSystem::GetScene() {
 	return &this->scene;
 }
 
-const int* OpenGLSystem::Start(HWND hwnd) {
-	this->OpenGLVersion[0] = -1;
-	this->OpenGLVersion[1] = -1;
-	this->hwnd = hwnd; // Set the HWND for our window  
-
-	this->hdc = GetDC(hwnd); // Get the device context for our window  
-
-	PIXELFORMATDESCRIPTOR pfd;
-	memset(&pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
-	pfd.nSize  = sizeof(PIXELFORMATDESCRIPTOR);
-	pfd.nVersion   = 1;
-	pfd.dwFlags    = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
-	pfd.iPixelType = PFD_TYPE_RGBA;
-	pfd.cColorBits = 32;
-	pfd.cDepthBits = 32;
-	pfd.iLayerType = PFD_MAIN_PLANE;
-
-	int nPixelFormat = ChoosePixelFormat(this->hdc, &pfd);
-
-	if (nPixelFormat == 0) {
-		return OpenGLVersion;
-	}
-
-	BOOL bResult = SetPixelFormat (this->hdc, nPixelFormat, &pfd);
-
-	if (!bResult) {
-		return OpenGLVersion;
-	}
-
-	HGLRC tempContext = wglCreateContext(this->hdc);
-	wglMakeCurrent(this->hdc, tempContext);
-
-	GLenum error = glewInit();
-	if (error != GLEW_OK) {
-		return OpenGLVersion;
-	}
-
-	int attribs[] =
-	{
-		WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-		WGL_CONTEXT_MINOR_VERSION_ARB, 1,
-		WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
-		0
-	};
-
-	if (wglewIsSupported("WGL_ARB_create_context") == 1) {
-		this->hrc = wglCreateContextAttribsARB(this->hdc, 0, attribs);
-		wglMakeCurrent(NULL,NULL);
-		wglDeleteContext(tempContext);
-		wglMakeCurrent(this->hdc, this->hrc);
-	} else {
-		//It's not possible to make a GL 3.x context. Use the old style context (GL 2.1 and before)
-		this->hrc = tempContext;
-	}
-
+const int* OpenGLSystem::Start() {
 	//Checking GL version
 	const GLubyte *GLVersionString = glGetString(GL_VERSION);
 
@@ -211,10 +153,6 @@ const int* OpenGLSystem::Start(HWND hwnd) {
 		0.1f,
 		10000.0f
 		);
-
-	// Set options for depth tests.
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
 
 	this->view->Move(4.0f,3.0f,-10.f);
 

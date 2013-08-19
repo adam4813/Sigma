@@ -95,10 +95,10 @@ public:
 	 *
 	 * Updates the state of the system based off how much time has elapsed since the last update.
 	 * \param[in] const float delta The change in time since the last update
-	 * \returns   void 
+	 * \returns bool Returns true if we had an update interval passed. 
 	 * \exception  
 	 */
-	virtual void Update(const double delta) = 0;
+	virtual bool Update(const double delta) = 0;
 
 	/**
 	 * \brief Retrieve the component that belongs to the given entity ID

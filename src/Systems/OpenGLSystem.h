@@ -6,12 +6,10 @@
 #define GLEW_STATIC
 
 #include "GL/glew.h"
-#include "GL/wglew.h"
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 
 struct IGLView;
-
 
 class OpenGLSystem : public ISystem {
 public:
@@ -28,7 +26,7 @@ public:
 	 * \param[in] HWND hwnd The window handle to associate the rendering context with.
 	 * \returns   const int* Returns -1 in the 0 index on failure, else the major and minor version in index 0 and 1 respectively.
 	 */
-	const int* Start(HWND hwnd);
+	const int* Start();
 
 	/**
 	 * \brief A factory to create new components of a given type.
@@ -46,9 +44,9 @@ public:
 	 *
 	 * Updates the state of the system based off how much time has elapsed since the last update.
 	 * \param[in] const float delta The change in time since the last update
-	 * \returns   void
+	 * \returns bool Returns true if we had an update interval passed.
 	 */
-	void Update(const double delta);
+	bool Update(const double delta);
 
 	/**
 	 * \brief Retrieve the component that belongs to the given entity ID
@@ -83,10 +81,6 @@ public:
 	void Rotate(float x, float y, float z);
 private:
 	SceneManager scene;
-
-	HGLRC hrc; // OpenGL Rendering Context.
-	HDC hdc; // Handle to the device context.
-	HWND hwnd; // Window identifier.
 
 	int windowWidth; // Store the width of our window  
 	int windowHeight; // Store the height of our window 

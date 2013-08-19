@@ -14,4 +14,6 @@ public:
 	virtual double GetDeltaTime() = 0;
 
 	virtual bool KeyDown(int key) = 0;
+
+	virtual void Present() = 0;
 };
