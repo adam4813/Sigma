@@ -15,10 +15,37 @@ int main(int argCount, char **argValues) {
 	std::vector<Property> props;
 	glsys.Factory("GLSprite", 1, props);
 	glsys.Factory("GLSprite", 2, props);
-	Property prop1("scale");
-	prop1.Set<float>(10.0f);
-	props.push_back(prop1);
-	glsys.Factory("GLIcoSphere", 0, props);
+	{
+		Property prop1("scale");
+		prop1.Set<float>(100.0f);
+		props.push_back(prop1);
+		Property prop2("x");
+		prop2.Set<float>(0.0f);
+		props.push_back(prop2);
+		Property prop3("y");
+		prop3.Set<float>(0.0f);
+		props.push_back(prop3);
+		Property prop4("z");
+		prop4.Set<float>(300.0f);
+		props.push_back(prop4);
+		glsys.Factory("GLIcoSphere", 3, props);
+	}
+	props.clear();
+	{
+		Property prop1("scale");
+		prop1.Set<float>(200.0f);
+		props.push_back(prop1);
+		Property prop2("x");
+		prop2.Set<float>(500.0f);
+		props.push_back(prop2);
+		Property prop3("y");
+		prop3.Set<float>(0.0f);
+		props.push_back(prop3);
+		Property prop4("z");
+		prop4.Set<float>(500.0f);
+		props.push_back(prop4);
+		glsys.Factory("GLIcoSphere", 4, props);
+	}
 
 	win.SetupTimer();
 	double delta;
@@ -28,7 +55,11 @@ int main(int argCount, char **argValues) {
 
 		// Translation keys
 		if (win.KeyDown('W')) { // Move forward
-			glsys.Translate(0.0f,0.0f,10.0f * (float)delta / 1000.0f);
+			if (win.KeyDown('B')) {
+				glsys.Translate(0.0f,0.0f,100.0f * (float)delta / 1000.0f);
+			} else {
+				glsys.Translate(0.0f,0.0f,10.0f * (float)delta / 1000.0f);
+			}
 		} else if (win.KeyDown('S')) { // Move backward
 			glsys.Translate(0.0f,0.0f,-10.0f * (float)delta / 1000.0f);
 		}

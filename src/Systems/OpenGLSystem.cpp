@@ -8,8 +8,6 @@ OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumul
 	this->view = new GLSixDOFView(); 
 }
 
-GLIcoSphere* sphere;
-
 OpenGLSystem::~OpenGLSystem() {
 	delete this->view;
 	for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {
@@ -34,17 +32,30 @@ IComponent* OpenGLSystem::Factory(const std::string type, const unsigned int ent
 		this->components[entityID].push_back(spr);
 		return spr;
 	} else if (type == "GLIcoSphere") {
-		sphere = GLIcoSphere::Factory(entityID);
-		if (properties.size() > 0) {
-			Property p = properties[0];
-			if (p.GetName() == "scale") {
-				float scale = p.Get<float>();
-				int bad = p.Get<int>();
-				std::string error = p.Get<std::string>();
+		GLIcoSphere* sphere = GLIcoSphere::Factory(entityID);
+		float scale = 1.0f;
+		float x = 0.0f;
+		float y = 0.0f;
+		float z = 0.0f;
+		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
+			Property*  p = &*propitr;
+			if (p->GetName() == "scale") {
+				scale = p->Get<float>();
+				continue;
+			} else if (p->GetName() == "x") {
+				x = p->Get<float>();
+				continue;
+			} else if (p->GetName() == "y") {
+				y = p->Get<float>();
+				continue;
+			} else if (p->GetName() == "z") {
+				z = p->Get<float>();
+				continue;
 			}
 		}
-		sphere->Transform().Scale(100.0f,100.0f,100.0f);
-		sphere->Transform().Translate(0.0f,0.0f,1000.0f);
+		sphere->Transform().Scale(scale,scale,scale);
+		sphere->Transform().Translate(x,y,z);
+		this->components[entityID].push_back(sphere);
 		return sphere;
 	}
 	return nullptr;
@@ -60,43 +71,56 @@ void OpenGLSystem::Update(const double delta) {
 		glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window  
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
-		GLSprite::shader.Use();
-		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		// Set the ViewProjection matrix to be used in the shader.
-		glm::mat4 ModelMatrix(1.0f);
-		glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &ModelMatrix[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_View"), 1, GL_FALSE, &this->view->ViewMatrix[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
 		// Loop through and draw each component.
 		for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {
 			for (auto vecitr = mapitr->second.begin(); vecitr < mapitr->second.end(); ++vecitr) {
 				try {
-					GLSprite* sprite = static_cast<GLSprite*>(*vecitr);
+					GLSprite* sprite = dynamic_cast<GLSprite*>(*vecitr);
+					if (sprite == nullptr) {
+						throw std::bad_cast();
+					}
+					glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+					GLSprite::shader.Use();
+					glm::mat4 ModelMatrix(1.0f);
+					glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &ModelMatrix[0][0]);
+					glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_View"), 1, GL_FALSE, &this->view->ViewMatrix[0][0]);
+					glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
 					glBindVertexArray(sprite->Vao());
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite->ElemBuf());
 					glUniform2d(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Offset"), sprite->OffsetX(), sprite->OffsetY());
 					glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, (void*)0);
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 					glBindVertexArray(0);
+					GLSprite::shader.UnUse();
+					break;
 				} catch (std::bad_cast b) {
+
+				}
+				try {
+					GLIcoSphere* sphere = dynamic_cast<GLIcoSphere*>(*vecitr);
+					if (sphere == nullptr) {
+						throw std::bad_cast();
+					}
+					glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+					GLIcoSphere::shader.Use();
+					sphere->Transform().Rotate(0.0f,0.1f,0.0f);
+					glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &sphere->Transform().ModelMatrix()[0][0]);
+					glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_View"), 1, GL_FALSE, &this->view->ViewMatrix[0][0]);
+					glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
+					glBindVertexArray(sphere->Vao());
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphere->ElemBuf());
+					glDrawElements(GL_TRIANGLES, sphere->NumberElements(), GL_UNSIGNED_SHORT, (void*)0);
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+					glBindVertexArray(0);
+					GLIcoSphere::shader.UnUse();
+					break;
+				}
+				catch (std::bad_cast b) {
 
 				}
 			}
 		}
-		GLSprite::shader.UnUse();
-		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-		GLIcoSphere::shader.Use();
-		sphere->Transform().Rotate(0.0f,0.1f,0.0f);
-		glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &sphere->Transform().ModelMatrix()[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_View"), 1, GL_FALSE, &this->view->ViewMatrix[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
-		glBindVertexArray(sphere->Vao());
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphere->ElemBuf());
-		glDrawElements(GL_TRIANGLES, sphere->NumberElements(), GL_UNSIGNED_SHORT, (void*)0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
-		glBindVertexArray(0);
-		GLIcoSphere::shader.UnUse();
-		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 		SwapBuffers(hdc); // Swap buffers so we can see our rendering.
 		this->deltaAccumulator = 0.0;
