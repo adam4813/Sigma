@@ -22,4 +22,4 @@ source_group("Source Files\\Systems" FILES ${Sigma_SRC_SYSTEM_CPP})
 add_executable (Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP})
 
 # Link the executable to the Hello library. 
-target_link_libraries (Sigma opengl32.lib glew32s.lib) 
+target_link_libraries (Sigma opengl32.lib glew32s.lib soil.lib) 
