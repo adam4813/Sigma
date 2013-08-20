@@ -64,7 +64,7 @@ bool OpenGLSystem::Update(const double delta) {
 	// Check if the deltaAccumulator is greater than 1/60 of a second.
 	if (deltaAccumulator > 16.7) {
 		// Set up the scene to a "clean" state.
-		glClearColor(0.0f,0.0f,1.0f,0.0f);
+		glClearColor(0.0f,0.0f,0.0f,0.0f);
 		glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window  
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
@@ -100,7 +100,7 @@ bool OpenGLSystem::Update(const double delta) {
 					if (sphere == nullptr) {
 						throw std::bad_cast();
 					}
-					glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+					//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 					GLIcoSphere::shader.Use();
 					sphere->Transform().Rotate(0.0f,0.1f,0.0f);
 					glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &sphere->Transform().ModelMatrix()[0][0]);
