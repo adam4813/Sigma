@@ -6,8 +6,13 @@ precision highp float; // needed only for version 1.30
  
 in  vec3 ex_Color;
 out vec4 out_Color;
+
+uniform sampler2D tex;
+in vec2 coord;
+out vec4 color;
  
 void main(void)
 {
         out_Color = vec4(ex_Color,1.0f);
+	color = texture(tex,coord) * vec4(ex_Color,1);
 }

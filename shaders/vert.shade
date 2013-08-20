@@ -9,12 +9,14 @@ uniform  mat4 in_Model;
 uniform  mat4 in_View;
 uniform  mat4 in_Proj;
 out vec3 ex_Color;
+
+in vec2 in_UV;
+out vec2 coord;
  
 void main(void)
 {
-	in_Position.x += in_Offset.x;
-	in_Position.y += in_Offset.y;
 	vec4 v = vec4(in_Position,1);
 	gl_Position = in_Proj * (in_View * ( in_Model * v));
         ex_Color = in_Color;
+	coord = in_UV;
 }
