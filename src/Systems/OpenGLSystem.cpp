@@ -79,13 +79,15 @@ bool OpenGLSystem::Update(const double delta) {
 					}
 					glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 					GLSprite::shader.Use();
-					glm::mat4 ModelMatrix(1.0f);
+					glUniform1i(glGetUniformLocation(GLSprite::shader.GetProgram(),"tex"), 0); // 0 for GL_TEXTURE0
+					glActiveTexture(GL_TEXTURE0);
+					glBindTexture(GL_TEXTURE_2D, 1);
 					glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &sprite->Transform().ModelMatrix()[0][0]);
 					glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_View"), 1, GL_FALSE, &this->view->ViewMatrix[0][0]);
 					glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
 					glBindVertexArray(sprite->Vao());
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite->GetBuffer(sprite->ElemBufIndex));
-					glDrawElements(sprite->DrawMode(), 4, GL_UNSIGNED_SHORT, (void*)0);
+					glDrawElements(sprite->DrawMode(), sprite->NumberElements(), GL_UNSIGNED_SHORT, (void*)0);
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 					glBindVertexArray(0);
 					GLSprite::shader.UnUse();

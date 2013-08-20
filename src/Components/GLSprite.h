@@ -16,6 +16,8 @@ public:
 	 */
 	void Initialize();
 
+	unsigned int LoadTexture();
+
 	// The shader used for rendering GLSprites.
 	static void LoadShader();
 	static GLSLShader shader;
@@ -25,6 +27,6 @@ public:
 	 *
 	 * \returns unsigned int The number of elements to draw.
 	 */
-	unsigned int NumberElements() const { return 4; }
+	unsigned int NumberElements() const { return 6; }
 private:
 };
