@@ -3,7 +3,7 @@
 #include "IComponent.h"
 #include "GLTransform.h"
 
-class IGLComponent : IComponent {
+class IGLComponent : public IComponent {
 public:
 	IGLComponent() : IComponent(0) { } // Default ctor setting entity ID to 0.
 	IGLComponent(const int entityID) : IComponent(entityID) { } // Ctor that sets the entity ID.
