@@ -17,6 +17,10 @@ struct vertex {
 	vertex(float x, float y, float z) : x(x), y(y), z(z) { }
 	float x,y,z;
 };
+struct color {
+	color(float r, float g, float b) : r(r), g(g), b(b) { }
+	float r,g,b;
+};
 
 class GLIcoSphere : public IGLComponent {
 public:
@@ -57,4 +61,5 @@ public:
 private:
 	std::vector<face> faces; // The faces for this IcoSphere. Can be used for later refinement.
 	std::vector<vertex> verts; // The verts that the faces refers to. Can be used for later refinement.
+	std::vector<color> colors;
 };
