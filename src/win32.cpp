@@ -86,7 +86,12 @@ double win32::GetDeltaTime() {
 	return delta/this->frequency;
 }
 
-bool win32::KeyDown(int key) {
+bool win32::KeyDown(int key, bool focused) {
+	if (focused) {
+		if (this->hwnd != GetFocus()) {
+			return false;
+		}
+	}
 	short k = GetKeyState(key);
 	return (k & 0x80) > 0 ? true : false;
 }

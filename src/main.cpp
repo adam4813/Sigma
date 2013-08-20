@@ -26,7 +26,7 @@ int main(int argCount, char **argValues) {
 		prop1.Set<float>(100.0f);
 		props.push_back(prop1);
 		Property prop2("x");
-		prop2.Set(0.0f);
+		prop2.Set(500.0f);
 		props.push_back(prop2);
 		Property prop3("y");
 		prop3.Set<float>(0.0f);
@@ -39,7 +39,7 @@ int main(int argCount, char **argValues) {
 	props.clear();
 	{
 		Property prop1("scale");
-		prop1.Set<float>(200.0f);
+		prop1.Set<float>(1000.0f);
 		props.push_back(prop1);
 		Property prop2("x");
 		prop2.Set<float>(500.0f);
@@ -48,20 +48,20 @@ int main(int argCount, char **argValues) {
 		prop3.Set<float>(0.0f);
 		props.push_back(prop3);
 		Property prop4("z");
-		prop4.Set<float>(500.0f);
+		prop4.Set<float>(8000.0f);
 		props.push_back(prop4);
 		glsys.Factory("GLIcoSphere", 4, props);
 	}
 	props.clear();
 	{
 		Property prop1("scale");
-		prop1.Set<float>(1000.0f);
+		prop1.Set<float>(500.0f);
 		props.push_back(prop1);
 		Property prop2("x");
 		prop2.Set<float>(500.0f);
 		props.push_back(prop2);
 		Property prop3("y");
-		prop3.Set<float>(500.0f);
+		prop3.Set<float>(0.0f);
 		props.push_back(prop3);
 		Property prop4("z");
 		prop4.Set<float>(2000.0f);
@@ -78,39 +78,39 @@ int main(int argCount, char **argValues) {
 		}
 
 		// Translation keys
-		if (os->KeyDown('W')) { // Move forward
-			if (os->KeyDown('B')) {
+		if (os->KeyDown('W', true)) { // Move forward
+			if (os->KeyDown('B', true)) {
 				glsys.Move(0.0f,0.0f,100.0f * (float)delta / 1000.0f);
 			} else {
 				glsys.Move(0.0f,0.0f,10.0f * (float)delta / 1000.0f);
 			}
-		} else if (os->KeyDown('S')) { // Move backward
+		} else if (os->KeyDown('S', true)) { // Move backward
 			glsys.Move(0.0f,0.0f,-10.0f * (float)delta / 1000.0f);
 		}
-		if (os->KeyDown('A')) { 
+		if (os->KeyDown('A', true)) { 
 			glsys.Rotate(0.0f,-90.0f * (float)delta / 1000.0f,0.0f); // Yaw left.
-		} else if (os->KeyDown('D')) {
+		} else if (os->KeyDown('D', true)) {
 			glsys.Rotate(0.0f,90.0f * (float)delta / 1000.0f,0.0f); // Yaw right.
 		}
-		if (os->KeyDown('F')) { 
+		if (os->KeyDown('F', true)) { 
 			glsys.Move(-10.0f * (float)delta / 1000.0f,0.0f,0.0f); // Strafe Left
-		} else if (os->KeyDown('G')) {
+		} else if (os->KeyDown('G', true)) {
 			glsys.Move(10.0f * (float)delta / 1000.0f,0.0f,0.0f); // Strafe Right
 		}
-		if (os->KeyDown('E')) { // Move up
+		if (os->KeyDown('E', true)) { // Move up
 			glsys.Move(0.0f,10.0f * (float)delta / 1000.0f,0.0f);
-		} else if (os->KeyDown('C')) { // Move down
+		} else if (os->KeyDown('C', true)) { // Move down
 			glsys.Move(0.0f,-10.0f * (float)delta / 1000.0f,0.0f);
 		}
-		if (os->KeyDown('Q')) { // Pitch Up
+		if (os->KeyDown('Q', true)) { // Pitch Up
 			glsys.Rotate(-90.0f * (float)delta / 1000.0f,0.0f,0.0f);
-		} else if (os->KeyDown('Z')) { // Pitch Down
+		} else if (os->KeyDown('Z', true)) { // Pitch Down
 			glsys.Rotate(90.0f * (float)delta / 1000.0f,0.0f,0.0f);
 		}
 
-		if (os->KeyDown('R')) { // Roll left
+		if (os->KeyDown('R', true)) { // Roll left
 			glsys.Rotate(0.0f,0.0f,-90.0f * (float)delta / 1000.0f);
-		} else if (os->KeyDown('T')) { // Roll right
+		} else if (os->KeyDown('T', true)) { // Roll right
 			glsys.Rotate(0.0f,0.0f,90.0f * (float)delta / 1000.0f);
 		}
 	}

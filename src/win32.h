@@ -17,7 +17,7 @@ public:
 
 	double GetDeltaTime();
 
-	bool KeyDown(int key);
+	bool KeyDown(int key, bool focused = false);
 
 	void Present();
 private:
