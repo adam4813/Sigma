@@ -3,6 +3,7 @@
 #include "GLSixDOFView.h"
 #include "../Components/GLSprite.h"
 #include "../Components/GLIcoSphere.h"
+#include "../Components/GLMesh.h"
 
 OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumulator(0.0) {
 	this->view = new GLSixDOFView(); 
@@ -54,6 +55,33 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		sphere->Transform().Translate(x,y,z);
 		this->components[entityID].push_back(sphere);
 		return sphere;
+	} else if (type=="GLMesh") {
+		GLMesh* mesh = new GLMesh(entityID);
+		mesh->LoadMesh("lowpolyship.obj");
+		mesh->Initialize();
+		float scale = 1.0f;
+		float x = 0.0f;
+		float y = 0.0f;
+		float z = 0.0f;
+		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
+			Property*  p = &*propitr;
+			if (p->GetName() == "scale") {
+				scale = p->Get<float>();
+				continue;
+			} else if (p->GetName() == "x") {
+				x = p->Get<float>();
+				continue;
+			} else if (p->GetName() == "y") {
+				y = p->Get<float>();
+				continue;
+			} else if (p->GetName() == "z") {
+				z = p->Get<float>();
+				continue;
+			}
+		}
+		mesh->Transform().Scale(scale,scale,scale);
+		mesh->Transform().Translate(x,y,z);
+		this->components[entityID].push_back(mesh);
 	}
 	return nullptr;
 }
@@ -64,7 +92,7 @@ bool OpenGLSystem::Update(const double delta) {
 	// Check if the deltaAccumulator is greater than 1/60 of a second.
 	if (deltaAccumulator > 16.7) {
 		// Set up the scene to a "clean" state.
-		glClearColor(0.0f,0.0f,0.0f,0.0f);
+		glClearColor(1.0f,1.0f,1.0f,0.0f);
 		glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window  
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
@@ -93,9 +121,22 @@ bool OpenGLSystem::Update(const double delta) {
 					GLSprite::shader.UnUse();
 					break;
 				} catch (std::bad_cast b) {
-
+					//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+					GLIcoSphere::shader.Use();
+					(*vecitr)->Transform().Rotate(0.0f,0.1f,0.0f);
+					glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &(*vecitr)->Transform().ModelMatrix()[0][0]);
+					glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_View"), 1, GL_FALSE, &this->view->ViewMatrix[0][0]);
+					glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
+					glBindVertexArray((*vecitr)->Vao());
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (*vecitr)->GetBuffer((*vecitr)->ElemBufIndex));
+					for (int i = 0, cur = (*vecitr)->NumberElements(0), prev = 0; cur != 0; prev = cur, cur = (*vecitr)->NumberElements(++i)) {
+						glDrawElements((*vecitr)->DrawMode(), cur, GL_UNSIGNED_SHORT, (void*)prev);
+					}
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+					glBindVertexArray(0);
+					GLIcoSphere::shader.UnUse();
 				}
-				try {
+				/*try {
 					GLIcoSphere* sphere = dynamic_cast<GLIcoSphere*>(*vecitr);
 					if (sphere == nullptr) {
 						throw std::bad_cast();
@@ -116,7 +157,7 @@ bool OpenGLSystem::Update(const double delta) {
 				}
 				catch (std::bad_cast b) {
 
-				}
+				}*/
 			}
 		}
 

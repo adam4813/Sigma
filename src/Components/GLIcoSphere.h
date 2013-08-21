@@ -6,22 +6,6 @@
 #include "../GLTransform.h"
 #include "../IGLComponent.h"
 
-// A helper to store which index each of its verts are.
-struct face {
-	face(unsigned short v1, unsigned short v2, unsigned short v3) : v1(v1), v2(v2), v3(v3) { }
-	unsigned short v1, v2, v3;
-};
-
-// A helper to store the location for each vertex.
-struct vertex {
-	vertex(float x, float y, float z) : x(x), y(y), z(z) { }
-	float x,y,z;
-};
-struct color {
-	color(float r, float g, float b) : r(r), g(g), b(b) { }
-	float r,g,b;
-};
-
 class GLIcoSphere : public IGLComponent {
 public:
 	// We have a private ctor so the factory method must be used.
@@ -57,7 +41,12 @@ public:
 	 *
 	 * \returns unsigned int The number of elements to draw.
 	 */
-	unsigned int NumberElements() const { return this->faces.size() * 3; }
+	unsigned int NumberElements(const int group = 0) const { 
+		if (group > 0) {
+			return 0;
+		}
+		return this->faces.size() * 3;
+	}
 private:
 	std::vector<face> faces; // The faces for this IcoSphere. Can be used for later refinement.
 	std::vector<vertex> verts; // The verts that the faces refers to. Can be used for later refinement.
