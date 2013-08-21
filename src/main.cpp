@@ -68,6 +68,22 @@ int main(int argCount, char **argValues) {
 		props.push_back(prop4);
 		glsys.Factory("GLIcoSphere", 5, props);
 	}
+	props.clear();
+	{
+		Property prop1("scale");
+		prop1.Set<float>(1.0f);
+		props.push_back(prop1);
+		Property prop2("x");
+		prop2.Set<float>(0.0f);
+		props.push_back(prop2);
+		Property prop3("y");
+		prop3.Set<float>(0.0f);
+		props.push_back(prop3);
+		Property prop4("z");
+		prop4.Set<float>(0.0f);
+		props.push_back(prop4);
+		glsys.Factory("GLMesh", 6, props);
+	}
 
 	os->SetupTimer();
 	double delta;
