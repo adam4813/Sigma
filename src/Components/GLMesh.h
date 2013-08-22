@@ -4,6 +4,11 @@
 #include "../IGLComponent.h"
 #include <vector>
 
+struct texCoord {
+	texCoord(float u, float v = 0.0f) : u(u), v(v) { }
+	float u, v;
+};
+
 class GLMesh : public IGLComponent {
 public:
 	GLMesh(const int entityID); // Ctor that sets the entity ID.
@@ -35,5 +40,9 @@ private:
 	std::vector<unsigned int> groupIndex; // Stores which index in faces a group starts at.
 	std::vector<face> faces; // Stores vectors of face groupings.
 	std::vector<vertex> verts; // The verts that the faces refers to. Can be used for later refinement.
+	std::vector<vertex> vertNorms; // The vertex normals for each vert.
+	std::vector<face> faceNorms; // The index for each vert normal.
+	std::vector<texCoord> texCoords; // The texture coords for each vertex.
+	std::vector<face> texFaces; // The texture coords for each face.
 	std::vector<color> colors;
 };
