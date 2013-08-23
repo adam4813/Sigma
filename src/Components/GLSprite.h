@@ -17,6 +17,7 @@ public:
 	void Initialize();
 
 	unsigned int LoadTexture();
+	GLuint GetTexture() { return texture_; }
 
 	// The shader used for rendering GLSprites.
 	static void LoadShader();
@@ -34,4 +35,5 @@ public:
 		return 6;
 	}
 private:
+	GLuint texture_;
 };
