@@ -57,8 +57,6 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		return sphere;
 	} else if (type=="GLMesh") {
 		GLMesh* mesh = new GLMesh(entityID);
-		mesh->LoadMesh("lowpolyship.obj");
-		mesh->Initialize();
 		float scale = 1.0f;
 		float x = 0.0f;
 		float y = 0.0f;
@@ -77,8 +75,11 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 			} else if (p->GetName() == "z") {
 				z = p->Get<float>();
 				continue;
+			} else if (p->GetName() == "meshFile") {
+				mesh->LoadMesh(p->Get<std::string>());
 			}
 		}
+		mesh->Initialize();
 		mesh->Transform().Scale(scale,scale,scale);
 		mesh->Transform().Translate(x,y,z);
 		this->components[entityID].push_back(mesh);

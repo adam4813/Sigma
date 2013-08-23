@@ -12,14 +12,19 @@ int main(int argCount, char **argValues) {
 	os = new win32();
 #endif
 	os->CreateGraphicsWindow();
+
 	const int* version = glsys.Start();
+	
 	if (version[0] == -1) {
 		std::cout<< "Error starting OpenGL!"<<std::endl;
 	} else {
 		std::cout<<"OpenGL version: " << version[0] << "." << version[1] << std::endl;
 	}
+	
 	std::vector<Property> props;
+	
 	glsys.Factory("GLSprite", 1, props);
+	
 	glsys.Factory("GLSprite", 2, props);
 	{
 		Property prop1("scale");
@@ -36,6 +41,7 @@ int main(int argCount, char **argValues) {
 		props.push_back(prop4);
 		glsys.Factory("GLIcoSphere", 3, props);
 	}
+	
 	props.clear();
 	{
 		Property prop1("scale");
@@ -52,6 +58,7 @@ int main(int argCount, char **argValues) {
 		props.push_back(prop4);
 		glsys.Factory("GLIcoSphere", 4, props);
 	}
+	
 	props.clear();
 	{
 		Property prop1("scale");
@@ -68,6 +75,7 @@ int main(int argCount, char **argValues) {
 		props.push_back(prop4);
 		glsys.Factory("GLIcoSphere", 5, props);
 	}
+	
 	props.clear();
 	{
 		Property prop1("scale");
@@ -82,11 +90,16 @@ int main(int argCount, char **argValues) {
 		Property prop4("z");
 		prop4.Set<float>(0.0f);
 		props.push_back(prop4);
+		Property prop5("meshFile");
+		prop5.Set<std::string>("lowpolyship.obj");
+		props.push_back(prop5);
 		glsys.Factory("GLMesh", 6, props);
 	}
 
 	os->SetupTimer();
+	
 	double delta;
+	
 	while (os->MessageLoop()) {
 		delta = os->GetDeltaTime();
 		if (glsys.Update(delta)) {
@@ -103,21 +116,25 @@ int main(int argCount, char **argValues) {
 		} else if (os->KeyDown('S', true)) { // Move backward
 			glsys.Move(0.0f,0.0f,-10.0f * (float)delta / 1000.0f);
 		}
+		
 		if (os->KeyDown('A', true)) { 
 			glsys.Rotate(0.0f,-90.0f * (float)delta / 1000.0f,0.0f); // Yaw left.
 		} else if (os->KeyDown('D', true)) {
 			glsys.Rotate(0.0f,90.0f * (float)delta / 1000.0f,0.0f); // Yaw right.
 		}
+		
 		if (os->KeyDown('F', true)) { 
 			glsys.Move(-10.0f * (float)delta / 1000.0f,0.0f,0.0f); // Strafe Left
 		} else if (os->KeyDown('G', true)) {
 			glsys.Move(10.0f * (float)delta / 1000.0f,0.0f,0.0f); // Strafe Right
 		}
+		
 		if (os->KeyDown('E', true)) { // Move up
 			glsys.Move(0.0f,10.0f * (float)delta / 1000.0f,0.0f);
 		} else if (os->KeyDown('C', true)) { // Move down
 			glsys.Move(0.0f,-10.0f * (float)delta / 1000.0f,0.0f);
 		}
+		
 		if (os->KeyDown('Q', true)) { // Pitch Up
 			glsys.Rotate(-90.0f * (float)delta / 1000.0f,0.0f,0.0f);
 		} else if (os->KeyDown('Z', true)) { // Pitch Down
@@ -130,6 +147,7 @@ int main(int argCount, char **argValues) {
 			glsys.Rotate(0.0f,0.0f,90.0f * (float)delta / 1000.0f);
 		}
 	}
+	
 	delete os;
 
 	return 0;
