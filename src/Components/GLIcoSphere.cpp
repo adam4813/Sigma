@@ -110,7 +110,7 @@ void GLIcoSphere::Initialize() {
 		glm::vec3 final_normal(total_normals.x, total_normals.y, total_normals.z);
 		final_normal = glm::normalize(final_normal);
 		vertNorms.push_back(vertex(final_normal.x, final_normal.y, final_normal.z));
-		std::cout << vertNorms[i].x << " " << vertNorms[i].y << " " << vertNorms[i].z << std::endl;
+		//std::cout << vertNorms[i].x << " " << vertNorms[i].y << " " << vertNorms[i].z << std::endl;
 	}
 
 	surfaceNorms.clear();
