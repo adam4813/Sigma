@@ -36,7 +36,7 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		float y = 0.0f;
 		float z = 0.0f;
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
-			Property*  p = &*propitr;
+			Property*  p = &(*propitr);
 			if (p->GetName() == "scale") {
 				scale = p->Get<float>();
 				continue;

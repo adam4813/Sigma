@@ -13,5 +13,4 @@ void main(void)
 {
 		float cosTheta = max( dot(normalize(ex_Normal), normalize(ex_Light)), 0.0);
         out_Color = vec4(ex_Color*cosTheta,1.0f);
-		//out_Color = vec4(ex_Color, 1.0f);
 }

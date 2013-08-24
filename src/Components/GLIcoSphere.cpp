@@ -8,6 +8,7 @@ GLIcoSphere::GLIcoSphere( const int entityID /*= 0*/ ) : IGLComponent(entityID) 
 	this->ElemBufIndex = 2;
 	this->ColorBufIndex = 1;
 	this->VertBufIndex = 0;
+	this->NormalBufIndex = 3;
 }
 
 void GLIcoSphere::Initialize() {
@@ -78,6 +79,42 @@ void GLIcoSphere::Initialize() {
 	// Store the new faces.
 	this->faces = faceLevelZero;
 
+	std::vector<vertex> surfaceNorms;
+
+	// compute surface normals
+	for(size_t i = 0; i < faces.size(); i++) {
+		glm::vec3 vector1, vector2, cross, normal;
+		vertex vert1(verts[faces[i].v1]), vert2(verts[faces[i].v2]), vert3(verts[faces[i].v3]);
+
+		vector1 = glm::normalize(glm::vec3(vert2.x-vert1.x, vert2.y-vert1.y, vert2.z-vert1.z));
+		vector2 = glm::normalize(glm::vec3(vert3.x-vert1.x, vert3.y-vert1.y, vert3.z-vert1.z));
+		cross = glm::cross(vector1, vector2);
+		normal = glm::normalize(cross);
+
+		surfaceNorms.push_back(vertex(normal.x, normal.y, normal.z));
+	}
+
+	// compute vertex normals
+	// should probably compute adjacency first, this could be slow
+	for(size_t i = 0; i < verts.size(); i++) {
+		vertex total_normals(0.0f, 0.0f, 0.0f);
+
+		for(size_t j = 0; j < faces.size(); j++) {
+			if (faces[j].v1 == i || faces[j].v2 == i || faces[j].v3 == i) {
+				total_normals.x += surfaceNorms[j].x;
+				total_normals.y += surfaceNorms[j].y;
+				total_normals.z += surfaceNorms[j].z;
+			}
+		}
+
+		glm::vec3 final_normal(total_normals.x, total_normals.y, total_normals.z);
+		final_normal = glm::normalize(final_normal);
+		vertNorms.push_back(vertex(final_normal.x, final_normal.y, final_normal.z));
+		std::cout << vertNorms[i].x << " " << vertNorms[i].y << " " << vertNorms[i].z << std::endl;
+	}
+
+	surfaceNorms.clear();
+
 	// We must create a vao and then store it in our GLIcoSphere.
 	glGenVertexArrays(1, &this->vao); // Generate the VAO
 	glBindVertexArray(this->vao); // Bind the VAO
@@ -100,6 +137,15 @@ void GLIcoSphere::Initialize() {
 	glGenBuffers(1, &this->buffers[this->ElemBufIndex]); // Generate the element buffer.
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buffers[this->ElemBufIndex]); // Bind the element buffer.
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(face) * this->faces.size(), &this->faces.front(), GL_STATIC_DRAW); // Store the faces in the element buffer.
+
+	if (this->vertNorms.size() > 0) {
+		glGenBuffers(1, &this->buffers[this->NormalBufIndex]);
+		glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->NormalBufIndex]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex)*this->vertNorms.size(), &this->vertNorms[0], GL_STATIC_DRAW);
+		GLint normalLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Normal");
+		glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(normalLocation);
+	}
 
 	glBindVertexArray(0); // Reset the buffer binding because we are good programmers.
 }

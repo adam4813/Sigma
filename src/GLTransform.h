@@ -43,6 +43,7 @@ public:
 		if (this->MMhasChanged) {
 			this->modelMatrix = glm::mat4(1.0f);
 			this->modelMatrix =  this->translateMatrix * this->rotateMatrix * this->scaleMatrix;
+			//this->modelMatrix =  this->scaleMatrix*this->rotateMatrix*this->translateMatrix;
 			this->MMhasChanged = false;
 		}
 		return this->modelMatrix;

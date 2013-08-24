@@ -41,8 +41,8 @@ void GLMesh::Initialize() {
 	}
 	if (this->vertNorms.size() > 0) {
 		glGenBuffers(1, &this->buffers[this->NormalBufIndex]);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buffers[this->NormalBufIndex]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(vertex)*this->vertNorms.size(), &this->vertNorms[0], GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->NormalBufIndex]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex)*this->vertNorms.size(), &this->vertNorms[0], GL_STATIC_DRAW);
 		GLint normalLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Normal");
 		glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(normalLocation);
@@ -69,8 +69,9 @@ void GLMesh::LoadMesh(std::string fname) {
 			short indicies[3][3];
 			std::string cur = line.substr(2, line.find(' ', 2) - 2);
 			std::string left = line.substr(line.find(' ', 2) + 1);
-			for (int i = 0; i < 3; ++i) { // Each face contains 3 sets of indicies. Each set is 3 indicies n/t/n.
-				std::string first = cur.substr(0, cur.find('/')); // Substring for the n portion
+
+			for (int i = 0; i < 3; ++i) { // Each face contains 3 sets of indicies. Each set is 3 indicies v/t/n.
+				std::string first = cur.substr(0, cur.find('/')); // Substring for the v portion
 				indicies[i][0] = atoi(first.c_str());
 				if ((cur.find('/') + 1) != cur.find('/', cur.find('/') + 1)) { // Check if we have a t portion
 					std::string second = cur.substr(cur.find('/') + 1, cur.find('/', cur.find('/') + 1)); // Substring for the t portion
@@ -94,19 +95,19 @@ void GLMesh::LoadMesh(std::string fname) {
 			ta = indicies[0][1]; tb = indicies[1][1]; tc = indicies[2][1];
 			ta--; tb--; tc--;
 			GLushort na,nb,nc;
-			na = indicies[0][2]; nb = indicies[1][3]; nc = indicies[2][3];
+			na = indicies[0][2]; nb = indicies[1][2]; nc = indicies[2][2];
 			na--; nb--; nc--;
 			this->faces.push_back(face(a,b,c));
 			this->texFaces.push_back(face(ta,tb,tc));
 			this->faceNorms.push_back(face(na,nb,nc));
 		}  else if (line.substr(0,2) == "vt") { //  Vertex tex coord
 			float u, v = 0.0f;
-			std::istringstream s(line.substr(2));
+			std::istringstream s(line.substr(3));
 			s >> u; s >> v;
 			this->texCoords.push_back(texCoord(u,v));
 		}  else if (line.substr(0,2) == "vn") { // Vertex normal
 			float i, j, k;
-			std::istringstream s(line.substr(2));
+			std::istringstream s(line.substr(3));
 			s >> i; s >> j; s >> k;
 			this->vertNorms.push_back(vertex(i,j,k));
 		} else if (line[0] == 'g') { // Face group
@@ -119,6 +120,7 @@ void GLMesh::LoadMesh(std::string fname) {
 		}
 	}
 
+	// Check if vertex normals exist
 	if(vertNorms.size() == 0) {
 		std::vector<vertex> surfaceNorms;
 
@@ -127,8 +129,8 @@ void GLMesh::LoadMesh(std::string fname) {
 			glm::vec3 vector1, vector2, cross, normal;
 			vertex vert1(verts[faces[i].v1]), vert2(verts[faces[i].v2]), vert3(verts[faces[i].v3]);
 
-			vector1 = glm::vec3(vert2.x-vert1.x, vert2.y-vert1.y, vert2.z-vert1.z);
-			vector2 = glm::vec3(vert3.x-vert1.x, vert3.y-vert1.y, vert3.z-vert1.z);
+			vector1 = glm::normalize(glm::vec3(vert2.x-vert1.x, vert2.y-vert1.y, vert2.z-vert1.z));
+			vector2 = glm::normalize(glm::vec3(vert3.x-vert1.x, vert3.y-vert1.y, vert3.z-vert1.z));
 			cross = glm::cross(vector1, vector2);
 			normal = glm::normalize(cross);
 
