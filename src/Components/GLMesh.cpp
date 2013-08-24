@@ -102,12 +102,12 @@ void GLMesh::LoadMesh(std::string fname) {
 			this->faceNorms.push_back(face(na,nb,nc));
 		}  else if (line.substr(0,2) == "vt") { //  Vertex tex coord
 			float u, v = 0.0f;
-			std::istringstream s(line.substr(3));
+			std::istringstream s(line.substr(2));
 			s >> u; s >> v;
 			this->texCoords.push_back(texCoord(u,v));
 		}  else if (line.substr(0,2) == "vn") { // Vertex normal
 			float i, j, k;
-			std::istringstream s(line.substr(3));
+			std::istringstream s(line.substr(2));
 			s >> i; s >> j; s >> k;
 			this->vertNorms.push_back(vertex(i,j,k));
 		} else if (line[0] == 'g') { // Face group
@@ -150,9 +150,14 @@ void GLMesh::LoadMesh(std::string fname) {
 				}
 			}
 
-			glm::vec3 final_normal(total_normals.x, total_normals.y, total_normals.z);
-			final_normal = glm::normalize(final_normal);
-			vertNorms.push_back(vertex(final_normal.x, final_normal.y, final_normal.z));
+			if(!(total_normals.x == 0.0f && total_normals.y == 0.0f && total_normals.z == 0.0f)) {
+				glm::vec3 final_normal(total_normals.x, total_normals.y, total_normals.z);
+				final_normal = glm::normalize(final_normal);
+				vertNorms.push_back(vertex(final_normal.x, final_normal.y, final_normal.z));
+			}
+			else {
+				vertNorms.push_back(vertex(total_normals.x, total_normals.y, total_normals.z));
+			}
 			//std::cout << vertNorms[i].x << " " << vertNorms[i].y << " " << vertNorms[i].z << std::endl;
 		}
 
