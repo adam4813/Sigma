@@ -102,22 +102,81 @@ void GLMesh::LoadMesh(std::string fname) {
 			this->vertNorms.push_back(vertex(i,j,k));
 		} else if (line[0] == 'g') { // Face group
 			this->groupIndex.push_back(this->faces.size());
+		} else if (line.substr(0, line.find(' ')) == "mtllib") { // Material library
+			ParseMTL(line.substr(line.find(' ') + 1));
 		} else if ((line[0] == '#') || (line.size() == 0)) { // Comment or blank line
 			/* ignoring this line comment or blank*/
 		} else { // Unknown
 			/* ignoring this line */
+			std::string test = line.substr(0, line.find(' '));
 			std::cerr << "Unrecognized line " << line << std::endl;
 		}
 	}
+}
 
-	/*normals.resize(mesh->vertices.size(), glm::vec3(0.0, 0.0, 0.0));
-	for (int i = 0; i < elements.size(); i+=3) {
-		GLushort ia = elements[i];
-		GLushort ib = elements[i+1];
-		GLushort ic = elements[i+2];
-		glm::vec3 normal = glm::normalize(glm::cross(
-			glm::vec3(vertices[ib]) - glm::vec3(vertices[ia]),
-			glm::vec3(vertices[ic]) - glm::vec3(vertices[ia])));
-		normals[ia] = normals[ib] = normals[ic] = normal;
-	}*/
+void GLMesh::ParseMTL(std::string fname) {
+	std::ifstream in(fname, std::ios::in);
+	if (!in) {
+		std::cerr << "Cannot open " << fname << std::endl;
+		return;
+	}
+
+	std::string line;
+	while (getline(in, line)) {
+		std::stringstream s(line);
+		std::string label;
+		s >> label;
+		if (label == "newmtl") {
+			std::string name;
+			s >> name;
+			material m;
+			getline(in, line);
+			s.str(line);
+			s.seekg(0);
+			s >> label;
+			while (label != "newmtl") {
+				if (label == "Ka") {
+					float r,g,b;
+					s >> r; s >> g; s >> b;
+					m.ka[0] = r; m.ka[1] = g; m.ka[2] = b;
+				} else if (label == "Kd") {
+					float r,g,b;
+					s >> r; s >> g; s >> b;
+					m.kd[0] = r; m.kd[1] = g; m.kd[2] = b;
+				} else if (label == "Ks") {
+					float r,g,b;
+					s >> r; s >> g; s >> b;
+					m.ks[0] = r; m.ks[1] = g; m.ks[2] = b;
+				} else if ((label == "Tr") || (label == "d")) {
+					float tr;
+					s >> tr;
+					m.tr = tr;
+				} else if (label == "Ns") {
+					float ns;
+					s >> ns;
+					m.tr = ns;
+				} else if (label == "illum") {
+					int i;
+					s >> i;
+					m.illum = i;
+				} else {
+					// Blank line
+				}
+				int pre = in.tellg();
+				getline(in, line);
+				if (in.eof()) {
+					break;
+				}
+				s.str(line);
+				s.seekg(0);
+				s >> label;
+				std::string newlabel;
+				if (s.str().find("newmtl") != std::string::npos) {
+					in.seekg(pre);
+					break;
+				}
+			}
+			this->mats[name] = m;
+		}
+	}
 }
