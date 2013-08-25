@@ -98,7 +98,7 @@ int main(int argCount, char **argValues) {
 		prop4.Set<float>(0.0f);
 		props.push_back(prop4);
 		Property prop5("meshFile");
-		prop5.Set<std::string>("lowpolyshiptri.obj");
+		prop5.Set<std::string>("trillek_dev_clonk2u_tri.obj");
 		props.push_back(prop5);
 		glsys.Factory("GLMesh", 6, props);
 	}

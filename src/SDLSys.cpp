@@ -10,10 +10,23 @@
 void* SDLSys::CreateGraphicsWindow() {
 	std::cout << "Creating Window using SDL...";
 
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+
 	this->_Window = SDL_CreateWindow("Sigma Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
 	this->_Context = SDL_GL_CreateContext(this->_Window);
 
-	glewInit();
+	GLenum glew_err = glewInit();
+	if (glew_err != GLEW_OK) {
+		fprintf(stderr, "GLEW Error: %s\n", glewGetErrorString(glew_err));
+		return 0;
+	}
+	
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 
 	return &this->_Context;
 }
