@@ -1,14 +1,15 @@
 #ifndef SDL_SYS_H
 #define SDL_SYS_H
 
+#include <map>
+
 #include "IOpSys.h"
 #include "SDL.h"
-#include "SDL_opengl.h"
 
 class SDLSys : public IOpSys {
 public:
 	SDLSys() { SDL_Init(SDL_INIT_EVERYTHING); }
-	virtual ~SDLSys() { SDL_GL_DeleteContext(m_Context); SDL_DestroyWindow(m_Window); SDL_Quit(); }
+	virtual ~SDLSys() { SDL_GL_DeleteContext(_Context); SDL_DestroyWindow(_Window); SDL_Quit(); }
 
 	virtual void* CreateGraphicsWindow();
 	virtual bool MessageLoop();
@@ -18,12 +19,14 @@ public:
 	virtual void Present();
 
 private:
-	SDL_Window *m_Window;
-	SDL_Renderer *m_Renderer;
-	SDL_GLContext m_Context;
+	SDL_Window *_Window;
+	SDL_GLContext _Context;
 
-	double frequency;
-	long long lastTime;
+	// Keyboard state
+	std::map<char, bool> _KeyStates;
+
+	double _Frequency;
+	long long _LastTime;
 };
 
 #endif

@@ -1,21 +1,47 @@
+#include <iostream>
+
 #include "SDLSys.h"
 
+#define GLEW_STATIC
+
+#include "GL/glew.h"
+#include "SDL_opengl.h"
+
 void* SDLSys::CreateGraphicsWindow() {
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	std::cout << "Creating Window using SDL...";
 
-	m_Window = SDL_CreateWindow("Sigma Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
-	m_Renderer = SDL_CreateRenderer(m_Window, -1, 0);
-	m_Context = SDL_GL_CreateContext(m_Window);
+	this->_Window = SDL_CreateWindow("Sigma Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
+	this->_Context = SDL_GL_CreateContext(this->_Window);
 
-	return &m_Context;
+	glewInit();
+
+	return &this->_Context;
 }
 
 bool SDLSys::MessageLoop() {
-	SDL_Event *event;
+	SDL_Event event;
+	SDL_Keycode key;
 
-	if (SDL_PollEvent(event)) {
-		if(event->type == SDL_QUIT) {
+	while(SDL_PollEvent(&event)) {
+		switch(event.type) {
+		case SDL_QUIT:
 			return false;
+		case SDL_KEYDOWN:
+			// hack to do case insensitive lookup
+			key = event.key.keysym.sym;
+			if (key > 96 && key < 123) {
+				key -= 32;
+			}
+			this->_KeyStates[key] = true;
+			break;
+		case SDL_KEYUP:
+			// hack to do case insensitive lookup
+			key = event.key.keysym.sym;
+			if (key > 96 && key < 123) {
+				key -= 32;
+			}
+			this->_KeyStates[key] = false;
+			break;
 		}
 	}
 
@@ -28,26 +54,32 @@ bool SDLSys::SetupTimer() {
 		return false;
 	}
 
-	this->frequency = static_cast<double>(li.QuadPart)/1000.0;
+	this->_Frequency = static_cast<double>(li.QuadPart)/1000.0;
 
 	QueryPerformanceCounter(&li);
-	this->lastTime = li.QuadPart;
+	this->_LastTime = li.QuadPart;
 	return true;
 }
 
 double SDLSys::GetDeltaTime() {
 	LARGE_INTEGER li;
 	QueryPerformanceCounter(&li);
-	double delta = static_cast<double>(li.QuadPart - this->lastTime);
-	this->lastTime = li.QuadPart;
-	return delta/this->frequency;
+	double delta = static_cast<double>(li.QuadPart - this->_LastTime);
+	this->_LastTime = li.QuadPart;
+	return delta/this->_Frequency;
 }
 
 bool SDLSys::KeyDown(int key, bool focused) {
-	return false;
+	// Check if the focused bool is true, and that
+	// the window we are using has keyboard focus
+	if(focused && this->_Window == SDL_GetKeyboardFocus()) {
+		return this->_KeyStates[key];
+	}
+	else {
+		return false;
+	}
 }
 
 void SDLSys::Present() {
-	SDL_GL_SwapWindow(m_Window);
-	//SDL_RenderPresent(this->m_Renderer);
+	SDL_GL_SwapWindow(this->_Window);
 }

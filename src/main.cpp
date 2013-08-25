@@ -1,6 +1,7 @@
 #include <iostream>
 #include "sdl.h"
 #include "SDL_image.h"
+#include "SDLSys.h"
 
 #include "Systems/OpenGLSystem.h"
 
@@ -8,15 +9,14 @@
 #include "win32.h"
 #endif
 
-#include "SDLSys.h"
-
 int main(int argCount, char **argValues) {
 	OpenGLSystem glsys;
 	IOpSys* os = nullptr;
-//#ifdef WIN32
+//#ifdef _WIN32
 //	os = new win32();
-//#endif
+//#else
 	os = new SDLSys();
+//#endif
 
 	os->CreateGraphicsWindow();
 
