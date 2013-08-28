@@ -24,13 +24,13 @@ public:
 	 *
 	 * Given a set of verts and faces, divide each face into 4, append the new verts to the verts array, and add the faces to a temporary array.
 	 * Then replace the input array of faces with the new array of faces.
-	 * \param[in/out] std::vector<vertex> & verts The verts that will be used as a starting point. Any new verts created will be added to this.
-	 * \param[in/out] std::vector<face> & faces The faces to refine. The set of faces will be stored here when complete.
+	 * \param[in/out] std::vector<Vertex> & verts The verts that will be used as a starting point. Any new verts created will be added to this.
+	 * \param[in/out] std::vector<Face> & faces The faces to refine. The set of faces will be stored here when complete.
 	 * \param[in] int level The number of refinements to apply.
 	 * \returns   void 
 	 * \exception  
 	 */
-	void Refine(std::vector<vertex> &verts, std::vector<face> &faces, int level);
+	void Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::Face> &faces, int level);
 
 	// The shader used for rendering GLIcoSphere.
 	static void LoadShader();
@@ -41,15 +41,15 @@ public:
 	 *
 	 * \returns unsigned int The number of elements to draw.
 	 */
-	unsigned int NumberElements(const int group = 0) const { 
+	unsigned int MeshGroup_ElementCount(const unsigned int group = 0) const { 
 		if (group > 0) {
 			return 0;
 		}
 		return this->faces.size() * 3;
 	}
 private:
-	std::vector<face> faces; // The faces for this IcoSphere. Can be used for later refinement.
-	std::vector<vertex> verts; // The verts that the faces refers to. Can be used for later refinement.
+	std::vector<Sigma::Face> faces; // The faces for this IcoSphere. Can be used for later refinement.
+	std::vector<Sigma::Vertex> verts; // The verts that the faces refers to. Can be used for later refinement.
 	std::vector<color> colors;
-	std::vector<vertex> vertNorms;
+	std::vector<Sigma::Vertex> vertNorms;
 };

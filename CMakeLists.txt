@@ -18,6 +18,9 @@ source_group("Header Files\\Systems" FILES ${Sigma_SRC_SYSTEM_H})
 file(GLOB Sigma_SRC_SYSTEM_CPP "src/Systems/*.cpp")
 source_group("Source Files\\Systems" FILES ${Sigma_SRC_SYSTEM_CPP})
 
+# Add a define to prevent GLEW linker warnings
+ADD_DEFINITIONS(-DGLEW_STATIC)
+
 # add the executable
 add_executable (Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP})
 

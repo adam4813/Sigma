@@ -3,17 +3,19 @@
 #include "IComponent.h"
 #include "GLTransform.h"
 
-// A helper to store which index each of its verts are.
-struct face {
-	face(unsigned short v1, unsigned short v2, unsigned short v3) : v1(v1), v2(v2), v3(v3) { }
-	unsigned short v1, v2, v3;
-};
+namespace Sigma {
+	// A helper to store which index each of its verts are.
+	struct Face {
+		Face(unsigned short v1, unsigned short v2, unsigned short v3) : v1(v1), v2(v2), v3(v3) { }
+		unsigned short v1, v2, v3;
+	};
 
-// A helper to store the location for each vertex.
-struct vertex {
-	vertex(float x, float y, float z) : x(x), y(y), z(z) { }
-	float x,y,z;
-};
+	// A helper to store the location for each vertex.
+	struct Vertex {
+		Vertex(float x, float y, float z) : x(x), y(y), z(z) { }
+		float x,y,z;
+	};
+}
 
 struct color {
 	color(float r, float g, float b) : r(r), g(g), b(b) { }
@@ -48,7 +50,7 @@ public:
 	 *
 	 * \returns unsigned int The number of elements to draw.
 	 */
-	virtual unsigned int NumberElements(const int group = 0) const = 0;
+	virtual unsigned int MeshGroup_ElementCount(const unsigned int group = 0) const = 0;
 
 	/**
 	 * \brief Returns the draw type for this component.

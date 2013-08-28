@@ -121,7 +121,7 @@ bool OpenGLSystem::Update(const double delta) {
 	// Check if the deltaAccumulator is greater than 1/60 of a second.
 	if (deltaAccumulator > 16.7) {
 		// Set up the scene to a "clean" state.
-		glClearColor(0.0f,0.0f,0.0f,0.0f);
+		glClearColor(1.0f,1.0f,1.0f,0.0f);
 		glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window  
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
@@ -146,7 +146,7 @@ bool OpenGLSystem::Update(const double delta) {
 					glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
 					glBindVertexArray(sprite->Vao());
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite->GetBuffer(sprite->ElemBufIndex));
-					glDrawElements(sprite->DrawMode(), sprite->NumberElements(), GL_UNSIGNED_SHORT, (void*)0);
+					glDrawElements(sprite->DrawMode(), sprite->MeshGroup_ElementCount(), GL_UNSIGNED_SHORT, (void*)0);
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 					glBindVertexArray(0);
 					GLSprite::shader.UnUse();
@@ -160,7 +160,7 @@ bool OpenGLSystem::Update(const double delta) {
 					glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
 					glBindVertexArray((*vecitr)->Vao());
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (*vecitr)->GetBuffer((*vecitr)->ElemBufIndex));
-					for (int i = 0, cur = (*vecitr)->NumberElements(0), prev = 0; cur != 0; prev = cur, cur = (*vecitr)->NumberElements(++i)) {
+					for (int i = 0, cur = (*vecitr)->MeshGroup_ElementCount(0), prev = 0; cur != 0; prev = cur, cur = (*vecitr)->MeshGroup_ElementCount(++i)) {
 						glDrawElements((*vecitr)->DrawMode(), cur, GL_UNSIGNED_SHORT, (void*)prev);
 					}
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
@@ -204,10 +204,6 @@ IGLComponent* OpenGLSystem::GetComponent(int entityID) {
 		return this->components[entityID][0];
 	}
 	return nullptr;
-}
-
-SceneManager* OpenGLSystem::GetScene() {
-	return &this->scene;
 }
 
 const int* OpenGLSystem::Start() {
