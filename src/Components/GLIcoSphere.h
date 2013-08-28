@@ -51,4 +51,5 @@ private:
 	std::vector<face> faces; // The faces for this IcoSphere. Can be used for later refinement.
 	std::vector<vertex> verts; // The verts that the faces refers to. Can be used for later refinement.
 	std::vector<color> colors;
+	std::vector<vertex> vertNorms;
 };

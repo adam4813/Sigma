@@ -69,6 +69,8 @@ public:
 	int VertBufIndex;
 	int UVBufIndex;
 	int ColorBufIndex;
+	int NormalBufIndex;
+
 protected:
 	unsigned int buffers[10];
 	unsigned int vao; // The VAO that describes this component's data.

@@ -12,7 +12,7 @@ GLSprite::GLSprite( const int entityID /*= 0*/ ) : IGLComponent(entityID)  {
 
 
 void GLSprite::Initialize() {
-	LoadTexture();
+	texture_ = LoadTexture();
 	static const GLfloat vert[] = {
 		-1.0f, 1.0f, 0.0f,
 		1.0f, 1.0f, 0.0f,
@@ -74,9 +74,14 @@ void GLSprite::LoadShader() {
 
 unsigned int GLSprite::LoadTexture() {
 
-	GLuint textureid = SOIL_load_OGL_texture("test.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
+	//GLuint textureid = SOIL_load_OGL_texture("test.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
 
-	return textureid;
+	//if(textureid==0) {
+	//	assert(0 && "Failed to load test.jpg");
+	//}
+
+	//return textureid;
+	return 0;
 }
 
 GLSLShader GLSprite::shader;

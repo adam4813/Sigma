@@ -17,6 +17,6 @@ void main(void)
 {
 	vec4 v = vec4(in_Position,1);
 	gl_Position = in_Proj * (in_View * ( in_Model * v));
-        ex_Color = in_Color;
+	ex_Color = in_Color;
 	coord = in_UV;
 }

@@ -36,7 +36,7 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		float y = 0.0f;
 		float z = 0.0f;
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
-			Property*  p = &*propitr;
+			Property*  p = &(*propitr);
 			if (p->GetName() == "scale") {
 				scale = p->Get<float>();
 				continue;
@@ -57,8 +57,6 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		return sphere;
 	} else if (type=="GLMesh") {
 		GLMesh* mesh = new GLMesh(entityID);
-		mesh->LoadMesh("lowpolyship.obj");
-		mesh->Initialize();
 		float scale = 1.0f;
 		float x = 0.0f;
 		float y = 0.0f;
@@ -77,8 +75,11 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 			} else if (p->GetName() == "z") {
 				z = p->Get<float>();
 				continue;
+			} else if (p->GetName() == "meshFile") {
+				mesh->LoadMesh(p->Get<std::string>());
 			}
 		}
+		mesh->Initialize();
 		mesh->Transform().Scale(scale,scale,scale);
 		mesh->Transform().Translate(x,y,z);
 		this->components[entityID].push_back(mesh);
@@ -109,7 +110,7 @@ bool OpenGLSystem::Update(const double delta) {
 					GLSprite::shader.Use();
 					glUniform1i(glGetUniformLocation(GLSprite::shader.GetProgram(),"tex"), 0); // 0 for GL_TEXTURE0
 					glActiveTexture(GL_TEXTURE0);
-					glBindTexture(GL_TEXTURE_2D, 1);
+					glBindTexture(GL_TEXTURE_2D, sprite->GetTexture());
 					glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &sprite->Transform().ModelMatrix()[0][0]);
 					glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_View"), 1, GL_FALSE, &this->view->ViewMatrix[0][0]);
 					glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
