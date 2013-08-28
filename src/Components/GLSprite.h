@@ -28,7 +28,7 @@ public:
 	 *
 	 * \returns unsigned int The number of elements to draw.
 	 */
-	unsigned int NumberElements(const int group = 0) const {
+	unsigned int MeshGroup_ElementCount(const unsigned int group = 0) const {
 		if (group > 0) {
 			return 0;
 		}
