@@ -1,6 +1,10 @@
 #include <iostream>
+#include "sdl.h"
+#include "SDL_image.h"
+#include "SDLSys.h"
 
 #include "Systems/OpenGLSystem.h"
+
 #ifdef WIN32
 #include "win32.h"
 #endif
@@ -8,9 +12,12 @@
 int main(int argCount, char **argValues) {
 	OpenGLSystem glsys;
 	IOpSys* os = nullptr;
-#ifdef WIN32
-	os = new win32();
-#endif
+//#ifdef _WIN32
+//	os = new win32();
+//#else
+	os = new SDLSys();
+//#endif
+
 	os->CreateGraphicsWindow();
 
 	const int* version = glsys.Start();

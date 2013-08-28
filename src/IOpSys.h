@@ -3,7 +3,7 @@
 class IOpSys {
 public:
 	IOpSys() { }
-	~IOpSys() { }
+	virtual ~IOpSys() { }
 
 	virtual void* CreateGraphicsWindow() = 0;
 
