@@ -18,7 +18,7 @@ public:
 	 * \returns   GLIcoSphere* The newly creates GLIcoSphere
 	 */
 	void Initialize();
-
+	virtual void Update(glm::mediump_float *view, glm::mediump_float *proj);
 	/**
 	 * \brief Refines a given set of faces into 4 smaller faces.
 	 *

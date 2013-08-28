@@ -129,7 +129,9 @@ bool OpenGLSystem::Update(const double delta) {
 		// Loop through and draw each component.
 		for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {
 			for (auto vecitr = mapitr->second.begin(); vecitr < mapitr->second.end(); ++vecitr) {
-				try {
+				(*vecitr)->Update(&this->view->ViewMatrix[0][0], &this->ProjectionMatrix[0][0]);
+				
+				/*try {
 					GLSprite* sprite = dynamic_cast<GLSprite*>(*vecitr);
 					if (sprite == nullptr) {
 						throw std::bad_cast();
@@ -149,9 +151,9 @@ bool OpenGLSystem::Update(const double delta) {
 					glBindVertexArray(0);
 					GLSprite::shader.UnUse();
 					break;
-				} catch (std::bad_cast b) {
+				} catch (std::bad_cast b) {*/
 					//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-					GLIcoSphere::shader.Use();
+				/*	GLIcoSphere::shader.Use();
 					(*vecitr)->Transform().Rotate(0.0f,0.1f,0.0f);
 					glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &(*vecitr)->Transform().ModelMatrix()[0][0]);
 					glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_View"), 1, GL_FALSE, &this->view->ViewMatrix[0][0]);
@@ -165,7 +167,7 @@ bool OpenGLSystem::Update(const double delta) {
 					glBindVertexArray(0);
 					GLIcoSphere::shader.UnUse();
 					//glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-				}
+				}*/
 				/*try {
 					GLIcoSphere* sphere = dynamic_cast<GLIcoSphere*>(*vecitr);
 					if (sphere == nullptr) {
@@ -219,6 +221,7 @@ const int* OpenGLSystem::Start() {
 	// Now that GL is up and running load the shaders
 	GLSprite::LoadShader();
 	GLIcoSphere::LoadShader();
+	GLCubeSphere::LoadShader();
 
 	// Generates a really hard-to-read matrix, but a normal, standard 4x4 matrix nonetheless
 	this->ProjectionMatrix = glm::perspective(
@@ -233,6 +236,7 @@ const int* OpenGLSystem::Start() {
 	// App specific global gl settings
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+	glEnable(GL_MULTISAMPLE_ARB);
 
 	return OpenGLVersion;
 }

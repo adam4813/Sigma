@@ -1,7 +1,12 @@
-#include "GLCubeSphere.h"
-#include "GLIcoSphere.h"
 #include <vector>
 #include <algorithm>
+
+#include "sdl.h"
+#include "sdl_image.h"
+
+#include "GLCubeSphere.h"
+
+GLSLShader GLCubeSphere::shader;
 
 // For std::find
 bool operator ==(const vertex &lhs, const vertex &rhs) { return (lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z); }
@@ -20,7 +25,7 @@ void GLCubeSphere::Initialize() {
 	int subdivisions = 5;
 
 	// Create the verts to begin refining at.
-	float t = 0.5f;
+	float t = 1.0f;
 	glm::vec3 coordPair(t, t, t);
 
 	this->verts.push_back(vertex(-coordPair.x, -coordPair.y, coordPair.z));
@@ -103,14 +108,14 @@ void GLCubeSphere::Initialize() {
 	glGenBuffers(1, &this->buffers[this->VertBufIndex]); 	// Generate the vertex buffer.
 	glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->VertBufIndex]); // Bind the vertex buffer.
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex) * this->verts.size(), &this->verts.front(), GL_STATIC_DRAW); // Stores the verts in the vertex buffer.
-	GLint posLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Position"); // Find the location in the shader where the vertex buffer data will be placed.
+	GLint posLocation = glGetAttribLocation(GLCubeSphere::shader.GetProgram(), "in_Position"); // Find the location in the shader where the vertex buffer data will be placed.
 	glVertexAttribPointer(posLocation, 3, GL_FLOAT, GL_FALSE, 0, 0); // Tell the VAO the vertex data will be stored at the location we just found.
 	glEnableVertexAttribArray(posLocation); // Enable the VAO line for vertex data.
 
 	glGenBuffers(1, &this->buffers[this->ColorBufIndex]);
 	glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->ColorBufIndex]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(color) * this->colors.size(), &this->colors.front(), GL_STATIC_DRAW);
-	GLint colLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Color");
+	GLint colLocation = glGetAttribLocation(GLCubeSphere::shader.GetProgram(), "in_Color");
 	glVertexAttribPointer(colLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(colLocation);
 
@@ -122,7 +127,7 @@ void GLCubeSphere::Initialize() {
 		glGenBuffers(1, &this->buffers[this->NormalBufIndex]);
 		glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->NormalBufIndex]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex)*this->vertNorms.size(), &this->vertNorms[0], GL_STATIC_DRAW);
-		GLint normalLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Normal");
+		GLint normalLocation = glGetAttribLocation(GLCubeSphere::shader.GetProgram(), "in_Normal");
 		glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(normalLocation);
 	}
@@ -140,11 +145,18 @@ void GLCubeSphere::Initialize() {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);
 
 	// There is always six filenames
-	for(int i=1; i < 7; i++) {
+	for(int i=0; i < 6; i++) {
 		char filename[100];
-		sprintf_s(filename, "mars%d.jpg", i);
-		//BMPData* bmpData = LoadTextureBMPData_custom(filename);
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+i,0,GL_RGB,bmpData->width,bmpData->height,0,GL_BGR,GL_UNSIGNED_BYTE,&(bmpData->data[0]));
+		sprintf_s(filename, "mars%d.jpg", i+1);
+		SDL_Surface *img;
+		img = IMG_Load(filename);
+
+		if(img) {
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+i,0,GL_RGB,img->w,img->h,0,GL_RGB,GL_UNSIGNED_BYTE,(img->pixels));
+			SDL_FreeSurface(img);
+		} else {
+			assert(0 && "Texture file did not load correctly.");
+		}
 	}
 	
 	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
@@ -240,4 +252,38 @@ void GLCubeSphere::SubDivide(int levels) {
 	if(levels > 1) {
 		this->SubDivide(levels-1);
 	}
+}
+
+void GLCubeSphere::LoadShader() {
+	GLCubeSphere::shader.LoadFromFile(GL_VERTEX_SHADER, "..\\..\\shaders\\cubesphere.vert");
+	GLCubeSphere::shader.LoadFromFile(GL_FRAGMENT_SHADER, "..\\..\\shaders\\cubesphere.frag");
+	GLCubeSphere::shader.CreateAndLinkProgram();
+}
+
+void GLCubeSphere::Update(glm::mediump_float *view, glm::mediump_float *proj) {
+	GLCubeSphere::shader.Use();
+	
+	this->Transform().Rotate(0.0f,0.1f,0.0f);
+
+	glUniform1i(glGetUniformLocation(GLCubeSphere::shader.GetProgram(), "cubeMap"), 0);
+
+	glUniformMatrix4fv(glGetUniformLocation(GLCubeSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &this->Transform().ModelMatrix()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(GLCubeSphere::shader.GetProgram(), "in_View"), 1, GL_FALSE, view);
+	glUniformMatrix4fv(glGetUniformLocation(GLCubeSphere::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, proj);
+
+	glBindVertexArray(this->Vao());
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->GetBuffer(this->ElemBufIndex));
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeMap);
+
+	for (int i = 0, cur = this->NumberElements(0), prev = 0; cur != 0; prev = cur, cur = this->NumberElements(++i)) {
+		glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_SHORT, (void*)prev);
+	}
+	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+	glBindVertexArray(0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	
+	GLCubeSphere::shader.UnUse();
 }

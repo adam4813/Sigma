@@ -19,6 +19,7 @@ public:
 	 * \returns IGLCompoent* the newly created component.
 	 */
 	void Initialize() ;
+	virtual void Update(glm::mediump_float *view, glm::mediump_float *proj);
 
 	/**
 	 * \brief Returns the number of elements to draw for this component.

@@ -85,16 +85,16 @@ int main(int argCount, char **argValues) {
 
 	{
 		Property prop1("scale");
-		prop1.Set<float>(10.0f);
+		prop1.Set<float>(1500.0f);
 		props.push_back(prop1);
 		Property prop2("x");
-		prop2.Set(-30.0f);
+		prop2.Set(2000.0f);
 		props.push_back(prop2);
 		Property prop3("y");
 		prop3.Set<float>(0.0f);
 		props.push_back(prop3);
 		Property prop4("z");
-		prop4.Set<float>(0.0f);
+		prop4.Set<float>(1000.0f);
 		props.push_back(prop4);
 		glsys.Factory("GLCubeSphere", 3, props);
 	}

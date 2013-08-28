@@ -18,10 +18,11 @@ public:
 	 * \returns   GLIcoSphere* The newly creates GLIcoSphere
 	 */
 	void Initialize();
+	virtual void Update(glm::mediump_float *view, glm::mediump_float *proj);
 
 	// The shader used for rendering GLCubeSphere.
-	static void LoadShader() {}
-	//static GLSLShader shader;
+	static void LoadShader();
+	static GLSLShader shader;
 
 	/**
 	 * \brief Returns the number of elements to draw for this component.

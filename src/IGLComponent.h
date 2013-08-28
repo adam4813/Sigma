@@ -58,6 +58,12 @@ public:
 	unsigned int DrawMode() const { return this->drawMode; }
 
 	/**
+	 * \brief Update renders the object
+	 *
+	 */
+	virtual void Update(glm::mediump_float *view, glm::mediump_float *proj)=0;
+
+	/**
 	 * \brief Retrieves the transform object for this component.
 	 *
 	 * \returns GLTransform& The transform object.
