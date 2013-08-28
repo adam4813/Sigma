@@ -116,7 +116,7 @@ bool OpenGLSystem::Update(const double delta) {
 					glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
 					glBindVertexArray(sprite->Vao());
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite->GetBuffer(sprite->ElemBufIndex));
-					glDrawElements(sprite->DrawMode(), sprite->NumberElements(), GL_UNSIGNED_SHORT, (void*)0);
+					glDrawElements(sprite->DrawMode(), sprite->MeshGroup_ElementCount(), GL_UNSIGNED_SHORT, (void*)0);
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 					glBindVertexArray(0);
 					GLSprite::shader.UnUse();
@@ -130,7 +130,7 @@ bool OpenGLSystem::Update(const double delta) {
 					glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
 					glBindVertexArray((*vecitr)->Vao());
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (*vecitr)->GetBuffer((*vecitr)->ElemBufIndex));
-					for (int i = 0, cur = (*vecitr)->NumberElements(0), prev = 0; cur != 0; prev = cur, cur = (*vecitr)->NumberElements(++i)) {
+					for (int i = 0, cur = (*vecitr)->MeshGroup_ElementCount(0), prev = 0; cur != 0; prev = cur, cur = (*vecitr)->MeshGroup_ElementCount(++i)) {
 						glDrawElements((*vecitr)->DrawMode(), cur, GL_UNSIGNED_SHORT, (void*)prev);
 					}
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
