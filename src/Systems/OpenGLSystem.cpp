@@ -3,6 +3,7 @@
 #include "GLSixDOFView.h"
 #include "../Components/GLSprite.h"
 #include "../Components/GLIcoSphere.h"
+#include "../Components/GLCubeSphere.h"
 #include "../Components/GLMesh.h"
 
 OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumulator(0.0) {
@@ -30,6 +31,33 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		return spr;
 	} else if (type == "GLIcoSphere") {
 		GLIcoSphere* sphere = new GLIcoSphere(entityID);
+		sphere->Initialize();
+		float scale = 1.0f;
+		float x = 0.0f;
+		float y = 0.0f;
+		float z = 0.0f;
+		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
+			Property*  p = &(*propitr);
+			if (p->GetName() == "scale") {
+				scale = p->Get<float>();
+				continue;
+			} else if (p->GetName() == "x") {
+				x = p->Get<float>();
+				continue;
+			} else if (p->GetName() == "y") {
+				y = p->Get<float>();
+				continue;
+			} else if (p->GetName() == "z") {
+				z = p->Get<float>();
+				continue;
+			}
+		}
+		sphere->Transform().Scale(scale,scale,scale);
+		sphere->Transform().Translate(x,y,z);
+		this->components[entityID].push_back(sphere);
+		return sphere;
+	} else if (type == "GLCubeSphere") {
+		GLCubeSphere* sphere = new GLCubeSphere(entityID);
 		sphere->Initialize();
 		float scale = 1.0f;
 		float x = 0.0f;
@@ -106,7 +134,7 @@ bool OpenGLSystem::Update(const double delta) {
 					if (sprite == nullptr) {
 						throw std::bad_cast();
 					}
-					glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+					//glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 					GLSprite::shader.Use();
 					glUniform1i(glGetUniformLocation(GLSprite::shader.GetProgram(),"tex"), 0); // 0 for GL_TEXTURE0
 					glActiveTexture(GL_TEXTURE0);
@@ -136,6 +164,7 @@ bool OpenGLSystem::Update(const double delta) {
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 					glBindVertexArray(0);
 					GLIcoSphere::shader.UnUse();
+					//glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 				}
 				/*try {
 					GLIcoSphere* sphere = dynamic_cast<GLIcoSphere*>(*vecitr);
@@ -200,6 +229,10 @@ const int* OpenGLSystem::Start() {
 		);
 
 	this->view->Move(4.0f,3.0f,-10.f);
+
+	// App specific global gl settings
+	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 	return OpenGLVersion;
 }
