@@ -1,9 +1,6 @@
 #pragma once
 
 #include "../ISystem.h"
-#include "../SceneManager.h"
-
-#define GLEW_STATIC
 
 #include "GL/glew.h"
 #include "glm/glm.hpp"
@@ -57,8 +54,6 @@ public:
 	 */
 	IGLComponent* GetComponent(int entityID);
 
-	SceneManager* GetScene();
-
 	/**
 	 * \brief Move the camera around the world.
 	 *
@@ -81,7 +76,6 @@ public:
 	 */
 	void Rotate(float x, float y, float z);
 private:
-	SceneManager scene;
 
 	int windowWidth; // Store the width of our window  
 	int windowHeight; // Store the height of our window 

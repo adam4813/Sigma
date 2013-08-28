@@ -175,10 +175,6 @@ IGLComponent* OpenGLSystem::GetComponent(int entityID) {
 	return nullptr;
 }
 
-SceneManager* OpenGLSystem::GetScene() {
-	return &this->scene;
-}
-
 const int* OpenGLSystem::Start() {
 	//Checking GL version
 	const GLubyte *GLVersionString = glGetString(GL_VERSION);
