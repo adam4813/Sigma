@@ -38,7 +38,7 @@ int main(int argCount, char **argValues) {
 		prop1.Set<float>(100.0f);
 		props.push_back(prop1);
 		Property prop2("x");
-		prop2.Set(500.0f);
+		prop2.Set(-500.0f);
 		props.push_back(prop2);
 		Property prop3("y");
 		prop3.Set<float>(0.0f);
@@ -55,7 +55,7 @@ int main(int argCount, char **argValues) {
 		prop1.Set<float>(1000.0f);
 		props.push_back(prop1);
 		Property prop2("x");
-		prop2.Set<float>(500.0f);
+		prop2.Set<float>(-500.0f);
 		props.push_back(prop2);
 		Property prop3("y");
 		prop3.Set<float>(0.0f);
@@ -72,7 +72,7 @@ int main(int argCount, char **argValues) {
 		prop1.Set<float>(500.0f);
 		props.push_back(prop1);
 		Property prop2("x");
-		prop2.Set<float>(500.0f);
+		prop2.Set<float>(-500.0f);
 		props.push_back(prop2);
 		Property prop3("y");
 		prop3.Set<float>(0.0f);
