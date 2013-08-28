@@ -121,7 +121,7 @@ bool OpenGLSystem::Update(const double delta) {
 	// Check if the deltaAccumulator is greater than 1/60 of a second.
 	if (deltaAccumulator > 16.7) {
 		// Set up the scene to a "clean" state.
-		glClearColor(1.0f,1.0f,1.0f,0.0f);
+		glClearColor(0.0f,0.0f,0.0f,0.0f);
 		glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window  
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
@@ -130,66 +130,6 @@ bool OpenGLSystem::Update(const double delta) {
 		for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {
 			for (auto vecitr = mapitr->second.begin(); vecitr < mapitr->second.end(); ++vecitr) {
 				(*vecitr)->Update(&this->view->ViewMatrix[0][0], &this->ProjectionMatrix[0][0]);
-				
-				/*try {
-					GLSprite* sprite = dynamic_cast<GLSprite*>(*vecitr);
-					if (sprite == nullptr) {
-						throw std::bad_cast();
-					}
-					//glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-					GLSprite::shader.Use();
-					glUniform1i(glGetUniformLocation(GLSprite::shader.GetProgram(),"tex"), 0); // 0 for GL_TEXTURE0
-					glActiveTexture(GL_TEXTURE0);
-					glBindTexture(GL_TEXTURE_2D, sprite->GetTexture());
-					glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &sprite->Transform().ModelMatrix()[0][0]);
-					glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_View"), 1, GL_FALSE, &this->view->ViewMatrix[0][0]);
-					glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
-					glBindVertexArray(sprite->Vao());
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite->GetBuffer(sprite->ElemBufIndex));
-					glDrawElements(sprite->DrawMode(), sprite->MeshGroup_ElementCount(), GL_UNSIGNED_SHORT, (void*)0);
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
-					glBindVertexArray(0);
-					GLSprite::shader.UnUse();
-					break;
-				} catch (std::bad_cast b) {*/
-					//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-				/*	GLIcoSphere::shader.Use();
-					(*vecitr)->Transform().Rotate(0.0f,0.1f,0.0f);
-					glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &(*vecitr)->Transform().ModelMatrix()[0][0]);
-					glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_View"), 1, GL_FALSE, &this->view->ViewMatrix[0][0]);
-					glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
-					glBindVertexArray((*vecitr)->Vao());
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (*vecitr)->GetBuffer((*vecitr)->ElemBufIndex));
-					for (int i = 0, cur = (*vecitr)->MeshGroup_ElementCount(0), prev = 0; cur != 0; prev = cur, cur = (*vecitr)->MeshGroup_ElementCount(++i)) {
-						glDrawElements((*vecitr)->DrawMode(), cur, GL_UNSIGNED_SHORT, (void*)prev);
-					}
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
-					glBindVertexArray(0);
-					GLIcoSphere::shader.UnUse();
-					//glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-				}*/
-				/*try {
-					GLIcoSphere* sphere = dynamic_cast<GLIcoSphere*>(*vecitr);
-					if (sphere == nullptr) {
-						throw std::bad_cast();
-					}
-					//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-					GLIcoSphere::shader.Use();
-					sphere->Transform().Rotate(0.0f,0.1f,0.0f);
-					glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &sphere->Transform().ModelMatrix()[0][0]);
-					glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_View"), 1, GL_FALSE, &this->view->ViewMatrix[0][0]);
-					glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, &this->ProjectionMatrix[0][0]);
-					glBindVertexArray(sphere->Vao());
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphere->GetBuffer(sphere->ElemBufIndex));
-					glDrawElements(sphere->DrawMode(), sphere->NumberElements(), GL_UNSIGNED_SHORT, (void*)0);
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
-					glBindVertexArray(0);
-					GLIcoSphere::shader.UnUse();
-					break;
-				}
-				catch (std::bad_cast b) {
-
-				}*/
 			}
 		}
 

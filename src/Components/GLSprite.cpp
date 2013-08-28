@@ -92,7 +92,7 @@ void GLSprite::Update(glm::mediump_float *view, glm::mediump_float *proj) {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, this->GetTexture());
 
-	glDrawElements(this->DrawMode(), this->NumberElements(), GL_UNSIGNED_SHORT, (void*)0);
+	glDrawElements(this->DrawMode(), this->MeshGroup_ElementCount(), GL_UNSIGNED_SHORT, (void*)0);
 	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 	glBindVertexArray(0);

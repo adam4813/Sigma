@@ -17,7 +17,7 @@ public:
 	 * \param[in] int entityID The entity this component belongs to
 	 * \returns   GLIcoSphere* The newly creates GLIcoSphere
 	 */
-	void Initialize();
+	virtual void Initialize();
 	virtual void Update(glm::mediump_float *view, glm::mediump_float *proj);
 
 	// The shader used for rendering GLCubeSphere.
@@ -29,7 +29,7 @@ public:
 	 *
 	 * \returns unsigned int The number of elements to draw.
 	 */
-	unsigned int NumberElements(const int group = 0) const { 
+	virtual unsigned int MeshGroup_ElementCount(const unsigned int group = 0) const { 
 		if (group > 0) {
 			return 0;
 		}
@@ -37,10 +37,10 @@ public:
 	}
 private:
 	void SubDivide(int levels);
-	std::vector<face> faces; // The faces for this IcoSphere. Can be used for later refinement.
-	std::vector<vertex> verts; // The verts that the faces refers to. Can be used for later refinement.
+	std::vector<Sigma::Face> faces; // The faces for this IcoSphere. Can be used for later refinement.
+	std::vector<Sigma::Vertex> verts; // The verts that the faces refers to. Can be used for later refinement.
 	std::vector<color> colors;
-	std::vector<vertex> vertNorms;
+	std::vector<Sigma::Vertex> vertNorms;
 
 	GLuint _cubeMap;
 };

@@ -9,7 +9,9 @@
 GLSLShader GLCubeSphere::shader;
 
 // For std::find
-bool operator ==(const vertex &lhs, const vertex &rhs) { return (lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z); }
+namespace Sigma {
+	bool operator ==(const Vertex &lhs, const Vertex &rhs) { return (lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z); }
+}
 
 GLCubeSphere::GLCubeSphere( const int entityID /*= 0*/ ) : IGLComponent(entityID) {
 	this->drawMode = GL_TRIANGLES;
@@ -27,33 +29,33 @@ void GLCubeSphere::Initialize() {
 	float t = 1.0f;
 	glm::vec3 coordPair(t, t, t);
 
-	this->verts.push_back(vertex(-coordPair.x, -coordPair.y, coordPair.z));
-	this->verts.push_back(vertex(coordPair.x, -coordPair.y, coordPair.z));
-	this->verts.push_back(vertex(coordPair.x, coordPair.y, coordPair.z));
-	this->verts.push_back(vertex(-coordPair.x, coordPair.y, coordPair.z));
-	this->verts.push_back(vertex(-coordPair.x, -coordPair.y, -coordPair.z));
-	this->verts.push_back(vertex(coordPair.x, -coordPair.y, -coordPair.z));
-	this->verts.push_back(vertex(coordPair.x, coordPair.y, -coordPair.z));
-	this->verts.push_back(vertex(-coordPair.x, coordPair.y, -coordPair.z));
+	this->verts.push_back(Sigma::Vertex(-coordPair.x, -coordPair.y, coordPair.z));
+	this->verts.push_back(Sigma::Vertex(coordPair.x, -coordPair.y, coordPair.z));
+	this->verts.push_back(Sigma::Vertex(coordPair.x, coordPair.y, coordPair.z));
+	this->verts.push_back(Sigma::Vertex(-coordPair.x, coordPair.y, coordPair.z));
+	this->verts.push_back(Sigma::Vertex(-coordPair.x, -coordPair.y, -coordPair.z));
+	this->verts.push_back(Sigma::Vertex(coordPair.x, -coordPair.y, -coordPair.z));
+	this->verts.push_back(Sigma::Vertex(coordPair.x, coordPair.y, -coordPair.z));
+	this->verts.push_back(Sigma::Vertex(-coordPair.x, coordPair.y, -coordPair.z));
 
 	// front
-	this->faces.push_back(face(0,1,2));
-	this->faces.push_back(face(2,3,0));
+	this->faces.push_back(Sigma::Face(0,1,2));
+	this->faces.push_back(Sigma::Face(2,3,0));
 	// top
-    this->faces.push_back(face(3,2,6));
-    this->faces.push_back(face(6, 7, 3));
+    this->faces.push_back(Sigma::Face(3,2,6));
+    this->faces.push_back(Sigma::Face(6, 7, 3));
     // back
-    this->faces.push_back(face(7, 6, 5));
-    this->faces.push_back(face(5, 4, 7));
+    this->faces.push_back(Sigma::Face(7, 6, 5));
+    this->faces.push_back(Sigma::Face(5, 4, 7));
     // bottom
-    this->faces.push_back(face(4, 5, 1));
-    this->faces.push_back(face(1, 0, 4));
+    this->faces.push_back(Sigma::Face(4, 5, 1));
+    this->faces.push_back(Sigma::Face(1, 0, 4));
     // left
-    this->faces.push_back(face(4, 0, 3));
-    this->faces.push_back(face(3, 7, 4));
+    this->faces.push_back(Sigma::Face(4, 0, 3));
+    this->faces.push_back(Sigma::Face(3, 7, 4));
     // right
-    this->faces.push_back(face(1, 5, 6));
-    this->faces.push_back(face(6, 2, 1));
+    this->faces.push_back(Sigma::Face(1, 5, 6));
+    this->faces.push_back(Sigma::Face(6, 2, 1));
 
 	this->SubDivide(subdivisions);
 
@@ -62,14 +64,14 @@ void GLCubeSphere::Initialize() {
 
 	glGenBuffers(1, &this->buffers[this->VertBufIndex]); 	// Generate the vertex buffer.
 	glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->VertBufIndex]); // Bind the vertex buffer.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex) * this->verts.size(), &this->verts.front(), GL_STATIC_DRAW); // Stores the verts in the vertex buffer.
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Sigma::Vertex) * this->verts.size(), &this->verts.front(), GL_STATIC_DRAW); // Stores the verts in the vertex buffer.
 	GLint posLocation = glGetAttribLocation(GLCubeSphere::shader.GetProgram(), "in_Position"); // Find the location in the shader where the vertex buffer data will be placed.
 	glVertexAttribPointer(posLocation, 3, GL_FLOAT, GL_FALSE, 0, 0); // Tell the VAO the vertex data will be stored at the location we just found.
 	glEnableVertexAttribArray(posLocation); // Enable the VAO line for vertex data.
 
 	glGenBuffers(1, &this->buffers[this->ElemBufIndex]); // Generate the element buffer.
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buffers[this->ElemBufIndex]); // Bind the element buffer.
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(face) * this->faces.size(), &this->faces.front(), GL_STATIC_DRAW); // Store the faces in the element buffer.
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Sigma::Face) * this->faces.size(), &this->faces.front(), GL_STATIC_DRAW); // Store the faces in the element buffer.
 
 	glBindVertexArray(0); // Reset the buffer binding because we are good programmers.
 
@@ -102,12 +104,12 @@ void GLCubeSphere::Initialize() {
 }
 
 void GLCubeSphere::SubDivide(int levels) {
-	std::vector<face> newFaces;
+	std::vector<Sigma::Face> newFaces;
 
 	// Iterate over each face and subdivide it
-	for(std::vector<face>::iterator i = this->faces.begin(); i != this->faces.end(); ++i) {
-		vertex v1(0, 0, 0), v2(0, 0, 0), newVert(0, 0, 0);
-		face newFace(0, 0, 0);
+	for(std::vector<Sigma::Face>::iterator i = this->faces.begin(); i != this->faces.end(); ++i) {
+		Sigma::Vertex v1(0, 0, 0), v2(0, 0, 0), newVert(0, 0, 0);
+		Sigma::Face newFace(0, 0, 0);
 
 		short i1, i2, i3;
 
@@ -120,7 +122,7 @@ void GLCubeSphere::SubDivide(int levels) {
 		newVert.z = (v1.z + v2.z)/2.0f;
 
 		// See if vertex already exists
-		std::vector<vertex>::iterator existingVert = std::find(this->verts.begin(), this->verts.end(), newVert);
+		std::vector<Sigma::Vertex>::iterator existingVert = std::find(this->verts.begin(), this->verts.end(), newVert);
 		if(existingVert==this->verts.end()) {
 			i1 = verts.size();
 			this->verts.push_back(newVert);
@@ -212,7 +214,7 @@ void GLCubeSphere::Update(glm::mediump_float *view, glm::mediump_float *proj) {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeMap);
 
-	for (int i = 0, cur = this->NumberElements(0), prev = 0; cur != 0; prev = cur, cur = this->NumberElements(++i)) {
+	for (int i = 0, cur = this->MeshGroup_ElementCount(0), prev = 0; cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
 		glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_SHORT, (void*)prev);
 	}
 	
