@@ -8,7 +8,7 @@
 #include "SDL_opengl.h"
 
 void* SDLSys::CreateGraphicsWindow() {
-	std::cout << "Creating Window using SDL...";
+	std::cout << "Creating Window using SDL..." << std::endl;
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
@@ -64,24 +64,13 @@ bool SDLSys::MessageLoop() {
 }
 
 bool SDLSys::SetupTimer() {
-	LARGE_INTEGER li;
-	if(!QueryPerformanceFrequency(&li)) {
-		return false;
-	}
-
-	this->_Frequency = static_cast<double>(li.QuadPart)/1000.0;
-
-	QueryPerformanceCounter(&li);
-	this->_LastTime = li.QuadPart;
+	this->_LastTime = SDL_GetTicks();
 	return true;
 }
 
 double SDLSys::GetDeltaTime() {
-	LARGE_INTEGER li;
-	QueryPerformanceCounter(&li);
-	double delta = static_cast<double>(li.QuadPart - this->_LastTime);
-	this->_LastTime = li.QuadPart;
-	return delta/this->_Frequency;
+	double delta = static_cast<double>(SDL_GetTicks() - this->_LastTime);
+	return delta/1000.0f;
 }
 
 bool SDLSys::KeyDown(int key, bool focused) {

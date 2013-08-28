@@ -137,8 +137,8 @@ void GLMesh::LoadMesh(std::string fname) {
 	}
 
 	// Check if vertex normals exist
-	if(vertNorms.size() == 0) {
-	//vertNorms.clear();
+	if(true) {
+		vertNorms.clear();
 		std::vector<vertex> surfaceNorms;
 
 		// compute surface normals

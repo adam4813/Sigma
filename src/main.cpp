@@ -12,7 +12,7 @@
 int main(int argCount, char **argValues) {
 	OpenGLSystem glsys;
 	IOpSys* os = nullptr;
-//#ifdef _WIN32
+//#ifdef WIN32
 //	os = new win32();
 //#else
 	os = new SDLSys();
@@ -115,7 +115,6 @@ int main(int argCount, char **argValues) {
 		props.push_back(prop4);
 		Property prop5("meshFile");
 		prop5.Set<std::string>("trillek_dev_clonk2u_tri.obj");
-		//prop5.Set<std::string>("ship3.obj");
 		props.push_back(prop5);
 		glsys.Factory("GLMesh", 6, props);
 	}
