@@ -13,10 +13,9 @@ bool operator ==(const vertex &lhs, const vertex &rhs) { return (lhs.x == rhs.x 
 
 GLCubeSphere::GLCubeSphere( const int entityID /*= 0*/ ) : IGLComponent(entityID) {
 	this->drawMode = GL_TRIANGLES;
-	this->ElemBufIndex = 2;
-	this->ColorBufIndex = 1;
 	this->VertBufIndex = 0;
-	this->NormalBufIndex = 3;
+	this->ColorBufIndex = 1;
+	this->ElemBufIndex = 2;
 }
 
 void GLCubeSphere::Initialize() {
@@ -29,21 +28,13 @@ void GLCubeSphere::Initialize() {
 	glm::vec3 coordPair(t, t, t);
 
 	this->verts.push_back(vertex(-coordPair.x, -coordPair.y, coordPair.z));
-	this->colors.push_back(color(0,1,0));
 	this->verts.push_back(vertex(coordPair.x, -coordPair.y, coordPair.z));
-	this->colors.push_back(color(0,1,0));
 	this->verts.push_back(vertex(coordPair.x, coordPair.y, coordPair.z));
-	this->colors.push_back(color(0,1,0));
 	this->verts.push_back(vertex(-coordPair.x, coordPair.y, coordPair.z));
-	this->colors.push_back(color(0,1,0));
 	this->verts.push_back(vertex(-coordPair.x, -coordPair.y, -coordPair.z));
-	this->colors.push_back(color(0,1,0));
 	this->verts.push_back(vertex(coordPair.x, -coordPair.y, -coordPair.z));
-	this->colors.push_back(color(0,1,0));
 	this->verts.push_back(vertex(coordPair.x, coordPair.y, -coordPair.z));
-	this->colors.push_back(color(0,1,0));
 	this->verts.push_back(vertex(-coordPair.x, coordPair.y, -coordPair.z));
-	this->colors.push_back(color(0,1,0));
 
 	// front
 	this->faces.push_back(face(0,1,2));
@@ -75,13 +66,6 @@ void GLCubeSphere::Initialize() {
 	GLint posLocation = glGetAttribLocation(GLCubeSphere::shader.GetProgram(), "in_Position"); // Find the location in the shader where the vertex buffer data will be placed.
 	glVertexAttribPointer(posLocation, 3, GL_FLOAT, GL_FALSE, 0, 0); // Tell the VAO the vertex data will be stored at the location we just found.
 	glEnableVertexAttribArray(posLocation); // Enable the VAO line for vertex data.
-
-	glGenBuffers(1, &this->buffers[this->ColorBufIndex]);
-	glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->ColorBufIndex]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(color) * this->colors.size(), &this->colors.front(), GL_STATIC_DRAW);
-	GLint colLocation = glGetAttribLocation(GLCubeSphere::shader.GetProgram(), "in_Color");
-	glVertexAttribPointer(colLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(colLocation);
 
 	glGenBuffers(1, &this->buffers[this->ElemBufIndex]); // Generate the element buffer.
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buffers[this->ElemBufIndex]); // Bind the element buffer.
@@ -121,7 +105,6 @@ void GLCubeSphere::SubDivide(int levels) {
 	std::vector<face> newFaces;
 
 	// Iterate over each face and subdivide it
-	// Note: currently produces redundant vertices
 	for(std::vector<face>::iterator i = this->faces.begin(); i != this->faces.end(); ++i) {
 		vertex v1(0, 0, 0), v2(0, 0, 0), newVert(0, 0, 0);
 		face newFace(0, 0, 0);
@@ -141,7 +124,6 @@ void GLCubeSphere::SubDivide(int levels) {
 		if(existingVert==this->verts.end()) {
 			i1 = verts.size();
 			this->verts.push_back(newVert);
-			this->colors.push_back(color(0,1,0));
 		}
 		else {
 			i1 = std::distance(this->verts.begin(), existingVert);
@@ -158,7 +140,6 @@ void GLCubeSphere::SubDivide(int levels) {
 		if(existingVert==this->verts.end()) {
 			i2 = this->verts.size();
 			this->verts.push_back(newVert);
-			this->colors.push_back(color(0,1,0));
 		}
 		else {
 			i2 = std::distance(this->verts.begin(), existingVert);
@@ -175,7 +156,6 @@ void GLCubeSphere::SubDivide(int levels) {
 		if(existingVert==verts.end()) {
 			i3 = this->verts.size();
 			this->verts.push_back(newVert);
-			this->colors.push_back(color(0,1,0));
 		}
 		else {
 			i3 = std::distance(this->verts.begin(), existingVert);
