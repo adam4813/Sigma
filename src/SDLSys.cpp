@@ -2,10 +2,8 @@
 
 #include "SDLSys.h"
 
-#define GLEW_STATIC
-
 #include "GL/glew.h"
-#include "SDL_opengl.h"
+#include "SDL/SDL_opengl.h"
 
 void* SDLSys::CreateGraphicsWindow() {
 	std::cout << "Creating Window using SDL..." << std::endl;

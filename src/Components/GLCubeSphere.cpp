@@ -2,8 +2,8 @@
 #include <algorithm>
 #include <limits>
 
-#include "sdl.h"
-#include "sdl_image.h"
+#include "SDL/SDL.h"
+#include "SDL/SDL_image.h"
 
 #include "GLCubeSphere.h"
 

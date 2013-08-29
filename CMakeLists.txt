@@ -24,5 +24,8 @@ ADD_DEFINITIONS(-DGLEW_STATIC)
 # add the executable
 add_executable (Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP})
 
+# make a var for the SDL libs
+set(SDL_LIBS SDL2.lib SDL2_image.lib SDL2main.lib)
+
 # Link the executable to the Hello library. 
-target_link_libraries (Sigma opengl32.lib glew32s.lib soil.lib) 
+target_link_libraries (Sigma opengl32.lib glew32s.lib soil.lib ${SDL_LIBS}) 

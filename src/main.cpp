@@ -1,6 +1,4 @@
 #include <iostream>
-#include "sdl.h"
-#include "SDL_image.h"
 #include "SDLSys.h"
 
 #include "Systems/OpenGLSystem.h"
