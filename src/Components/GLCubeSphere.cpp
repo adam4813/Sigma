@@ -11,9 +11,9 @@ GLSLShader GLCubeSphere::shader;
 
 // For std::find
 namespace Sigma {
-	bool operator ==(const Vertex &lhs, const Vertex &rhs) { return ((lhs.x - rhs.x < std::numeric_limits<float>::epsilon()) && 
-																	 (lhs.y - rhs.y < std::numeric_limits<float>::epsilon()) && 
-																	 (lhs.z - rhs.z < std::numeric_limits<float>::epsilon())); }
+	bool operator ==(const Vertex &lhs, const Vertex &rhs) { return ((abs(rhs.x - lhs.x) < std::numeric_limits<float>::epsilon()) && 
+																	 (abs(rhs.y - lhs.y) < std::numeric_limits<float>::epsilon()) && 
+																	 (abs(rhs.z - lhs.z) < std::numeric_limits<float>::epsilon())); }
 }
 
 GLCubeSphere::GLCubeSphere( const int entityID /*= 0*/ ) : IGLComponent(entityID) {
