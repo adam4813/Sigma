@@ -110,7 +110,6 @@ void GLIcoSphere::Initialize() {
 		glm::vec3 final_normal(total_normals.x, total_normals.y, total_normals.z);
 		final_normal = glm::normalize(final_normal);
 		vertNorms.push_back(Sigma::Vertex(final_normal.x, final_normal.y, final_normal.z));
-		//std::cout << vertNorms[i].x << " " << vertNorms[i].y << " " << vertNorms[i].z << std::endl;
 	}
 
 	surfaceNorms.clear();
@@ -154,6 +153,23 @@ void GLIcoSphere::LoadShader() {
 	GLIcoSphere::shader.LoadFromFile(GL_VERTEX_SHADER, "..\\..\\shaders\\icosphere.vert");
 	GLIcoSphere::shader.LoadFromFile(GL_FRAGMENT_SHADER, "..\\..\\shaders\\icosphere.frag");
 	GLIcoSphere::shader.CreateAndLinkProgram();
+}
+
+
+void GLIcoSphere::Update(glm::mediump_float *view, glm::mediump_float *proj) {
+	GLIcoSphere::shader.Use();
+	this->Transform().Rotate(0.0f,0.1f,0.0f);
+	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &this->Transform().ModelMatrix()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_View"), 1, GL_FALSE, view);
+	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, proj);
+	glBindVertexArray(this->Vao());
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->GetBuffer(this->ElemBufIndex));
+	for (int i = 0, cur = this->MeshGroup_ElementCount(0), prev = 0; cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
+		glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_SHORT, (void*)prev);
+	}
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+	glBindVertexArray(0);
+	GLIcoSphere::shader.UnUse();
 }
 
 glm::vec3 GetMidPoint(Sigma::Vertex v1, Sigma::Vertex v2) {

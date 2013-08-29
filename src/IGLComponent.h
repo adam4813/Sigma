@@ -16,10 +16,11 @@ namespace Sigma {
 		float x,y,z;
 	};
 }
-	struct color {
-		color(float r, float g, float b) : r(r), g(g), b(b) { }
-		float r,g,b;
-	};
+
+struct color {
+	color(float r, float g, float b) : r(r), g(g), b(b) { }
+	float r,g,b;
+};
 
 class IGLComponent : public IComponent {
 public:
@@ -57,6 +58,12 @@ public:
 	 * \returns unsigned int The draw type (ex. GL_TRIANGLES, GL_TRIANGLE_STRIP).
 	 */
 	unsigned int DrawMode() const { return this->drawMode; }
+
+	/**
+	 * \brief Update renders the object
+	 *
+	 */
+	virtual void Update(glm::mediump_float *view, glm::mediump_float *proj)=0;
 
 	/**
 	 * \brief Retrieves the transform object for this component.

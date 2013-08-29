@@ -51,6 +51,22 @@ void GLMesh::Initialize() {
 	glBindVertexArray(0); // Reset the buffer binding because we are good programmers.
 }
 
+void GLMesh::Update(glm::mediump_float *view, glm::mediump_float *proj) {
+	GLIcoSphere::shader.Use();
+	this->Transform().Rotate(0.0f,0.1f,0.0f);
+	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &this->Transform().ModelMatrix()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_View"), 1, GL_FALSE, view);
+	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, proj);
+	glBindVertexArray(this->Vao());
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->GetBuffer(this->ElemBufIndex));
+	for (int i = 0, cur = this->MeshGroup_ElementCount(0), prev = 0; cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
+		glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_SHORT, (void*)prev);
+	}
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+	glBindVertexArray(0);
+	GLIcoSphere::shader.UnUse();
+}
+
 void GLMesh::LoadMesh(std::string fname) {
 	std::ifstream in(fname, std::ios::in);
 	if (!in) {
@@ -125,7 +141,6 @@ void GLMesh::LoadMesh(std::string fname) {
 
 	// Check if vertex normals exist
 	if(vertNorms.size() == 0) {
-	//vertNorms.clear();
 		std::vector<Sigma::Vertex> surfaceNorms;
 
 		// compute surface normals

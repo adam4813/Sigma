@@ -1,6 +1,8 @@
 #include <iostream>
+#include "SDLSys.h"
 
 #include "Systems/OpenGLSystem.h"
+
 #ifdef WIN32
 #include "win32.h"
 #endif
@@ -8,9 +10,12 @@
 int main(int argCount, char **argValues) {
 	OpenGLSystem glsys;
 	IOpSys* os = nullptr;
-#ifdef WIN32
-	os = new win32();
-#endif
+//#ifdef WIN32
+//	os = new win32();
+//#else
+	os = new SDLSys();
+//#endif
+
 	os->CreateGraphicsWindow();
 
 	const int* version = glsys.Start();
@@ -31,7 +36,7 @@ int main(int argCount, char **argValues) {
 		prop1.Set<float>(100.0f);
 		props.push_back(prop1);
 		Property prop2("x");
-		prop2.Set(500.0f);
+		prop2.Set(-500.0f);
 		props.push_back(prop2);
 		Property prop3("y");
 		prop3.Set<float>(0.0f);
@@ -48,7 +53,7 @@ int main(int argCount, char **argValues) {
 		prop1.Set<float>(1000.0f);
 		props.push_back(prop1);
 		Property prop2("x");
-		prop2.Set<float>(500.0f);
+		prop2.Set<float>(-500.0f);
 		props.push_back(prop2);
 		Property prop3("y");
 		prop3.Set<float>(0.0f);
@@ -65,7 +70,7 @@ int main(int argCount, char **argValues) {
 		prop1.Set<float>(500.0f);
 		props.push_back(prop1);
 		Property prop2("x");
-		prop2.Set<float>(500.0f);
+		prop2.Set<float>(-500.0f);
 		props.push_back(prop2);
 		Property prop3("y");
 		prop3.Set<float>(0.0f);
@@ -75,6 +80,22 @@ int main(int argCount, char **argValues) {
 		props.push_back(prop4);
 		glsys.Factory("GLIcoSphere", 5, props);
 	}
+
+	{
+		Property prop1("scale");
+		prop1.Set<float>(1500.0f);
+		props.push_back(prop1);
+		Property prop2("x");
+		prop2.Set(2000.0f);
+		props.push_back(prop2);
+		Property prop3("y");
+		prop3.Set<float>(0.0f);
+		props.push_back(prop3);
+		Property prop4("z");
+		prop4.Set<float>(1000.0f);
+		props.push_back(prop4);
+		glsys.Factory("GLCubeSphere", 3, props);
+	}
 	
 	props.clear();
 	{
@@ -82,7 +103,7 @@ int main(int argCount, char **argValues) {
 		prop1.Set<float>(1.0f);
 		props.push_back(prop1);
 		Property prop2("x");
-		prop2.Set<float>(10.0f);
+		prop2.Set<float>(30.0f);
 		props.push_back(prop2);
 		Property prop3("y");
 		prop3.Set<float>(0.0f);
@@ -92,7 +113,6 @@ int main(int argCount, char **argValues) {
 		props.push_back(prop4);
 		Property prop5("meshFile");
 		prop5.Set<std::string>("trillek_dev_clonk2u_tri.obj");
-		//prop5.Set<std::string>("ship3.obj");
 		props.push_back(prop5);
 		glsys.Factory("GLMesh", 6, props);
 	}
@@ -100,7 +120,8 @@ int main(int argCount, char **argValues) {
 	os->SetupTimer();
 	
 	double delta;
-	
+	bool isWireframe=false;
+
 	while (os->MessageLoop()) {
 		delta = os->GetDeltaTime();
 		float deltaSec = (float)delta/1000.0f;
@@ -148,6 +169,15 @@ int main(int argCount, char **argValues) {
 			glsys.Rotate(0.0f, 0.0f, -90.0f * deltaSec);
 		} else if (os->KeyDown('T', true)) { // Roll right
 			glsys.Rotate(0.0f, 0.0f, 90.0f*deltaSec);
+		}
+
+		if (os->KeyDown('P', true)) { // Wireframe mode
+			if (isWireframe) {
+				glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+			} else {
+				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+			}
+			isWireframe = !isWireframe;
 		}
 	}
 	
