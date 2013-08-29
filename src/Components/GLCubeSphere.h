@@ -10,6 +10,7 @@ class GLCubeSphere : public IGLComponent {
 public:
 	// We have a private ctor so the factory method must be used.
 	GLCubeSphere(const int entityID = 0);
+	virtual ~GLCubeSphere();
 
 	/**
 	 * \brief Generates new cube and subdivides, loads textures
@@ -56,5 +57,5 @@ private:
 	std::vector<Sigma::Face> faces;			// The faces for this IcoSphere. Can be used for later refinement.
 	std::vector<Sigma::Vertex> verts;		// The verts that the faces refers to. Can be used for later refinement.
 
-	GLuint _cubeMap;
+	GLuint _cubeMap, _cubeNormalMap;
 };

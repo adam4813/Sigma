@@ -1,5 +1,6 @@
 #include <vector>
 #include <algorithm>
+#include <limits>
 
 #include "sdl.h"
 #include "sdl_image.h"
@@ -10,7 +11,9 @@ GLSLShader GLCubeSphere::shader;
 
 // For std::find
 namespace Sigma {
-	bool operator ==(const Vertex &lhs, const Vertex &rhs) { return (lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z); }
+	bool operator ==(const Vertex &lhs, const Vertex &rhs) { return ((lhs.x - rhs.x < std::numeric_limits<float>::epsilon()) && 
+																	 (lhs.y - rhs.y < std::numeric_limits<float>::epsilon()) && 
+																	 (lhs.z - rhs.z < std::numeric_limits<float>::epsilon())); }
 }
 
 GLCubeSphere::GLCubeSphere( const int entityID /*= 0*/ ) : IGLComponent(entityID) {
@@ -18,6 +21,10 @@ GLCubeSphere::GLCubeSphere( const int entityID /*= 0*/ ) : IGLComponent(entityID
 	this->VertBufIndex = 0;
 	this->ColorBufIndex = 1;
 	this->ElemBufIndex = 2;
+}
+
+GLCubeSphere::~GLCubeSphere() {
+	glDeleteTextures(1, &this->_cubeMap);
 }
 
 void GLCubeSphere::Initialize() {
@@ -85,10 +92,37 @@ void GLCubeSphere::Initialize() {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);
 
-	// There is always six filenames
+	// There are always six files
 	for(int i=0; i < 6; i++) {
 		char filename[100];
 		sprintf_s(filename, "mars%d.jpg", i+1);
+		SDL_Surface *img;
+		img = IMG_Load(filename);
+
+		if(img) {
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+i,0,GL_RGB,img->w,img->h,0,GL_RGB,GL_UNSIGNED_BYTE,(img->pixels));
+			SDL_FreeSurface(img);
+		} else {
+			assert(0 && "Texture file did not load correctly.");
+		}
+	}
+
+	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+	// normal map
+	glGenTextures(1, &this->_cubeNormalMap);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeNormalMap);
+	
+	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);
+
+	// There are always six files
+	for(int i=0; i < 6; i++) {
+		char filename[100];
+		sprintf_s(filename, "mars_nm%d.jpg", i+1);
 		SDL_Surface *img;
 		img = IMG_Load(filename);
 
