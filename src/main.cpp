@@ -181,6 +181,11 @@ int main(int argCount, char **argValues) {
 			}
 			isWireframe = !isWireframe;
 		}
+
+		if (os->KeyDown('M', true)) { // Fullscreen mode
+			os->ToggleFullscreen();
+			glsys.SetWindowDim(os->GetWindowWidth(), os->GetWindowHeight()); 
+		}
 	}
 	
 	delete os;

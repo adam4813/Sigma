@@ -20,6 +20,11 @@ public:
 	bool KeyDown(int key, bool focused = false);
 
 	void Present();
+
+	// Stubbed out for now
+	virtual void ToggleFullscreen() {}
+	virtual int GetWindowWidth() { return 800; }
+	virtual int GetWindowHeight() { return 600; }
 private:
 	HWND hwnd; // The current window handle.
 	HGLRC hrc; // OpenGL Rendering Context.

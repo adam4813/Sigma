@@ -118,6 +118,7 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 bool OpenGLSystem::Update(const double delta) {
 	this->deltaAccumulator += delta;
 	this->view->UpdateViewMatrix();
+
 	// Check if the deltaAccumulator is greater than 1/60 of a second.
 	if (deltaAccumulator > 16.7) {
 		// Set up the scene to a "clean" state.

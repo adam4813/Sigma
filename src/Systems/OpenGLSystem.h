@@ -75,6 +75,15 @@ public:
 	 * \returns   void
 	 */
 	void Rotate(float x, float y, float z);
+
+	/**
+	 * \brief Sets the window width and height for glViewport
+	 *
+	 * \param[in] int width
+	 * \param[in] int height
+	 * \returns void
+	 */
+	void SetWindowDim(int width, int height) { this->windowWidth = width; this->windowHeight = height; }
 private:
 
 	int windowWidth; // Store the width of our window  

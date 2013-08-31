@@ -33,6 +33,38 @@ void* SDLSys::CreateGraphicsWindow() {
 	return &this->_Context;
 }
 
+int SDLSys::GetWindowWidth() {
+	int width;
+	SDL_GetWindowSize(this->_Window, &width, 0);
+	return width;
+}
+
+int SDLSys::GetWindowHeight() {
+	int height;
+	SDL_GetWindowSize(this->_Window, 0, &height);
+	return height;
+}
+
+void SDLSys::ToggleFullscreen() {
+	if(this->_IsFullscreen) {
+		SDL_DisplayMode mode;
+		SDL_SetWindowFullscreen(this->_Window, SDL_FALSE);
+		SDL_GetWindowDisplayMode(this->_Window, &mode);
+		mode.w = 800;
+		mode.h = 600;
+		SDL_SetWindowDisplayMode(this->_Window, &mode);
+	}
+	else {
+		SDL_DisplayMode mode;
+		SDL_GetWindowDisplayMode(this->_Window, &mode);
+		mode.w = 1280;
+		mode.h = 1024;
+		SDL_SetWindowDisplayMode(this->_Window, &mode);
+		SDL_SetWindowFullscreen(this->_Window, SDL_WINDOW_FULLSCREEN);
+	}
+	this->_IsFullscreen = !this->_IsFullscreen;
+}
+
 bool SDLSys::MessageLoop() {
 	SDL_Event event;
 	SDL_Keycode key;

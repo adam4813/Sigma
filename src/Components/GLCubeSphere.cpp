@@ -84,6 +84,7 @@ void GLCubeSphere::Initialize() {
 
 	// albedo map
 	glGenTextures(1, &this->_cubeMap);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeMap);
 	
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
@@ -111,6 +112,7 @@ void GLCubeSphere::Initialize() {
 
 	// normal map
 	glGenTextures(1, &this->_cubeNormalMap);
+	glActiveTexture(GL_TEXTURE0+1);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeNormalMap);
 	
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
@@ -236,7 +238,8 @@ void GLCubeSphere::Update(glm::mediump_float *view, glm::mediump_float *proj) {
 	
 	this->Transform().Rotate(0.0f,0.01f,0.0f);
 
-	glUniform1i(glGetUniformLocation(GLCubeSphere::shader.GetProgram(), "cubeMap"), 0);
+	glUniform1i(glGetUniformLocation(GLCubeSphere::shader.GetProgram(), "cubeMap"), GL_TEXTURE0);
+	glUniform1i(glGetUniformLocation(GLCubeSphere::shader.GetProgram(), "cubeNormMap"), GL_TEXTURE0+1);
 
 	glUniformMatrix4fv(glGetUniformLocation(GLCubeSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &this->Transform().ModelMatrix()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(GLCubeSphere::shader.GetProgram(), "in_View"), 1, GL_FALSE, view);
@@ -247,6 +250,9 @@ void GLCubeSphere::Update(glm::mediump_float *view, glm::mediump_float *proj) {
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeMap);
+
+	glActiveTexture(GL_TEXTURE0+1);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeNormalMap);
 
 	for (int i = 0, cur = this->MeshGroup_ElementCount(0), prev = 0; cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
 		glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_SHORT, (void*)prev);
