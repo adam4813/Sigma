@@ -1,22 +1,21 @@
 #include <iostream>
-#include "sdl.h"
-#include "SDL_image.h"
-#include "SDLSys.h"
 
 #include "Systems/OpenGLSystem.h"
 
-#ifdef WIN32
+#ifdef OS_Win32
 #include "win32.h"
+#else if OS_SDL
+#include "SDLSys.h"
 #endif
 
 int main(int argCount, char **argValues) {
 	OpenGLSystem glsys;
 	IOpSys* os = nullptr;
-//#ifdef WIN32
-//	os = new win32();
-//#else
+#ifdef OS_Win32
+	os = new win32();
+#else if OS_SDL
 	os = new SDLSys();
-//#endif
+#endif
 
 	os->CreateGraphicsWindow();
 
@@ -30,8 +29,8 @@ int main(int argCount, char **argValues) {
 	
 	std::vector<Property> props;
 	
-	glsys.Factory("GLSprite", 1, props);
-	glsys.Factory("GLSprite", 2, props);
+	//glsys.Factory("GLSprite", 1, props);
+	//glsys.Factory("GLSprite", 2, props);
 
 	{
 		Property prop1("scale");
@@ -83,6 +82,7 @@ int main(int argCount, char **argValues) {
 		glsys.Factory("GLIcoSphere", 5, props);
 	}
 
+	/*props.clear();
 	{
 		Property prop1("scale");
 		prop1.Set<float>(1500.0f);
@@ -97,7 +97,7 @@ int main(int argCount, char **argValues) {
 		prop4.Set<float>(1000.0f);
 		props.push_back(prop4);
 		glsys.Factory("GLCubeSphere", 3, props);
-	}
+	}*/
 	
 	props.clear();
 	{
@@ -174,11 +174,12 @@ int main(int argCount, char **argValues) {
 		}
 
 		if (os->KeyDown('P', true)) { // Wireframe mode
-			if (isWireframe) {
-				glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-			} else {
+			if (!isWireframe) {
 				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+				isWireframe = !isWireframe;
 			}
+		} else if (isWireframe) {
+			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 			isWireframe = !isWireframe;
 		}
 

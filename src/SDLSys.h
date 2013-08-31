@@ -4,7 +4,7 @@
 #include <map>
 
 #include "IOpSys.h"
-#include "SDL.h"
+#include "SDL/SDL.h"
 
 class SDLSys : public IOpSys {
 public:

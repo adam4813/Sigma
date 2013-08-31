@@ -1,8 +1,8 @@
 #include "GLSprite.h"
 #include "GL/glew.h"
 //#include "SOIL/SOIL.h"
-#include "SDL.h"
-#include "SDL_image.h"
+#include "SDL/SDL.h"
+#include "SDL/SDL_image.h"
 
 GLSprite::GLSprite( const int entityID /*= 0*/ ) : IGLComponent(entityID)  {
 	this->drawMode = GL_TRIANGLES;
