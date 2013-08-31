@@ -82,7 +82,7 @@ int main(int argCount, char **argValues) {
 		glsys.Factory("GLIcoSphere", 5, props);
 	}
 
-	/*props.clear();
+	props.clear();
 	{
 		Property prop1("scale");
 		prop1.Set<float>(1500.0f);
@@ -97,7 +97,7 @@ int main(int argCount, char **argValues) {
 		prop4.Set<float>(1000.0f);
 		props.push_back(prop4);
 		glsys.Factory("GLCubeSphere", 3, props);
-	}*/
+	}
 	
 	props.clear();
 	{
