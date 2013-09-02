@@ -29,7 +29,7 @@ void GLMesh::Initialize() {
 	if (this->colors.size() > 0) {
 		glGenBuffers(1, &this->buffers[this->ColorBufIndex]);
 		glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->ColorBufIndex]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(color) * this->colors.size(), &this->colors.front(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Sigma::Color) * this->colors.size(), &this->colors.front(), GL_STATIC_DRAW);
 		GLint colLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Color");
 		glVertexAttribPointer(colLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(colLocation);

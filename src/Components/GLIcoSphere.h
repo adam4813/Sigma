@@ -5,6 +5,7 @@
 #include "../Systems/GLSLShader.h"
 #include "../GLTransform.h"
 #include "../IGLComponent.h"
+#include "GLMesh.h"
 
 class GLIcoSphere : public IGLComponent {
 public:
@@ -50,6 +51,7 @@ public:
 private:
 	std::vector<Sigma::Face> faces; // The faces for this IcoSphere. Can be used for later refinement.
 	std::vector<Sigma::Vertex> verts; // The verts that the faces refers to. Can be used for later refinement.
-	std::vector<color> colors;
+	std::vector<Sigma::Color> colors;
 	std::vector<Sigma::Vertex> vertNorms;
+	GLMesh mesh;
 };
