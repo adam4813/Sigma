@@ -296,11 +296,52 @@ void GLIcoSphere::Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::F
 	faces = newFaces;
 }
 
-void GLIcoSphere::RefineFace(const unsigned int index) {
-	std::vector<Sigma::Face> face;
-	face.push_back(*GetFace(index));
-
-	Refine(this->verts, face, 1);
-}
+//void GLIcoSphere::RefineFace(const unsigned int index) {
+//	std::vector<Sigma::Face> face;
+//	face.push_back(*GetFace(index));
+//
+//	Refine(this->verts, face, 1);
+//	RemoveFace(index);
+//	// Store the new faces.
+//	for (auto faceitr = face.begin(); faceitr != face.end(); ++faceitr) {
+//		AddFace((*faceitr));
+//	}
+//
+//	std::vector<Sigma::Vertex> surfaceNorms;
+//
+//	// compute surface normals
+//	for(size_t i = 0; i < 4; i++) {
+//		glm::vec3 vector1, vector2, cross, normal;
+//		Sigma::Face f = face[i];
+//		Sigma::Vertex vert1(verts[f.v1]), vert2(verts[f.v2]), vert3(verts[f.v3]);
+//
+//		vector1 = glm::normalize(glm::vec3(vert2.x-vert1.x, vert2.y-vert1.y, vert2.z-vert1.z));
+//		vector2 = glm::normalize(glm::vec3(vert3.x-vert1.x, vert3.y-vert1.y, vert3.z-vert1.z));
+//		cross = glm::cross(vector1, vector2);
+//		normal = glm::normalize(cross);
+//
+//		surfaceNorms.push_back(Sigma::Vertex(normal.x, normal.y, normal.z));
+//	}
+//
+//	// compute vertex normals
+//	// should probably compute adjacency first, this could be slow
+//	for(size_t i = 0; i < verts.size(); i++) {
+//		Sigma::Vertex total_normals(0.0f, 0.0f, 0.0f);
+//
+//		for(size_t j = 0; j < 4; j++) {
+//			Sigma::Face f = face[j];
+//			if (f.v1 == i || f.v2 == i || f.v3 == i) {
+//				total_normals.x += surfaceNorms[j].x;
+//				total_normals.y += surfaceNorms[j].y;
+//				total_normals.z += surfaceNorms[j].z;
+//			}
+//		}
+//
+//		glm::vec3 final_normal(total_normals.x, total_normals.y, total_normals.z);
+//		final_normal = glm::normalize(final_normal);
+//		AddVertexNormal(Sigma::Vertex(final_normal.x, final_normal.y, final_normal.z));
+//	}
+//	GLMesh::Initialize();
+//}
 
 GLSLShader GLIcoSphere::shader;
