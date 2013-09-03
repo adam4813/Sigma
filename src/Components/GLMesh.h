@@ -171,9 +171,7 @@ private:
 	std::vector<Sigma::Face> faces; // Stores vectors of face groupings.
 	std::vector<Sigma::Vertex> verts; // The verts that the faces refers to. Can be used for later refinement.
 	std::vector<Sigma::Vertex> vertNorms; // The vertex normals for each vert.
-	std::vector<Sigma::Face> faceNorms; // The index for each vert normal.
 	std::vector<texCoord> texCoords; // The texture coords for each vertex.
-	std::vector<Sigma::Face> texFaces; // The texture coords for each face.
 	std::vector<Sigma::Color> colors;
 	std::map<std::string, material> mats;
 };

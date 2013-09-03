@@ -65,7 +65,6 @@ void GLMesh::Initialize() {
 
 void GLMesh::Update(glm::mediump_float *view, glm::mediump_float *proj) {
 	GLIcoSphere::shader.Use();
-	this->Transform().Rotate(0.0f,0.1f,0.0f);
 	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &this->Transform().ModelMatrix()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_View"), 1, GL_FALSE, view);
 	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, proj);
@@ -126,8 +125,6 @@ void GLMesh::LoadMesh(std::string fname) {
 			na = indicies[0][2]; nb = indicies[1][2]; nc = indicies[2][2];
 			na--; nb--; nc--;
 			this->faces.push_back(Sigma::Face(a,b,c));
-			this->texFaces.push_back(Sigma::Face(ta,tb,tc));
-			this->faceNorms.push_back(Sigma::Face(na,nb,nc));
 		}  else if (line.substr(0,2) == "vt") { //  Vertex tex coord
 			float u, v = 0.0f;
 			std::istringstream s(line.substr(2));
@@ -142,6 +139,15 @@ void GLMesh::LoadMesh(std::string fname) {
 			this->groupIndex.push_back(this->faces.size());
 		} else if (line.substr(0, line.find(' ')) == "mtllib") { // Material library
 			ParseMTL(line.substr(line.find(' ') + 1));
+		} else if (line.substr(0, line.find(' ')) == "usemtl") { // Use material
+			std::string mtlname = line.substr(line.find(' ') + 1);
+			material m = this->mats[mtlname];
+			glm::vec3 amb(m.ka[0], m.ka[1], m.ka[2]);
+			glm::vec3 spec(m.ks[0], m.ks[1], m.ks[2]);
+			glm::vec3 dif(m.kd[0], m.kd[1], m.kd[2]);
+
+			glm::vec3 color = amb + dif + spec;
+			this->colors.push_back(Sigma::Color(color.r, color.g, color.b));
 		} else if ((line[0] == '#') || (line.size() == 0)) { // Comment or blank line
 			/* ignoring this line comment or blank*/
 		} else { // Unknown
@@ -189,22 +195,10 @@ void GLMesh::LoadMesh(std::string fname) {
 			else {
 				vertNorms.push_back(Sigma::Vertex(total_normals.x, total_normals.y, total_normals.z));
 			}
-			//std::cout << vertNorms[i].x << " " << vertNorms[i].y << " " << vertNorms[i].z << std::endl;
 		}
 
 		surfaceNorms.clear();
 	}
-
-	/*normals.resize(mesh->vertices.size(), glm::vec3(0.0, 0.0, 0.0));
-	for (int i = 0; i < elements.size(); i+=3) {
-		GLushort ia = elements[i];
-		GLushort ib = elements[i+1];
-		GLushort ic = elements[i+2];
-		glm::vec3 normal = glm::normalize(glm::cross(
-			glm::vec3(vertices[ib]) - glm::vec3(vertices[ia]),
-			glm::vec3(vertices[ic]) - glm::vec3(vertices[ia])));
-		normals[ia] = normals[ib] = normals[ic] = normal;
-	}*/
 }
 
 void GLMesh::ParseMTL(std::string fname) {
