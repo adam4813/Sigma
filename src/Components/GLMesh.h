@@ -110,6 +110,13 @@ public:
 		}
 	}
 
+	bool RemoveFace(const unsigned int index);
+
+
+	int GetFaceCount() {
+		return this->faces.size();
+	}
+
 	/**
 	 * \brief Adds a mesh group index.
 	 *
@@ -136,6 +143,21 @@ public:
 	 */
 	void AddVertexColor(const Sigma::Color& c) {
 		this->colors.push_back(c);
+	}
+
+	/**
+	 * \brief Gets a vertex color.
+	 *
+	 * Returns the vertex color at the specific index.
+	 * \param[in] const unsigned int index The index of the color to get.
+	 * \returns   const Sigma::Color* The color at the index or nullptr if the index was invalid.
+	 */
+	const Sigma::Color* GetVertexColor(const unsigned int index) {
+		try {
+			return &this->colors.at(index);
+		} catch (std::out_of_range oor) {
+			return nullptr;
+		}
 	}
 private:
 	std::vector<unsigned int> groupIndex; // Stores which index in faces a group starts at.
