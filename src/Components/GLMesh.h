@@ -110,7 +110,14 @@ public:
 		}
 	}
 
-	bool RemoveFace(const unsigned int index);
+	bool RemoveFace(const unsigned int index) {
+		try {
+			this->faces.erase(this->faces.begin() + index);
+			return true;
+		} catch (std::out_of_range oor) {
+			return false;
+		}
+	}
 
 
 	int GetFaceCount() {

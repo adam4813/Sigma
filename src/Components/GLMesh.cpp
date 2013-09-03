@@ -6,6 +6,8 @@
 #include "GLIcoSphere.h"
 
 GLMesh::GLMesh(const int entityID) : IGLComponent(entityID) {
+	memset(&this->buffers, 0, sizeof(this->buffers));
+	this->vao = 0;
 	this->drawMode = GL_TRIANGLES;
 	this->ElemBufIndex = 2;
 	this->ColorBufIndex = 1;
@@ -15,11 +17,15 @@ GLMesh::GLMesh(const int entityID) : IGLComponent(entityID) {
 
 void GLMesh::Initialize() {
 	// We must create a vao and then store it in our GLIcoSphere.
-	glGenVertexArrays(1, &this->vao); // Generate the VAO
+	if (this->vao == 0) {
+		glGenVertexArrays(1, &this->vao); // Generate the VAO
+	}
 	glBindVertexArray(this->vao); // Bind the VAO
 
 	if (this->verts.size() > 0) {
-		glGenBuffers(1, &this->buffers[this->VertBufIndex]); 	// Generate the vertex buffer.
+		if (this->buffers[this->VertBufIndex] == 0) {
+			glGenBuffers(1, &this->buffers[this->VertBufIndex]); 	// Generate the vertex buffer.
+		}
 		glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->VertBufIndex]); // Bind the vertex buffer.
 		glBufferData(GL_ARRAY_BUFFER, sizeof(Sigma::Vertex) * this->verts.size(), &this->verts.front(), GL_STATIC_DRAW); // Stores the verts in the vertex buffer.
 		GLint posLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Position"); // Find the location in the shader where the vertex buffer data will be placed.
@@ -27,7 +33,9 @@ void GLMesh::Initialize() {
 		glEnableVertexAttribArray(posLocation); // Enable the VAO line for vertex data.
 	}
 	if (this->colors.size() > 0) {
-		glGenBuffers(1, &this->buffers[this->ColorBufIndex]);
+		if (this->buffers[this->ColorBufIndex] == 0) {
+			glGenBuffers(1, &this->buffers[this->ColorBufIndex]);
+		}
 		glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->ColorBufIndex]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(Sigma::Color) * this->colors.size(), &this->colors.front(), GL_STATIC_DRAW);
 		GLint colLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Color");
@@ -35,12 +43,16 @@ void GLMesh::Initialize() {
 		glEnableVertexAttribArray(colLocation);
 	}
 	if (this->faces.size() > 0) {
-		glGenBuffers(1, &this->buffers[this->ElemBufIndex]); // Generate the element buffer.
+		if (this->buffers[this->ElemBufIndex] == 0) {
+			glGenBuffers(1, &this->buffers[this->ElemBufIndex]); // Generate the element buffer.
+		}
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buffers[this->ElemBufIndex]); // Bind the element buffer.
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Sigma::Face) * this->faces.size(), &this->faces.front(), GL_STATIC_DRAW); // Store the faces in the element buffer.
 	}
 	if (this->vertNorms.size() > 0) {
-		glGenBuffers(1, &this->buffers[this->NormalBufIndex]);
+		if (this->buffers[this->NormalBufIndex] == 0) {
+			glGenBuffers(1, &this->buffers[this->NormalBufIndex]);
+		}
 		glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->NormalBufIndex]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(Sigma::Vertex)*this->vertNorms.size(), &this->vertNorms[0], GL_STATIC_DRAW);
 		GLint normalLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Normal");
