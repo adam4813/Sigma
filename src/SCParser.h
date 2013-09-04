@@ -24,6 +24,45 @@ namespace Sigma {
 	}
 }
 
+// SC files contain data for Sigma Component creation
+// Each line begins with a key. These keys describe the rest of the line.
+// There is no whitespace allowed between the key and the rest of the line
+// The keys and the line are as follows:
+// ----------
+// * - A comment. e.g.
+// *I am a comment just ignore me.
+// ----------
+// @ - Entity name. This denotes the start of a new entity. e.g.
+// @entity1
+// ...
+// 
+// @entity2
+// ----------
+// # - The entity ID. e.g.
+// #2
+// ----------
+// & - The type of the component to create. e.g.
+// &GLIcoSphere
+// ----------
+// > - A component property. Each line has a value and a type.
+// The last letter in the line dictates the type of the value. e.g.
+// Each property is added to the component it follows.
+// >100i
+// >10.0f
+// >I am a strings
+// ----------
+// NOTE a blank line or comment line must follow each component.
+//
+// To create multiple components for each entity just make add a new component line (&).
+// @entity1
+// #1
+// &GLIcoSphere
+// >prop1=1.0f
+// 
+// &GLMesh
+// >prop2=2i
+
+
 class SCParser {
 public:
 	SCParser() { }
