@@ -19,6 +19,8 @@ public:
 
 	bool KeyDown(int key, bool focused = false);
 
+	bool KeyUp(int key, bool focused = false);
+
 	void Present();
 private:
 	HWND hwnd; // The current window handle.
@@ -31,5 +33,5 @@ private:
 	LONGLONG lastTime; // The time of the last call to GetDeltaTime.
 
 	int OpenGLVersion[2];
+	static int keyUp[256];
 };
-

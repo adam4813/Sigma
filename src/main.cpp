@@ -52,6 +52,10 @@ int main(int argCount, char **argValues) {
 			os->Present();
 		}
 
+		if (os->KeyUp('O', true)) {
+			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+		}
+
 		// Translation keys
 		if (os->KeyDown('W', true)) { // Move forward
 			if (os->KeyDown('B', true)) {
