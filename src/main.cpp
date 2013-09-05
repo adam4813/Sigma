@@ -48,14 +48,6 @@ int main(int argCount, char **argValues) {
 		delta = os->GetDeltaTime();
 		float deltaSec = (float)delta/1000.0f;
 
-		if (glsys.Update(delta)) {
-			os->Present();
-		}
-
-		if (os->KeyUp('O', true)) {
-			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-		}
-
 		// Translation keys
 		if (os->KeyDown('W', true)) { // Move forward
 			if (os->KeyDown('B', true)) {
@@ -97,14 +89,18 @@ int main(int argCount, char **argValues) {
 			glsys.Rotate(0.0f, 0.0f, 90.0f*deltaSec);
 		}
 
-		if (os->KeyDown('P', true)) { // Wireframe mode
+		if (os->KeyUp('P', true)) { // Wireframe mode
 			if (!isWireframe) {
 				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-				isWireframe = !isWireframe;
+				isWireframe = true;
+			} else {
+				glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+				isWireframe = false;
 			}
-		} else if (isWireframe) {
-			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-			isWireframe = !isWireframe;
+		}
+
+		if (glsys.Update(delta)) {
+			os->Present();
 		}
 	}
 	

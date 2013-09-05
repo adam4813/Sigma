@@ -42,10 +42,10 @@ void* win32::CreateGraphicsWindow() {
 }
 
 LRESULT CALLBACK win32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
-	ZeroMemory(keyUp, sizeof(keyUp));
 	switch (message) {
 	case WM_KEYUP:
 			keyUp[wParam] = 1;
+			return 0;
 		break;
 	case WM_DESTROY: 
 		PostQuitMessage(0);
@@ -56,6 +56,7 @@ LRESULT CALLBACK win32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 bool win32::MessageLoop() {
 	MSG msg;
+	ZeroMemory(keyUp, sizeof(keyUp));
 	if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) { // If we have a message to process, process it
 		if (msg.message == WM_QUIT) {
 			return false;
