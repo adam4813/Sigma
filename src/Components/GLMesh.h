@@ -120,7 +120,7 @@ public:
 	}
 
 
-	int GetFaceCount() {
+	unsigned int GetFaceCount() {
 		return this->faces.size();
 	}
 

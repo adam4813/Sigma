@@ -249,7 +249,7 @@ void GLMesh::ParseMTL(std::string fname) {
 				} else {
 					// Blank line
 				}
-				int pre = in.tellg();
+				std::streamoff pre = in.tellg();
 				getline(in, line);
 				if (in.eof()) {
 					break;

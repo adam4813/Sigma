@@ -40,7 +40,7 @@ bool SCParser::Parse(const std::string& fname) {
 					Property p(propName);
 
 					if (propType == "f") {
-						p.Set<float>(atof(propValue.c_str()));
+						p.Set<float>(static_cast<float>(atof(propValue.c_str())));
 					}
 					else if (propType == "s") {
 						p.Set<std::string>(propValue);
