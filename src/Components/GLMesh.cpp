@@ -80,6 +80,8 @@ void GLMesh::Update(glm::mediump_float *view, glm::mediump_float *proj) {
 }
 
 void GLMesh::LoadMesh(std::string fname) {
+	Sigma::Color current_color(0.0f, 0.0f, 0.0f);
+
 	std::ifstream in(fname, std::ios::in);
 	if (!in) {
 		std::cerr << "Cannot open " << fname << std::endl;
@@ -93,6 +95,8 @@ void GLMesh::LoadMesh(std::string fname) {
 			std::istringstream s(line.substr(2));
 			s >> x; s >> y; s >> z;
 			this->verts.push_back(Sigma::Vertex(x, y, z));
+			//this->colors.push_back(current_color);
+			this->colors.push_back(Sigma::Color(1.0f, 0.0f, 0.0f));
 		}  else if (line.substr(0,2) == "f ") { // Face
 			short indicies[3][3];
 			std::string cur = line.substr(2, line.find(' ', 2) - 2);
@@ -148,7 +152,8 @@ void GLMesh::LoadMesh(std::string fname) {
 			glm::vec3 dif(m.kd[0], m.kd[1], m.kd[2]);
 
 			glm::vec3 color = amb + dif + spec;
-			this->colors.push_back(Sigma::Color(color.r, color.g, color.b));
+			//this->colors.push_back(Sigma::Color(color.r, color.g, color.b));
+			current_color = Sigma::Color(color.r, color.g, color.b);
 		} else if ((line[0] == '#') || (line.size() == 0)) { // Comment or blank line
 			/* ignoring this line comment or blank*/
 		} else { // Unknown
@@ -204,6 +209,7 @@ void GLMesh::LoadMesh(std::string fname) {
 
 void GLMesh::ParseMTL(std::string fname) {
 	std::ifstream in(fname, std::ios::in);
+	
 	if (!in) {
 		std::cerr << "Cannot open " << fname << std::endl;
 		return;

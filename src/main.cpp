@@ -30,7 +30,9 @@ int main(int argCount, char **argValues) {
 
 	SCParser parser;
 
-	parser.Parse("test.sc");
+	if (!parser.Parse("../../test.sc")) {
+		assert(0 && "Failed to load entities from file.");
+	}
 	
 	for (int i = 0; i < parser.EntityCount(); ++i) {
 		const Sigma::Parser::Entity* e = parser.GetEntity(i);
@@ -47,32 +49,32 @@ int main(int argCount, char **argValues) {
 	while (os->MessageLoop()) {
 		delta = os->GetDeltaTime();
 		float deltaSec = (float)delta/1000.0f;
-
+		
 		if (glsys.Update(delta)) {
 			os->Present();
 		}
 
 		// Rotate the ship
-		glsys.GetComponent(7)->Transform().Rotate(0.0f, 5.0f*deltaSec, 0.0f);
+		//glsys.GetComponent(7)->Transform().Rotate(0.0f, 5.0f*deltaSec, 0.0f);
 
 		// Translate the skybox
-		glsys.GetComponent(9)->Transform().Translate(glsys.GetView()->position);
+		//glsys.GetComponent(9)->Transform().Translate(glsys.GetView()->position);
 
 		// Translation keys
 		if (os->KeyDown('W', true)) { // Move forward
 			if (os->KeyDown('B', true)) {
 				glsys.Move(0.0f, 0.0f, 100.0f*deltaSec);
-				glsys.GetComponent(8)->Transform().Translate(0.0f, 0.0f, 100.0f*deltaSec);
+				//glsys.GetComponent(8)->Transform().Translate(0.0f, 0.0f, 100.0f*deltaSec);
 			} else if (os->KeyDown('N', true)) {
 				glsys.Move(0.0f, 0.0f, 10000.0f*deltaSec);
-				glsys.GetComponent(8)->Transform().Translate(0.0f, 0.0f, 10000.0f*deltaSec);
+				//glsys.GetComponent(8)->Transform().Translate(0.0f, 0.0f, 10000.0f*deltaSec);
 			} else {
 				glsys.Move(0.0f, 0.0f, 10.0f*deltaSec);
-				glsys.GetComponent(8)->Transform().Translate(0.0f, 0.0f, 10.0f*deltaSec);
+				//glsys.GetComponent(8)->Transform().Translate(0.0f, 0.0f, 10.0f*deltaSec);
 			}
 		} else if (os->KeyDown('S', true)) { // Move backward
 			glsys.Move(0.0f, 0.0f, -10.0f*deltaSec);
-			glsys.GetComponent(8)->Transform().Translate(0.0f, 0.0f, -10.0f*deltaSec);
+			//glsys.GetComponent(8)->Transform().Translate(0.0f, 0.0f, -10.0f*deltaSec);
 		}
 		
 		if (os->KeyDown('A', true)) { 
