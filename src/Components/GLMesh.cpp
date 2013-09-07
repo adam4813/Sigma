@@ -53,7 +53,7 @@ void GLMesh::Initialize() {
 
 void GLMesh::Update(glm::mediump_float *view, glm::mediump_float *proj) {
 	GLIcoSphere::shader.Use();
-	this->Transform().Rotate(0.0f,0.1f,0.0f);
+
 	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &this->Transform().ModelMatrix()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_View"), 1, GL_FALSE, view);
 	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, proj);

@@ -58,7 +58,10 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		return sphere;
 	} else if (type == "GLCubeSphere") {
 		GLCubeSphere* sphere = new GLCubeSphere(entityID);
-		sphere->Initialize();
+
+		std::string texture_name = "";
+		std::string shader_name = "";
+		int subdivision_levels = 1;
 		float scale = 1.0f;
 		float x = 0.0f;
 		float y = 0.0f;
@@ -77,10 +80,23 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 			} else if (p->GetName() == "z") {
 				z = p->Get<float>();
 				continue;
+			} else if (p->GetName() == "subdivision_levels") {
+				subdivision_levels = p->Get<int>();
+			} else if (p->GetName() == "texture_name") {
+				texture_name = p->Get<std::string>();
+			} else if (p->GetName() == "shader") {
+				shader_name = p->Get<std::string>();
 			}
 		}
+
+		sphere->SetSubdivisions(subdivision_levels);
+		sphere->LoadShader(shader_name);
+		sphere->Initialize();
+		sphere->LoadTexture(texture_name);
+
 		sphere->Transform().Scale(scale,scale,scale);
 		sphere->Transform().Translate(x,y,z);
+
 		this->components[entityID].push_back(sphere);
 		return sphere;
 	} else if (type=="GLMesh") {
@@ -158,14 +174,13 @@ const int* OpenGLSystem::Start() {
 	// Now that GL is up and running load the shaders
 	GLSprite::LoadShader();
 	GLIcoSphere::LoadShader();
-	GLCubeSphere::LoadShader();
 
-	// Generates a really hard-to-read matrix, but a normal, standard 4x4 matrix nonetheless
+	// Generates a floatly hard-to-read matrix, but a normal, standard 4x4 matrix nonetheless
 	this->ProjectionMatrix = glm::perspective(
 		45.0f,
 		4.0f / 3.0f,
-		0.1f,
-		10000.0f
+		1.0f,
+		5000000.0f
 		);
 
 	this->view->Move(4.0f,3.0f,-10.f);

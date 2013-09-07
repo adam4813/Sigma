@@ -6,8 +6,10 @@
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 
-struct IGLView;
-class IGLComponent;
+//struct IGLView;
+#include "IGLVIew.h"
+#include "../IGLComponent.h"
+//class IGLComponent;
 
 class OpenGLSystem : public ISystem {
 public:
@@ -84,6 +86,8 @@ public:
 	 * \returns void
 	 */
 	void SetWindowDim(int width, int height) { this->windowWidth = width; this->windowHeight = height; }
+
+	IGLView *GetView() { return this->view; }
 private:
 
 	int windowWidth; // Store the width of our window  
