@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "Systems/OpenGLSystem.h"
+#include "SCParser.h"
 
 #ifdef OS_Win32
 #include "win32.h"
@@ -26,152 +27,16 @@ int main(int argCount, char **argValues) {
 	} else {
 		std::cout<<"OpenGL version: " << version[0] << "." << version[1] << std::endl;
 	}
-	
-	std::vector<Property> props;
-	
-	//glsys.Factory("GLSprite", 1, props);
-	//glsys.Factory("GLSprite", 2, props);
 
-	{
-		Property prop1("scale");
-		prop1.Set<float>(100.0f);
-		props.push_back(prop1);
-		Property prop2("x");
-		prop2.Set<float>(-500.0f);
-		props.push_back(prop2);
-		Property prop3("y");
-		prop3.Set<float>(0.0f);
-		props.push_back(prop3);
-		Property prop4("z");
-		prop4.Set<float>(300.0f);
-		props.push_back(prop4);
-		glsys.Factory("GLIcoSphere", 3, props);
-	}
-	
-	props.clear();
-	{
-		Property prop1("scale");
-		prop1.Set<float>(1000.0f);
-		props.push_back(prop1);
-		Property prop2("x");
-		prop2.Set<float>(-500.0f);
-		props.push_back(prop2);
-		Property prop3("y");
-		prop3.Set<float>(0.0f);
-		props.push_back(prop3);
-		Property prop4("z");
-		prop4.Set<float>(8000.0f);
-		props.push_back(prop4);
-		glsys.Factory("GLIcoSphere", 4, props);
-	}
-	
-	props.clear();
-	{
-		Property prop1("scale");
-		prop1.Set<float>(500.0f);
-		props.push_back(prop1);
-		Property prop2("x");
-		prop2.Set<float>(-500.0f);
-		props.push_back(prop2);
-		Property prop3("y");
-		prop3.Set<float>(0.0f);
-		props.push_back(prop3);
-		Property prop4("z");
-		prop4.Set<float>(2000.0f);
-		props.push_back(prop4);
-		glsys.Factory("GLIcoSphere", 5, props);
-	}
+	SCParser parser;
 
-	props.clear();
-	{
-		Property prop1("scale");
-		prop1.Set<float>(3389500.0f);
-		props.push_back(prop1);
-		Property prop2("x");
-		prop2.Set<float>(4000000.0f);
-		props.push_back(prop2);
-		Property prop3("y");
-		prop3.Set<float>(0.0f);
-		props.push_back(prop3);
-		Property prop4("z");
-		prop4.Set<float>(0.0f);
-		props.push_back(prop4);
-		Property prop5("texture_name");
-		prop5.Set<std::string>("mars");
-		props.push_back(prop5);
-		Property prop6("subdivision_levels");
-		prop6.Set<int>(5);
-		props.push_back(prop6);
-		Property prop7("shader");
-		prop7.Set<std::string>("cubesphere");
-		props.push_back(prop7);
-		glsys.Factory("GLCubeSphere", 6, props);
-	}
+	parser.Parse("test.sc");
 	
-	props.clear();
-	{
-		Property prop1("scale");
-		prop1.Set<float>(1.0f);
-		props.push_back(prop1);
-		Property prop2("x");
-		prop2.Set<float>(30.0f);
-		props.push_back(prop2);
-		Property prop3("y");
-		prop3.Set<float>(0.0f);
-		props.push_back(prop3);
-		Property prop4("z");
-		prop4.Set<float>(0.0f);
-		props.push_back(prop4);
-		Property prop5("meshFile");
-		prop5.Set<std::string>("trillek_dev_clonk2u_tri.obj");
-		props.push_back(prop5);
-		glsys.Factory("GLMesh", 7, props);
-	}
-
-	props.clear();
-	{
-		Property prop1("scale");
-		prop1.Set<float>(1.0f);
-		props.push_back(prop1);
-		Property prop2("x");
-		prop2.Set<float>(-4.0f);
-		props.push_back(prop2);
-		Property prop3("y");
-		prop3.Set<float>(3.0f);
-		props.push_back(prop3);
-		Property prop4("z");
-		prop4.Set<float>(-10.0f);
-		props.push_back(prop4);
-		Property prop5("meshFile");
-		prop5.Set<std::string>("ship_room.obj");
-		props.push_back(prop5);
-		glsys.Factory("GLMesh", 8, props);
-	}
-
-	props.clear();
-	{
-		Property prop1("scale");
-		prop1.Set<float>(1.0f);
-		props.push_back(prop1);
-		Property prop2("x");
-		prop2.Set<float>(0.0f);
-		props.push_back(prop2);
-		Property prop3("y");
-		prop3.Set<float>(0.0f);
-		props.push_back(prop3);
-		Property prop4("z");
-		prop4.Set<float>(0.0f);
-		props.push_back(prop4);
-		Property prop5("texture_name");
-		prop5.Set<std::string>("stars");
-		props.push_back(prop5);
-		Property prop6("subdivision_levels");
-		prop6.Set<int>(1);
-		props.push_back(prop6);
-		Property prop7("shader");
-		prop7.Set<std::string>("skybox");
-		props.push_back(prop7);
-		glsys.Factory("GLCubeSphere", 9, props);
+	for (int i = 0; i < parser.EntityCount(); ++i) {
+		const Sigma::Parser::Entity* e = parser.GetEntity(i);
+		for (auto itr = e->components.begin(); itr != e->components.end(); ++itr) {
+			glsys.Factory(itr->type, e->id, const_cast<std::vector<Property>&>(itr->properties));
+		}
 	}
 
 	os->SetupTimer();
@@ -240,14 +105,18 @@ int main(int argCount, char **argValues) {
 			glsys.Rotate(0.0f, 0.0f, 90.0f*deltaSec);
 		}
 
-		if (os->KeyDown('P', true)) { // Wireframe mode
+		if (os->KeyUp('P', true)) { // Wireframe mode
 			if (!isWireframe) {
 				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-				isWireframe = !isWireframe;
+				isWireframe = true;
+			} else {
+				glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+				isWireframe = false;
 			}
-		} else if (isWireframe) {
-			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-			isWireframe = !isWireframe;
+		}
+
+		if (glsys.Update(delta)) {
+			os->Present();
 		}
 
 		if (os->KeyDown('M', true)) { // Fullscreen mode

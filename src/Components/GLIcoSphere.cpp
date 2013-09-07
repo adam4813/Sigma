@@ -3,12 +3,7 @@
 #include <map>
 #include <stdint.h>
 
-GLIcoSphere::GLIcoSphere( const int entityID /*= 0*/ ) : IGLComponent(entityID) {
-	this->drawMode = GL_TRIANGLES;
-	this->ElemBufIndex = 2;
-	this->ColorBufIndex = 1;
-	this->VertBufIndex = 0;
-	this->NormalBufIndex = 3;
+GLIcoSphere::GLIcoSphere( const int entityID /*= 0*/ ) : GLMesh(entityID) {
 }
 
 void GLIcoSphere::Initialize() {
@@ -17,32 +12,51 @@ void GLIcoSphere::Initialize() {
 	double t = (1.0 + glm::sqrt(5.0)) / 2.0;
 	glm::vec2 coordPair = glm::normalize(glm::vec2(1,t));
 
+	AddVertex(Sigma::Vertex(-coordPair.r, coordPair.g, 0));
+	AddVertex(Sigma::Vertex(coordPair.r, coordPair.g, 0));
+	AddVertex(Sigma::Vertex(-coordPair.r, -coordPair.g, 0));
+	AddVertex(Sigma::Vertex(coordPair.r, -coordPair.g, 0));
+
 	this->verts.push_back(Sigma::Vertex(-coordPair.r, coordPair.g, 0));
-	this->colors.push_back((rand() % 6) > 0 ? color(0,0,1) : color(0,1,0));
 	this->verts.push_back(Sigma::Vertex(coordPair.r, coordPair.g, 0));
-	this->colors.push_back((rand() % 6) > 0 ? color(0,0,1) : color(0,1,0));
 	this->verts.push_back(Sigma::Vertex(-coordPair.r, -coordPair.g, 0));
-	this->colors.push_back((rand() % 6) > 0 ? color(0,0,1) : color(0,1,0));
 	this->verts.push_back(Sigma::Vertex(coordPair.r, -coordPair.g, 0));
-	this->colors.push_back((rand() % 6) > 0 ? color(0,0,1) : color(0,1,0));
+
+	AddVertex(Sigma::Vertex(0, -coordPair.r, coordPair.g));
+	AddVertex(Sigma::Vertex(0, coordPair.r, coordPair.g));
+	AddVertex(Sigma::Vertex(0, -coordPair.r, -coordPair.g));
+	AddVertex(Sigma::Vertex(0, coordPair.r, -coordPair.g));
 
 	this->verts.push_back(Sigma::Vertex(0, -coordPair.r, coordPair.g));
-	this->colors.push_back((rand() % 6) > 0 ? color(0,0,1) : color(0,1,0));
 	this->verts.push_back(Sigma::Vertex(0, coordPair.r, coordPair.g));
-	this->colors.push_back((rand() % 6) > 0 ? color(0,0,1) : color(0,1,0));
 	this->verts.push_back(Sigma::Vertex(0, -coordPair.r, -coordPair.g));
-	this->colors.push_back((rand() % 6) > 0 ? color(0,0,1) : color(0,1,0));
 	this->verts.push_back(Sigma::Vertex(0, coordPair.r, -coordPair.g));
-	this->colors.push_back((rand() % 6) > 0 ? color(0,0,1) : color(0,1,0));
+
+	AddVertex(Sigma::Vertex(coordPair.g, 0, -coordPair.r));
+	AddVertex(Sigma::Vertex(coordPair.g, 0, coordPair.r));
+	AddVertex(Sigma::Vertex(-coordPair.g, 0, -coordPair.r));
+	AddVertex(Sigma::Vertex(-coordPair.g, 0, coordPair.r));
 
 	this->verts.push_back(Sigma::Vertex(coordPair.g, 0, -coordPair.r));
-	this->colors.push_back((rand() % 6) > 0 ? color(0,0,1) : color(0,1,0));
 	this->verts.push_back(Sigma::Vertex(coordPair.g, 0, coordPair.r));
-	this->colors.push_back((rand() % 6) > 0 ? color(0,0,1) : color(0,1,0));
 	this->verts.push_back(Sigma::Vertex(-coordPair.g, 0, -coordPair.r));
-	this->colors.push_back((rand() % 6) > 0 ? color(0,0,1) : color(0,1,0));
 	this->verts.push_back(Sigma::Vertex(-coordPair.g, 0, coordPair.r));
-	this->colors.push_back((rand() % 6) > 0 ? color(0,0,1) : color(0,1,0));
+
+
+	AddVertexColor((rand() % 6) > 0 ? Sigma::Color(0,0,1) : Sigma::Color(0,1,0));
+	AddVertexColor((rand() % 6) > 0 ? Sigma::Color(0,0,1) : Sigma::Color(0,1,0));
+	AddVertexColor((rand() % 6) > 0 ? Sigma::Color(0,0,1) : Sigma::Color(0,1,0));
+	AddVertexColor((rand() % 6) > 0 ? Sigma::Color(0,0,1) : Sigma::Color(0,1,0));
+
+	AddVertexColor((rand() % 6) > 0 ? Sigma::Color(0,0,1) : Sigma::Color(0,1,0));
+	AddVertexColor((rand() % 6) > 0 ? Sigma::Color(0,0,1) : Sigma::Color(0,1,0));
+	AddVertexColor((rand() % 6) > 0 ? Sigma::Color(0,0,1) : Sigma::Color(0,1,0));
+	AddVertexColor((rand() % 6) > 0 ? Sigma::Color(0,0,1) : Sigma::Color(0,1,0));
+
+	AddVertexColor((rand() % 6) > 0 ? Sigma::Color(0,0,1) : Sigma::Color(0,1,0));
+	AddVertexColor((rand() % 6) > 0 ? Sigma::Color(0,0,1) : Sigma::Color(0,1,0));
+	AddVertexColor((rand() % 6) > 0 ? Sigma::Color(0,0,1) : Sigma::Color(0,1,0));
+	AddVertexColor((rand() % 6) > 0 ? Sigma::Color(0,0,1) : Sigma::Color(0,1,0));
 
 	// Create the faces to begin refining at.
 	std::vector<Sigma::Face> faceLevelZero;
@@ -74,17 +88,22 @@ void GLIcoSphere::Initialize() {
 	// Refine the IcoSphere by 2 levels.
 	// We are using a temp face buffer as it will be replaced by a new set.
 	// The vertex buffer is the actual buffer as we will add to it.
-	Refine(this->verts, faceLevelZero, this->GetEntityID());
+	Refine(this->verts, faceLevelZero, 4);
 
 	// Store the new faces.
-	this->faces = faceLevelZero;
+	for (auto faceitr = faceLevelZero.begin(); faceitr != faceLevelZero.end(); ++faceitr) {
+		AddFace((*faceitr));
+	}
+
+	AddMeshGroupIndex(0);
 
 	std::vector<Sigma::Vertex> surfaceNorms;
 
 	// compute surface normals
-	for(size_t i = 0; i < faces.size(); i++) {
+	for(size_t i = 0; i < GetFaceCount(); i++) {
 		glm::vec3 vector1, vector2, cross, normal;
-		Sigma::Vertex vert1(verts[faces[i].v1]), vert2(verts[faces[i].v2]), vert3(verts[faces[i].v3]);
+		const Sigma::Face* f = GetFace(i);
+		Sigma::Vertex vert1(verts[f->v1]), vert2(verts[f->v2]), vert3(verts[f->v3]);
 
 		vector1 = glm::normalize(glm::vec3(vert2.x-vert1.x, vert2.y-vert1.y, vert2.z-vert1.z));
 		vector2 = glm::normalize(glm::vec3(vert3.x-vert1.x, vert3.y-vert1.y, vert3.z-vert1.z));
@@ -99,8 +118,9 @@ void GLIcoSphere::Initialize() {
 	for(size_t i = 0; i < verts.size(); i++) {
 		Sigma::Vertex total_normals(0.0f, 0.0f, 0.0f);
 
-		for(size_t j = 0; j < faces.size(); j++) {
-			if (faces[j].v1 == i || faces[j].v2 == i || faces[j].v3 == i) {
+		for(size_t j = 0; j < GetFaceCount(); j++) {
+			const Sigma::Face* f = GetFace(j);
+			if (f->v1 == i || f->v2 == i || f->v3 == i) {
 				total_normals.x += surfaceNorms[j].x;
 				total_normals.y += surfaceNorms[j].y;
 				total_normals.z += surfaceNorms[j].z;
@@ -109,44 +129,11 @@ void GLIcoSphere::Initialize() {
 
 		glm::vec3 final_normal(total_normals.x, total_normals.y, total_normals.z);
 		final_normal = glm::normalize(final_normal);
-		vertNorms.push_back(Sigma::Vertex(final_normal.x, final_normal.y, final_normal.z));
+		AddVertexNormal(Sigma::Vertex(final_normal.x, final_normal.y, final_normal.z));
 	}
 
 	surfaceNorms.clear();
-
-	// We must create a vao and then store it in our GLIcoSphere.
-	glGenVertexArrays(1, &this->vao); // Generate the VAO
-	glBindVertexArray(this->vao); // Bind the VAO
-
-	glGenBuffers(1, &this->buffers[this->VertBufIndex]); 	// Generate the vertex buffer.
-	glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->VertBufIndex]); // Bind the vertex buffer.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Sigma::Vertex) * this->verts.size(), &this->verts.front(), GL_STATIC_DRAW); // Stores the verts in the vertex buffer.
-	GLint posLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Position"); // Find the location in the shader where the vertex buffer data will be placed.
-	glVertexAttribPointer(posLocation, 3, GL_FLOAT, GL_FALSE, 0, 0); // Tell the VAO the vertex data will be stored at the location we just found.
-	glEnableVertexAttribArray(posLocation); // Enable the VAO line for vertex data.
-
-
-	glGenBuffers(1, &this->buffers[this->ColorBufIndex]);
-	glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->ColorBufIndex]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(color) * this->colors.size(), &this->colors.front(), GL_STATIC_DRAW);
-	GLint colLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Color");
-	glVertexAttribPointer(colLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(colLocation);
-
-	glGenBuffers(1, &this->buffers[this->ElemBufIndex]); // Generate the element buffer.
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buffers[this->ElemBufIndex]); // Bind the element buffer.
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Sigma::Face) * this->faces.size(), &this->faces.front(), GL_STATIC_DRAW); // Store the faces in the element buffer.
-
-	if (this->vertNorms.size() > 0) {
-		glGenBuffers(1, &this->buffers[this->NormalBufIndex]);
-		glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->NormalBufIndex]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(Sigma::Vertex)*this->vertNorms.size(), &this->vertNorms[0], GL_STATIC_DRAW);
-		GLint normalLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Normal");
-		glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(normalLocation);
-	}
-
-	glBindVertexArray(0); // Reset the buffer binding because we are good programmers.
+	GLMesh::Initialize();
 }
 
 void GLIcoSphere::LoadShader() {
@@ -157,19 +144,7 @@ void GLIcoSphere::LoadShader() {
 
 
 void GLIcoSphere::Update(glm::mediump_float *view, glm::mediump_float *proj) {
-	GLIcoSphere::shader.Use();
-	this->Transform().Rotate(0.0f,0.1f,0.0f);
-	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &this->Transform().ModelMatrix()[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_View"), 1, GL_FALSE, view);
-	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, proj);
-	glBindVertexArray(this->Vao());
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->GetBuffer(this->ElemBufIndex));
-	for (int i = 0, cur = this->MeshGroup_ElementCount(0), prev = 0; cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
-		glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_SHORT, (void*)prev);
-	}
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
-	glBindVertexArray(0);
-	GLIcoSphere::shader.UnUse();
+	GLMesh::Update(view, proj);
 }
 
 glm::vec3 GetMidPoint(Sigma::Vertex v1, Sigma::Vertex v2) {
@@ -200,9 +175,10 @@ void GLIcoSphere::Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::F
 				} else {
 					glm::vec3 middle = GetMidPoint(this->verts[v1], this->verts[v2]);
 
-					verts.push_back(Sigma::Vertex(middle.x, middle.y, middle.z));
-					int blue = this->colors[v1].b + this->colors[v2].b;
-					int green = this->colors[v1].g + this->colors[v2].g;
+					AddVertex(Sigma::Vertex(middle.x, middle.y, middle.z));
+					this->verts.push_back(Sigma::Vertex(middle.x, middle.y, middle.z));
+					int blue = GetVertexColor(v1)->b + GetVertexColor(v2)->b;
+					int green = GetVertexColor(v1)->g + GetVertexColor(v2)->g;
 					
 					if (blue == green) {
 						int val = rand() % 2;
@@ -221,7 +197,8 @@ void GLIcoSphere::Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::F
 							blue = 0;
 						}
 					}
-					this->colors.push_back(color(0,green,blue));
+
+					AddVertexColor(Sigma::Color(0,green,blue));
 
 					a = cache[key] = this->verts.size() - 1;
 				}
@@ -240,9 +217,10 @@ void GLIcoSphere::Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::F
 				} else {
 					glm::vec3 middle = GetMidPoint(this->verts[v1], this->verts[v2]);
 
-					verts.push_back(Sigma::Vertex(middle.x, middle.y, middle.z));
-					int blue = this->colors[v1].b + this->colors[v2].b;
-					int green = this->colors[v1].g + this->colors[v2].g;
+					AddVertex(Sigma::Vertex(middle.x, middle.y, middle.z));
+					this->verts.push_back(Sigma::Vertex(middle.x, middle.y, middle.z));
+					int blue = GetVertexColor(v1)->b + GetVertexColor(v2)->b;
+					int green = GetVertexColor(v1)->g + GetVertexColor(v2)->g;
 
 					if (blue == green) {
 						int val = rand() % 2;
@@ -261,7 +239,7 @@ void GLIcoSphere::Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::F
 							blue = 0;
 						}
 					}
-					this->colors.push_back(color(0,green,blue));
+					AddVertexColor(Sigma::Color(0,green,blue));
 
 					b = cache[key] = this->verts.size() - 1;
 				}
@@ -280,9 +258,10 @@ void GLIcoSphere::Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::F
 				} else {
 					glm::vec3 middle = GetMidPoint(this->verts[v1], this->verts[v2]);
 
-					verts.push_back(Sigma::Vertex(middle.x, middle.y, middle.z));
-					int blue = this->colors[v1].b + this->colors[v2].b;
-					int green = this->colors[v1].g + this->colors[v2].g;
+					AddVertex(Sigma::Vertex(middle.x, middle.y, middle.z));
+					this->verts.push_back(Sigma::Vertex(middle.x, middle.y, middle.z));
+					int blue = GetVertexColor(v1)->b + GetVertexColor(v2)->b;
+					int green = GetVertexColor(v1)->g + GetVertexColor(v2)->g;
 
 					if (blue == green) {
 						int val = rand() % 2;
@@ -301,7 +280,7 @@ void GLIcoSphere::Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::F
 							blue = 0;
 						}
 					}
-					this->colors.push_back(color(0,green,blue));
+					AddVertexColor(Sigma::Color(0,green,blue));
 
 					c = cache[key] = this->verts.size() - 1;
 				}
@@ -316,5 +295,53 @@ void GLIcoSphere::Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::F
 	}
 	faces = newFaces;
 }
+
+//void GLIcoSphere::RefineFace(const unsigned int index) {
+//	std::vector<Sigma::Face> face;
+//	face.push_back(*GetFace(index));
+//
+//	Refine(this->verts, face, 1);
+//	RemoveFace(index);
+//	// Store the new faces.
+//	for (auto faceitr = face.begin(); faceitr != face.end(); ++faceitr) {
+//		AddFace((*faceitr));
+//	}
+//
+//	std::vector<Sigma::Vertex> surfaceNorms;
+//
+//	// compute surface normals
+//	for(size_t i = 0; i < 4; i++) {
+//		glm::vec3 vector1, vector2, cross, normal;
+//		Sigma::Face f = face[i];
+//		Sigma::Vertex vert1(verts[f.v1]), vert2(verts[f.v2]), vert3(verts[f.v3]);
+//
+//		vector1 = glm::normalize(glm::vec3(vert2.x-vert1.x, vert2.y-vert1.y, vert2.z-vert1.z));
+//		vector2 = glm::normalize(glm::vec3(vert3.x-vert1.x, vert3.y-vert1.y, vert3.z-vert1.z));
+//		cross = glm::cross(vector1, vector2);
+//		normal = glm::normalize(cross);
+//
+//		surfaceNorms.push_back(Sigma::Vertex(normal.x, normal.y, normal.z));
+//	}
+//
+//	// compute vertex normals
+//	// should probably compute adjacency first, this could be slow
+//	for(size_t i = 0; i < verts.size(); i++) {
+//		Sigma::Vertex total_normals(0.0f, 0.0f, 0.0f);
+//
+//		for(size_t j = 0; j < 4; j++) {
+//			Sigma::Face f = face[j];
+//			if (f.v1 == i || f.v2 == i || f.v3 == i) {
+//				total_normals.x += surfaceNorms[j].x;
+//				total_normals.y += surfaceNorms[j].y;
+//				total_normals.z += surfaceNorms[j].z;
+//			}
+//		}
+//
+//		glm::vec3 final_normal(total_normals.x, total_normals.y, total_normals.z);
+//		final_normal = glm::normalize(final_normal);
+//		AddVertexNormal(Sigma::Vertex(final_normal.x, final_normal.y, final_normal.z));
+//	}
+//	GLMesh::Initialize();
+//}
 
 GLSLShader GLIcoSphere::shader;

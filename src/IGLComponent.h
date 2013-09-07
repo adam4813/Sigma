@@ -15,13 +15,12 @@ namespace Sigma {
 		Vertex(float x, float y, float z) : x(x), y(y), z(z) { }
 		float x,y,z;
 	};
-}
 
-// Colors are always floats not doubles
-struct color {
-	color(float r, float g, float b) : r(r), g(g), b(b) { }
-	float r,g,b;
-};
+	struct Color {
+		Color(float r, float g, float b) : r(r), g(g), b(b) { }
+		float r,g,b;
+	};
+}
 
 class IGLComponent : public IComponent {
 public:

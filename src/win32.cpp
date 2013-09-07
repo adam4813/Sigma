@@ -41,8 +41,12 @@ void* win32::CreateGraphicsWindow() {
 	return this->hdc;
 }
 
-LRESULT CALLBACK win32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {  
+LRESULT CALLBACK win32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message) {
+	case WM_KEYUP:
+			keyUp[wParam] = 1;
+			return 0;
+		break;
 	case WM_DESTROY: 
 		PostQuitMessage(0);
 		break;
@@ -52,6 +56,7 @@ LRESULT CALLBACK win32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 bool win32::MessageLoop() {
 	MSG msg;
+	ZeroMemory(keyUp, sizeof(keyUp));
 	if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) { // If we have a message to process, process it
 		if (msg.message == WM_QUIT) {
 			return false;
@@ -166,3 +171,14 @@ const int* win32::StartOpengGL() {
 void win32::Present() {
 	SwapBuffers(this->hdc); // Swap buffers so we can see our rendering.
 }
+
+bool win32::KeyUp(int key, bool focused /*= false*/) {
+	if (focused) {
+		if (this->hwnd != GetFocus()) {
+			return false;
+		}
+	}
+	return keyUp[key];
+}
+
+int win32::keyUp[256];

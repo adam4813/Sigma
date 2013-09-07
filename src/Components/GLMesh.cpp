@@ -6,6 +6,8 @@
 #include "GLIcoSphere.h"
 
 GLMesh::GLMesh(const int entityID) : IGLComponent(entityID) {
+	memset(&this->buffers, 0, sizeof(this->buffers));
+	this->vao = 0;
 	this->drawMode = GL_TRIANGLES;
 	this->ElemBufIndex = 2;
 	this->ColorBufIndex = 1;
@@ -15,11 +17,15 @@ GLMesh::GLMesh(const int entityID) : IGLComponent(entityID) {
 
 void GLMesh::Initialize() {
 	// We must create a vao and then store it in our GLIcoSphere.
-	glGenVertexArrays(1, &this->vao); // Generate the VAO
+	if (this->vao == 0) {
+		glGenVertexArrays(1, &this->vao); // Generate the VAO
+	}
 	glBindVertexArray(this->vao); // Bind the VAO
 
 	if (this->verts.size() > 0) {
-		glGenBuffers(1, &this->buffers[this->VertBufIndex]); 	// Generate the vertex buffer.
+		if (this->buffers[this->VertBufIndex] == 0) {
+			glGenBuffers(1, &this->buffers[this->VertBufIndex]); 	// Generate the vertex buffer.
+		}
 		glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->VertBufIndex]); // Bind the vertex buffer.
 		glBufferData(GL_ARRAY_BUFFER, sizeof(Sigma::Vertex) * this->verts.size(), &this->verts.front(), GL_STATIC_DRAW); // Stores the verts in the vertex buffer.
 		GLint posLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Position"); // Find the location in the shader where the vertex buffer data will be placed.
@@ -27,20 +33,26 @@ void GLMesh::Initialize() {
 		glEnableVertexAttribArray(posLocation); // Enable the VAO line for vertex data.
 	}
 	if (this->colors.size() > 0) {
-		glGenBuffers(1, &this->buffers[this->ColorBufIndex]);
+		if (this->buffers[this->ColorBufIndex] == 0) {
+			glGenBuffers(1, &this->buffers[this->ColorBufIndex]);
+		}
 		glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->ColorBufIndex]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(color) * this->colors.size(), &this->colors.front(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Sigma::Color) * this->colors.size(), &this->colors.front(), GL_STATIC_DRAW);
 		GLint colLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Color");
 		glVertexAttribPointer(colLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(colLocation);
 	}
 	if (this->faces.size() > 0) {
-		glGenBuffers(1, &this->buffers[this->ElemBufIndex]); // Generate the element buffer.
+		if (this->buffers[this->ElemBufIndex] == 0) {
+			glGenBuffers(1, &this->buffers[this->ElemBufIndex]); // Generate the element buffer.
+		}
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buffers[this->ElemBufIndex]); // Bind the element buffer.
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Sigma::Face) * this->faces.size(), &this->faces.front(), GL_STATIC_DRAW); // Store the faces in the element buffer.
 	}
 	if (this->vertNorms.size() > 0) {
-		glGenBuffers(1, &this->buffers[this->NormalBufIndex]);
+		if (this->buffers[this->NormalBufIndex] == 0) {
+			glGenBuffers(1, &this->buffers[this->NormalBufIndex]);
+		}
 		glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->NormalBufIndex]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(Sigma::Vertex)*this->vertNorms.size(), &this->vertNorms[0], GL_STATIC_DRAW);
 		GLint normalLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Normal");
@@ -114,8 +126,6 @@ void GLMesh::LoadMesh(std::string fname) {
 			na = indicies[0][2]; nb = indicies[1][2]; nc = indicies[2][2];
 			na--; nb--; nc--;
 			this->faces.push_back(Sigma::Face(a,b,c));
-			this->texFaces.push_back(Sigma::Face(ta,tb,tc));
-			this->faceNorms.push_back(Sigma::Face(na,nb,nc));
 		}  else if (line.substr(0,2) == "vt") { //  Vertex tex coord
 			float u, v = 0.0f;
 			std::istringstream s(line.substr(2));
@@ -130,6 +140,15 @@ void GLMesh::LoadMesh(std::string fname) {
 			this->groupIndex.push_back(this->faces.size());
 		} else if (line.substr(0, line.find(' ')) == "mtllib") { // Material library
 			ParseMTL(line.substr(line.find(' ') + 1));
+		} else if (line.substr(0, line.find(' ')) == "usemtl") { // Use material
+			std::string mtlname = line.substr(line.find(' ') + 1);
+			material m = this->mats[mtlname];
+			glm::vec3 amb(m.ka[0], m.ka[1], m.ka[2]);
+			glm::vec3 spec(m.ks[0], m.ks[1], m.ks[2]);
+			glm::vec3 dif(m.kd[0], m.kd[1], m.kd[2]);
+
+			glm::vec3 color = amb + dif + spec;
+			this->colors.push_back(Sigma::Color(color.r, color.g, color.b));
 		} else if ((line[0] == '#') || (line.size() == 0)) { // Comment or blank line
 			/* ignoring this line comment or blank*/
 		} else { // Unknown
@@ -177,22 +196,10 @@ void GLMesh::LoadMesh(std::string fname) {
 			else {
 				vertNorms.push_back(Sigma::Vertex(total_normals.x, total_normals.y, total_normals.z));
 			}
-			//std::cout << vertNorms[i].x << " " << vertNorms[i].y << " " << vertNorms[i].z << std::endl;
 		}
 
 		surfaceNorms.clear();
 	}
-
-	/*normals.resize(mesh->vertices.size(), glm::vec3(0.0, 0.0, 0.0));
-	for (int i = 0; i < elements.size(); i+=3) {
-		GLushort ia = elements[i];
-		GLushort ib = elements[i+1];
-		GLushort ic = elements[i+2];
-		glm::vec3 normal = glm::normalize(glm::cross(
-			glm::vec3(vertices[ib]) - glm::vec3(vertices[ia]),
-			glm::vec3(vertices[ic]) - glm::vec3(vertices[ia])));
-		normals[ia] = normals[ib] = normals[ic] = normal;
-	}*/
 }
 
 void GLMesh::ParseMTL(std::string fname) {

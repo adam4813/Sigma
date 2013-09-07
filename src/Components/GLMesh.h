@@ -68,7 +68,7 @@ public:
 	 * \param[in] const Sigma::Vertex & v The vertex to add. It is copied.
 	 */
 	void AddVertex(const Sigma::Vertex& v) {
-		this->verts2.push_back(v);
+		this->verts.push_back(v);
 	}
 
 	/**
@@ -80,7 +80,7 @@ public:
 	 */
 	const Sigma::Vertex* GetVertex(const unsigned int index) {
 		try {
-			return &this->verts2.at(index);
+			return &this->verts.at(index);
 		} catch (std::out_of_range oor) {
 			return nullptr;
 		}
@@ -92,7 +92,7 @@ public:
 	 * \param[in] const Sigma::Face & f The face to add. It is copied.
 	 */
 	void AddFace(const Sigma::Face& f) {
-		this->faces2.push_back(f);
+		this->faces.push_back(f);
 	}
 		
 	/**
@@ -104,7 +104,64 @@ public:
 	 */
 	const Sigma::Face* GetFace(const unsigned int index) {
 		try {
-			return &this->faces2.at(index);
+			return &this->faces.at(index);
+		} catch (std::out_of_range oor) {
+			return nullptr;
+		}
+	}
+
+	bool RemoveFace(const unsigned int index) {
+		try {
+			this->faces.erase(this->faces.begin() + index);
+			return true;
+		} catch (std::out_of_range oor) {
+			return false;
+		}
+	}
+
+
+	int GetFaceCount() {
+		return this->faces.size();
+	}
+
+	/**
+	 * \brief Adds a mesh group index.
+	 *
+	 * Adds a mesh group starting index to groupIndex. This is the starting face index for the mesh group.
+	 * \param[in] const unsigned int index
+	 */
+	void AddMeshGroupIndex(const unsigned int index) {
+		this->groupIndex.push_back(index);
+	}
+
+	/**
+	 * \brief Add a vertex normal to the list.
+	 * 
+	 * \param[in] const Sigma::Vertex & v The vertex normal to add. It is copied.
+	 */
+	void AddVertexNormal(const Sigma::Vertex& vn) {
+		this->vertNorms.push_back(vn);
+	}
+
+	/**
+	 * \brief Add a vertex color to the list.
+	 * 
+	 * \param[in] const Sigma::Vertex & v The vertex color to add. It is copied.
+	 */
+	void AddVertexColor(const Sigma::Color& c) {
+		this->colors.push_back(c);
+	}
+
+	/**
+	 * \brief Gets a vertex color.
+	 *
+	 * Returns the vertex color at the specific index.
+	 * \param[in] const unsigned int index The index of the color to get.
+	 * \returns   const Sigma::Color* The color at the index or nullptr if the index was invalid.
+	 */
+	const Sigma::Color* GetVertexColor(const unsigned int index) {
+		try {
+			return &this->colors.at(index);
 		} catch (std::out_of_range oor) {
 			return nullptr;
 		}
@@ -114,12 +171,7 @@ private:
 	std::vector<Sigma::Face> faces; // Stores vectors of face groupings.
 	std::vector<Sigma::Vertex> verts; // The verts that the faces refers to. Can be used for later refinement.
 	std::vector<Sigma::Vertex> vertNorms; // The vertex normals for each vert.
-	std::vector<Sigma::Face> faceNorms; // The index for each vert normal.
 	std::vector<texCoord> texCoords; // The texture coords for each vertex.
-	std::vector<Sigma::Face> texFaces; // The texture coords for each face.
-	std::vector<color> colors;
+	std::vector<Sigma::Color> colors;
 	std::map<std::string, material> mats;
-
-	std::vector<Sigma::Vertex> verts2;
-	std::vector<Sigma::Face> faces2;
 };

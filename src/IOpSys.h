@@ -16,6 +16,8 @@ public:
 
 	virtual bool KeyDown(int key, bool focused = false) = 0;
 
+	virtual bool KeyUp( int key, bool focused = false ) = 0;
+
 	virtual void Present() = 0;
 
 	virtual int GetWindowWidth()=0;
