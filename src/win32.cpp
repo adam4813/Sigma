@@ -3,6 +3,9 @@
 #include "GL/glew.h"
 #include "GL/wglew.h"
 
+Sigma::event::KeyboardInputSystem IOpSys::KeybaordEventSystem; // Handles keyboard events
+double IOpSys::curDelta;
+
 win32::~win32() {
 	wglMakeCurrent(this->hdc, 0); // Remove the rendering context from our device context  
 	wglDeleteContext(this->hrc); // Delete our rendering context  
@@ -44,8 +47,13 @@ void* win32::CreateGraphicsWindow() {
 LRESULT CALLBACK win32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message) {
 	case WM_KEYUP:
+			KeybaordEventSystem.KeyUp(wParam);
 			keyUp[wParam] = 1;
 			return 0;
+		break;
+	case WM_KEYDOWN:
+		KeybaordEventSystem.KeyDown(wParam);
+		return 0;
 		break;
 	case WM_DESTROY: 
 		PostQuitMessage(0);
@@ -87,7 +95,7 @@ double win32::GetDeltaTime() {
 	QueryPerformanceCounter(&li);
 	double delta = static_cast<double>(li.QuadPart - this->lastTime);
 	this->lastTime = li.QuadPart;
-	return delta/this->frequency;
+	return this->curDelta = delta/this->frequency;
 }
 
 bool win32::KeyDown(int key, bool focused) {

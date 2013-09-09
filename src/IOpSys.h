@@ -1,5 +1,7 @@
 #pragma  once
 
+#include "Systems/KeyboardInputSystem.h"
+
 class IOpSys {
 public:
 	IOpSys() { }
@@ -19,5 +21,15 @@ public:
 
 	virtual void Present() = 0;
 
+	/**
+	 * \brief Returns the current delta time.
+	 *
+	 * Returns the current delta time set in the last call to GetDeltaTime.
+	 * \returns   double The current delta time.
+	 */
+	static double GetCurrentDelta() { return curDelta; }
 
+	static Sigma::event::KeyboardInputSystem KeybaordEventSystem; // Handles keyboard events
+protected:
+	static double curDelta;
 };
