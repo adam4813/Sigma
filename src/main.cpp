@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "Systems/OpenGLSystem.h"
+#include "Controllers/GLSixDOFViewController.h"
 #include "SCParser.h"
 
 #ifdef OS_Win32
@@ -32,12 +33,15 @@ int main(int argCount, char **argValues) {
 
 	parser.Parse("test.sc");
 	
-	for (int i = 0; i < parser.EntityCount(); ++i) {
+	for (unsigned int i = 0; i < parser.EntityCount(); ++i) {
 		const Sigma::Parser::Entity* e = parser.GetEntity(i);
 		for (auto itr = e->components.begin(); itr != e->components.end(); ++itr) {
 			glsys.Factory(itr->type, e->id, const_cast<std::vector<Property>&>(itr->properties));
 		}
 	}
+
+	Sigma::event::handler::GLSixDOFViewController cameraController(&glsys);
+	IOpSys::KeybaordEventSystem.Register(&cameraController);
 
 	os->SetupTimer();
 	
@@ -49,7 +53,7 @@ int main(int argCount, char **argValues) {
 		float deltaSec = (float)delta/1000.0f;
 
 		// Translation keys
-		if (os->KeyDown('W', true)) { // Move forward
+		/*if (os->KeyDown('W', true)) { // Move forward
 			if (os->KeyDown('B', true)) {
 				glsys.Move(0.0f, 0.0f, 100.0f*deltaSec);
 			} else {
@@ -87,7 +91,7 @@ int main(int argCount, char **argValues) {
 			glsys.Rotate(0.0f, 0.0f, -90.0f * deltaSec);
 		} else if (os->KeyDown('T', true)) { // Roll right
 			glsys.Rotate(0.0f, 0.0f, 90.0f*deltaSec);
-		}
+		}*/
 
 		if (os->KeyUp('P', true)) { // Wireframe mode
 			if (!isWireframe) {
