@@ -1,6 +1,6 @@
 #pragma  once
 #include <windows.h>
-#include "IOpSys.h"
+#include "../../IOpSys.h"
 
 class win32 : public IOpSys {
 public:

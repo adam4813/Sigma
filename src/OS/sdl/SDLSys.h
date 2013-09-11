@@ -3,7 +3,7 @@
 
 #include <map>
 
-#include "IOpSys.h"
+#include "../../IOpSys.h"
 #include "SDL/SDL.h"
 
 class SDLSys : public IOpSys {
@@ -16,6 +16,7 @@ public:
 	virtual bool SetupTimer();
 	virtual double GetDeltaTime();
 	virtual bool KeyDown(int key, bool focused = false);
+	virtual bool KeyUp( int key, bool focused = false );
 	virtual void Present();
 
 private:
