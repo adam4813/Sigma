@@ -1,8 +1,12 @@
 #include "GLSprite.h"
 #include "GL/glew.h"
-//#include "SOIL/SOIL.h"
-#include "SDL/SDL.h"
-#include "SDL/SDL_image.h"
+
+#ifdef OS_Win32
+	#include "SOIL/SOIL.h"
+#elif OS_SDL
+	#include "SDL/SDL.h"
+	#include "SDL/SDL_image.h"
+#endif
 
 GLSprite::GLSprite( const int entityID /*= 0*/ ) : IGLComponent(entityID)  {
 	this->drawMode = GL_TRIANGLES;
@@ -78,7 +82,6 @@ void GLSprite::LoadShader() {
 }
 
 void GLSprite::Update(glm::mediump_float *view, glm::mediump_float *proj) {
-	//glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	GLSprite::shader.Use();
 
 	glUniform1i(glGetUniformLocation(GLSprite::shader.GetProgram(), "tex"), GL_TEXTURE0);
@@ -101,18 +104,21 @@ void GLSprite::Update(glm::mediump_float *view, glm::mediump_float *proj) {
 }
 
 unsigned int GLSprite::LoadTexture() {
-	GLuint texture_id;
-	glGenTextures(1, &texture_id);
-	glBindTexture(GL_TEXTURE_2D, texture_id);
+	GLuint textureID;
+#ifdef OS_Win32
+	textureID = SOIL_load_OGL_texture("test.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
+#elif OS_SDL
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
 
 	SDL_Surface *img;
-	img = IMG_Load("test.jpg");
+	//img = IMG_Load("test.jpg");
 	
 	if(img==0) {
 		assert(0 && "Failed to load test.jpg");
 	} else {
 		glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,img->w,img->h,0,GL_RGB,GL_UNSIGNED_BYTE,(img->pixels));
-		SDL_FreeSurface(img);
+		//SDL_FreeSurface(img);
 	}
 
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
@@ -124,8 +130,9 @@ unsigned int GLSprite::LoadTexture() {
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
+#endif
 
-	return texture_id;
+	return textureID;
 }
 
 GLSLShader GLSprite::shader;
