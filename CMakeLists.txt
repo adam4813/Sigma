@@ -4,6 +4,9 @@ project (Sigma)
 include_directories ("${CMAKE_SOURCE_DIR}/include")
 link_directories ("${CMAKE_SOURCE_DIR}/lib/x86")
 
+set(Sigma_SRC "")
+set(Sigma_LIB "")
+
 file(GLOB Sigma_SRC "src/*.h" "src/*.cpp")
 
 # Put all component files into a filter
@@ -21,18 +24,17 @@ source_group("Source Files\\Systems" FILES ${Sigma_SRC_SYSTEM_CPP})
 # Add a define to prevent GLEW linker warnings
 ADD_DEFINITIONS(-DGLEW_STATIC)
 
-# add the executable
-add_executable (Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP})
-
-# make a var for the SDL libs
-set(SDL_LIBS SDL2.lib SDL2_image.lib SDL2main.lib)
-
 set(IOPSYS "OS_Win32" CACHE STRING  "Select the Op Sys you want to use") 
 set_property(CACHE IOPSYS PROPERTY STRINGS "OS_SDL" "OS_Win32")
 
 message(${IOPSYS})
 
+add_subdirectory("src/OS")
+
+# add the executable
+add_executable (Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP})
+
 add_definitions(-D${IOPSYS})
 
 # Link the executable to the Hello library. 
-target_link_libraries (Sigma opengl32.lib glew32s.lib soil.lib ${SDL_LIBS}) 
+target_link_libraries (Sigma ${Sigma_LIB} opengl32.lib glew32s.lib ) 
