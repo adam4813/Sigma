@@ -5,9 +5,9 @@
 #include "SCParser.h"
 
 #ifdef OS_Win32
-#include "win32.h"
+#include "os/win32/win32.h"
 #else if OS_SDL
-#include "SDLSys.h"
+#include "os/sdl/SDLSys.h"
 #endif
 
 int main(int argCount, char **argValues) {
