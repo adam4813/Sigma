@@ -13,7 +13,18 @@ win32::~win32() {
 	ReleaseDC(this->hwnd, this->hdc); // Release the device context from our window  
 }
 
-void* win32::CreateGraphicsWindow() {
+void win32::ToggleFullscreen() {
+	if (this->fullscreen) {
+		SetWindowLongPtr(this->hwnd, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE);
+		AdjustWindowRect(&this->winSize, WS_OVERLAPPEDWINDOW, FALSE);
+	} else {
+		SetWindowLongPtr(this->hwnd, GWL_STYLE, WS_SYSMENU | WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE);
+	}
+	MoveWindow(this->hwnd, 0, 0, this->winSize.right, this->winSize.bottom, TRUE);
+	this->fullscreen = !this->fullscreen;
+}
+
+void* win32::CreateGraphicsWindow(const unsigned int width, const unsigned int height) {
 	WNDCLASS windowClass;
 	//HWND hwnd;
 	DWORD dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
@@ -31,10 +42,13 @@ void* win32::CreateGraphicsWindow() {
 	windowClass.lpszMenuName = NULL;
 	windowClass.lpszClassName = "GL Test Window";
 
+	this->winSize.right = width;
+	this->winSize.bottom = height;
+
 	if (!RegisterClass(&windowClass)) {
 		return false;
 	}
-	this->hwnd = CreateWindowEx(dwExStyle, windowClass.lpszClassName, windowClass.lpszClassName, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, 800, 600, NULL, NULL, hInstance, NULL);
+	this->hwnd = CreateWindowEx(dwExStyle, windowClass.lpszClassName, windowClass.lpszClassName, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, this->winSize.right, this->winSize.bottom, NULL, NULL, hInstance, NULL);
 
 	ShowWindow(this->hwnd, SW_SHOW);
 	UpdateWindow(this->hwnd);
@@ -109,6 +123,7 @@ bool win32::KeyDown(int key, bool focused) {
 }
 
 const int* win32::StartOpengGL() {
+	this->fullscreen = false;
 	this->OpenGLVersion[0] = -1;
 	this->OpenGLVersion[1] = -1;
 
@@ -187,6 +202,14 @@ bool win32::KeyUp(int key, bool focused /*= false*/) {
 		}
 	}
 	return keyUp[key];
+}
+
+int win32::GetWindowWidth() {
+	throw std::exception("The method or operation is not implemented.");
+}
+
+int win32::GetWindowHeight() {
+	throw std::exception("The method or operation is not implemented.");
 }
 
 int win32::keyUp[256];

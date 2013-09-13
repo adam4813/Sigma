@@ -19,7 +19,7 @@ int main(int argCount, char **argValues) {
 	os = new SDLSys();
 #endif
 
-	os->CreateGraphicsWindow();
+	os->CreateGraphicsWindow(1024,768);
 
 	const int* version = glsys.Start();
 	
@@ -101,6 +101,9 @@ int main(int argCount, char **argValues) {
 				glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 				isWireframe = false;
 			}
+		}
+		if (os->KeyUp('M', true)) {
+			os->ToggleFullscreen();
 		}
 
 		if (glsys.Update(delta)) {

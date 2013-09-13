@@ -7,7 +7,8 @@ public:
 	IOpSys() { }
 	virtual ~IOpSys() { }
 
-	virtual void* CreateGraphicsWindow() = 0;
+	virtual void* CreateGraphicsWindow(const unsigned int width = 800, const unsigned int height = 600) = 0;
+	virtual void ToggleFullscreen() = 0;
 
 	virtual bool MessageLoop() = 0;
 
@@ -21,6 +22,8 @@ public:
 
 	virtual void Present() = 0;
 
+	virtual int GetWindowWidth() = 0;
+	virtual int GetWindowHeight() = 0;
 	/**
 	 * \brief Returns the current delta time.
 	 *

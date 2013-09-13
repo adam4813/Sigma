@@ -7,7 +7,9 @@ public:
 	win32() { }
 	~win32();
 
-	void* CreateGraphicsWindow();
+	void* CreateGraphicsWindow(const unsigned int width = 800, const unsigned int height = 600);
+
+	void ToggleFullscreen();
 
 	const int* StartOpengGL();
 
@@ -28,10 +30,16 @@ private:
 	HDC hdc; // Handle to the device context.
 	HINSTANCE hInstance; // The HINSTANCE of this application  
 	static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM); // Standard window callback
+	virtual int GetWindowWidth();
+
+	virtual int GetWindowHeight();
 
 	double frequency; // The frequency of our timer in ticks/second.
 	LONGLONG lastTime; // The time of the last call to GetDeltaTime.
 
 	int OpenGLVersion[2];
 	static int keyUp[256];
+
+	bool fullscreen;
+	RECT winSize;
 };
