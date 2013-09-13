@@ -12,9 +12,9 @@ OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumul
 
 OpenGLSystem::~OpenGLSystem() {
 	delete this->view;
-	for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {
-		for (auto vecitr = mapitr->second.begin(); vecitr < mapitr->second.end(); ++vecitr) {
-			delete *vecitr;
+	for (auto eitr = this->components.begin(); eitr != this->components.end(); ++eitr) {
+		for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
+			delete citr->second;
 		}
 	}
 }
@@ -26,7 +26,7 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		if (entityID == 2) {
 			spr->Transform().Translate(2,2,0);
 		}
-		this->components[entityID].push_back(spr);
+		this->components[entityID][0] = spr;
 		spr->Transform().Translate(0,0,0);
 		return spr;
 	} else if (type == "GLIcoSphere") {
@@ -54,7 +54,7 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		}
 		sphere->Transform().Scale(scale,scale,scale);
 		sphere->Transform().Translate(x,y,z);
-		this->components[entityID].push_back(sphere);
+		this->components[entityID][0] = sphere;
 		return sphere;
 	} else if (type == "GLCubeSphere") {
 		GLCubeSphere* sphere = new GLCubeSphere(entityID);
@@ -81,7 +81,7 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		}
 		sphere->Transform().Scale(scale,scale,scale);
 		sphere->Transform().Translate(x,y,z);
-		this->components[entityID].push_back(sphere);
+		this->components[entityID][0] = sphere;
 		return sphere;
 	} else if (type=="GLMesh") {
 		GLMesh* mesh = new GLMesh(entityID);
@@ -110,16 +110,16 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		mesh->Initialize();
 		mesh->Transform().Scale(scale,scale,scale);
 		mesh->Transform().Translate(x,y,z);
-		this->components[entityID].push_back(mesh);
+		this->components[entityID][0] = mesh;
 	}
 	return nullptr;
 }
 
 bool OpenGLSystem::Update(const double delta) {
 	this->deltaAccumulator += delta;
-	this->view->UpdateViewMatrix();
 	// Check if the deltaAccumulator is greater than 1/60 of a second.
 	if (deltaAccumulator > 16.7) {
+		this->view->UpdateViewMatrix();
 		// Set up the scene to a "clean" state.
 		glClearColor(0.0f,0.0f,0.0f,0.0f);
 		glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window  
@@ -127,9 +127,9 @@ bool OpenGLSystem::Update(const double delta) {
 
 		// Set the ViewProjection matrix to be used in the shader.
 		// Loop through and draw each component.
-		for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {
-			for (auto vecitr = mapitr->second.begin(); vecitr < mapitr->second.end(); ++vecitr) {
-				(*vecitr)->Update(&this->view->ViewMatrix[0][0], &this->ProjectionMatrix[0][0]);
+		for (auto eitr = this->components.begin(); eitr != this->components.end(); ++eitr) {
+			for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
+				citr->second->Update(&this->view->ViewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 			}
 		}
 
@@ -139,9 +139,11 @@ bool OpenGLSystem::Update(const double delta) {
 	return false;
 }
 
-IGLComponent* OpenGLSystem::GetComponent(int entityID) {
+IGLComponent* OpenGLSystem::GetComponent(const unsigned int entityID, const unsigned int componentID) {
 	if (this->components.find(entityID) != this->components.end()) {
-		return this->components[entityID][0];
+		if (this->components.at(entityID).find(componentID) != this->components.at(entityID).end()) {
+			return this->components[entityID][componentID];
+		}
 	}
 	return nullptr;
 }

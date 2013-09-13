@@ -9,7 +9,7 @@
 struct IGLView;
 class IGLComponent;
 
-class OpenGLSystem : public ISystem {
+class OpenGLSystem {
 public:
 	OpenGLSystem();
 
@@ -49,10 +49,11 @@ public:
 	/**
 	 * \brief Retrieve the component that belongs to the given entity ID
 	 * 
-	 * \param[in] int entityID
+	 * \param[in] const unsigned int entityID
+	 * \param[in] const unsigned int componentID
 	 * \returns   IComponent* The component that belongs to the entity ID or nullptr if no component exists for the given ID.
 	 */
-	IGLComponent* GetComponent(int entityID);
+	IGLComponent* GetComponent(const unsigned int entityID, const unsigned int componentID);
 
 	/**
 	 * \brief Move the camera around the world.
@@ -76,7 +77,6 @@ public:
 	 */
 	void Rotate(float x, float y, float z);
 private:
-
 	int windowWidth; // Store the width of our window  
 	int windowHeight; // Store the height of our window 
 
@@ -88,5 +88,5 @@ private:
 	IGLView* view;
 
 	double deltaAccumulator;
-	std::map<int, std::vector<IGLComponent*>> components; // A mapping of entity ID to a vector containing all of it's components.
+	std::map<int, std::map<int, IGLComponent*>> components; // A mapping of entity ID to a mapping of component ID to component.
 };
