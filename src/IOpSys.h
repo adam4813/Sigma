@@ -22,8 +22,9 @@ public:
 
 	virtual void Present() = 0;
 
-	virtual int GetWindowWidth() = 0;
-	virtual int GetWindowHeight() = 0;
+	virtual unsigned int GetWindowWidth() = 0;
+
+	virtual unsigned int GetWindowHeight() = 0;
 	/**
 	 * \brief Returns the current delta time.
 	 *

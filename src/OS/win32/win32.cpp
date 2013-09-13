@@ -204,12 +204,12 @@ bool win32::KeyUp(int key, bool focused /*= false*/) {
 	return keyUp[key];
 }
 
-int win32::GetWindowWidth() {
-	throw std::exception("The method or operation is not implemented.");
+unsigned int win32::GetWindowWidth() {
+	return this->winSize.right;
 }
 
-int win32::GetWindowHeight() {
-	throw std::exception("The method or operation is not implemented.");
+unsigned int win32::GetWindowHeight() {
+	return this->winSize.bottom
 }
 
 int win32::keyUp[256];
