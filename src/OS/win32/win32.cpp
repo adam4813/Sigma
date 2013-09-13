@@ -15,14 +15,22 @@ win32::~win32() {
 
 void win32::ToggleFullscreen() {
 	if (this->fullscreen) {
-		SetWindowLongPtr(this->hwnd, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE);
-		AdjustWindowRect(&this->windowedSize, WS_OVERLAPPEDWINDOW, FALSE);
-		MoveWindow(this->hwnd, 0, 0, this->windowedSize.right, this->windowedSize.bottom, TRUE);
+		SetWindowLongPtr(this->hwnd, GWL_STYLE, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_VISIBLE);
+		MoveWindow(this->hwnd, this->windowedSize.left, this->windowedSize.top, this->windowedSize.right - this->windowedSize.left, this->windowedSize.bottom - this->windowedSize.top, TRUE);
 	} else {
+		// Save the current windowed position
+		GetWindowRect(this->hwnd, &this->windowedSize);
+
 		SetWindowLongPtr(this->hwnd, GWL_STYLE, WS_SYSMENU | WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE);
-		RECT desktopRect;
-		GetWindowRect(GetDesktopWindow(), &desktopRect);
-		MoveWindow(this->hwnd, 0, 0, desktopRect.right, desktopRect.bottom, TRUE);
+
+		// Get the monitor info about the monitor the window is most over.
+		HMONITOR hmon = MonitorFromWindow(this->hwnd, MONITOR_DEFAULTTONEAREST);
+		MONITORINFO monInfo;
+		monInfo.cbSize = sizeof(MONITORINFO);
+		GetMonitorInfo(hmon, &monInfo);
+
+		// Move the window and resize it to take up the whole monitor
+		MoveWindow(this->hwnd, monInfo.rcMonitor.left, monInfo.rcMonitor.top, monInfo.rcMonitor.right - monInfo.rcMonitor.left, monInfo.rcMonitor.bottom - monInfo.rcMonitor.top, TRUE);
 	}
 	this->fullscreen = !this->fullscreen;
 }
@@ -45,13 +53,15 @@ void* win32::CreateGraphicsWindow(const unsigned int width, const unsigned int h
 	windowClass.lpszMenuName = NULL;
 	windowClass.lpszClassName = "GL Test Window";
 
+	this->windowedSize.left = 0;
+	this->windowedSize.top = 0;
 	this->windowedSize.right = width;
 	this->windowedSize.bottom = height;
 
 	if (!RegisterClass(&windowClass)) {
 		return false;
 	}
-	this->hwnd = CreateWindowEx(dwExStyle, windowClass.lpszClassName, windowClass.lpszClassName, WS_OVERLAPPEDWINDOW, 0, 0, this->windowedSize.right, this->windowedSize.bottom, NULL, NULL, hInstance, NULL);
+	this->hwnd = CreateWindowEx(dwExStyle, windowClass.lpszClassName, windowClass.lpszClassName, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, this->windowedSize.left, this->windowedSize.top, this->windowedSize.right, this->windowedSize.bottom, NULL, NULL, hInstance, NULL);
 
 	ShowWindow(this->hwnd, SW_SHOW);
 	UpdateWindow(this->hwnd);
@@ -209,21 +219,27 @@ bool win32::KeyUp(int key, bool focused /*= false*/) {
 
 unsigned int win32::GetWindowWidth() {
 	if (fullscreen) {
-		RECT desktopRect;
-		GetWindowRect(GetDesktopWindow(), &desktopRect);
-		return desktopRect.right;
+		// Get the monitor info about the monitor the window is most over.
+		HMONITOR hmon = MonitorFromWindow(this->hwnd, MONITOR_DEFAULTTONEAREST);
+		MONITORINFO monInfo;
+		monInfo.cbSize = sizeof(MONITORINFO);
+		GetMonitorInfo(hmon, &monInfo);
+		return monInfo.rcMonitor.right - monInfo.rcMonitor.left;
 	} else {
-		return this->windowedSize.right;
+		return this->windowedSize.right - this->windowedSize.left;
 	}
 }
 
 unsigned int win32::GetWindowHeight() {
 	if (fullscreen) {
-		RECT desktopRect;
-		GetWindowRect(GetDesktopWindow(), &desktopRect);
-		return desktopRect.bottom;
+		// Get the monitor info about the monitor the window is most over.
+		HMONITOR hmon = MonitorFromWindow(this->hwnd, MONITOR_DEFAULTTONEAREST);
+		MONITORINFO monInfo;
+		monInfo.cbSize = sizeof(MONITORINFO);
+		GetMonitorInfo(hmon, &monInfo);
+		return monInfo.rcMonitor.bottom - monInfo.rcMonitor.top;
 	} else {
-		return this->windowedSize.bottom;
+		return this->windowedSize.bottom - this->windowedSize.top;
 	}
 }
 
