@@ -164,7 +164,7 @@ const int* OpenGLSystem::Start() {
 	// Generates a really hard-to-read matrix, but a normal, standard 4x4 matrix nonetheless
 	this->ProjectionMatrix = glm::perspective(
 		45.0f,
-		4.0f / 3.0f,
+		(float)this->windowWidth / (float)this->windowHeight,
 		0.1f,
 		10000.0f
 		);
@@ -185,4 +185,15 @@ void OpenGLSystem::Move(float x, float y, float z) {
 
 void OpenGLSystem::Rotate(float x, float y, float z) {
 	this->view->Rotate(x,y,z);
+}
+
+void OpenGLSystem::SetViewportSize(const unsigned int width, const unsigned int height) {
+	this->windowHeight = height;
+	this->windowWidth = width;
+	this->ProjectionMatrix = glm::perspective(
+		45.0f,
+		(float)this->windowWidth / (float)this->windowHeight,
+		0.1f,
+		10000.0f
+		);
 }

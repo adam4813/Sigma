@@ -76,9 +76,17 @@ public:
 	 * \returns   void
 	 */
 	void Rotate(float x, float y, float z);
+
+	/**
+	 * \brief Sets the viewport width and height.
+	 *
+	 * \param[in/out] const unsigned int width
+	 * \param[in/out] const unsigned int height
+	 */
+	void SetViewportSize(const unsigned int width, const unsigned int height);
 private:
-	int windowWidth; // Store the width of our window  
-	int windowHeight; // Store the height of our window 
+	unsigned int windowWidth; // Store the width of our window  
+	unsigned int windowHeight; // Store the height of our window 
 
 	GLuint m_vaoID[2]; // two vertex array objects, one for each drawn object
 	GLuint m_vboID[3]; // three VBOs
