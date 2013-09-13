@@ -42,5 +42,5 @@ private:
 	static int keyUp[256];
 
 	bool fullscreen;
-	RECT winSize;
+	RECT windowedSize;
 };

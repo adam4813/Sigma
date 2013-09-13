@@ -16,11 +16,14 @@ win32::~win32() {
 void win32::ToggleFullscreen() {
 	if (this->fullscreen) {
 		SetWindowLongPtr(this->hwnd, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE);
-		AdjustWindowRect(&this->winSize, WS_OVERLAPPEDWINDOW, FALSE);
+		AdjustWindowRect(&this->windowedSize, WS_OVERLAPPEDWINDOW, FALSE);
+		MoveWindow(this->hwnd, 0, 0, this->windowedSize.right, this->windowedSize.bottom, TRUE);
 	} else {
 		SetWindowLongPtr(this->hwnd, GWL_STYLE, WS_SYSMENU | WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE);
+		RECT desktopRect;
+		GetWindowRect(GetDesktopWindow(), &desktopRect);
+		MoveWindow(this->hwnd, 0, 0, desktopRect.right, desktopRect.bottom, TRUE);
 	}
-	MoveWindow(this->hwnd, 0, 0, this->winSize.right, this->winSize.bottom, TRUE);
 	this->fullscreen = !this->fullscreen;
 }
 
@@ -42,13 +45,13 @@ void* win32::CreateGraphicsWindow(const unsigned int width, const unsigned int h
 	windowClass.lpszMenuName = NULL;
 	windowClass.lpszClassName = "GL Test Window";
 
-	this->winSize.right = width;
-	this->winSize.bottom = height;
+	this->windowedSize.right = width;
+	this->windowedSize.bottom = height;
 
 	if (!RegisterClass(&windowClass)) {
 		return false;
 	}
-	this->hwnd = CreateWindowEx(dwExStyle, windowClass.lpszClassName, windowClass.lpszClassName, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, this->winSize.right, this->winSize.bottom, NULL, NULL, hInstance, NULL);
+	this->hwnd = CreateWindowEx(dwExStyle, windowClass.lpszClassName, windowClass.lpszClassName, WS_OVERLAPPEDWINDOW, 0, 0, this->windowedSize.right, this->windowedSize.bottom, NULL, NULL, hInstance, NULL);
 
 	ShowWindow(this->hwnd, SW_SHOW);
 	UpdateWindow(this->hwnd);
@@ -205,11 +208,23 @@ bool win32::KeyUp(int key, bool focused /*= false*/) {
 }
 
 unsigned int win32::GetWindowWidth() {
-	return this->winSize.right;
+	if (fullscreen) {
+		RECT desktopRect;
+		GetWindowRect(GetDesktopWindow(), &desktopRect);
+		return desktopRect.right;
+	} else {
+		return this->windowedSize.right;
+	}
 }
 
 unsigned int win32::GetWindowHeight() {
-	return this->winSize.bottom
+	if (fullscreen) {
+		RECT desktopRect;
+		GetWindowRect(GetDesktopWindow(), &desktopRect);
+		return desktopRect.bottom;
+	} else {
+		return this->windowedSize.bottom;
+	}
 }
 
 int win32::keyUp[256];

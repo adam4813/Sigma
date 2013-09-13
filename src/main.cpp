@@ -22,6 +22,7 @@ int main(int argCount, char **argValues) {
 	os->CreateGraphicsWindow(1024,768);
 
 	const int* version = glsys.Start();
+	glsys.SetViewportSize(os->GetWindowWidth(), os->GetWindowHeight());
 	
 	if (version[0] == -1) {
 		std::cout<< "Error starting OpenGL!"<<std::endl;
@@ -104,6 +105,7 @@ int main(int argCount, char **argValues) {
 		}
 		if (os->KeyUp('M', true)) {
 			os->ToggleFullscreen();
+			glsys.SetViewportSize(os->GetWindowWidth(), os->GetWindowHeight());
 		}
 
 		if (glsys.Update(delta)) {
