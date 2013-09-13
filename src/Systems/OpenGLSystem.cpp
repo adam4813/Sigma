@@ -36,6 +36,7 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		float x = 0.0f;
 		float y = 0.0f;
 		float z = 0.0f;
+		int componentID = 0;
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			Property*  p = &(*propitr);
 			if (p->GetName() == "scale") {
@@ -50,11 +51,13 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 			} else if (p->GetName() == "z") {
 				z = p->Get<float>();
 				continue;
+			} else if (p->GetName() == "id") {
+				componentID = p->Get<int>();
 			}
 		}
 		sphere->Transform().Scale(scale,scale,scale);
 		sphere->Transform().Translate(x,y,z);
-		this->components[entityID][0] = sphere;
+		this->components[entityID][componentID] = sphere;
 		return sphere;
 	} else if (type == "GLCubeSphere") {
 		GLCubeSphere* sphere = new GLCubeSphere(entityID);
@@ -63,6 +66,7 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		float x = 0.0f;
 		float y = 0.0f;
 		float z = 0.0f;
+		int componentID = 0;
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			Property*  p = &(*propitr);
 			if (p->GetName() == "scale") {
@@ -77,11 +81,13 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 			} else if (p->GetName() == "z") {
 				z = p->Get<float>();
 				continue;
+			} else if (p->GetName() == "id") {
+				componentID = p->Get<int>();
 			}
 		}
 		sphere->Transform().Scale(scale,scale,scale);
 		sphere->Transform().Translate(x,y,z);
-		this->components[entityID][0] = sphere;
+		this->components[entityID][componentID] = sphere;
 		return sphere;
 	} else if (type=="GLMesh") {
 		GLMesh* mesh = new GLMesh(entityID);
@@ -89,6 +95,7 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		float x = 0.0f;
 		float y = 0.0f;
 		float z = 0.0f;
+		int componentID = 0;
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			Property*  p = &*propitr;
 			if (p->GetName() == "scale") {
@@ -105,12 +112,14 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 				continue;
 			} else if (p->GetName() == "meshFile") {
 				mesh->LoadMesh(p->Get<std::string>());
+			} else if (p->GetName() == "id") {
+				componentID = p->Get<int>();
 			}
 		}
 		mesh->Initialize();
 		mesh->Transform().Scale(scale,scale,scale);
 		mesh->Transform().Translate(x,y,z);
-		this->components[entityID][0] = mesh;
+		this->components[entityID][componentID] = mesh;
 	}
 	return nullptr;
 }

@@ -49,6 +49,10 @@ bool SCParser::Parse(const std::string& fname) {
 						p.Set<int>(atoi(propValue.c_str()));
 					}
 					c.properties.push_back(p);
+				} else if (line.substr(0,1) == "#") {
+					Property p("id");
+					p.Set<int>(atoi(line.substr(1).c_str()));
+					c.properties.push_back(p);
 				} else {
 					break;
 				}
