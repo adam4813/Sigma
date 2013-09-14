@@ -1,5 +1,5 @@
 #include "SCParser.h"
-#include "ISystem.h"
+#include "Property.h"
 #include <fstream>
 #include <iostream>
 
