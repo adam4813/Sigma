@@ -70,7 +70,7 @@ public:
 	 *
 	 * \returns GLTransform& The transform object.
 	 */
-	GLTransform& Transform() { return transform; }
+	GLTransform* Transform() { return &transform; }
 
 	unsigned int Vao() const { return this->vao; }
 

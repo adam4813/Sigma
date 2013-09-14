@@ -24,10 +24,10 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		GLSprite* spr = new GLSprite(entityID);
 		spr->Initialize();
 		if (entityID == 2) {
-			spr->Transform().Translate(2,2,0);
+			spr->Transform()->Translate(2,2,0);
 		}
 		this->components[entityID][0] = spr;
-		spr->Transform().Translate(0,0,0);
+		spr->Transform()->Translate(0,0,0);
 		return spr;
 	} else if (type == "GLIcoSphere") {
 		GLIcoSphere* sphere = new GLIcoSphere(entityID);
@@ -55,8 +55,8 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 				componentID = p->Get<int>();
 			}
 		}
-		sphere->Transform().Scale(scale,scale,scale);
-		sphere->Transform().Translate(x,y,z);
+		sphere->Transform()->Scale(scale,scale,scale);
+		sphere->Transform()->Translate(x,y,z);
 		this->components[entityID][componentID] = sphere;
 		return sphere;
 	} else if (type == "GLCubeSphere") {
@@ -85,8 +85,8 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 				componentID = p->Get<int>();
 			}
 		}
-		sphere->Transform().Scale(scale,scale,scale);
-		sphere->Transform().Translate(x,y,z);
+		sphere->Transform()->Scale(scale,scale,scale);
+		sphere->Transform()->Translate(x,y,z);
 		this->components[entityID][componentID] = sphere;
 		return sphere;
 	} else if (type=="GLMesh") {
@@ -117,8 +117,8 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 			}
 		}
 		mesh->Initialize();
-		mesh->Transform().Scale(scale,scale,scale);
-		mesh->Transform().Translate(x,y,z);
+		mesh->Transform()->Scale(scale,scale,scale);
+		mesh->Transform()->Translate(x,y,z);
 		this->components[entityID][componentID] = mesh;
 	}
 	return nullptr;
