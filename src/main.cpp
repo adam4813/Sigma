@@ -30,12 +30,12 @@ int main(int argCount, char **argValues) {
 		std::cout<<"OpenGL version: " << version[0] << "." << version[1] << std::endl;
 	}
 
-	SCParser parser;
+	Sigma::parser::SCParser parser;
 
 	parser.Parse("test.sc");
 	
 	for (unsigned int i = 0; i < parser.EntityCount(); ++i) {
-		const Sigma::Parser::Entity* e = parser.GetEntity(i);
+		const Sigma::parser::Entity* e = parser.GetEntity(i);
 		for (auto itr = e->components.begin(); itr != e->components.end(); ++itr) {
 			glsys.Factory(itr->type, e->id, const_cast<std::vector<Property>&>(itr->properties));
 		}
