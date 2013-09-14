@@ -84,6 +84,9 @@ public:
 	 * \param[in/out] const unsigned int height
 	 */
 	void SetViewportSize(const unsigned int width, const unsigned int height);
+
+
+	IGLView* View() const { return view; }
 private:
 	unsigned int windowWidth; // Store the width of our window  
 	unsigned int windowHeight; // Store the height of our window 
@@ -94,7 +97,6 @@ private:
 
 	glm::mat4 ProjectionMatrix;
 	IGLView* view;
-
 	double deltaAccumulator;
 	std::map<int, std::map<int, IGLComponent*>> components; // A mapping of entity ID to a mapping of component ID to component.
 };
