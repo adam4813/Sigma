@@ -1,7 +1,9 @@
 #include <iostream>
 
 #include "Systems/OpenGLSystem.h"
+#include "Systems/SimplePhysics.h"
 #include "Controllers/GLSixDOFViewController.h"
+#include "Components/ViewMover.h"
 #include "SCParser.h"
 
 #ifdef OS_Win32
@@ -41,8 +43,14 @@ int main(int argCount, char **argValues) {
 		}
 	}
 
-	Sigma::event::handler::GLSixDOFViewController cameraController(&glsys);
+	SimplePhysics physys;
+
+	std::vector<Property> props;
+	ViewMover* mover = reinterpret_cast<ViewMover*>(physys.Factory("ViewMover", 9, props));
+
+	Sigma::event::handler::GLSixDOFViewController cameraController(glsys.View(), mover);
 	IOpSys::KeybaordEventSystem.Register(&cameraController);
+
 
 	os->SetupTimer();
 	
@@ -107,6 +115,8 @@ int main(int argCount, char **argValues) {
 			os->ToggleFullscreen();
 			glsys.SetViewportSize(os->GetWindowWidth(), os->GetWindowHeight());
 		}
+
+		physys.Update(delta);
 
 		if (glsys.Update(delta)) {
 			os->Present();
