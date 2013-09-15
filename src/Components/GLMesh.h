@@ -37,7 +37,7 @@ public:
 	 * \param[in] int entityID The entity this component belongs to.
 	 * \returns IGLCompoent* the newly created component.
 	 */
-	void Initialize() ;
+	void InitializeBuffers() ;
 	virtual void Update(glm::mediump_float *view, glm::mediump_float *proj);
 
 	/**

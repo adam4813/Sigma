@@ -15,7 +15,7 @@ GLMesh::GLMesh(const int entityID) : IGLComponent(entityID) {
 	this->NormalBufIndex = 3;
 }
 
-void GLMesh::Initialize() {
+void GLMesh::InitializeBuffers() {
 	// We must create a vao and then store it in our GLIcoSphere.
 	if (this->vao == 0) {
 		glGenVertexArrays(1, &this->vao); // Generate the VAO

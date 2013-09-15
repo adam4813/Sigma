@@ -17,7 +17,7 @@ GLSprite::GLSprite( const int entityID /*= 0*/ ) : IGLComponent(entityID)  {
 }
 
 
-void GLSprite::Initialize() {
+void GLSprite::InitializeBuffers() {
 	texture_ = LoadTexture();
 	static const GLfloat vert[] = {
 		-1.0f, 1.0f, 0.0f,

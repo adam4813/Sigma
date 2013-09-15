@@ -22,7 +22,7 @@ OpenGLSystem::~OpenGLSystem() {
 IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
 	if (type == "GLSprite") {
 		GLSprite* spr = new GLSprite(entityID);
-		spr->Initialize();
+		spr->InitializeBuffers();
 		if (entityID == 2) {
 			spr->Transform()->Translate(2,2,0);
 		}
@@ -31,7 +31,7 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		return spr;
 	} else if (type == "GLIcoSphere") {
 		GLIcoSphere* sphere = new GLIcoSphere(entityID);
-		sphere->Initialize();
+		sphere->InitializeBuffers();
 		float scale = 1.0f;
 		float x = 0.0f;
 		float y = 0.0f;
@@ -61,7 +61,7 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		return sphere;
 	} else if (type == "GLCubeSphere") {
 		GLCubeSphere* sphere = new GLCubeSphere(entityID);
-		sphere->Initialize();
+		sphere->InitializeBuffers();
 		float scale = 1.0f;
 		float x = 0.0f;
 		float y = 0.0f;
@@ -116,7 +116,7 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 				componentID = p->Get<int>();
 			}
 		}
-		mesh->Initialize();
+		mesh->InitializeBuffers();
 		mesh->Transform()->Scale(scale,scale,scale);
 		mesh->Transform()->Translate(x,y,z);
 		this->components[entityID][componentID] = mesh;

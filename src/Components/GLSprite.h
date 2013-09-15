@@ -14,7 +14,7 @@ public:
 	 * \param[in] int entityID The entity this component belongs to
 	 * \returns   GLSprite* The newly creates GLSprite
 	 */
-	void Initialize();
+	void InitializeBuffers();
 	virtual void Update(glm::mediump_float *view, glm::mediump_float *proj);
 
 	unsigned int LoadTexture();

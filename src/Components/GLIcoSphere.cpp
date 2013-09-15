@@ -6,7 +6,7 @@
 GLIcoSphere::GLIcoSphere( const int entityID /*= 0*/ ) : GLMesh(entityID) {
 }
 
-void GLIcoSphere::Initialize() {
+void GLIcoSphere::InitializeBuffers() {
 	srand(this->GetEntityID());
 	// Create the verts to begin refining at.
 	double t = (1.0 + glm::sqrt(5.0)) / 2.0;
@@ -133,7 +133,7 @@ void GLIcoSphere::Initialize() {
 	}
 
 	surfaceNorms.clear();
-	GLMesh::Initialize();
+	GLMesh::InitializeBuffers();
 }
 
 void GLIcoSphere::LoadShader() {
@@ -341,7 +341,7 @@ void GLIcoSphere::Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::F
 //		final_normal = glm::normalize(final_normal);
 //		AddVertexNormal(Sigma::Vertex(final_normal.x, final_normal.y, final_normal.z));
 //	}
-//	GLMesh::Initialize();
+//	GLMesh::InitializeBuffers();
 //}
 
 GLSLShader GLIcoSphere::shader;
