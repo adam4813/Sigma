@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../Systems/KeyboardInputSystem.h"
-#include "../Systems/OpenGLSystem.h"
-#include "../IOpSys.h"
+#include "../Components/ViewMover.h"
+#include "../Systems/IGLView.h"
 
 namespace Sigma {
 	namespace event {
@@ -12,7 +12,11 @@ namespace Sigma {
 			private:
 				GLSixDOFViewController() { }
 			public:
-				GLSixDOFViewController(OpenGLSystem *gl) : glsys(gl) {
+				GLSixDOFViewController(IGLView* view, ViewMover* mover) : mover(mover) {
+					// Set the view mover's view pointer.
+					this->mover->View(view);
+					
+					// Clear out the internal key state buffers.
 					memset(this->keys, 0, sizeof(this->keys));
 					memset(this->keyState, 0, sizeof(this->keyState));
 					this->keys['W'] = 1; this->keys['B'] = 1; this->keys['S'] = 1;
@@ -22,52 +26,185 @@ namespace Sigma {
 					this->keys['Q'] = 1; this->keys['Z'] = 1; this->keys['R'] = 1;
 					this->keys['T'] = 1;
 				}
+				/**
+				 * \brief Triggered whenever a key state change event happens
+				 *
+				 * This method adjusts the view mover according to various key state changes.
+				 * \param[in] const unsigned int key The key for which the state change is happening
+				 * \param[in] const KEY_STATE state // The new state of the key.
+				 * \returns   void 
+				 * \exception  
+				 */
 				void KeyStateChange(const unsigned int key, const KEY_STATE state) {
+					// Store the new key state
 					this->keyState[key] = state;
-					float deltaSec = (float)IOpSys::GetCurrentDelta()/1000.0f;
+
 					// Translation keys
+
 					if (key == 'W') { // Move forward
-						if (this->keyState['B'] == KS_DOWN) {
-							this->glsys->Move(0.0f, 0.0f, 100.0f*deltaSec);
+						if (state == KS_UP) {
+							if (this->keyState['B'] == KS_DOWN) {
+								this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, 10.0f));
+							}
+							else {
+								this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, 1.0f));
+							}
 						} else {
-							this->glsys->Move(0.0f, 0.0f, 10.0f*deltaSec);
+							if (this->keyState['B'] == KS_DOWN) {
+								this->mover->AddForce(glm::vec3(0.0f, 0.0f, 10.0f));
+								this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -10.0f));
+							}
+							else {
+								this->mover->AddForce(glm::vec3(0.0f, 0.0f, 1.0f));
+								this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -1.0f));
+							}
 						}
 					} else if (key == 'S') { // Move backward
-						this->glsys->Move(0.0f, 0.0f, -10.0f*deltaSec);
+						if (state == KS_UP) {
+							if (this->keyState['B'] == KS_DOWN) {
+								this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -10.0f));
+							}
+							else {
+								this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -1.0f));
+							}
+						}
+						else {
+							if (this->keyState['B'] == KS_DOWN) {
+								this->mover->AddForce(glm::vec3(0.0f, 0.0f, -10.0f));
+								this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, 10.0f));
+							}
+							else {
+								this->mover->AddForce(glm::vec3(0.0f, 0.0f, -1.0f));
+								this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, 1.0f));
+							}
+						}
+					}
+					if (key == 'B') { // Boost on
+						if (state == KS_DOWN) {
+							if (this->keyState['W'] == KS_DOWN) {
+								this->mover->AddForce(glm::vec3(0.0f, 0.0f, 10.0f));
+								this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, 1.0f));
+							} else if (this->keyState['S'] == KS_DOWN) {
+								this->mover->AddForce(glm::vec3(0.0f, 0.0f, -10.0f));
+								this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -1.0f));
+							}
+						}
+						else { // Boost off
+							if (this->keyState['W'] == KS_DOWN) {
+								this->mover->AddForce(glm::vec3(0.0f, 0.0f, 1.0f));
+								this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, 10.0f));
+							} else if (this->keyState['S'] == KS_DOWN) {
+								this->mover->AddForce(glm::vec3(0.0f, 0.0f, -1.0f));
+								this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -10.0f));
+							}
+						}
 					}
 
-					if (key == 'A') { 
-						this->glsys->Rotate(0.0f, -90.0f*deltaSec, 0.0f); // Yaw left.
-					} else if (key == 'D') {
-						this->glsys->Rotate(0.0f, 90.0f*deltaSec, 0.0f); // Yaw right.
-					}
-
-					if (key == 'F') { 
-						this->glsys->Move(-10.0f*deltaSec, 0.0f, 0.0f); // Strafe Left
-					} else if (key == 'G') {
-						this->glsys->Move(10.0f*deltaSec, 0.0f, 0.0f); // Strafe Right
+					if (key == 'F') { // Strafe left
+						if (state == KS_UP) {
+							this->mover->RemoveForce(glm::vec3(-1.0f,0.0f,0.0f));
+						}
+						else {
+							this->mover->AddForce(glm::vec3(-1.0f,0.0f,0.0f));
+							this->mover->RemoveForce(glm::vec3(1.0f,0.0f,0.0f));
+						}
+					} else if (key == 'G') { // Strafe right
+						if (state == KS_UP) {
+							this->mover->RemoveForce(glm::vec3(1.0f,0.0f,0.0f));
+						}
+						else {
+							this->mover->AddForce(glm::vec3(1.0f,0.0f,0.0f));
+							this->mover->RemoveForce(glm::vec3(-1.0f,0.0f,0.0f));
+						}
 					}
 
 					if (key == 'E') { // Move up
-						this->glsys->Move(0.0f, 10.0f*deltaSec, 0.0f);
+						if (state == KS_UP) {
+							this->mover->RemoveForce(glm::vec3(0.0f,1.0f,0.0f));
+						}
+						else {
+							this->mover->AddForce(glm::vec3(0.0f,1.0f,0.0f));
+							this->mover->RemoveForce(glm::vec3(0.0f,-1.0f,0.0f));
+						}
 					} else if (key == 'C') { // Move down
-						this->glsys->Move(0.0f, -10.0f*deltaSec, 0.0f);
+						if (state == KS_UP) {
+							this->mover->RemoveForce(glm::vec3(0.0f,-1.0f,0.0f));
+						}
+						else {
+							this->mover->AddForce(glm::vec3(0.0f,-1.0f,0.0f));
+							this->mover->RemoveForce(glm::vec3(0.0f,1.0f,0.0f));
+						}
+					}
+
+					// Rotation Keys
+
+					// Set the value to positive or negative for forward/backward and 0 for no change.
+					// To remove a force on an axis set its rem_ to the correct direction.
+					// To add a force on an axis set its add_ to the correct direction,
+					//	and set the corresponding rem_ to the opposite direction to remove it.
+					int add_x = 0, add_y = 0, add_z = 0;
+					int rem_x = 0, rem_y = 0, rem_z = 0;
+
+					if (key == 'A') {
+						if (state == KS_UP) {
+							rem_y = -1;
+						}
+						else {
+							add_y = -1;
+							rem_y = 1;
+						}
+					} else if (key == 'D') {
+						if (state == KS_UP) {
+							rem_y = 1;
+						}
+						else {
+							add_y = 1;
+							rem_y = -1;
+						}
 					}
 
 					if (key == 'Q') { // Pitch Up
-						this->glsys->Rotate(-90.0f * deltaSec, 0.0f, 0.0f);
+						if (state == KS_UP) {
+							rem_x  = -1;
+						}
+						else {
+							add_x = -1;
+							rem_x = 1;
+						}
 					} else if (key == 'Z') { // Pitch Down
-						this->glsys->Rotate(90.0f*deltaSec, 0.0f, 0.0f);
+						if (state == KS_UP) {
+							rem_x = 1;
+						}
+						else {
+							add_x = 1;
+							rem_x = -1;
+						}
 					}
 
 					if (key == 'R') { // Roll left
-						this->glsys->Rotate(0.0f, 0.0f, -90.0f * deltaSec);
+						if (state == KS_UP) {
+							rem_z = -1;
+						}
+						else {
+							add_z = -1;
+							rem_z = 1;
+						}
 					} else if (key == 'T') { // Roll right
-						this->glsys->Rotate(0.0f, 0.0f, 90.0f*deltaSec);
+						if (state == KS_UP) {
+							rem_z = 1;
+						}
+						else {
+							add_z = 1;
+							rem_z = -1;
+						}
 					}
+
+					// Add and remove rotation forces based on the variables set above.
+					this->mover->AddRotationForce(glm::vec3(0.1f * add_x, 0.1f * add_y, 0.1 * add_z));
+					this->mover->RemoveRotationForce(glm::vec3(0.1f * rem_x, 0.1f * rem_y, 0.1 * rem_z));
 				}
 			private:
-				OpenGLSystem* glsys;
+				ViewMover* mover; // The view mover component that applies the rotations and forces set in the trigger method.
 			};
 		}
 	}
