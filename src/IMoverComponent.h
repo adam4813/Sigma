@@ -31,12 +31,7 @@ public:
 	 *
 	 * \param[in] glm::vec3 force The force to remove. Is is evaluated based on glm's comparisson.
 	 */
-	void RemoveFroce(const glm::vec3& force) {
-		/*for (auto forceitr = this->forces.begin(); forceitr != this->forces.end(); ++forceitr) {
-			if ((*forceitr) == force) {
-				this->forces.erase(forceitr--);
-			}
-		}*/
+	void RemoveForce(const glm::vec3& force) {
 		this->forces.remove(force);
 	}
 

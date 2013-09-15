@@ -20,7 +20,7 @@ void GLSixDOFView::Move(float right, float up, float forward) {
 void GLSixDOFView::Rotate(float x, float y, float z) {
 	glm::quat qX = glm::angleAxis(x, 1.0f,0.0f,0.0f);
 	glm::quat qY = glm::angleAxis(y, 0.0f,1.0f,0.0f);
-	glm::quat qZ = glm::angleAxis(z, 0.0f,0.0f,1.0f); // TODO: Fix roll rotation.
+	glm::quat qZ = glm::angleAxis(z, 0.0f,0.0f,1.0f);
 	glm::quat change = qX * qY * qZ;
 	this->orientation = change * this->orientation;
 }

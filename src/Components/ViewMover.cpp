@@ -11,8 +11,19 @@ void ViewMover::ApplyForces(const double delta) {
 	for (auto forceitr = this->forces.begin(); forceitr != this->forces.end(); ++forceitr) {
 		this->view->Move((*forceitr) * deltavec);
 	}
+	for (auto rotitr = this->rotationForces.begin(); rotitr != this->rotationForces.end(); ++rotitr) {
+		this->view->Rotate((*rotitr) * deltavec);
+	}
 }
 
 void ViewMover::View(IGLView* view) {
 	this->view = view;
+}
+
+void ViewMover::AddRotationForce(glm::vec3 rotation) {
+	this->rotationForces.push_back(rotation);
+}
+
+void ViewMover::RemoveRotationForce(glm::vec3 rotation) {
+	this->rotationForces.remove(rotation);
 }
