@@ -45,8 +45,6 @@ public:
 		}
 		return this->faces.size() * 3;
 	}
-	
-	virtual void InitializeBuffers();
 private:
 
 	/**
