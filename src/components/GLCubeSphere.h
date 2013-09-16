@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "../Systems/GLSLShader.h"
+#include "../systems/GLSLShader.h"
 #include "../GLTransform.h"
 #include "../IGLComponent.h"
 

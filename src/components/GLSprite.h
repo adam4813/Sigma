@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Systems/GLSLShader.h"
+#include "../systems/GLSLShader.h"
 #include "../IGLComponent.h"
 
 class GLSprite : public IGLComponent {

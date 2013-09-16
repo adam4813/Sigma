@@ -29,7 +29,7 @@ set_property(CACHE IOPSYS PROPERTY STRINGS "OS_SDL" "OS_Win32")
 
 message(${IOPSYS})
 
-add_subdirectory("src/OS")
+add_subdirectory("src/os")
 
 # add the executable
 add_executable (Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP})

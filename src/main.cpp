@@ -1,9 +1,9 @@
 #include <iostream>
 
-#include "Systems/OpenGLSystem.h"
-#include "Systems/SimplePhysics.h"
-#include "Controllers/GLSixDOFViewController.h"
-#include "Components/ViewMover.h"
+#include "systems/OpenGLSystem.h"
+#include "systems/SimplePhysics.h"
+#include "controllers/GLSixDOFViewController.h"
+#include "components/ViewMover.h"
 #include "SCParser.h"
 
 #ifdef OS_Win32
