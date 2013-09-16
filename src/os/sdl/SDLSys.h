@@ -11,7 +11,7 @@ public:
 	SDLSys() { SDL_Init(SDL_INIT_EVERYTHING); }
 	virtual ~SDLSys() { SDL_GL_DeleteContext(_Context); SDL_DestroyWindow(_Window); SDL_Quit(); }
 
-	virtual void* CreateGraphicsWindow(const unsigned int width = 800, const unsigned int height = 600);
+	virtual void* CreateGraphicsWindow();
 	virtual void ToggleFullscreen();
 	virtual bool MessageLoop();
 	virtual bool SetupTimer();
