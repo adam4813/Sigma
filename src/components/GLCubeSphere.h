@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "../Systems/GLSLShader.h"
+#include "../systems/GLSLShader.h"
 #include "../GLTransform.h"
 #include "../IGLComponent.h"
 
@@ -45,6 +45,8 @@ public:
 		}
 		return this->faces.size() * 3;
 	}
+	
+	virtual void InitializeBuffers();
 private:
 
 	/**

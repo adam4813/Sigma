@@ -1,6 +1,6 @@
 #include "ViewMover.h"
 
-#include "../Systems/IGLView.h"
+#include "../systems/IGLView.h"
 
 ViewMover::ViewMover(const int entityID) : IMoverComponent(entityID) {
 

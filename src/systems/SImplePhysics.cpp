@@ -1,7 +1,7 @@
 #include "SimplePhysics.h"
 #include "../Property.h"
-#include "../Components/PhysicsMover.h"
-#include "../Components/ViewMover.h"
+#include "../components/PhysicsMover.h"
+#include "../components/ViewMover.h"
 
 IMoverComponent* SimplePhysics::Factory(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
 	if (type == "PhysicsMover") {

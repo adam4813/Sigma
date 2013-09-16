@@ -1,10 +1,10 @@
 #include "OpenGLSystem.h"
 #include "GLSLShader.h"
 #include "GLSixDOFView.h"
-#include "../Components/GLSprite.h"
-#include "../Components/GLIcoSphere.h"
-#include "../Components/GLCubeSphere.h"
-#include "../Components/GLMesh.h"
+#include "../components/GLSprite.h"
+#include "../components/GLIcoSphere.h"
+#include "../components/GLCubeSphere.h"
+#include "../components/GLMesh.h"
 
 OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumulator(0.0) {
 	this->view = new GLSixDOFView(); 

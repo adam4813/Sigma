@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../Systems/KeyboardInputSystem.h"
-#include "../Components/ViewMover.h"
-#include "../Systems/IGLView.h"
+#include "../systems/KeyboardInputSystem.h"
+#include "../components/ViewMover.h"
+#include "../systems/IGLView.h"
 
 namespace Sigma {
 	namespace event {

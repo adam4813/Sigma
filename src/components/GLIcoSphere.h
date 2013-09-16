@@ -3,7 +3,7 @@
 #include <vector>
 #include "GLMesh.h"
 
-#include "../Systems/GLSLShader.h"
+#include "../systems/GLSLShader.h"
 
 struct IcoScphereFace {
 	int vertexIndex[3];
