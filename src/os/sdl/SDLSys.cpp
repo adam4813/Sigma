@@ -69,6 +69,12 @@ bool SDLSys::SetupTimer() {
 	return true;
 }
 
+void SDLSys::ToggleFullscreen() { }
+
+unsigned int SDLSys::GetWindowHeight() { return 0; }
+
+unsigned int SDLSys::GetWindowWidth() { return 0; }
+
 double SDLSys::GetDeltaTime() {
 	double delta = static_cast<double>(SDL_GetTicks() - this->_LastTime);
 	return delta/1000.0f;

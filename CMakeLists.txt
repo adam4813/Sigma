@@ -56,6 +56,7 @@ if(UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
   endif(NOT SDL2_FOUND)
   
   # Link the libraries
+  set(SIGMA_LIBS ${SIGMA_LIBS} ${SDL2_LIBRARY} ${SDLIMAGE2_LIBRARY} SDL2main)
   link_libraries (
     ${SDL2_LIBRARY}
     ${SDLIMAGE2_LIBRARY} # if using SDL_image, obviously
@@ -81,4 +82,4 @@ add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT
 add_definitions(-D${IOPSYS})
 
 # Link the executable to the Hello library. 
-target_link_libraries (Sigma ${Sigma_LIB})
+target_link_libraries (Sigma ${Sigma_LIB} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})
