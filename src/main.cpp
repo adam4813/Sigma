@@ -8,7 +8,7 @@
 
 #ifdef OS_Win32
 #include "os/win32/win32.h"
-#else if OS_SDL
+#elif OS_SDL
 #include "os/sdl/SDLSys.h"
 #endif
 
@@ -17,7 +17,7 @@ int main(int argCount, char **argValues) {
 	IOpSys* os = nullptr;
 #ifdef OS_Win32
 	os = new win32();
-#else if OS_SDL
+#elif OS_SDL
 	os = new SDLSys();
 #endif
 

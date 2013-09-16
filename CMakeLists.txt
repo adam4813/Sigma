@@ -21,8 +21,10 @@ source_group("Header Files\\systems" FILES ${Sigma_SRC_SYSTEM_H})
 file(GLOB Sigma_SRC_SYSTEM_CPP "src/systems/*.cpp")
 source_group("Source Files\\systems" FILES ${Sigma_SRC_SYSTEM_CPP})
 
-# Add a define to prevent GLEW linker warnings
-ADD_DEFINITIONS(-DGLEW_STATIC)
+ADD_DEFINITIONS(
+  -DGLEW_STATIC # Add a define to prevent GLEW linker warnings
+  -std=c++11 # Force C++11
+)
 
 # Figure out what Operating System to compile against
 if(WIN32) # Windows

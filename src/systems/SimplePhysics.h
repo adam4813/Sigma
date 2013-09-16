@@ -46,5 +46,5 @@ public:
 	 */
 	void* GetComponent(int entityID);
 private:
-	std::map<int, std::vector<IMoverComponent*>> components; // A mapping of entity ID to a vector containing all of it's components.
+	std::map<int, std::vector<IMoverComponent*> > components; // A mapping of entity ID to a vector containing all of it's components.
 };

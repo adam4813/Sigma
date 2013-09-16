@@ -67,7 +67,7 @@ namespace Sigma {
 			}
 
 		private:
-			std::map<unsigned int, std::vector<Sigma::event::IKeyboardEventHandler*>> eventHandlers;
+			std::map<unsigned int, std::vector<Sigma::event::IKeyboardEventHandler*> > eventHandlers;
 		};
 	}
 }

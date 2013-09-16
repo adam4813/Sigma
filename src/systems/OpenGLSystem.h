@@ -98,5 +98,5 @@ private:
 	glm::mat4 ProjectionMatrix;
 	IGLView* view;
 	double deltaAccumulator;
-	std::map<int, std::map<int, IGLComponent*>> components; // A mapping of entity ID to a mapping of component ID to component.
+	std::map<int, std::map<int, IGLComponent*> > components; // A mapping of entity ID to a mapping of component ID to component.
 };
