@@ -27,7 +27,7 @@ GLCubeSphere::~GLCubeSphere() {
 	glDeleteTextures(1, &this->_cubeMap);
 }
 
-void GLCubeSphere::Initialize() {
+void GLCubeSphere::InitializeBuffers() {
 	srand(this->GetEntityID());
 
 	int subdivisions = 5;
@@ -97,11 +97,11 @@ void GLCubeSphere::Initialize() {
 		char filename[100];
 		sprintf(filename, "mars%d.jpg", i+1);
 		SDL_Surface *img;
-		img = IMG_Load(filename);
+		//img = IMG_Load(filename);
 
 		if(img) {
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+i,0,GL_RGB,img->w,img->h,0,GL_RGB,GL_UNSIGNED_BYTE,(img->pixels));
-			SDL_FreeSurface(img);
+			//SDL_FreeSurface(img);
 		} else {
 			assert(0 && "Texture file did not load correctly.");
 		}
@@ -124,11 +124,11 @@ void GLCubeSphere::Initialize() {
 		char filename[100];
 		sprintf(filename, "mars_nm%d.jpg", i+1);
 		SDL_Surface *img;
-		img = IMG_Load(filename);
+		//img = IMG_Load(filename);
 
 		if(img) {
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+i,0,GL_RGB,img->w,img->h,0,GL_RGB,GL_UNSIGNED_BYTE,(img->pixels));
-			SDL_FreeSurface(img);
+			//SDL_FreeSurface(img);
 		} else {
 			assert(0 && "Texture file did not load correctly.");
 		}

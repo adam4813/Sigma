@@ -19,7 +19,7 @@ public:
 	 * \param[in] None
 	 * \returns   void
 	 */
-	virtual void Initialize();
+	virtual void InitializeBuffers();
 	
 	/**
 	 * \brief Updates the rotation and renders the mesh
