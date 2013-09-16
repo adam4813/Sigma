@@ -7,6 +7,9 @@ link_directories ("${CMAKE_SOURCE_DIR}/lib/x86")
 set(Sigma_SRC "")
 set(Sigma_LIB "")
 
+# Set the directory where to find FindSLD2.cmake
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
+
 file(GLOB Sigma_SRC "src/*.h" "src/*.cpp")
 
 # Put all component files into a filter
@@ -21,21 +24,50 @@ source_group("Header Files\\systems" FILES ${Sigma_SRC_SYSTEM_H})
 file(GLOB Sigma_SRC_SYSTEM_CPP "src/systems/*.cpp")
 source_group("Source Files\\systems" FILES ${Sigma_SRC_SYSTEM_CPP})
 
-ADD_DEFINITIONS(
+add_definitions(
   -DGLEW_STATIC # Add a define to prevent GLEW linker warnings
   -std=c++11 # Force C++11
 )
 
+# Link aganst OpenGL and GLEW
+find_package(OpenGL REQUIRED)
+if(NOT OPENGL_FOUND)
+  message(FATAL_ERROR "OpenGL not found! Aborting!")
+endif(NOT OPENGL_FOUND)
+
+find_package(GLEW REQUIRED)
+if(NOT GLEW_FOUND)
+  message(FATAL_ERROR "GLEW not found! Aborting!")
+endif(NOT GLEW_FOUND)
+
 # Figure out what Operating System to compile against
 if(WIN32) # Windows
-  set(IOPSYS "OS_Win32" CACHE STRING  "Select the Op Sys you want to use")
-endif()
+  set(IOPSYS "OS_Win32" CACHE STRING "Select the Op Sys you want to use")
+endif(WIN32)
+
 if(UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
-  set(IOPSYS "OS_SDL" CACHE STRING  "Select the Op Sys you want to use")
-endif()
+  # We need SDL to build for *nix
+  find_package(SDL2 REQUIRED)
+  find_package(SDL2_image REQUIRED)
+  
+  # Work around for CMake <=2.4.6 (REQUIRED doesn't work)
+  if(NOT SDL2_FOUND)
+    message(FATAL_ERROR "SDL2 not found!")
+  endif(NOT SDL2_FOUND)
+  
+  # Link the libraries
+  link_libraries (
+    ${SDL2_LIBRARY}
+    ${SDLIMAGE2_LIBRARY} # if using SDL_image, obviously
+    SDL2main # Sadly not included in SDL_LIBRARY variable
+  )
+  
+  set(IOPSYS "OS_SDL" CACHE STRING "Select the Op Sys you want to use")
+endif(UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
 if(APPLE) # Mac OSX
   #TODO: Add stuff here if needed
-endif()
+endif(APPLE)
 
 set_property(CACHE IOPSYS PROPERTY STRINGS "OS_SDL" "OS_Win32")
 
@@ -44,9 +76,9 @@ message("Using ${IOPSYS}...")
 add_subdirectory("src/os")
 
 # add the executable
-add_executable (Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP})
+add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP})
 
 add_definitions(-D${IOPSYS})
 
 # Link the executable to the Hello library. 
-target_link_libraries (Sigma ${Sigma_LIB} opengl32.lib glew32s.lib ) 
+target_link_libraries (Sigma ${Sigma_LIB})
