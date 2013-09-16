@@ -95,7 +95,7 @@ void GLCubeSphere::Initialize() {
 	// There are always six files
 	for(int i=0; i < 6; i++) {
 		char filename[100];
-		sprintf_s(filename, "mars%d.jpg", i+1);
+		sprintf(filename, "mars%d.jpg", i+1);
 		SDL_Surface *img;
 		img = IMG_Load(filename);
 
@@ -122,7 +122,7 @@ void GLCubeSphere::Initialize() {
 	// There are always six files
 	for(int i=0; i < 6; i++) {
 		char filename[100];
-		sprintf_s(filename, "mars_nm%d.jpg", i+1);
+		sprintf(filename, "mars_nm%d.jpg", i+1);
 		SDL_Surface *img;
 		img = IMG_Load(filename);
 
@@ -234,11 +234,11 @@ void GLCubeSphere::LoadShader() {
 void GLCubeSphere::Update(glm::mediump_float *view, glm::mediump_float *proj) {
 	GLCubeSphere::shader.Use();
 	
-	this->Transform().Rotate(0.0f,0.01f,0.0f);
+	this->Transform()->Rotate(0.0f,0.01f,0.0f);
 
 	glUniform1i(glGetUniformLocation(GLCubeSphere::shader.GetProgram(), "cubeMap"), 0);
 
-	glUniformMatrix4fv(glGetUniformLocation(GLCubeSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &this->Transform().ModelMatrix()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(GLCubeSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &this->Transform()->ModelMatrix()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(GLCubeSphere::shader.GetProgram(), "in_View"), 1, GL_FALSE, view);
 	glUniformMatrix4fv(glGetUniformLocation(GLCubeSphere::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, proj);
 

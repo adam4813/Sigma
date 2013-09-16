@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IGLVIew.h"
+#include "IGLView.h"
 
 struct GLSixDOFView : public IGLView {
 	GLSixDOFView();
