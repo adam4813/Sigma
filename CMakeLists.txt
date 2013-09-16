@@ -10,24 +10,34 @@ set(Sigma_LIB "")
 file(GLOB Sigma_SRC "src/*.h" "src/*.cpp")
 
 # Put all component files into a filter
-file(GLOB Sigma_SRC_COMPONENT_H "src/Components/*.h")
-source_group("Header Files\\Components" FILES ${Sigma_SRC_COMPONENT_H})
-file(GLOB Sigma_SRC_COMPONENT_CPP "src/Components/*.cpp")
-source_group("Source Files\\Components" FILES ${Sigma_SRC_COMPONENT_CPP})
+file(GLOB Sigma_SRC_COMPONENT_H "src/components/*.h")
+source_group("Header Files\\components" FILES ${Sigma_SRC_COMPONENT_H})
+file(GLOB Sigma_SRC_COMPONENT_CPP "src/components/*.cpp")
+source_group("Source Files\\components" FILES ${Sigma_SRC_COMPONENT_CPP})
 
 # Put all Systems files into a filter
-file(GLOB Sigma_SRC_SYSTEM_H "src/Systems/*.h")
-source_group("Header Files\\Systems" FILES ${Sigma_SRC_SYSTEM_H})
-file(GLOB Sigma_SRC_SYSTEM_CPP "src/Systems/*.cpp")
-source_group("Source Files\\Systems" FILES ${Sigma_SRC_SYSTEM_CPP})
+file(GLOB Sigma_SRC_SYSTEM_H "src/systems/*.h")
+source_group("Header Files\\systems" FILES ${Sigma_SRC_SYSTEM_H})
+file(GLOB Sigma_SRC_SYSTEM_CPP "src/systems/*.cpp")
+source_group("Source Files\\systems" FILES ${Sigma_SRC_SYSTEM_CPP})
 
 # Add a define to prevent GLEW linker warnings
 ADD_DEFINITIONS(-DGLEW_STATIC)
 
-set(IOPSYS "OS_Win32" CACHE STRING  "Select the Op Sys you want to use") 
+# Figure out what Operating System to compile against
+if(WIN32) # Windows
+  set(IOPSYS "OS_Win32" CACHE STRING  "Select the Op Sys you want to use")
+endif()
+if(UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
+  set(IOPSYS "OS_SDL" CACHE STRING  "Select the Op Sys you want to use")
+endif()
+if(APPLE) # Mac OSX
+  #TODO: Add stuff here if needed
+endif()
+
 set_property(CACHE IOPSYS PROPERTY STRINGS "OS_SDL" "OS_Win32")
 
-message(${IOPSYS})
+message("Using ${IOPSYS}...")
 
 add_subdirectory("src/os")
 
