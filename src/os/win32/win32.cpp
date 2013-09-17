@@ -71,10 +71,6 @@ void* win32::CreateGraphicsWindow(const unsigned int width, const unsigned int h
 	return this->hdc;
 }
 
-void* win32::CreateGraphicsWindow(const unsigned int width /*= 800*/, const unsigned int height /*= 600 */) {
-	throw std::exception("The method or operation is not implemented.");
-}
-
 LRESULT CALLBACK win32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message) {
 	case WM_KEYUP:
