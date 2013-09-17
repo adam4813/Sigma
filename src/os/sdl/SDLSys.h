@@ -28,9 +28,11 @@ private:
 
 	// Keyboard state
 	std::map<char, bool> _KeyStates;
+	bool keysReleased[256];
 
 	double _Frequency;
 	long long _LastTime;
+	bool Fullscreen;
 };
 
 #endif

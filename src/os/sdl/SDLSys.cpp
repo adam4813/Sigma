@@ -28,6 +28,7 @@ void* SDLSys::CreateGraphicsWindow(const unsigned int width, const unsigned int 
 		return 0;
 	}
 	
+	this->Fullscreen = false;
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
@@ -37,6 +38,8 @@ void* SDLSys::CreateGraphicsWindow(const unsigned int width, const unsigned int 
 bool SDLSys::MessageLoop() {
 	SDL_Event event;
 	SDL_Keycode key;
+
+	memset(&this->keysReleased, false, sizeof(this->keysReleased));
 
 	while(SDL_PollEvent(&event)) {
 		switch(event.type) {
@@ -57,6 +60,7 @@ bool SDLSys::MessageLoop() {
 				key -= 32;
 			}
 			this->_KeyStates[key] = false;
+			this->keysReleased[key] = true;
 			break;
 		}
 	}
@@ -69,11 +73,27 @@ bool SDLSys::SetupTimer() {
 	return true;
 }
 
-void SDLSys::ToggleFullscreen() { }
+void SDLSys::ToggleFullscreen() {
+	if(!this->Fullscreen) {
+		SDL_SetWindowFullscreen(this->_Window,SDL_WINDOW_FULLSCREEN);
+	}
+	else {
+		SDL_SetWindowFullscreen(this->_Window,0);
+	}
+	this->Fullscreen=!this->Fullscreen;
+}
 
-unsigned int SDLSys::GetWindowHeight() { return 0; }
+unsigned int SDLSys::GetWindowHeight() {
+	int width,height;
+	SDL_GetWindowSize(this->_Window,&width,&height);
+	return height;
+}
 
-unsigned int SDLSys::GetWindowWidth() { return 0; }
+unsigned int SDLSys::GetWindowWidth() {
+	int width,height;
+	SDL_GetWindowSize(this->_Window,&width,&height);
+	return width;
+}
 
 double SDLSys::GetDeltaTime() {
 	double delta = static_cast<double>(SDL_GetTicks() - this->_LastTime);
@@ -92,7 +112,12 @@ bool SDLSys::KeyDown(int key, bool focused) {
 }
 
 bool SDLSys::KeyUp(int key, bool focused /*= false */) {
-	return true;
+	if(focused && this->_Window == SDL_GetKeyboardFocus()) {
+		return this->keysReleased[key];
+	}
+	else {
+		return false;
+	}
 }
 
 
