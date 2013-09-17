@@ -21,6 +21,11 @@ void ViewMover::View(IGLView* view) {
 }
 
 void ViewMover::AddRotationForce(glm::vec3 rotation) {
+	for (auto rotitr = this->rotationForces.begin(); rotitr != this->rotationForces.end(); ++rotitr) {
+		if ((*rotitr) == rotation) {
+			return;
+		}
+	}
 	this->rotationForces.push_back(rotation);
 }
 
