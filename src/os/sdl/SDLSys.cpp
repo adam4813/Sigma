@@ -99,8 +99,10 @@ unsigned int SDLSys::GetWindowWidth() {
 }
 
 double SDLSys::GetDeltaTime() {
-	double delta = static_cast<double>(SDL_GetTicks() - this->_LastTime);
-	return delta/1000000.0f;
+	int currentTime = SDL_GetTicks();
+	double delta = static_cast<double>(currentTime - this->_LastTime);
+	this->_LastTime = currentTime;
+	return delta;
 }
 
 bool SDLSys::KeyDown(int key, bool focused) {
