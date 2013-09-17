@@ -3,6 +3,8 @@ project (Sigma)
 
 include_directories("${CMAKE_SOURCE_DIR}/include")
 link_directories("${CMAKE_SOURCE_DIR}/lib/x86")
+set(CMAKE_INCLUDE_PATH ${CMAKE_SOURCE_DIR}/include)
+set(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x86)
 
 set(Sigma_SRC "")
 set(Sigma_LIB "")
@@ -43,6 +45,7 @@ endif(NOT GLEW_FOUND)
 # Figure out what Operating System to compile against
 if(WIN32) # Windows
   set(IOPSYS "OS_Win32" CACHE STRING "Select the Op Sys you want to use")
+  set(GLEW_LIBRARIES glew32s)
 endif(WIN32)
 
 if(UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
