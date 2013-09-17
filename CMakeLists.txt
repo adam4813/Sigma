@@ -43,12 +43,12 @@ if(NOT GLEW_FOUND)
 endif(NOT GLEW_FOUND)
 
 # Figure out what Operating System to compile against
-if(WIN32) # Windows
+if(WIN32 AND NOT MINGW) # Windows
   set(IOPSYS "OS_Win32" CACHE STRING "Select the Op Sys you want to use")
   set(GLEW_LIBRARIES glew32s)
-endif(WIN32)
+endif(WIN32 AND NOT MINGW)
 
-if(UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
+if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
   # We need SDL to build for *nix
   find_package(SDL2 REQUIRED)
   find_package(SDL2_image REQUIRED)
@@ -69,7 +69,7 @@ if(UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
   )
   
   set(IOPSYS "OS_SDL" CACHE STRING "Select the Op Sys you want to use")
-endif(UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+endif(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 if(APPLE) # Mac OSX
   #TODO: Add stuff here if needed
