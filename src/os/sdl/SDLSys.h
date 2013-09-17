@@ -28,7 +28,7 @@ private:
 
 	// Keyboard state
 	std::map<char, bool> _KeyStates;
-	bool keysReleased[256];
+	std::map<char, bool> _KeyReleased;
 
 	double _Frequency;
 	long long _LastTime;

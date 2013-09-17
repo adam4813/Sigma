@@ -40,7 +40,7 @@ bool SDLSys::MessageLoop() {
 	SDL_Event event;
 	SDL_Keycode key;
 
-	memset(&this->keysReleased, false, sizeof(this->keysReleased));
+	this->_KeyReleased.clear();
 
 	while(SDL_PollEvent(&event)) {
 		switch(event.type) {
@@ -62,7 +62,7 @@ bool SDLSys::MessageLoop() {
 				key -= 32;
 			}
 			this->_KeyStates[key] = false;
-			this->keysReleased[key] = true;
+			this->_KeyReleased[key] = true;
 			KeybaordEventSystem.KeyUp(key);
 			break;
 		}
@@ -116,7 +116,7 @@ bool SDLSys::KeyDown(int key, bool focused) {
 
 bool SDLSys::KeyUp(int key, bool focused /*= false */) {
 	if(focused && this->_Window == SDL_GetKeyboardFocus()) {
-		return this->keysReleased[key];
+		return this->_KeyReleased[key];
 	}
 	else {
 		return false;
