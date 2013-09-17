@@ -7,17 +7,17 @@ namespace Sigma {
 	namespace event {
 		enum KEY_STATE {KS_UP, KS_DOWN};
 
-		// A keybaord event handler interface. Handlers can be controllers, loggers, etc.
+		// A keyboard event handler interface. Handlers can be controllers, loggers, etc.
 		struct IKeyboardEventHandler {
 			unsigned int keys[256]; // The keys this handler triggers off.
 			KEY_STATE keyState[256]; // State of the keys.
 			/**
 			 * \brief Called when on the keys reported during register has a state change.
-			 * 
+			 *
 			 * \param[in] unsigned int key The key that has had a state change
 			 * \param[in] KEY_STATE state The new state the key is in
 			 */
-			virtual void KeyStateChange(const unsigned int key, const KEY_STATE state) = 0; 
+			virtual void KeyStateChange(const unsigned int key, const KEY_STATE state) = 0;
 		};
 
 		class KeyboardInputSystem {
@@ -27,7 +27,7 @@ namespace Sigma {
 
 			/**
 			 * \brief Register a KeyboardEventHandler.
-			 * 
+			 *
 			 * \param[in] Sigma::event::IKeyboardEventHandler * e The keyboard even handler to register.
 			 */
 			void Register( Sigma::event::IKeyboardEventHandler *e ) {

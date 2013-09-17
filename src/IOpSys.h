@@ -33,7 +33,7 @@ public:
 	 */
 	static double GetCurrentDelta() { return curDelta; }
 
-	static Sigma::event::KeyboardInputSystem KeybaordEventSystem; // Handles keyboard events
+	static Sigma::event::KeyboardInputSystem KeyboardEventSystem; // Handles keyboard events
 protected:
 	static double curDelta;
 };

@@ -25,7 +25,7 @@ int main(int argCount, char **argValues) {
 
 	const int* version = glsys.Start();
 	glsys.SetViewportSize(os->GetWindowWidth(), os->GetWindowHeight());
-	
+
 	if (version[0] == -1) {
 		std::cout<< "Error starting OpenGL!"<<std::endl;
 	} else {
@@ -35,7 +35,7 @@ int main(int argCount, char **argValues) {
 	Sigma::parser::SCParser parser;
 
 	parser.Parse("test.sc");
-	
+
 	for (unsigned int i = 0; i < parser.EntityCount(); ++i) {
 		const Sigma::parser::Entity* e = parser.GetEntity(i);
 		for (auto itr = e->components.begin(); itr != e->components.end(); ++itr) {
@@ -49,11 +49,11 @@ int main(int argCount, char **argValues) {
 	ViewMover* mover = reinterpret_cast<ViewMover*>(physys.Factory("ViewMover", 9, props));
 
 	Sigma::event::handler::GLSixDOFViewController cameraController(glsys.View(), mover);
-	IOpSys::KeybaordEventSystem.Register(&cameraController);
+	IOpSys::KeyboardEventSystem.Register(&cameraController);
 
 
 	os->SetupTimer();
-	
+
 	double delta;
 	bool isWireframe=false;
 
@@ -71,25 +71,25 @@ int main(int argCount, char **argValues) {
 		} else if (os->KeyDown('S', true)) { // Move backward
 			glsys.Move(0.0f, 0.0f, -10.0f*deltaSec);
 		}
-		
-		if (os->KeyDown('A', true)) { 
+
+		if (os->KeyDown('A', true)) {
 			glsys.Rotate(0.0f, -90.0f*deltaSec, 0.0f); // Yaw left.
 		} else if (os->KeyDown('D', true)) {
 			glsys.Rotate(0.0f, 90.0f*deltaSec, 0.0f); // Yaw right.
 		}
-		
-		if (os->KeyDown('F', true)) { 
+
+		if (os->KeyDown('F', true)) {
 			glsys.Move(-10.0f*deltaSec, 0.0f, 0.0f); // Strafe Left
 		} else if (os->KeyDown('G', true)) {
 			glsys.Move(10.0f*deltaSec, 0.0f, 0.0f); // Strafe Right
 		}
-		
+
 		if (os->KeyDown('E', true)) { // Move up
 			glsys.Move(0.0f, 10.0f*deltaSec, 0.0f);
 		} else if (os->KeyDown('C', true)) { // Move down
 			glsys.Move(0.0f, -10.0f*deltaSec, 0.0f);
 		}
-		
+
 		if (os->KeyDown('Q', true)) { // Pitch Up
 			glsys.Rotate(-90.0f * deltaSec, 0.0f, 0.0f);
 		} else if (os->KeyDown('Z', true)) { // Pitch Down
@@ -122,7 +122,7 @@ int main(int argCount, char **argValues) {
 			os->Present();
 		}
 	}
-	
+
 	delete os;
 
 	return 0;
