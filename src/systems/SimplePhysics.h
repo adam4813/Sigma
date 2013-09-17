@@ -1,5 +1,7 @@
 #pragma  once
 
+#include "../IFactory.h"
+
 #include <string>
 #include <vector>
 #include <map>
@@ -7,7 +9,8 @@
 class Property;
 class IMoverComponent;
 
-class SimplePhysics {
+class SimplePhysics
+    : public IFactory  {
 public:
 	SimplePhysics() { }
 	~SimplePhysics();
@@ -18,6 +21,7 @@ public:
 	 */
 	bool Start() { }
 
+    std::map<std::string,FactoryFunction> getFactoryFunctions();
 	/**
 	 * \brief A factory to create new components of a given type.
 	 *
@@ -40,7 +44,7 @@ public:
 
 	/**
 	 * \brief Retrieve the component that belongs to the given entity ID
-	 * 
+	 *
 	 * \param[in] int entityID
 	 * \returns   void* The component that belongs to the entity ID or nullptr if no component exists for the given ID.
 	 */

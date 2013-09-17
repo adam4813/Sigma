@@ -3,6 +3,17 @@
 #include "../components/PhysicsMover.h"
 #include "../components/ViewMover.h"
 
+std::map<std::string,IFactory::FactoryFunction> SimplePhysics::getFactoryFunctions()
+{
+    using namespace std::placeholders;
+    std::map<std::string,IFactory::FactoryFunction> retval=
+    {
+        {"PhysicsMover",std::bind(&SimplePhysics::Factory,this,_1,_2,_3)},
+        {"ViewMover",std::bind(&SimplePhysics::Factory,this,_1,_2,_3)}
+    };
+    return retval;
+}
+
 IMoverComponent* SimplePhysics::Factory(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
 	if (type == "PhysicsMover") {
 		PhysicsMover* mover = new PhysicsMover(entityID);

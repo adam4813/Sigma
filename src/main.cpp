@@ -2,6 +2,7 @@
 
 #include "systems/OpenGLSystem.h"
 #include "systems/SimplePhysics.h"
+#include "systems/FactorySystem.h"
 #include "controllers/GLSixDOFViewController.h"
 #include "components/ViewMover.h"
 #include "SCParser.h"
@@ -14,6 +15,9 @@
 
 int main(int argCount, char **argValues) {
 	OpenGLSystem glsys;
+	SimplePhysics physys;
+	FactorySystem::getInstance().register_Factory(&glsys);
+	FactorySystem::getInstance().register_Factory(&physys);
 	IOpSys* os = nullptr;
 #ifdef OS_Win32
 	os = new win32();
@@ -39,14 +43,15 @@ int main(int argCount, char **argValues) {
 	for (unsigned int i = 0; i < parser.EntityCount(); ++i) {
 		const Sigma::parser::Entity* e = parser.GetEntity(i);
 		for (auto itr = e->components.begin(); itr != e->components.end(); ++itr) {
-			glsys.Factory(itr->type, e->id, const_cast<std::vector<Property>&>(itr->properties));
+            FactorySystem::getInstance().create(
+                        itr->type,e->id,
+                        const_cast<std::vector<Property>&>(itr->properties));
 		}
 	}
 
-	SimplePhysics physys;
-
 	std::vector<Property> props;
-	ViewMover* mover = reinterpret_cast<ViewMover*>(physys.Factory("ViewMover", 9, props));
+	physys.Factory("ViewMover", 9, props);
+	ViewMover* mover = reinterpret_cast<ViewMover*>(physys.GetComponent(9));
 
 	Sigma::event::handler::GLSixDOFViewController cameraController(glsys.View(), mover);
 	IOpSys::KeyboardEventSystem.Register(&cameraController);

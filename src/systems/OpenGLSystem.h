@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Property.h"
+#include "../IFactory.h"
 
 #include "GL/glew.h"
 #include "glm/glm.hpp"
@@ -9,7 +10,8 @@
 struct IGLView;
 class IGLComponent;
 
-class OpenGLSystem {
+class OpenGLSystem
+    : public IFactory {
 public:
 	OpenGLSystem();
 
@@ -26,6 +28,8 @@ public:
 	 */
 	const int* Start();
 
+
+    std::map<std::string,FactoryFunction> getFactoryFunctions();
 	/**
 	 * \brief A factory to create new components of a given type.
 	 *
@@ -35,7 +39,7 @@ public:
 	 * \param[in] std::vector<Property> &properties A vector containing the properties to apply to the created component.
 	 * \returns   IComponent* The newly create component
 	 */
-	IGLComponent* Factory(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
+	void Factory(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
 
 	/**
 	 * \brief Causes an update in the system based on the change in time.
@@ -48,7 +52,7 @@ public:
 
 	/**
 	 * \brief Retrieve the component that belongs to the given entity ID
-	 * 
+	 *
 	 * \param[in] const unsigned int entityID
 	 * \param[in] const unsigned int componentID
 	 * \returns   IComponent* The component that belongs to the entity ID or nullptr if no component exists for the given ID.
@@ -62,7 +66,7 @@ public:
 	 * \param[in/out] float x
 	 * \param[in/out] float y
 	 * \param[in/out] float z
-	 * \returns   void 
+	 * \returns   void
 	 */
 	void Move(float x, float y, float z);
 
@@ -88,8 +92,8 @@ public:
 
 	IGLView* View() const { return view; }
 private:
-	unsigned int windowWidth; // Store the width of our window  
-	unsigned int windowHeight; // Store the height of our window 
+	unsigned int windowWidth; // Store the width of our window
+	unsigned int windowHeight; // Store the height of our window
 
 	GLuint m_vaoID[2]; // two vertex array objects, one for each drawn object
 	GLuint m_vboID[3]; // three VBOs
