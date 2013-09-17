@@ -225,6 +225,8 @@ void GLCubeSphere::SubDivide(int levels) {
 	}
 }
 
+void GLCubeSphere::InitializeBuffers() { }
+
 void GLCubeSphere::LoadShader() {
 	GLCubeSphere::shader.LoadFromFile(GL_VERTEX_SHADER, "..\\..\\shaders\\cubesphere.vert");
 	GLCubeSphere::shader.LoadFromFile(GL_FRAGMENT_SHADER, "..\\..\\shaders\\cubesphere.frag");

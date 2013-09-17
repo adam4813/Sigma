@@ -1,8 +1,8 @@
 cmake_minimum_required (VERSION 2.8)
 project (Sigma)
 
-include_directories ("${CMAKE_SOURCE_DIR}/include")
-link_directories ("${CMAKE_SOURCE_DIR}/lib/x86")
+include_directories("${CMAKE_SOURCE_DIR}/include")
+link_directories("${CMAKE_SOURCE_DIR}/lib/x86")
 
 set(Sigma_SRC "")
 set(Sigma_LIB "")
@@ -51,15 +51,17 @@ if(UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
   find_package(SDL2_image REQUIRED)
   
   # Work around for CMake <=2.4.6 (REQUIRED doesn't work)
-  if(NOT SDL2_FOUND)
-    message(FATAL_ERROR "SDL2 not found!")
-  endif(NOT SDL2_FOUND)
+  if(NOT SDL2_FOUND AND NOT SDL2IMAGE_FOUND)
+    message(ERROR "SDL2 located: ${SDL2_FOUND}")
+    message(ERROR "SDL2_image located: ${SDL2IMAGE_FOUND}")
+    message(FATAL_ERROR "SDL2 or SDL not found!")
+  endif(NOT SDL2_FOUND AND NOT SDL2IMAGE_FOUND)
   
   # Link the libraries
-  set(SIGMA_LIBS ${SIGMA_LIBS} ${SDL2_LIBRARY} ${SDLIMAGE2_LIBRARY} SDL2main)
+  set(SIGMA_LIBS ${SIGMA_LIBS} ${SDL2_LIBRARY} ${SDL2IMAGE_LIBRARY} SDL2main)
   link_libraries (
     ${SDL2_LIBRARY}
-    ${SDLIMAGE2_LIBRARY} # if using SDL_image, obviously
+    ${SDL2IMAGE_LIBRARY} # if using SDL_image, obviously
     SDL2main # Sadly not included in SDL_LIBRARY variable
   )
   
