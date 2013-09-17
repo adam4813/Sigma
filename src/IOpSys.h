@@ -67,7 +67,7 @@ public:
 	 * \param[in/out] bool focused If the check should be made only when the window has focus.
 	 * \returns   bool True if the key was released, false otherwise.
 	 */
-	virtual bool KeyUp( int key, bool focused = false ) = 0;
+	virtual bool KeyReleased( int key, bool focused = false ) = 0;
 
 	/**
 	 * \brief Sets up the OS specific timer.
