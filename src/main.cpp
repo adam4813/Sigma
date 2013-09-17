@@ -50,7 +50,7 @@ int main(int argCount, char **argValues) {
 	}
 
 	std::vector<Property> props;
-	physys.Factory("ViewMover", 9, props);
+	physys.createViewMover("ViewMover", 9, props);
 	ViewMover* mover = reinterpret_cast<ViewMover*>(physys.GetComponent(9));
 
 	Sigma::event::handler::GLSixDOFViewController cameraController(glsys.View(), mover);

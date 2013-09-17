@@ -21,18 +21,6 @@ public:
 	 */
 	bool Start() { }
 
-    std::map<std::string,FactoryFunction> getFactoryFunctions();
-	/**
-	 * \brief A factory to create new components of a given type.
-	 *
-	 * A factory method to create various components and add them to the system. These components will be used during the system update method
-	 * \param[in] const std::string type The type of componenet to create
-	 * \param[in] const int entityID The ID of the entity this component belongs to.
-	 * \param[in] std::vector<Property> &properties A vector containing the properties to apply to the created component.
-	 * \returns   void* The newly create component
-	 */
-	IMoverComponent* Factory(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
-
 	/**
 	 * \brief Causes an update in the system based on the change in time.
 	 *
@@ -49,6 +37,10 @@ public:
 	 * \returns   void* The component that belongs to the entity ID or nullptr if no component exists for the given ID.
 	 */
 	void* GetComponent(int entityID);
+
+    std::map<std::string,FactoryFunction> getFactoryFunctions();
+	void createPhysicsMover(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
+	void createViewMover(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
 private:
 	std::map<int, std::vector<IMoverComponent*> > components; // A mapping of entity ID to a vector containing all of it's components.
 };

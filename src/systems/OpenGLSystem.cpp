@@ -25,16 +25,15 @@ std::map<std::string,IFactory::FactoryFunction>
     using namespace std::placeholders;
     std::map<std::string,IFactory::FactoryFunction> retval=
     {
-        {"GLSprite",std::bind(&OpenGLSystem::Factory,this,_1,_2,_3)},
-        {"GLIcoSphere",std::bind(&OpenGLSystem::Factory,this,_1,_2,_3)},
-        {"GLCubeSphere",std::bind(&OpenGLSystem::Factory,this,_1,_2,_3)},
-        {"GLMesh",std::bind(&OpenGLSystem::Factory,this,_1,_2,_3)}
+        {"GLSprite",std::bind(&OpenGLSystem::createGLSprite,this,_1,_2,_3)},
+        {"GLIcoSphere",std::bind(&OpenGLSystem::createGLIcoSphere,this,_1,_2,_3)},
+        {"GLCubeSphere",std::bind(&OpenGLSystem::createGLCubeSphere,this,_1,_2,_3)},
+        {"GLMesh",std::bind(&OpenGLSystem::createGLMesh,this,_1,_2,_3)}
     };
     return retval;
 }
 
-void OpenGLSystem::Factory(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
-	if (type == "GLSprite") {
+void OpenGLSystem::createGLSprite(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
 		GLSprite* spr = new GLSprite(entityID);
 		spr->InitializeBuffers();
 		if (entityID == 2) {
@@ -42,7 +41,9 @@ void OpenGLSystem::Factory(const std::string type, const unsigned int entityID, 
 		}
 		this->components[entityID][0] = spr;
 		spr->Transform()->Translate(0,0,0);
-	} else if (type == "GLIcoSphere") {
+}
+
+void OpenGLSystem::createGLIcoSphere(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
 		GLIcoSphere* sphere = new GLIcoSphere(entityID);
 		sphere->InitializeBuffers();
 		float scale = 1.0f;
@@ -71,7 +72,9 @@ void OpenGLSystem::Factory(const std::string type, const unsigned int entityID, 
 		sphere->Transform()->Scale(scale,scale,scale);
 		sphere->Transform()->Translate(x,y,z);
 		this->components[entityID][componentID] = sphere;
-	} else if (type == "GLCubeSphere") {
+}
+
+void OpenGLSystem::createGLCubeSphere(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
 		GLCubeSphere* sphere = new GLCubeSphere(entityID);
 		sphere->InitializeBuffers();
 		float scale = 1.0f;
@@ -100,8 +103,9 @@ void OpenGLSystem::Factory(const std::string type, const unsigned int entityID, 
 		sphere->Transform()->Scale(scale,scale,scale);
 		sphere->Transform()->Translate(x,y,z);
 		this->components[entityID][componentID] = sphere;
-	} else if (type=="GLMesh") {
-		GLMesh* mesh = new GLMesh(entityID);
+}
+void OpenGLSystem::createGLMesh(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
+        GLMesh* mesh = new GLMesh(entityID);
 		float scale = 1.0f;
 		float x = 0.0f;
 		float y = 0.0f;
@@ -131,7 +135,6 @@ void OpenGLSystem::Factory(const std::string type, const unsigned int entityID, 
 		mesh->Transform()->Scale(scale,scale,scale);
 		mesh->Transform()->Translate(x,y,z);
 		this->components[entityID][componentID] = mesh;
-	}
 }
 
 bool OpenGLSystem::Update(const double delta) {

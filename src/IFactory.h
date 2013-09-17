@@ -14,6 +14,12 @@ class IFactory
                                     std::vector<Property>&)> FactoryFunction;
         IFactory(){};
         virtual ~IFactory(){};
+        /**
+         * \brief Returns the list of Factory functions and types they create
+         *
+         *
+         * \returns std::map<std::string, FactoryFunction> Contains Callbacks for different Component types that can be created by this class
+         */
         virtual std::map<std::string,FactoryFunction>
                 getFactoryFunctions()=0;
     protected:
