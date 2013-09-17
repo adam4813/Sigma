@@ -46,29 +46,23 @@ bool SDLSys::MessageLoop() {
 		case SDL_QUIT:
 			return false;
 		case SDL_KEYDOWN:
-		    if(!event.key.repeat)
-            {
-                // hack to do case insensitive lookup
-                key = event.key.keysym.sym;
-                if (key > 96 && key < 123) {
-                    key -= 32;
-                }
-                this->_KeyStates[key] = true;
-                KeybaordEventSystem.KeyDown(key);
+            // hack to do case insensitive lookup
+            key = event.key.keysym.sym;
+            if (key > 96 && key < 123) {
+                key -= 32;
             }
+            this->_KeyStates[key] = true;
+            KeyboardEventSystem.KeyDown(key);
             break;
 		case SDL_KEYUP:
-		    if(!event.key.repeat)
-            {
-                // hack to do case insensitive lookup
-                key = event.key.keysym.sym;
-                if (key > 96 && key < 123) {
-                    key -= 32;
-                }
-                this->_KeyStates[key] = false;
-                this->keysReleased[key] = true;
-                KeybaordEventSystem.KeyUp(key);
+            // hack to do case insensitive lookup
+            key = event.key.keysym.sym;
+            if (key > 96 && key < 123) {
+                key -= 32;
             }
+            this->_KeyStates[key] = false;
+            this->keysReleased[key] = true;
+            KeyboardEventSystem.KeyUp(key);
             break;
 		}
 	}
