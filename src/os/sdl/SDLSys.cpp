@@ -5,7 +5,7 @@
 #include "GL/glew.h"
 #include "SDL/SDL_opengl.h"
 
-Sigma::event::KeyboardInputSystem IOpSys::KeybaordEventSystem;
+Sigma::event::KeyboardInputSystem IOpSys::KeyboardEventSystem;
 double IOpSys::curDelta;
 
 void* SDLSys::CreateGraphicsWindow(const unsigned int width, const unsigned int height) {
@@ -27,7 +27,7 @@ void* SDLSys::CreateGraphicsWindow(const unsigned int width, const unsigned int 
 		fprintf(stderr, "GLEW Error: %s\n", glewGetErrorString(glew_err));
 		return 0;
 	}
-	
+
 	this->Fullscreen = false;
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -46,24 +46,30 @@ bool SDLSys::MessageLoop() {
 		case SDL_QUIT:
 			return false;
 		case SDL_KEYDOWN:
-			// hack to do case insensitive lookup
-			key = event.key.keysym.sym;
-			if (key > 96 && key < 123) {
-				key -= 32;
-			}
-			this->_KeyStates[key] = true;
-			KeybaordEventSystem.KeyDown(key);
-			break;
+		    if(!event.key.repeat)
+            {
+                // hack to do case insensitive lookup
+                key = event.key.keysym.sym;
+                if (key > 96 && key < 123) {
+                    key -= 32;
+                }
+                this->_KeyStates[key] = true;
+                KeybaordEventSystem.KeyDown(key);
+            }
+            break;
 		case SDL_KEYUP:
-			// hack to do case insensitive lookup
-			key = event.key.keysym.sym;
-			if (key > 96 && key < 123) {
-				key -= 32;
-			}
-			this->_KeyStates[key] = false;
-			this->keysReleased[key] = true;
-			KeybaordEventSystem.KeyUp(key);
-			break;
+		    if(!event.key.repeat)
+            {
+                // hack to do case insensitive lookup
+                key = event.key.keysym.sym;
+                if (key > 96 && key < 123) {
+                    key -= 32;
+                }
+                this->_KeyStates[key] = false;
+                this->keysReleased[key] = true;
+                KeybaordEventSystem.KeyUp(key);
+            }
+            break;
 		}
 	}
 

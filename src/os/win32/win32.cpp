@@ -3,14 +3,14 @@
 #include "GL/glew.h"
 #include "GL/wglew.h"
 
-Sigma::event::KeyboardInputSystem IOpSys::KeybaordEventSystem; // Handles keyboard events
+Sigma::event::KeyboardInputSystem IOpSys::KeyboardEventSystem; // Handles keyboard events
 double IOpSys::curDelta;
 
 win32::~win32() {
-	wglMakeCurrent(this->hdc, 0); // Remove the rendering context from our device context  
-	wglDeleteContext(this->hrc); // Delete our rendering context  
+	wglMakeCurrent(this->hdc, 0); // Remove the rendering context from our device context
+	wglDeleteContext(this->hrc); // Delete our rendering context
 
-	ReleaseDC(this->hwnd, this->hdc); // Release the device context from our window  
+	ReleaseDC(this->hwnd, this->hdc); // Release the device context from our window
 }
 
 void win32::ToggleFullscreen() {
@@ -74,20 +74,20 @@ void* win32::CreateGraphicsWindow(const unsigned int width, const unsigned int h
 LRESULT CALLBACK win32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message) {
 	case WM_KEYUP:
-			KeybaordEventSystem.KeyUp(wParam);
+			KeyboardEventSystem.KeyUp(wParam);
 			keyUp[wParam] = 1;
 			return 0;
 		break;
 	case WM_KEYDOWN:
-		KeybaordEventSystem.KeyDown(wParam);
+		KeyboardEventSystem.KeyDown(wParam);
 		return 0;
 		break;
-	case WM_DESTROY: 
+	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
 	}
-	return DefWindowProc(hWnd, message, wParam, lParam);  
-}  
+	return DefWindowProc(hWnd, message, wParam, lParam);
+}
 
 bool win32::MessageLoop() {
 	MSG msg;
@@ -140,7 +140,7 @@ const int* win32::StartOpengGL() {
 	this->OpenGLVersion[0] = -1;
 	this->OpenGLVersion[1] = -1;
 
-	this->hdc = GetDC(this->hwnd); // Get the device context for our window  
+	this->hdc = GetDC(this->hwnd); // Get the device context for our window
 
 	PIXELFORMATDESCRIPTOR pfd;
 	memset(&pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
