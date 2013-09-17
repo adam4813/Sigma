@@ -52,6 +52,7 @@ bool SDLSys::MessageLoop() {
 				key -= 32;
 			}
 			this->_KeyStates[key] = true;
+			KeybaordEventSystem.KeyDown(key);
 			break;
 		case SDL_KEYUP:
 			// hack to do case insensitive lookup
@@ -61,6 +62,7 @@ bool SDLSys::MessageLoop() {
 			}
 			this->_KeyStates[key] = false;
 			this->keysReleased[key] = true;
+			KeybaordEventSystem.KeyUp(key);
 			break;
 		}
 	}
