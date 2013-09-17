@@ -18,6 +18,7 @@ public:
 	virtual double GetDeltaTime();
 	virtual bool KeyDown(int key, bool focused = false);
 	virtual bool KeyUp( int key, bool focused = false );
+	virtual bool KeyReleased( int key, bool focused = false );
 	virtual void Present();
 	virtual unsigned int GetWindowWidth();
 	virtual unsigned int GetWindowHeight();

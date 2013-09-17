@@ -9,6 +9,8 @@ public:
 
 	void* CreateGraphicsWindow(const unsigned int width = 800, const unsigned int height = 600);
 
+	virtual void* CreateGraphicsWindow( const unsigned int width = 800, const unsigned int height = 600 );
+
 	void ToggleFullscreen();
 
 	const int* StartOpengGL();
@@ -22,6 +24,8 @@ public:
 	bool KeyDown(int key, bool focused = false);
 
 	bool KeyUp(int key, bool focused = false);
+
+	bool KeyReleased( int key, bool focused = false );
 
 	void Present();
 

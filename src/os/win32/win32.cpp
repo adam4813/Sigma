@@ -71,6 +71,10 @@ void* win32::CreateGraphicsWindow(const unsigned int width, const unsigned int h
 	return this->hdc;
 }
 
+void* win32::CreateGraphicsWindow(const unsigned int width /*= 800*/, const unsigned int height /*= 600 */) {
+	throw std::exception("The method or operation is not implemented.");
+}
+
 LRESULT CALLBACK win32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message) {
 	case WM_KEYUP:
@@ -208,7 +212,7 @@ void win32::Present() {
 	SwapBuffers(this->hdc); // Swap buffers so we can see our rendering.
 }
 
-bool win32::KeyUp(int key, bool focused /*= false*/) {
+bool win32::KeyReleased(int key, bool focused /*= false*/) {
 	if (focused) {
 		if (this->hwnd != GetFocus()) {
 			return false;
@@ -216,6 +220,17 @@ bool win32::KeyUp(int key, bool focused /*= false*/) {
 	}
 	return keyUp[key];
 }
+
+bool win32::KeyUp(int key, bool focused /*= false */) {
+	if (focused) {
+		if (this->hwnd != GetFocus()) {
+			return false;
+		}
+	}
+	short k = GetKeyState(key);
+	return (k & 0x80) > 0 ? false : true;
+}
+
 
 unsigned int win32::GetWindowWidth() {
 	if (fullscreen) {
@@ -242,5 +257,4 @@ unsigned int win32::GetWindowHeight() {
 		return this->windowedSize.bottom - this->windowedSize.top;
 	}
 }
-
 int win32::keyUp[256];

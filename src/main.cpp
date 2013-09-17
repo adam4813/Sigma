@@ -102,7 +102,7 @@ int main(int argCount, char **argValues) {
 			glsys.Rotate(0.0f, 0.0f, 90.0f*deltaSec);
 		}*/
 
-		if (os->KeyUp('P', true)) { // Wireframe mode
+		if (os->KeyReleased('P', true)) { // Wireframe mode
 			if (!isWireframe) {
 				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 				isWireframe = true;
@@ -111,7 +111,7 @@ int main(int argCount, char **argValues) {
 				isWireframe = false;
 			}
 		}
-		if (os->KeyUp('M', true)) {
+		if (os->KeyReleased('M', true)) {
 			os->ToggleFullscreen();
 			glsys.SetViewportSize(os->GetWindowWidth(), os->GetWindowHeight());
 		}

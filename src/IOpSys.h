@@ -61,6 +61,15 @@ public:
 	virtual bool KeyDown(int key, bool focused = false) = 0;
 
 	/**
+	 * \brief Polls to see if the specified key is up.
+	 *
+	 * \param[in/out] int key The key to poll.
+	 * \param[in/out] bool focused If the check should be made only when the window has focus.
+	 * \returns   bool True if the key is up, false otherwise.
+	 */
+	virtual bool KeyUp(int key, bool focused = false) = 0;
+
+	/**
 	 * \brief Polls to see if the specified key was released since the last call to MessageLoop().
 	 *
 	 * \param[in/out] int key The key to poll.

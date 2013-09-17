@@ -115,8 +115,19 @@ bool SDLSys::KeyDown(int key, bool focused) {
 		return false;
 	}
 }
-
 bool SDLSys::KeyUp(int key, bool focused /*= false */) {
+	// Check if the focused bool is true, and that
+	// the window we are using has keyboard focus
+	if(focused && this->_Window == SDL_GetKeyboardFocus()) {
+		return !this->_KeyStates[key];
+	}
+	else {
+		return false;
+	}
+}
+
+
+bool SDLSys::KeyReleased(int key, bool focused /*= false */) {
 	if(focused && this->_Window == SDL_GetKeyboardFocus()) {
 		return this->_KeyReleased[key];
 	}
