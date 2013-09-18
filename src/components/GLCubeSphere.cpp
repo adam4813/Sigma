@@ -2,8 +2,10 @@
 #include <algorithm>
 #include <limits>
 
-#include "SDL/SDL.h"
-#include "SDL/SDL_image.h"
+//#include "SDL/SDL.h"
+//#include "SDL/SDL_image.h"
+
+#include "SOIL/SOIL.h"
 
 #include "GLCubeSphere.h"
 
@@ -81,7 +83,7 @@ void GLCubeSphere::InitializeBuffers() {
 
 void GLCubeSphere::LoadTexture(std::string texture_name) {
 	// albedo map
-	glGenTextures(1, &this->_cubeMap);
+	/*glGenTextures(1, &this->_cubeMap);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeMap);
 	
@@ -89,10 +91,21 @@ void GLCubeSphere::LoadTexture(std::string texture_name) {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);*/
 
 	// There are always six files
+	char filenames[6][100];
 	for(int i=0; i < 6; i++) {
+		sprintf_s(filenames[i], "%s%d.jpg", texture_name.c_str(), i+1);
+	}
+
+	this->_cubeMap = SOIL_load_OGL_cubemap(filenames[0], filenames[1], filenames[2], filenames[3], filenames[4], filenames[5], SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+
+	if( 0 == this->_cubeMap ) {
+		printf( "SOIL loading error: '%s'\n", SOIL_last_result() );
+	}
+	// There are always six files
+	/*for(int i=0; i < 6; i++) {
 		char filename[100];
 		sprintf_s(filename, "%s%d.jpg", texture_name.c_str(), i+1);
 		SDL_Surface *img=0;
@@ -104,12 +117,12 @@ void GLCubeSphere::LoadTexture(std::string texture_name) {
 		} else {
 			assert(0 && "Texture file did not load correctly.");
 		}
-	}
+	}*/
 
-	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+	//glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
 	// normal map
-	glGenTextures(1, &this->_cubeNormalMap);
+	/*glGenTextures(1, &this->_cubeNormalMap);
 	glActiveTexture(GL_TEXTURE0+1);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeNormalMap);
 	
@@ -117,25 +130,32 @@ void GLCubeSphere::LoadTexture(std::string texture_name) {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);*/
 
 	// There are always six files
 	for(int i=0; i < 6; i++) {
-		char filename[100];
-		sprintf_s(filename, "%s_nm%d.jpg", texture_name.c_str(), i+1);
-		SDL_Surface *img=0;
-		img = IMG_Load(filename);
+		sprintf_s(filenames[i], "%s_nm%d.jpg", texture_name.c_str(), i+1);
+	}
 
-		if(img) {
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+i,0,GL_RGB,img->w,img->h,0,GL_RGB,GL_UNSIGNED_BYTE,(img->pixels));
-			SDL_FreeSurface(img);
-		} else {
+	this->_cubeNormalMap = SOIL_load_OGL_cubemap(filenames[0], filenames[1], filenames[2], filenames[3], filenames[4], filenames[5], SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+
+	if( 0 == this->_cubeNormalMap ) {
+		// It's ok not to have a normal map
+		//printf( "SOIL loading error: '%s'\n", SOIL_last_result() );
+	}
+		//SDL_Surface *img=0;
+		//img = IMG_Load(filename);
+
+		//if(img) {
+			//glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+i,0,GL_RGB,img->w,img->h,0,GL_RGB,GL_UNSIGNED_BYTE,(img->pixels));
+			//SDL_FreeSurface(img);
+		//} else {
 			// some may not have normal maps
 			//assert(0 && "Texture file did not load correctly.");
-		}
-	}
+		//}
+	//}
 	
-	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+	//glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 }
 
 void GLCubeSphere::SubDivide(int levels) {

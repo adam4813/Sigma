@@ -28,9 +28,6 @@ public:
 	virtual unsigned int GetWindowWidth();
 	virtual unsigned int GetWindowHeight();
 
-	virtual unsigned int GetWindowWidth();
-	virtual unsigned int GetWindowHeight();
-
 private:
 	SDL_Window *_Window;
 	SDL_GLContext _Context;

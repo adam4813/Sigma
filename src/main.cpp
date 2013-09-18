@@ -1,5 +1,8 @@
 #include <iostream>
 
+#undef OS_Win32
+#define OS_SDL
+
 #include "systems/OpenGLSystem.h"
 #include "systems/SimplePhysics.h"
 #include "systems/FactorySystem.h"
@@ -7,9 +10,9 @@
 #include "components/ViewMover.h"
 #include "SCParser.h"
 
-#ifdef OS_Win32
+#if defined OS_Win32
 #include "os/win32/win32.h"
-#elif OS_SDL
+#elif defined OS_SDL
 #include "os/sdl/SDLSys.h"
 #endif
 
@@ -19,21 +22,23 @@ int main(int argCount, char **argValues) {
 	FactorySystem::getInstance().register_Factory(&glsys);
 	FactorySystem::getInstance().register_Factory(&physys);
 	IOpSys* os = nullptr;
-#ifdef OS_Win32
+#if defined OS_Win32
 	os = new win32();
-#elif OS_SDL
+#elif defined OS_SDL
 	os = new SDLSys();
 #endif
 
-	os->CreateGraphicsWindow(1024,768);
+	if(os->CreateGraphicsWindow(1024,768) == 0) {
+		std::cout << "Error creating window!" << std::endl;
+	}
 
 	const int* version = glsys.Start();
 	glsys.SetViewportSize(os->GetWindowWidth(), os->GetWindowHeight());
 
 	if (version[0] == -1) {
-		std::cout<< "Error starting OpenGL!"<<std::endl;
+		std::cout << "Error starting OpenGL!" << std::endl;
 	} else {
-		std::cout<<"OpenGL version: " << version[0] << "." << version[1] << std::endl;
+		std::cout << "OpenGL version: " << version[0] << "." << version[1] << std::endl;
 	}
 
 	Sigma::parser::SCParser parser;

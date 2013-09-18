@@ -1,4 +1,5 @@
 #include "win32.h"
+#include <assert.h>
 
 #include "GL/glew.h"
 #include "GL/wglew.h"
@@ -186,6 +187,7 @@ const int* win32::StartOpengGL() {
 		wglDeleteContext(tempContext);
 		wglMakeCurrent(this->hdc, this->hrc);
 	} else {
+		assert(0 && "Unable to create GL 3.x context.");
 		//It's not possible to make a GL 3.x context. Use the old style context (GL 2.1 and before)
 		this->hrc = tempContext;
 	}

@@ -6,8 +6,8 @@
 #include "GL/glew.h"
 #include "SDL/SDL_opengl.h"
 
-Sigma::event::KeyboardInputSystem IOpSys::KeyboardEventSystem;
-double IOpSys::curDelta;
+//Sigma::event::KeyboardInputSystem IOpSys::KeyboardEventSystem;
+//double IOpSys::curDelta;
 
 void* SDLSys::CreateGraphicsWindow(const unsigned int width, const unsigned int height) {
 	std::cout << "Creating Window using SDL..." << std::endl;
