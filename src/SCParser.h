@@ -38,7 +38,7 @@ namespace Sigma {
 // 
 // @entity2
 // ----------
-// # - The entity ID. e.g.
+// # - The ID of the entity or component that is closest above it. e.g.
 // #2
 // ----------
 // & - The type of the component to create. e.g.

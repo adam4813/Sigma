@@ -40,7 +40,7 @@ bool SCParser::Parse(const std::string& fname) {
 					Property p(propName);
 
 					if (propType == "f") {
-						p.Set<float>(atof(propValue.c_str()));
+						p.Set<float>(static_cast<float>(atof(propValue.c_str())));
 					}
 					else if (propType == "s") {
 						p.Set<std::string>(propValue);
@@ -48,6 +48,10 @@ bool SCParser::Parse(const std::string& fname) {
 					else if (propType == "i") {
 						p.Set<int>(atoi(propValue.c_str()));
 					}
+					c.properties.push_back(p);
+				} else if (line.substr(0,1) == "#") {
+					Property p("id");
+					p.Set<int>(atoi(line.substr(1).c_str()));
 					c.properties.push_back(p);
 				} else {
 					break;

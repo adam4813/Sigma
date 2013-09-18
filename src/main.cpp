@@ -1,12 +1,13 @@
 #include <iostream>
 
 #include "Systems/OpenGLSystem.h"
+#include "Controllers/GLSixDOFViewController.h"
 #include "SCParser.h"
 
 #ifdef OS_Win32
-#include "win32.h"
+#include "os/win32/win32.h"
 #else if OS_SDL
-#include "SDLSys.h"
+#include "os/sdl/SDLSys.h"
 #endif
 
 int main(int argCount, char **argValues) {
@@ -18,9 +19,10 @@ int main(int argCount, char **argValues) {
 	os = new SDLSys();
 #endif
 
-	os->CreateGraphicsWindow();
+	os->CreateGraphicsWindow(1024,768);
 
 	const int* version = glsys.Start();
+	glsys.SetViewportSize(os->GetWindowWidth(), os->GetWindowHeight());
 	
 	if (version[0] == -1) {
 		std::cout<< "Error starting OpenGL!"<<std::endl;
@@ -34,12 +36,15 @@ int main(int argCount, char **argValues) {
 		assert(0 && "Failed to load entities from file.");
 	}
 	
-	for (int i = 0; i < parser.EntityCount(); ++i) {
+	for (unsigned int i = 0; i < parser.EntityCount(); ++i) {
 		const Sigma::Parser::Entity* e = parser.GetEntity(i);
 		for (auto itr = e->components.begin(); itr != e->components.end(); ++itr) {
 			glsys.Factory(itr->type, e->id, const_cast<std::vector<Property>&>(itr->properties));
 		}
 	}
+
+	Sigma::event::handler::GLSixDOFViewController cameraController(&glsys);
+	IOpSys::KeybaordEventSystem.Register(&cameraController);
 
 	os->SetupTimer();
 	
@@ -61,7 +66,7 @@ int main(int argCount, char **argValues) {
 		//glsys.GetComponent(9)->Transform().Translate(glsys.GetView()->position);
 
 		// Translation keys
-		if (os->KeyDown('W', true)) { // Move forward
+		/*if (os->KeyDown('W', true)) { // Move forward
 			if (os->KeyDown('B', true)) {
 				glsys.Move(0.0f, 0.0f, 100.0f*deltaSec);
 				//glsys.GetComponent(8)->Transform().Translate(0.0f, 0.0f, 100.0f*deltaSec);
@@ -105,7 +110,7 @@ int main(int argCount, char **argValues) {
 			glsys.Rotate(0.0f, 0.0f, -90.0f * deltaSec);
 		} else if (os->KeyDown('T', true)) { // Roll right
 			glsys.Rotate(0.0f, 0.0f, 90.0f*deltaSec);
-		}
+		}*/
 
 		if (os->KeyUp('P', true)) { // Wireframe mode
 			if (!isWireframe) {
@@ -116,14 +121,9 @@ int main(int argCount, char **argValues) {
 				isWireframe = false;
 			}
 		}
-
-		if (glsys.Update(delta)) {
-			os->Present();
-		}
-
-		if (os->KeyDown('M', true)) { // Fullscreen mode
+		if (os->KeyUp('M', true)) {
 			os->ToggleFullscreen();
-			glsys.SetWindowDim(os->GetWindowWidth(), os->GetWindowHeight()); 
+			glsys.SetViewportSize(os->GetWindowWidth(), os->GetWindowHeight());
 		}
 	}
 	

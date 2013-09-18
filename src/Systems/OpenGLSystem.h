@@ -11,7 +11,7 @@
 #include "../IGLComponent.h"
 //class IGLComponent;
 
-class OpenGLSystem : public ISystem {
+class OpenGLSystem {
 public:
 	OpenGLSystem();
 
@@ -51,10 +51,11 @@ public:
 	/**
 	 * \brief Retrieve the component that belongs to the given entity ID
 	 * 
-	 * \param[in] int entityID
+	 * \param[in] const unsigned int entityID
+	 * \param[in] const unsigned int componentID
 	 * \returns   IComponent* The component that belongs to the entity ID or nullptr if no component exists for the given ID.
 	 */
-	IGLComponent* GetComponent(int entityID);
+	IGLComponent* GetComponent(const unsigned int entityID, const unsigned int componentID);
 
 	/**
 	 * \brief Move the camera around the world.
@@ -88,10 +89,17 @@ public:
 	void SetWindowDim(int width, int height) { this->windowWidth = width; this->windowHeight = height; }
 
 	IGLView *GetView() { return this->view; }
-private:
 
-	int windowWidth; // Store the width of our window  
-	int windowHeight; // Store the height of our window 
+	/**
+	 * \brief Sets the viewport width and height.
+	 *
+	 * \param[in/out] const unsigned int width
+	 * \param[in/out] const unsigned int height
+	 */
+	void SetViewportSize(const unsigned int width, const unsigned int height);
+private:
+	unsigned int windowWidth; // Store the width of our window  
+	unsigned int windowHeight; // Store the height of our window 
 
 	GLuint m_vaoID[2]; // two vertex array objects, one for each drawn object
 	GLuint m_vboID[3]; // three VBOs
@@ -101,5 +109,5 @@ private:
 	IGLView* view;
 
 	double deltaAccumulator;
-	std::map<int, std::vector<IGLComponent*>> components; // A mapping of entity ID to a vector containing all of it's components.
+	std::map<int, std::map<int, IGLComponent*>> components; // A mapping of entity ID to a mapping of component ID to component.
 };

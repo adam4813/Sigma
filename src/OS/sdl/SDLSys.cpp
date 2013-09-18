@@ -5,6 +5,9 @@
 #include "GL/glew.h"
 #include "SDL/SDL_opengl.h"
 
+Sigma::event::KeyboardInputSystem IOpSys::KeybaordEventSystem;
+double IOpSys::curDelta;
+
 void* SDLSys::CreateGraphicsWindow() {
 	std::cout << "Creating Window using SDL..." << std::endl;
 
@@ -31,14 +34,14 @@ void* SDLSys::CreateGraphicsWindow() {
 	return &this->_Context;
 }
 
-int SDLSys::GetWindowWidth() {
-	int width;
+unsigned int SDLSys::GetWindowWidth() {
+	unsigned int width;
 	SDL_GetWindowSize(this->_Window, &width, 0);
 	return width;
 }
 
-int SDLSys::GetWindowHeight() {
-	int height;
+unsigned int SDLSys::GetWindowHeight() {
+	unsigned int height;
 	SDL_GetWindowSize(this->_Window, 0, &height);
 	return height;
 }
@@ -113,6 +116,11 @@ bool SDLSys::KeyDown(int key, bool focused) {
 		return false;
 	}
 }
+
+bool SDLSys::KeyUp(int key, bool focused /*= false */) {
+	return true;
+}
+
 
 void SDLSys::Present() {
 	SDL_GL_SwapWindow(this->_Window);

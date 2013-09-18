@@ -3,7 +3,7 @@
 
 #include <map>
 
-#include "IOpSys.h"
+#include "../../IOpSys.h"
 #include "SDL/SDL.h"
 
 class SDLSys : public IOpSys {
@@ -20,11 +20,12 @@ public:
 	virtual double GetDeltaTime();
 	
 	virtual bool KeyDown(int key, bool focused = false);
-	
+	virtual bool KeyUp( int key, bool focused = false );
+
 	virtual void Present();
 
-	virtual int GetWindowWidth();
-	virtual int GetWindowHeight();
+	virtual unsigned int GetWindowWidth();
+	virtual unsigned int GetWindowHeight();
 
 private:
 	SDL_Window *_Window;

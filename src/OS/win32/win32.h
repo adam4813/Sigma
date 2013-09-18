@@ -1,13 +1,15 @@
 #pragma  once
 #include <windows.h>
-#include "IOpSys.h"
+#include "../../IOpSys.h"
 
 class win32 : public IOpSys {
 public:
 	win32() { }
 	~win32();
 
-	void* CreateGraphicsWindow();
+	void* CreateGraphicsWindow(const unsigned int width = 800, const unsigned int height = 600);
+
+	void ToggleFullscreen();
 
 	const int* StartOpengGL();
 
@@ -23,10 +25,9 @@ public:
 
 	void Present();
 
-	// Stubbed out for now
-	virtual void ToggleFullscreen() {}
-	virtual int GetWindowWidth() { return 800; }
-	virtual int GetWindowHeight() { return 600; }
+	virtual unsigned int GetWindowWidth();
+	virtual unsigned int GetWindowHeight();
+
 private:
 	HWND hwnd; // The current window handle.
 	HGLRC hrc; // OpenGL Rendering Context.
@@ -39,4 +40,7 @@ private:
 
 	int OpenGLVersion[2];
 	static int keyUp[256];
+
+	bool fullscreen;
+	RECT windowedSize;
 };

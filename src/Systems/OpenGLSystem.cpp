@@ -12,9 +12,9 @@ OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumul
 
 OpenGLSystem::~OpenGLSystem() {
 	delete this->view;
-	for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {
-		for (auto vecitr = mapitr->second.begin(); vecitr < mapitr->second.end(); ++vecitr) {
-			delete *vecitr;
+	for (auto eitr = this->components.begin(); eitr != this->components.end(); ++eitr) {
+		for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
+			delete citr->second;
 		}
 	}
 }
@@ -26,7 +26,7 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		if (entityID == 2) {
 			spr->Transform().Translate(2,2,0);
 		}
-		this->components[entityID].push_back(spr);
+		this->components[entityID][0] = spr;
 		spr->Transform().Translate(0,0,0);
 		return spr;
 	} else if (type == "GLIcoSphere") {
@@ -36,6 +36,7 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		float x = 0.0f;
 		float y = 0.0f;
 		float z = 0.0f;
+		int componentID = 0;
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			Property*  p = &(*propitr);
 			if (p->GetName() == "scale") {
@@ -50,11 +51,13 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 			} else if (p->GetName() == "z") {
 				z = p->Get<float>();
 				continue;
+			} else if (p->GetName() == "id") {
+				componentID = p->Get<int>();
 			}
 		}
 		sphere->Transform().Scale(scale,scale,scale);
 		sphere->Transform().Translate(x,y,z);
-		this->components[entityID].push_back(sphere);
+		this->components[entityID][componentID] = sphere;
 		return sphere;
 	} else if (type == "GLCubeSphere") {
 		GLCubeSphere* sphere = new GLCubeSphere(entityID);
@@ -66,6 +69,7 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		float x = 0.0f;
 		float y = 0.0f;
 		float z = 0.0f;
+		int componentID = 0;
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			Property*  p = &(*propitr);
 			if (p->GetName() == "scale") {
@@ -86,6 +90,8 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 				texture_name = p->Get<std::string>();
 			} else if (p->GetName() == "shader") {
 				shader_name = p->Get<std::string>();
+			} else if (p->GetName() == "id") {
+				componentID = p->Get<int>();
 			}
 		}
 
@@ -97,7 +103,8 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		sphere->Transform().Scale(scale,scale,scale);
 		sphere->Transform().Translate(x,y,z);
 
-		this->components[entityID].push_back(sphere);
+		this->components[entityID][componentID] = sphere;
+
 		return sphere;
 	} else if (type=="GLMesh") {
 		GLMesh* mesh = new GLMesh(entityID);
@@ -105,6 +112,7 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		float x = 0.0f;
 		float y = 0.0f;
 		float z = 0.0f;
+		int componentID = 0;
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			Property*  p = &*propitr;
 			if (p->GetName() == "scale") {
@@ -121,12 +129,14 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 				continue;
 			} else if (p->GetName() == "meshFile") {
 				mesh->LoadMesh(p->Get<std::string>());
+			} else if (p->GetName() == "id") {
+				componentID = p->Get<int>();
 			}
 		}
 		mesh->Initialize();
 		mesh->Transform().Scale(scale,scale,scale);
 		mesh->Transform().Translate(x,y,z);
-		this->components[entityID].push_back(mesh);
+		this->components[entityID][componentID] = mesh;
 	}
 	return nullptr;
 }
@@ -137,6 +147,7 @@ bool OpenGLSystem::Update(const double delta) {
 
 	// Check if the deltaAccumulator is greater than 1/60 of a second.
 	if (deltaAccumulator > 16.7) {
+		this->view->UpdateViewMatrix();
 		// Set up the scene to a "clean" state.
 		glClearColor(0.0f,0.0f,0.0f,0.0f);
 		glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window  
@@ -144,9 +155,9 @@ bool OpenGLSystem::Update(const double delta) {
 
 		// Set the ViewProjection matrix to be used in the shader.
 		// Loop through and draw each component.
-		for (auto mapitr = this->components.begin(); mapitr != this->components.end(); ++mapitr) {
-			for (auto vecitr = mapitr->second.begin(); vecitr < mapitr->second.end(); ++vecitr) {
-				(*vecitr)->Update(&this->view->ViewMatrix[0][0], &this->ProjectionMatrix[0][0]);
+		for (auto eitr = this->components.begin(); eitr != this->components.end(); ++eitr) {
+			for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
+				citr->second->Update(&this->view->ViewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 			}
 		}
 
@@ -156,9 +167,11 @@ bool OpenGLSystem::Update(const double delta) {
 	return false;
 }
 
-IGLComponent* OpenGLSystem::GetComponent(int entityID) {
+IGLComponent* OpenGLSystem::GetComponent(const unsigned int entityID, const unsigned int componentID) {
 	if (this->components.find(entityID) != this->components.end()) {
-		return this->components[entityID][0];
+		if (this->components.at(entityID).find(componentID) != this->components.at(entityID).end()) {
+			return this->components[entityID][componentID];
+		}
 	}
 	return nullptr;
 }
@@ -178,9 +191,9 @@ const int* OpenGLSystem::Start() {
 	// Generates a floatly hard-to-read matrix, but a normal, standard 4x4 matrix nonetheless
 	this->ProjectionMatrix = glm::perspective(
 		45.0f,
-		4.0f / 3.0f,
-		1.0f,
-		5000000.0f
+		(float)this->windowWidth / (float)this->windowHeight,
+		0.1f,
+		10000.0f
 		);
 
 	this->view->Move(4.0f,3.0f,-10.f);
@@ -199,4 +212,15 @@ void OpenGLSystem::Move(float x, float y, float z) {
 
 void OpenGLSystem::Rotate(float x, float y, float z) {
 	this->view->Rotate(x,y,z);
+}
+
+void OpenGLSystem::SetViewportSize(const unsigned int width, const unsigned int height) {
+	this->windowHeight = height;
+	this->windowWidth = width;
+	this->ProjectionMatrix = glm::perspective(
+		45.0f,
+		(float)this->windowWidth / (float)this->windowHeight,
+		0.1f,
+		10000.0f
+		);
 }
