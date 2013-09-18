@@ -7,7 +7,7 @@
 #include "../components/GLMesh.h"
 
 OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumulator(0.0) {
-	this->view = new GLSixDOFView(); 
+	this->view = new GLSixDOFView();
 }
 
 OpenGLSystem::~OpenGLSystem() {
@@ -19,8 +19,21 @@ OpenGLSystem::~OpenGLSystem() {
 	}
 }
 
-IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
-	if (type == "GLSprite") {
+std::map<std::string,IFactory::FactoryFunction>
+        OpenGLSystem::getFactoryFunctions()
+{
+    using namespace std::placeholders;
+    std::map<std::string,IFactory::FactoryFunction> retval=
+    {
+        {"GLSprite",std::bind(&OpenGLSystem::createGLSprite,this,_1,_2,_3)},
+        {"GLIcoSphere",std::bind(&OpenGLSystem::createGLIcoSphere,this,_1,_2,_3)},
+        {"GLCubeSphere",std::bind(&OpenGLSystem::createGLCubeSphere,this,_1,_2,_3)},
+        {"GLMesh",std::bind(&OpenGLSystem::createGLMesh,this,_1,_2,_3)}
+    };
+    return retval;
+}
+
+void OpenGLSystem::createGLSprite(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
 		GLSprite* spr = new GLSprite(entityID);
 		spr->InitializeBuffers();
 		if (entityID == 2) {
@@ -28,8 +41,9 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		}
 		this->components[entityID][0] = spr;
 		spr->Transform()->Translate(0,0,0);
-		return spr;
-	} else if (type == "GLIcoSphere") {
+}
+
+void OpenGLSystem::createGLIcoSphere(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
 		GLIcoSphere* sphere = new GLIcoSphere(entityID);
 		sphere->InitializeBuffers();
 		float scale = 1.0f;
@@ -58,8 +72,9 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		sphere->Transform()->Scale(scale,scale,scale);
 		sphere->Transform()->Translate(x,y,z);
 		this->components[entityID][componentID] = sphere;
-		return sphere;
-	} else if (type == "GLCubeSphere") {
+}
+
+void OpenGLSystem::createGLCubeSphere(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
 		GLCubeSphere* sphere = new GLCubeSphere(entityID);
 		sphere->InitializeBuffers();
 		float scale = 1.0f;
@@ -88,9 +103,9 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		sphere->Transform()->Scale(scale,scale,scale);
 		sphere->Transform()->Translate(x,y,z);
 		this->components[entityID][componentID] = sphere;
-		return sphere;
-	} else if (type=="GLMesh") {
-		GLMesh* mesh = new GLMesh(entityID);
+}
+void OpenGLSystem::createGLMesh(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
+        GLMesh* mesh = new GLMesh(entityID);
 		float scale = 1.0f;
 		float x = 0.0f;
 		float y = 0.0f;
@@ -120,8 +135,6 @@ IGLComponent* OpenGLSystem::Factory(const std::string type, const unsigned int e
 		mesh->Transform()->Scale(scale,scale,scale);
 		mesh->Transform()->Translate(x,y,z);
 		this->components[entityID][componentID] = mesh;
-	}
-	return nullptr;
 }
 
 bool OpenGLSystem::Update(const double delta) {
@@ -131,7 +144,7 @@ bool OpenGLSystem::Update(const double delta) {
 		this->view->UpdateViewMatrix();
 		// Set up the scene to a "clean" state.
 		glClearColor(0.0f,0.0f,0.0f,0.0f);
-		glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window  
+		glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
 		// Set the ViewProjection matrix to be used in the shader.
