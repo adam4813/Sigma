@@ -32,7 +32,7 @@ public:
 	 * \param[in] int entityID The entity this component belongs to.
 	 * \returns IGLCompoent* the newly created component.
 	 */
-	virtual void Initialize() = 0;
+	virtual void InitializeBuffers() = 0;
 
 
 	/**
@@ -70,7 +70,7 @@ public:
 	 *
 	 * \returns GLTransform& The transform object.
 	 */
-	GLTransform& Transform() { return transform; }
+	GLTransform* Transform() { return &transform; }
 
 	unsigned int Vao() const { return this->vao; }
 

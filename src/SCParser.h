@@ -5,7 +5,7 @@
 class Property;
 
 namespace Sigma {
-	namespace Parser {
+	namespace parser {
 		/**
 		 * The component creation properties.
 		 */
@@ -21,8 +21,6 @@ namespace Sigma {
 			int id;
 			std::string name;
 		};
-	}
-}
 
 // SC files contain data for Sigma Component creation
 // Each line begins with a key. These keys describe the rest of the line.
@@ -91,8 +89,10 @@ public:
 	 * \returns   const Entity* The entity from the list or nullptr if the index is OOB.
 	 * \exception  
 	 */
-	const Sigma::Parser::Entity* GetEntity(const unsigned int index);
+	const Sigma::parser::Entity* GetEntity(const unsigned int index);
 private:
-	std::vector<Sigma::Parser::Entity> entities;
+	std::vector<Sigma::parser::Entity> entities;
 	std::string fname;
 };
+	}
+}

@@ -1,21 +1,27 @@
 #include <iostream>
 
-#include "Systems/OpenGLSystem.h"
-#include "Controllers/GLSixDOFViewController.h"
+#include "systems/OpenGLSystem.h"
+#include "systems/SimplePhysics.h"
+#include "systems/FactorySystem.h"
+#include "controllers/GLSixDOFViewController.h"
+#include "components/ViewMover.h"
 #include "SCParser.h"
 
 #ifdef OS_Win32
 #include "os/win32/win32.h"
-#else if OS_SDL
+#elif OS_SDL
 #include "os/sdl/SDLSys.h"
 #endif
 
 int main(int argCount, char **argValues) {
 	OpenGLSystem glsys;
+	SimplePhysics physys;
+	FactorySystem::getInstance().register_Factory(&glsys);
+	FactorySystem::getInstance().register_Factory(&physys);
 	IOpSys* os = nullptr;
 #ifdef OS_Win32
 	os = new win32();
-#else if OS_SDL
+#elif OS_SDL
 	os = new SDLSys();
 #endif
 
@@ -23,31 +29,37 @@ int main(int argCount, char **argValues) {
 
 	const int* version = glsys.Start();
 	glsys.SetViewportSize(os->GetWindowWidth(), os->GetWindowHeight());
-	
+
 	if (version[0] == -1) {
 		std::cout<< "Error starting OpenGL!"<<std::endl;
 	} else {
 		std::cout<<"OpenGL version: " << version[0] << "." << version[1] << std::endl;
 	}
 
-	SCParser parser;
+	Sigma::parser::SCParser parser;
 
 	if (!parser.Parse("../../test.sc")) {
 		assert(0 && "Failed to load entities from file.");
 	}
 	
 	for (unsigned int i = 0; i < parser.EntityCount(); ++i) {
-		const Sigma::Parser::Entity* e = parser.GetEntity(i);
+		const Sigma::parser::Entity* e = parser.GetEntity(i);
 		for (auto itr = e->components.begin(); itr != e->components.end(); ++itr) {
-			glsys.Factory(itr->type, e->id, const_cast<std::vector<Property>&>(itr->properties));
+            FactorySystem::getInstance().create(
+                        itr->type,e->id,
+                        const_cast<std::vector<Property>&>(itr->properties));
 		}
 	}
 
-	Sigma::event::handler::GLSixDOFViewController cameraController(&glsys);
-	IOpSys::KeybaordEventSystem.Register(&cameraController);
+	std::vector<Property> props;
+	physys.createViewMover("ViewMover", 9, props);
+	ViewMover* mover = reinterpret_cast<ViewMover*>(physys.GetComponent(9));
+
+	Sigma::event::handler::GLSixDOFViewController cameraController(glsys.View(), mover);
+	IOpSys::KeyboardEventSystem.Register(&cameraController);
 
 	os->SetupTimer();
-	
+
 	double delta;
 	bool isWireframe=false;
 
@@ -81,25 +93,25 @@ int main(int argCount, char **argValues) {
 			glsys.Move(0.0f, 0.0f, -10.0f*deltaSec);
 			//glsys.GetComponent(8)->Transform().Translate(0.0f, 0.0f, -10.0f*deltaSec);
 		}
-		
-		if (os->KeyDown('A', true)) { 
+
+		if (os->KeyDown('A', true)) {
 			glsys.Rotate(0.0f, -90.0f*deltaSec, 0.0f); // Yaw left.
 		} else if (os->KeyDown('D', true)) {
 			glsys.Rotate(0.0f, 90.0f*deltaSec, 0.0f); // Yaw right.
 		}
-		
-		if (os->KeyDown('F', true)) { 
+
+		if (os->KeyDown('F', true)) {
 			glsys.Move(-10.0f*deltaSec, 0.0f, 0.0f); // Strafe Left
 		} else if (os->KeyDown('G', true)) {
 			glsys.Move(10.0f*deltaSec, 0.0f, 0.0f); // Strafe Right
 		}
-		
+
 		if (os->KeyDown('E', true)) { // Move up
 			glsys.Move(0.0f, 10.0f*deltaSec, 0.0f);
 		} else if (os->KeyDown('C', true)) { // Move down
 			glsys.Move(0.0f, -10.0f*deltaSec, 0.0f);
 		}
-		
+
 		if (os->KeyDown('Q', true)) { // Pitch Up
 			glsys.Rotate(-90.0f * deltaSec, 0.0f, 0.0f);
 		} else if (os->KeyDown('Z', true)) { // Pitch Down
@@ -112,7 +124,7 @@ int main(int argCount, char **argValues) {
 			glsys.Rotate(0.0f, 0.0f, 90.0f*deltaSec);
 		}*/
 
-		if (os->KeyUp('P', true)) { // Wireframe mode
+		if (os->KeyReleased('P', true)) { // Wireframe mode
 			if (!isWireframe) {
 				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 				isWireframe = true;
@@ -121,12 +133,18 @@ int main(int argCount, char **argValues) {
 				isWireframe = false;
 			}
 		}
-		if (os->KeyUp('M', true)) {
+		if (os->KeyReleased('M', true)) {
 			os->ToggleFullscreen();
 			glsys.SetViewportSize(os->GetWindowWidth(), os->GetWindowHeight());
 		}
+
+		physys.Update(delta);
+
+		if (glsys.Update(delta)) {
+			os->Present();
+		}
 	}
-	
+
 	delete os;
 
 	return 0;
