@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <map>
 #include <vector>
+#include <string>
 
 class IComponent;
 

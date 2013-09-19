@@ -1,6 +1,3 @@
-#include <iostream>
-#include <cstring>
-
 #include "SDLSys.h"
 
 #include "GL/glew.h"
