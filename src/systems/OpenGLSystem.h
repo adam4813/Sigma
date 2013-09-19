@@ -2,6 +2,7 @@
 
 #include "../Property.h"
 #include "../IFactory.h"
+#include "../ISystem.h"
 
 #include "GL/glew.h"
 #include "glm/glm.hpp"
@@ -11,7 +12,7 @@ struct IGLView;
 class IGLComponent;
 
 class OpenGLSystem
-    : public IFactory {
+    : public IFactory, public ISystem<IGLComponent> {
 public:
 	OpenGLSystem();
 
@@ -36,15 +37,6 @@ public:
 	 * \returns bool Returns true if we had an update interval passed.
 	 */
 	bool Update(const double delta);
-
-	/**
-	 * \brief Retrieve the component that belongs to the given entity ID
-	 *
-	 * \param[in] const unsigned int entityID
-	 * \param[in] const unsigned int componentID
-	 * \returns   IComponent* The component that belongs to the entity ID or nullptr if no component exists for the given ID.
-	 */
-	IGLComponent* GetComponent(const unsigned int entityID, const unsigned int componentID);
 
 	/**
 	 * \brief Move the camera around the world.
@@ -95,5 +87,4 @@ private:
 	glm::mat4 ProjectionMatrix;
 	IGLView* view;
 	double deltaAccumulator;
-	std::map<int, std::map<int, IGLComponent*> > components; // A mapping of entity ID to a mapping of component ID to component.
 };

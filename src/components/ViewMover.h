@@ -7,9 +7,10 @@ struct IGLView;
 
 class ViewMover : public IMoverComponent {
 public:
+    SET_COMPONENT_ID("ViewMover");
 	ViewMover() : IMoverComponent(0) { }
 	ViewMover(const int entityID);
-	
+
 	/**
 	 * \brief Apply all forces in this mover's list.
 	 *

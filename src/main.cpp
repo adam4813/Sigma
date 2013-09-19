@@ -37,7 +37,6 @@ int main(int argCount, char **argValues) {
 	}
 
 	Sigma::parser::SCParser parser;
-
 	parser.Parse("test.sc");
 
 	for (unsigned int i = 0; i < parser.EntityCount(); ++i) {
@@ -51,8 +50,7 @@ int main(int argCount, char **argValues) {
 
 	std::vector<Property> props;
 	physys.createViewMover("ViewMover", 9, props);
-	ViewMover* mover = reinterpret_cast<ViewMover*>(physys.GetComponent(9));
-
+	ViewMover* mover = reinterpret_cast<ViewMover*>(physys.getComponent(9,ViewMover::getStaticComponentID()));
 	Sigma::event::handler::GLSixDOFViewController cameraController(glsys.View(), mover);
 	IOpSys::KeyboardEventSystem.Register(&cameraController);
 

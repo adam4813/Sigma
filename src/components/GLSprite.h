@@ -5,6 +5,7 @@
 
 class GLSprite : public IGLComponent {
 public:
+    SET_COMPONENT_ID("GLSprite");
 	// We have a private ctor so the factory method must be used.
 	GLSprite(const int entityID = 0);
 	/**

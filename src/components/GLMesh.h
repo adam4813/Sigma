@@ -31,6 +31,7 @@ struct material {
 
 class GLMesh : public IGLComponent {
 public:
+    SET_COMPONENT_ID("GLMesh");
 	GLMesh(const int entityID); // Ctor that sets the entity ID.
 	/**
 	 * \brief Creates a new IGLComponent.
@@ -65,7 +66,7 @@ public:
 
 	/**
 	 * \brief Add a vertex to the list.
-	 * 
+	 *
 	 * \param[in] const Sigma::Vertex & v The vertex to add. It is copied.
 	 */
 	void AddVertex(const Sigma::Vertex& v) {
@@ -89,13 +90,13 @@ public:
 
 	/**
 	 * \brief Add a face to the list.
-	 * 
+	 *
 	 * \param[in] const Sigma::Face & f The face to add. It is copied.
 	 */
 	void AddFace(const Sigma::Face& f) {
 		this->faces.push_back(f);
 	}
-		
+
 	/**
 	 * \brief Gets a face.
 	 *
@@ -137,7 +138,7 @@ public:
 
 	/**
 	 * \brief Add a vertex normal to the list.
-	 * 
+	 *
 	 * \param[in] const Sigma::Vertex & v The vertex normal to add. It is copied.
 	 */
 	void AddVertexNormal(const Sigma::Vertex& vn) {
@@ -146,7 +147,7 @@ public:
 
 	/**
 	 * \brief Add a vertex color to the list.
-	 * 
+	 *
 	 * \param[in] const Sigma::Vertex & v The vertex color to add. It is copied.
 	 */
 	void AddVertexColor(const Sigma::Color& c) {
