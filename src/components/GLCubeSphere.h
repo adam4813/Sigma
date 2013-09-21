@@ -62,7 +62,8 @@ public:
 	void LoadTexture(std::string texture_name);
 
 	void SetSubdivisions(int levels) { this->_subdivisionLevels = levels; }
-
+	void SetRotationSpeed(float rot_speed) { this->rotation_speed = rot_speed; }
+	void SetFixToCamera(bool fix_to_camera) { this->fix_to_camera = fix_to_camera; }
 private:
 
 	std::vector<Sigma::Face> faces;			// The faces for this IcoSphere. Can be used for later refinement.
@@ -70,4 +71,8 @@ private:
 
 	GLuint _cubeMap, _cubeNormalMap;
 	int _subdivisionLevels;
+	float rotation_speed;
+
+	// Special setting for skyboxes
+	bool fix_to_camera;
 };

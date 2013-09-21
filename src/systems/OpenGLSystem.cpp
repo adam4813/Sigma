@@ -85,7 +85,10 @@ void OpenGLSystem::createGLCubeSphere(const std::string type, const unsigned int
 
 		std::string texture_name = "";
 		std::string shader_name = "";
+		std::string cull_face = "back";
 		int subdivision_levels = 1;
+		float rotation_speed = 0.0f;
+		bool fix_to_camera = false;
 
 		float scale = 1.0f;
 		float x = 0.0f;
@@ -114,9 +117,18 @@ void OpenGLSystem::createGLCubeSphere(const std::string type, const unsigned int
 				shader_name = p->Get<std::string>();
 			} else if (p->GetName() == "id") {
 				componentID = p->Get<int>();
+			} else if (p->GetName() == "cullface") {
+				cull_face = p->Get<std::string>();
+			} else if (p->GetName() == "rotation_speed") {
+				rotation_speed = p->Get<float>();
+			} else if (p->GetName() == "fix_to_camera") {
+				fix_to_camera = p->Get<bool>();
 			}
 		}
 
+		sphere->SetFixToCamera(fix_to_camera);
+		sphere->SetRotationSpeed(rotation_speed);
+		sphere->SetCullFace(cull_face);
 		sphere->SetSubdivisions(subdivision_levels);
 		sphere->LoadShader(shader_name);
 		sphere->InitializeBuffers();
@@ -222,6 +234,8 @@ const int* OpenGLSystem::Start() {
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 	glEnable(GL_MULTISAMPLE_ARB);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 
 	return OpenGLVersion;
 }

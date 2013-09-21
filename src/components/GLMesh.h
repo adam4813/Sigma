@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include "../GLTransform.h"
 #include "../IGLComponent.h"
+#include <stdexcept>
 #include <vector>
 #include <map>
 

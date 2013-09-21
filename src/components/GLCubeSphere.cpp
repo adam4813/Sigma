@@ -248,8 +248,8 @@ void GLCubeSphere::SubDivide(int levels) {
 
 void GLCubeSphere::LoadShader(std::string shader_name) {
 	char vertex_shader[100], fragment_shader[100];
-	sprintf_s(vertex_shader, "..\\..\\shaders\\%s.vert", shader_name.c_str());
-	sprintf_s(fragment_shader, "..\\..\\shaders\\%s.frag", shader_name.c_str());
+	sprintf_s(vertex_shader, "../../shaders/%s.vert", shader_name.c_str());
+	sprintf_s(fragment_shader, "../../shaders/%s.frag", shader_name.c_str());
 
 	this->_shader.LoadFromFile(GL_VERTEX_SHADER, vertex_shader);
 	this->_shader.LoadFromFile(GL_FRAGMENT_SHADER, fragment_shader);
@@ -259,7 +259,24 @@ void GLCubeSphere::LoadShader(std::string shader_name) {
 void GLCubeSphere::Update(glm::mediump_float *view, glm::mediump_float *proj) {
 	this->_shader.Use();
 	
-	this->Transform()->Rotate(0.0f,0.01f,0.0f);
+	if(this->fix_to_camera) {
+		glm::mediump_float *view_ptr = view;
+		glm::mat4 view_matrix;
+	
+		for(int i=0; i < 4; i++) {
+			for(int j=0; j < 4; j++) {
+				view_matrix[i][j] = (*view_ptr++);
+			}
+		}
+
+		// Extract position from view matrix
+		glm::mat3 rotMat(view_matrix);
+		glm::vec3 d(view_matrix[3]);
+		glm::vec3 position = -d * rotMat;
+		this->Transform()->TranslateTo(position);
+	}
+
+	this->Transform()->Rotate(0.0f,this->rotation_speed,0.0f);
 
 	glUniform1i(glGetUniformLocation(this->_shader.GetProgram(), "cubeMap"), GL_TEXTURE0);
 	glUniform1i(glGetUniformLocation(this->_shader.GetProgram(), "cubeNormMap"), GL_TEXTURE0+1);
@@ -277,6 +294,9 @@ void GLCubeSphere::Update(glm::mediump_float *view, glm::mediump_float *proj) {
 	glActiveTexture(GL_TEXTURE0+1);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeNormalMap);
 
+	glCullFace(this->cull_face);
+	glDepthFunc(GL_LEQUAL);
+
 	for (int i = 0, cur = this->MeshGroup_ElementCount(0), prev = 0; cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
 		glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_SHORT, (void*)prev);
 	}
@@ -284,6 +304,8 @@ void GLCubeSphere::Update(glm::mediump_float *view, glm::mediump_float *proj) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	glCullFace(GL_BACK);
+	glDepthFunc(GL_LESS);
 	
 	this->_shader.UnUse();
 }

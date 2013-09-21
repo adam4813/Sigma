@@ -1,6 +1,8 @@
 #ifndef SDL_SYS_H
 #define SDL_SYS_H
 
+#include <iostream>
+#include <cstring>
 #include <map>
 
 #include "../../IOpSys.h"
