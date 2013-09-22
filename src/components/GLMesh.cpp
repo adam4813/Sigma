@@ -1,5 +1,7 @@
 #include "GLMesh.h"
 #include "GL/glew.h"
+#include <map>
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -16,7 +18,7 @@ GLMesh::GLMesh(const int entityID) : IGLComponent(entityID) {
 }
 
 void GLMesh::InitializeBuffers() {
-	// We must create a vao and then store it in our GLIcoSphere.
+	// We must create a vao and then store it in our GLMesh.
 	if (this->vao == 0) {
 		glGenVertexArrays(1, &this->vao); // Generate the VAO
 	}
@@ -64,6 +66,8 @@ void GLMesh::InitializeBuffers() {
 }
 
 void GLMesh::Update(glm::mediump_float *view, glm::mediump_float *proj) {
+	this->Transform()->Rotate(0.0f, 1.0f, 0.0f);
+
 	GLIcoSphere::shader.Use();
 	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &this->Transform()->ModelMatrix()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_View"), 1, GL_FALSE, view);
@@ -89,69 +93,115 @@ void GLMesh::Update(glm::mediump_float *view, glm::mediump_float *proj) {
 	GLIcoSphere::shader.UnUse();
 }
 
-void GLMesh::LoadMesh(std::string fname) {
-	Sigma::Color current_color(0.0f, 0.0f, 0.0f);
+bool operator ==(const VertexIndices &lhs, const VertexIndices &rhs) { 
+	return (lhs.vertex==rhs.vertex && 
+			lhs.normal==rhs.normal && 
+			lhs.uv==rhs.uv && 
+			lhs.color==rhs.color);
+}
 
+void GLMesh::LoadMesh(std::string fname) {
+	unsigned int current_color = 0;
+
+	std::vector<FaceIndices> temp_face_indices;
+	std::vector<VertexIndices> unique_vertices;
+
+	std::vector<Sigma::Vertex> temp_verts;
+	std::vector<texCoord> temp_uvs;
+	std::vector<Sigma::Vertex> temp_normals;
+	std::vector<Sigma::Color> temp_colors;
+	std::string line;
+
+	// Attempt to load file
 	std::ifstream in(fname, std::ios::in);
+	
 	if (!in) {
 		std::cerr << "Cannot open " << fname << std::endl;
 		return;
 	}
 
-	std::string line;
+	// Default color if no material is provided is white
+	temp_colors.push_back(Sigma::Color(1.0f, 1.0f, 1.0f));
+
+	// Parse line by line
 	while (getline(in, line)) {
 		if (line.substr(0,2) == "v ") { // Vertex position
 			float x,y,z;
 			std::istringstream s(line.substr(2));
 			s >> x; s >> y; s >> z;
-			this->verts.push_back(Sigma::Vertex(x, y, z));
-			//this->colors.push_back(current_color);
-			//this->colors.push_back(Sigma::Color(1.0f, 0.0f, 0.0f));
-		}  else if (line.substr(0,2) == "f ") { // Face
+			temp_verts.push_back(Sigma::Vertex(x, y, z));
+		}  else if (line.substr(0,2) == "vt") { //  Vertex tex coord
+			float u, v = 0.0f;
+			std::istringstream s(line.substr(2));
+			s >> u; s >> v;
+			temp_uvs.push_back(texCoord(u,v));
+		}  else if (line.substr(0,2) == "vn") { // Vertex normal
+			float x, y, z;
+			std::istringstream s(line.substr(2));
+			s >> x; s >> y; s >> z;
+			temp_normals.push_back(Sigma::Vertex(x,y,z));
+		}
+		else if (line.substr(0,2) == "f ") { // Face
+			FaceIndices current_face;
+			bool has_vert_indices=false, has_uv_indices=false, has_normal_indices=false;
 			short indicies[3][3];
+
 			std::string cur = line.substr(2, line.find(' ', 2) - 2);
 			std::string left = line.substr(line.find(' ', 2) + 1);
 
 			for (int i = 0; i < 3; ++i) { // Each face contains 3 sets of indicies. Each set is 3 indicies v/t/n.
 				std::string first = cur.substr(0, cur.find('/')); // Substring for the v portion
 				indicies[i][0] = atoi(first.c_str());
+				has_vert_indices=true;
 				if ((cur.find('/') + 1) != cur.find('/', cur.find('/') + 1)) { // Check if we have a t portion
 					std::string second = cur.substr(cur.find('/') + 1, cur.find('/', cur.find('/') + 1)); // Substring for the t portion
 					indicies[i][1] = atoi(second.c_str());
+					has_uv_indices=true;
 				} else {
 					indicies[i][1] = 0;
 				}
 				if (cur.find('/', cur.find('/')) != cur.find_last_of('/')) { // Check if we have an n portion
 					std::string third = cur.substr(cur.find_last_of('/') + 1); // Substring for the n portion
 					indicies[i][2] = atoi(third.c_str());
+					has_normal_indices=true;
 				} else {
 					indicies[i][2] = 0;
 				}
 				cur = left.substr(0, left.find(' '));
 				left = left.substr(left.find(' ') + 1);
 			}
-			GLushort a,b,c;
-			a = indicies[0][0]; b = indicies[1][0]; c = indicies[2][0];
-			a--; b--; c--;
-			GLushort ta,tb,tc;
-			ta = indicies[0][1]; tb = indicies[1][1]; tc = indicies[2][1];
-			ta--; tb--; tc--;
-			GLushort na,nb,nc;
-			na = indicies[0][2]; nb = indicies[1][2]; nc = indicies[2][2];
-			na--; nb--; nc--;
-			this->faces.push_back(Sigma::Face(a,b,c));
-		}  else if (line.substr(0,2) == "vt") { //  Vertex tex coord
-			float u, v = 0.0f;
-			std::istringstream s(line.substr(2));
-			s >> u; s >> v;
-			this->texCoords.push_back(texCoord(u,v));
-		}  else if (line.substr(0,2) == "vn") { // Vertex normal
-			float i, j, k;
-			std::istringstream s(line.substr(2));
-			s >> i; s >> j; s >> k;
-			this->vertNorms.push_back(Sigma::Vertex(i,j,k));
+			if(has_vert_indices) {
+				GLushort a,b,c;
+				a = indicies[0][0] - 1; b = indicies[1][0] - 1; c = indicies[2][0] - 1;
+				current_face.v[0].vertex = a;
+				current_face.v[1].vertex = b;
+				current_face.v[2].vertex = c;
+			}
+			if(has_uv_indices) {
+				GLushort ta,tb,tc;
+				ta = indicies[0][1] - 1; tb = indicies[1][1] - 1; tc = indicies[2][1] - 1;
+				current_face.v[0].uv = ta;
+				current_face.v[1].uv = tb;
+				current_face.v[2].uv = tc;
+			}
+			if(has_normal_indices) {
+				GLushort na,nb,nc;
+				na = indicies[0][2] - 1; nb = indicies[1][2] - 1; nc = indicies[2][2] - 1;
+				current_face.v[0].normal = na;
+				current_face.v[1].normal = nb;
+				current_face.v[2].normal = nc;
+			}
+
+			// Add index to currently active color
+			current_face.v[0].color = current_color;
+			current_face.v[1].color = current_color;
+			current_face.v[2].color = current_color;
+
+			// Store the face
+			temp_face_indices.push_back(current_face);
 		} else if (line[0] == 'g') { // Face group
-			this->groupIndex.push_back(this->faces.size());
+			//this->groupIndex.push_back(this->faces.size());
+			this->groupIndex.push_back(temp_face_indices.size());
 		} else if (line.substr(0, line.find(' ')) == "mtllib") { // Material library
 			ParseMTL(line.substr(line.find(' ') + 1));
 		} else if (line.substr(0, line.find(' ')) == "usemtl") { // Use material
@@ -162,8 +212,9 @@ void GLMesh::LoadMesh(std::string fname) {
 			glm::vec3 dif(m.kd[0], m.kd[1], m.kd[2]);
 
 			glm::vec3 color = amb + dif + spec;
-			this->colors.push_back(Sigma::Color(color.r, color.g, color.b));
-			current_color = Sigma::Color(color.r, color.g, color.b);
+			temp_colors.push_back(Sigma::Color(color.r, color.g, color.b));
+			//current_color = Sigma::Color(color.r, color.g, color.b);
+			current_color++;
 		} else if ((line[0] == '#') || (line.size() == 0)) { // Comment or blank line
 			/* ignoring this line comment or blank*/
 		} else { // Unknown
@@ -171,6 +222,42 @@ void GLMesh::LoadMesh(std::string fname) {
 			std::string test = line.substr(0, line.find(' '));
 			std::cerr << "Unrecognized line " << line << std::endl;
 		}
+	}
+
+	// Now we have all raw attributes stored in the temp vectors,
+	// and the set of indicies for each face.  Opengl only supports
+	// one index buffer, so we must duplicate vertices until
+	// all the data lines up.
+	for(unsigned int i=0; i < temp_face_indices.size(); i++) {
+		std::vector<VertexIndices>::iterator result;
+		unsigned int v[3];
+
+		for(int j=0; j<3; j++) {
+			result = std::find(unique_vertices.begin(),
+						  unique_vertices.end(),
+						  temp_face_indices[i].v[j]);
+
+			// if this combination of indicies doesn't exist,
+			// add the data to the attribute arrays
+			if (result == unique_vertices.end()) {
+				v[j] = this->verts.size();
+
+				this->verts.push_back(temp_verts[temp_face_indices[i].v[j].vertex]);
+				this->texCoords.push_back(temp_uvs[temp_face_indices[i].v[j].uv]);
+				this->vertNorms.push_back(temp_normals[temp_face_indices[i].v[j].normal]);
+				this->colors.push_back(temp_colors[temp_face_indices[i].v[j].color]);
+
+				unique_vertices.push_back(temp_face_indices[i].v[j]);
+			}
+			else {
+				// calculate the correct offset
+				unsigned int unique_vertex_index = std::distance(unique_vertices.begin(), result);
+				v[j] = unique_vertex_index;
+			}
+		}
+
+		// Push it back
+		this->faces.push_back(Sigma::Face(v[0], v[1], v[2]));
 	}
 
 	// Check if vertex normals exist

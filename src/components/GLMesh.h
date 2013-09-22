@@ -30,6 +30,18 @@ struct material {
 	// TODO: Add maps
 };
 
+// Helper structs for OBJ loading
+struct VertexIndices {
+		unsigned int vertex;
+		unsigned int normal;
+		unsigned int uv;
+		unsigned int color;
+};
+
+struct FaceIndices {
+	VertexIndices v[3];
+};
+
 class GLMesh : public IGLComponent {
 public:
 	GLMesh(const int entityID); // Ctor that sets the entity ID.
