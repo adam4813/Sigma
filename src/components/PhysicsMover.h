@@ -5,6 +5,7 @@ class GLTransform;
 
 class PhysicsMover : public IMoverComponent {
 public:
+    SET_COMPONENT_ID("PhysicsMover");
 	PhysicsMover() : IMoverComponent(0) { }
 	PhysicsMover(const int entityID);
 
@@ -19,7 +20,7 @@ public:
 	/**
 	 * \brief Sets the transform this mover acts on.
 	 *
-	 * 
+	 *
 	 * \param[in] GLTransform * transform The pointer to the transform to manipulate.
 	 */
 	void Transform(GLTransform* transform) {
