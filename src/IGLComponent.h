@@ -86,6 +86,9 @@ public:
 		else if (cull_face == "front") {
 			this->cull_face = GL_FRONT;
 		}
+		else if (cull_face == "none") {
+			this->cull_face = 0;
+		}
 		else {
 			assert(0 && "Invalid cull_face parameter");
 		}

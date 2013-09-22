@@ -147,6 +147,8 @@ void OpenGLSystem::createGLMesh(const std::string type, const unsigned int entit
 		float y = 0.0f;
 		float z = 0.0f;
 		int componentID = 0;
+		std::string cull_face = "back";
+
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			Property*  p = &*propitr;
 			if (p->GetName() == "scale") {
@@ -165,9 +167,13 @@ void OpenGLSystem::createGLMesh(const std::string type, const unsigned int entit
 				mesh->LoadMesh(p->Get<std::string>());
 			} else if (p->GetName() == "id") {
 				componentID = p->Get<int>();
+			} else if (p->GetName() == "cullface") {
+				cull_face = p->Get<std::string>();
 			}
 		}
+
 		mesh->InitializeBuffers();
+		mesh->SetCullFace(cull_face);
 		mesh->Transform()->Scale(scale,scale,scale);
 		mesh->Transform()->Translate(x,y,z);
 		this->components[entityID][componentID] = mesh;

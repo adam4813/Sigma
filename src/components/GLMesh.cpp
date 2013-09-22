@@ -70,9 +70,20 @@ void GLMesh::Update(glm::mediump_float *view, glm::mediump_float *proj) {
 	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, proj);
 	glBindVertexArray(this->Vao());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->GetBuffer(this->ElemBufIndex));
+
+	if(this->cull_face == 0) {
+		glDisable(GL_CULL_FACE);
+	}
+	else {
+		glCullFace(this->cull_face);
+	}
+
 	for (int i = 0, cur = this->MeshGroup_ElementCount(0), prev = 0; cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
 		glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_SHORT, (void*)prev);
 	}
+
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 	glBindVertexArray(0);
 	GLIcoSphere::shader.UnUse();
@@ -95,7 +106,7 @@ void GLMesh::LoadMesh(std::string fname) {
 			s >> x; s >> y; s >> z;
 			this->verts.push_back(Sigma::Vertex(x, y, z));
 			//this->colors.push_back(current_color);
-			this->colors.push_back(Sigma::Color(1.0f, 0.0f, 0.0f));
+			//this->colors.push_back(Sigma::Color(1.0f, 0.0f, 0.0f));
 		}  else if (line.substr(0,2) == "f ") { // Face
 			short indicies[3][3];
 			std::string cur = line.substr(2, line.find(' ', 2) - 2);
@@ -151,7 +162,7 @@ void GLMesh::LoadMesh(std::string fname) {
 			glm::vec3 dif(m.kd[0], m.kd[1], m.kd[2]);
 
 			glm::vec3 color = amb + dif + spec;
-			//this->colors.push_back(Sigma::Color(color.r, color.g, color.b));
+			this->colors.push_back(Sigma::Color(color.r, color.g, color.b));
 			current_color = Sigma::Color(color.r, color.g, color.b);
 		} else if ((line[0] == '#') || (line.size() == 0)) { // Comment or blank line
 			/* ignoring this line comment or blank*/
