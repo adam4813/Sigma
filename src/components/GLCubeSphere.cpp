@@ -248,8 +248,8 @@ void GLCubeSphere::SubDivide(int levels) {
 
 void GLCubeSphere::LoadShader(std::string shader_name) {
 	char vertex_shader[100], fragment_shader[100];
-	sprintf_s(vertex_shader, "../../shaders/%s.vert", shader_name.c_str());
-	sprintf_s(fragment_shader, "../../shaders/%s.frag", shader_name.c_str());
+	sprintf_s(vertex_shader, "../../../shaders/%s.vert", shader_name.c_str());
+	sprintf_s(fragment_shader, "../../../shaders/%s.frag", shader_name.c_str());
 
 	this->_shader.LoadFromFile(GL_VERTEX_SHADER, vertex_shader);
 	this->_shader.LoadFromFile(GL_FRAGMENT_SHADER, fragment_shader);

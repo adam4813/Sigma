@@ -43,7 +43,7 @@ int main(int argCount, char **argValues) {
 
 	Sigma::parser::SCParser parser;
 
-	if (!parser.Parse("../../test.sc")) {
+	if (!parser.Parse("../../../test.sc")) {
 		assert(0 && "Failed to load entities from file.");
 	}
 	
