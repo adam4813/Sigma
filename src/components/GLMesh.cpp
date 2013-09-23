@@ -1,10 +1,12 @@
-#include "GLMesh.h"
-#include "GL/glew.h"
 #include <map>
 #include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <sstream>
+
+#include "GLMesh.h"
+#include "GL/glew.h"
+#include "SOIL\SOIL.h"
 #include "GLIcoSphere.h"
 
 GLMesh::GLMesh(const int entityID) : IGLComponent(entityID) {
@@ -110,6 +112,9 @@ void GLMesh::LoadMesh(std::string fname) {
 	std::vector<texCoord> temp_uvs;
 	std::vector<Sigma::Vertex> temp_normals;
 	std::vector<Sigma::Color> temp_colors;
+
+	std::string currentMtlGroup = "";
+
 	std::string line;
 
 	// Attempt to load file
@@ -197,15 +202,26 @@ void GLMesh::LoadMesh(std::string fname) {
 			current_face.v[1].color = current_color;
 			current_face.v[2].color = current_color;
 
+			// Set this face as part of the current material group
+			if(this->groupIndex.size() > 0) {
+				this->materialGroups[this->groupIndex.size()-1][currentMtlGroup].push_back(temp_face_indices.size());
+			}
+
 			// Store the face
 			temp_face_indices.push_back(current_face);
 		} else if (line[0] == 'g') { // Face group
-			//this->groupIndex.push_back(this->faces.size());
 			this->groupIndex.push_back(temp_face_indices.size());
+			std::map<std::string, std::vector<unsigned int>> newMatGroup;
+			this->materialGroups.push_back(newMatGroup);
 		} else if (line.substr(0, line.find(' ')) == "mtllib") { // Material library
 			ParseMTL(line.substr(line.find(' ') + 1));
 		} else if (line.substr(0, line.find(' ')) == "usemtl") { // Use material
 			std::string mtlname = line.substr(line.find(' ') + 1);
+
+			// Set as current material group
+			currentMtlGroup = mtlname;
+
+			// Push back color (for now)
 			material m = this->mats[mtlname];
 			glm::vec3 amb(m.ka[0], m.ka[1], m.ka[2]);
 			glm::vec3 spec(m.ks[0], m.ks[1], m.ks[2]);
@@ -350,6 +366,14 @@ void GLMesh::ParseMTL(std::string fname) {
 					int i;
 					s >> i;
 					m.illum = i;
+				} else if (label == "map_Kd") {
+					std::string filepath;
+					s >> filepath;
+					m.diffuseMap = SOIL_load_OGL_texture(filepath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+				} else if (label == "map_Ka") {
+					std::string filepath;
+					s >> filepath;
+					m.ambientMap = SOIL_load_OGL_texture(filepath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
 				} else {
 					// Blank line
 				}

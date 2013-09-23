@@ -70,64 +70,7 @@ int main(int argCount, char **argValues) {
 
 	while (os->MessageLoop()) {
 		delta = os->GetDeltaTime();
-		float deltaSec = (float)delta/1000.0f;
-		
-		if (glsys.Update(delta)) {
-			os->Present();
-		}
-
-		// Rotate the ship
-		//glsys.GetComponent(7)->Transform().Rotate(0.0f, 5.0f*deltaSec, 0.0f);
-
-		// Translate the skybox
-		//glsys.GetComponent(9)->Transform().Translate(glsys.GetView()->position);
-
-		// Translation keys
-		/*if (os->KeyDown('W', true)) { // Move forward
-			if (os->KeyDown('B', true)) {
-				glsys.Move(0.0f, 0.0f, 100.0f*deltaSec);
-				//glsys.GetComponent(8)->Transform().Translate(0.0f, 0.0f, 100.0f*deltaSec);
-			} else if (os->KeyDown('N', true)) {
-				glsys.Move(0.0f, 0.0f, 10000.0f*deltaSec);
-				//glsys.GetComponent(8)->Transform().Translate(0.0f, 0.0f, 10000.0f*deltaSec);
-			} else {
-				glsys.Move(0.0f, 0.0f, 10.0f*deltaSec);
-				//glsys.GetComponent(8)->Transform().Translate(0.0f, 0.0f, 10.0f*deltaSec);
-			}
-		} else if (os->KeyDown('S', true)) { // Move backward
-			glsys.Move(0.0f, 0.0f, -10.0f*deltaSec);
-			//glsys.GetComponent(8)->Transform().Translate(0.0f, 0.0f, -10.0f*deltaSec);
-		}
-
-		if (os->KeyDown('A', true)) {
-			glsys.Rotate(0.0f, -90.0f*deltaSec, 0.0f); // Yaw left.
-		} else if (os->KeyDown('D', true)) {
-			glsys.Rotate(0.0f, 90.0f*deltaSec, 0.0f); // Yaw right.
-		}
-
-		if (os->KeyDown('F', true)) {
-			glsys.Move(-10.0f*deltaSec, 0.0f, 0.0f); // Strafe Left
-		} else if (os->KeyDown('G', true)) {
-			glsys.Move(10.0f*deltaSec, 0.0f, 0.0f); // Strafe Right
-		}
-
-		if (os->KeyDown('E', true)) { // Move up
-			glsys.Move(0.0f, 10.0f*deltaSec, 0.0f);
-		} else if (os->KeyDown('C', true)) { // Move down
-			glsys.Move(0.0f, -10.0f*deltaSec, 0.0f);
-		}
-
-		if (os->KeyDown('Q', true)) { // Pitch Up
-			glsys.Rotate(-90.0f * deltaSec, 0.0f, 0.0f);
-		} else if (os->KeyDown('Z', true)) { // Pitch Down
-			glsys.Rotate(90.0f*deltaSec, 0.0f, 0.0f);
-		}
-
-		if (os->KeyDown('R', true)) { // Roll left
-			glsys.Rotate(0.0f, 0.0f, -90.0f * deltaSec);
-		} else if (os->KeyDown('T', true)) { // Roll right
-			glsys.Rotate(0.0f, 0.0f, 90.0f*deltaSec);
-		}*/
+		double deltaSec = (double)delta/1000.0f;
 
 		if (os->KeyReleased('P', true)) { // Wireframe mode
 			if (!isWireframe) {
@@ -138,12 +81,14 @@ int main(int argCount, char **argValues) {
 				isWireframe = false;
 			}
 		}
+
 		if (os->KeyReleased('M', true)) {
 			os->ToggleFullscreen();
 			glsys.SetViewportSize(os->GetWindowWidth(), os->GetWindowHeight());
 		}
 
-		physys.Update(delta);
+		// Pass in delta time in seconds
+		physys.Update(deltaSec);
 
 		if (glsys.Update(delta)) {
 			os->Present();
