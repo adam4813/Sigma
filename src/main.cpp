@@ -1,5 +1,8 @@
 #include <iostream>
 
+#undef OS_Win32
+#define OS_SDL
+
 #include "systems/OpenGLSystem.h"
 #include "systems/SimplePhysics.h"
 #include "systems/FactorySystem.h"
@@ -66,7 +69,7 @@ int main(int argCount, char **argValues) {
 
 	while (os->MessageLoop()) {
 		delta = os->GetDeltaTime();
-		double deltaSec = (double)delta/100.0f;
+		double deltaSec = (double)delta/1000.0f;
 
 		if (os->KeyReleased('P', true)) { // Wireframe mode
 			if (!isWireframe) {
