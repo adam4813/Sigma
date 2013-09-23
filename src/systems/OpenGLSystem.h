@@ -3,13 +3,13 @@
 #include "../Property.h"
 #include "../IFactory.h"
 #include "../ISystem.h"
+#include "../IGLComponent.h"
 
 #include "GL/glew.h"
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 
 struct IGLView;
-class IGLComponent;
 
 class OpenGLSystem
     : public IFactory, public ISystem<IGLComponent> {
