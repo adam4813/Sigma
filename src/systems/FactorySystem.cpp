@@ -2,7 +2,6 @@
 #include <iostream>
 
 std::shared_ptr<FactorySystem> FactorySystem::_instance;
-std::once_flag FactorySystem::only_once;
 
 FactorySystem::FactorySystem()
 {
@@ -16,11 +15,10 @@ FactorySystem::~FactorySystem()
 
 FactorySystem& FactorySystem::getInstance()
 {
-    std::call_once( FactorySystem::only_once,
-        [] ()
-		{
-		   FactorySystem::_instance.reset( new FactorySystem() );
-        });
+    if(!_instance)
+    {
+        FactorySystem::_instance.reset( new FactorySystem() );
+    }
     return *FactorySystem::_instance;
 }
 

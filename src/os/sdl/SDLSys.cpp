@@ -3,7 +3,7 @@
 #include "GL/glew.h"
 #include "SDL/SDL_opengl.h"
 
-//Sigma::event::KeyboardInputSystem IOpSys::KeyboardEventSystem;
+Sigma::event::KeyboardInputSystem IOpSys::KeyboardEventSystem;
 //double IOpSys::curDelta;
 
 void* SDLSys::CreateGraphicsWindow(const unsigned int width, const unsigned int height) {
