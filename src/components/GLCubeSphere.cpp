@@ -2,12 +2,12 @@
 #include <algorithm>
 #include <limits>
 
-#include "SDL/SDL.h"
-#include "SDL/SDL_image.h"
+//#include "SDL/SDL.h"
+//#include "SDL/SDL_image.h"
+
+#include "SOIL/SOIL.h"
 
 #include "GLCubeSphere.h"
-
-GLSLShader GLCubeSphere::shader;
 
 // For std::find
 namespace Sigma {
@@ -29,8 +29,6 @@ GLCubeSphere::~GLCubeSphere() {
 
 void GLCubeSphere::InitializeBuffers() {
 	srand(this->GetEntityID());
-
-	int subdivisions = 5;
 
 	// Create the verts to begin refining at.
 	float t = 1.0f;
@@ -64,7 +62,7 @@ void GLCubeSphere::InitializeBuffers() {
     this->faces.push_back(Sigma::Face(1, 5, 6));
     this->faces.push_back(Sigma::Face(6, 2, 1));
 
-	this->SubDivide(subdivisions);
+	this->SubDivide(this->_subdivisionLevels);
 
 	glGenVertexArrays(1, &this->vao); // Generate the VAO
 	glBindVertexArray(this->vao); // Bind the VAO
@@ -72,7 +70,7 @@ void GLCubeSphere::InitializeBuffers() {
 	glGenBuffers(1, &this->buffers[this->VertBufIndex]); 	// Generate the vertex buffer.
 	glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->VertBufIndex]); // Bind the vertex buffer.
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Sigma::Vertex) * this->verts.size(), &this->verts.front(), GL_STATIC_DRAW); // Stores the verts in the vertex buffer.
-	GLint posLocation = glGetAttribLocation(GLCubeSphere::shader.GetProgram(), "in_Position"); // Find the location in the shader where the vertex buffer data will be placed.
+	GLint posLocation = glGetAttribLocation(this->_shader.GetProgram(), "in_Position"); // Find the location in the shader where the vertex buffer data will be placed.
 	glVertexAttribPointer(posLocation, 3, GL_FLOAT, GL_FALSE, 0, 0); // Tell the VAO the vertex data will be stored at the location we just found.
 	glEnableVertexAttribArray(posLocation); // Enable the VAO line for vertex data.
 
@@ -81,60 +79,83 @@ void GLCubeSphere::InitializeBuffers() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Sigma::Face) * this->faces.size(), &this->faces.front(), GL_STATIC_DRAW); // Store the faces in the element buffer.
 
 	glBindVertexArray(0); // Reset the buffer binding because we are good programmers.
+}
 
+void GLCubeSphere::LoadTexture(std::string texture_name) {
 	// albedo map
-	glGenTextures(1, &this->_cubeMap);
+	/*glGenTextures(1, &this->_cubeMap);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeMap);
 	
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);*/
 
 	// There are always six files
+	char filenames[6][100];
 	for(int i=0; i < 6; i++) {
+		sprintf_s(filenames[i], "%s%d.jpg", texture_name.c_str(), i+1);
+	}
+
+	this->_cubeMap = SOIL_load_OGL_cubemap(filenames[0], filenames[1], filenames[2], filenames[3], filenames[4], filenames[5], SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+
+	if( 0 == this->_cubeMap ) {
+		printf( "SOIL loading error: '%s'\n", SOIL_last_result() );
+	}
+	// There are always six files
+	/*for(int i=0; i < 6; i++) {
 		char filename[100];
-		sprintf(filename, "mars%d.jpg", i+1);
-		SDL_Surface *img;
-		//img = IMG_Load(filename);
+		sprintf_s(filename, "%s%d.jpg", texture_name.c_str(), i+1);
+		SDL_Surface *img=0;
+		img = IMG_Load(filename);
 
 		if(img) {
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+i,0,GL_RGB,img->w,img->h,0,GL_RGB,GL_UNSIGNED_BYTE,(img->pixels));
-			//SDL_FreeSurface(img);
+			SDL_FreeSurface(img);
 		} else {
 			assert(0 && "Texture file did not load correctly.");
 		}
-	}
+	}*/
 
-	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+	//glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
 	// normal map
-	glGenTextures(1, &this->_cubeNormalMap);
+	/*glGenTextures(1, &this->_cubeNormalMap);
+	glActiveTexture(GL_TEXTURE0+1);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeNormalMap);
 	
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);*/
 
 	// There are always six files
 	for(int i=0; i < 6; i++) {
-		char filename[100];
-		sprintf(filename, "mars_nm%d.jpg", i+1);
-		SDL_Surface *img;
+		sprintf_s(filenames[i], "%s_nm%d.jpg", texture_name.c_str(), i+1);
+	}
+
+	this->_cubeNormalMap = SOIL_load_OGL_cubemap(filenames[0], filenames[1], filenames[2], filenames[3], filenames[4], filenames[5], SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+
+	if( 0 == this->_cubeNormalMap ) {
+		// It's ok not to have a normal map
+		//printf( "SOIL loading error: '%s'\n", SOIL_last_result() );
+	}
+		//SDL_Surface *img=0;
 		//img = IMG_Load(filename);
 
-		if(img) {
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+i,0,GL_RGB,img->w,img->h,0,GL_RGB,GL_UNSIGNED_BYTE,(img->pixels));
+		//if(img) {
+			//glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+i,0,GL_RGB,img->w,img->h,0,GL_RGB,GL_UNSIGNED_BYTE,(img->pixels));
 			//SDL_FreeSurface(img);
-		} else {
-			assert(0 && "Texture file did not load correctly.");
-		}
-	}
+		//} else {
+			// some may not have normal maps
+			//assert(0 && "Texture file did not load correctly.");
+		//}
+	//}
 	
-	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+	//glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 }
 
 void GLCubeSphere::SubDivide(int levels) {
@@ -225,28 +246,56 @@ void GLCubeSphere::SubDivide(int levels) {
 	}
 }
 
-void GLCubeSphere::LoadShader() {
-	GLCubeSphere::shader.LoadFromFile(GL_VERTEX_SHADER, "../../shaders/cubesphere.vert");
-	GLCubeSphere::shader.LoadFromFile(GL_FRAGMENT_SHADER, "../../shaders/cubesphere.frag");
-	GLCubeSphere::shader.CreateAndLinkProgram();
+void GLCubeSphere::LoadShader(std::string shader_name) {
+	char vertex_shader[100], fragment_shader[100];
+	sprintf_s(vertex_shader, "../../../shaders/%s.vert", shader_name.c_str());
+	sprintf_s(fragment_shader, "../../../shaders/%s.frag", shader_name.c_str());
+
+	this->_shader.LoadFromFile(GL_VERTEX_SHADER, vertex_shader);
+	this->_shader.LoadFromFile(GL_FRAGMENT_SHADER, fragment_shader);
+	this->_shader.CreateAndLinkProgram();
 }
 
 void GLCubeSphere::Update(glm::mediump_float *view, glm::mediump_float *proj) {
-	GLCubeSphere::shader.Use();
+	this->_shader.Use();
 	
-	this->Transform()->Rotate(0.0f,0.01f,0.0f);
+	if(this->fix_to_camera) {
+		glm::mediump_float *view_ptr = view;
+		glm::mat4 view_matrix;
+	
+		for(int i=0; i < 4; i++) {
+			for(int j=0; j < 4; j++) {
+				view_matrix[i][j] = (*view_ptr++);
+			}
+		}
 
-	glUniform1i(glGetUniformLocation(GLCubeSphere::shader.GetProgram(), "cubeMap"), 0);
+		// Extract position from view matrix
+		glm::mat3 rotMat(view_matrix);
+		glm::vec3 d(view_matrix[3]);
+		glm::vec3 position = -d * rotMat;
+		this->Transform()->TranslateTo(position);
+	}
 
-	glUniformMatrix4fv(glGetUniformLocation(GLCubeSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &this->Transform()->ModelMatrix()[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(GLCubeSphere::shader.GetProgram(), "in_View"), 1, GL_FALSE, view);
-	glUniformMatrix4fv(glGetUniformLocation(GLCubeSphere::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, proj);
+	this->Transform()->Rotate(0.0f,this->rotation_speed,0.0f);
+
+	glUniform1i(glGetUniformLocation(this->_shader.GetProgram(), "cubeMap"), GL_TEXTURE0);
+	glUniform1i(glGetUniformLocation(this->_shader.GetProgram(), "cubeNormMap"), GL_TEXTURE0+1);
+
+	glUniformMatrix4fv(glGetUniformLocation(this->_shader.GetProgram(), "in_Model"), 1, GL_FALSE, &this->Transform()->ModelMatrix()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(this->_shader.GetProgram(), "in_View"), 1, GL_FALSE, view);
+	glUniformMatrix4fv(glGetUniformLocation(this->_shader.GetProgram(), "in_Proj"), 1, GL_FALSE, proj);
 
 	glBindVertexArray(this->Vao());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->GetBuffer(this->ElemBufIndex));
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeMap);
+
+	glActiveTexture(GL_TEXTURE0+1);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeNormalMap);
+
+	glCullFace(this->cull_face);
+	glDepthFunc(GL_LEQUAL);
 
 	for (int i = 0, cur = this->MeshGroup_ElementCount(0), prev = 0; cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
 		glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_SHORT, (void*)prev);
@@ -255,6 +304,8 @@ void GLCubeSphere::Update(glm::mediump_float *view, glm::mediump_float *proj) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	glCullFace(GL_BACK);
+	glDepthFunc(GL_LESS);
 	
-	GLCubeSphere::shader.UnUse();
+	this->_shader.UnUse();
 }

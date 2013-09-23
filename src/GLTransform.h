@@ -11,9 +11,18 @@ public:
 		this->MMhasChanged = true;
 	}
 
-	// Helper function.
+	void TranslateTo(float x, float y, float z) {
+		this->translateMatrix = glm::translate(x, y, z);
+		this->MMhasChanged = true;
+	}
+
+	// Helper functions.
 	void Translate(glm::vec3 trans) {
 		Translate(trans.x, trans.y, trans.z);
+	}
+
+	void TranslateTo(glm::vec3 trans) {
+		TranslateTo(trans.x, trans.y, trans.z);
 	}
 
 	void Rotate(float x, float y, float z) {
@@ -43,7 +52,7 @@ public:
 		if (this->MMhasChanged) {
 			this->modelMatrix = glm::mat4(1.0f);
 			this->modelMatrix =  this->translateMatrix * this->rotateMatrix * this->scaleMatrix;
-			//this->modelMatrix =  this->scaleMatrix*this->rotateMatrix*this->translateMatrix;
+			//this->modelMatrix =  this->modelMatrix*this->scaleMatrix*this->rotateMatrix*this->translateMatrix;
 			this->MMhasChanged = false;
 		}
 		return this->modelMatrix;

@@ -28,6 +28,23 @@ struct material {
 	float ns;
 	int illum;
 	// TODO: Add maps
+	GLuint ambientMap;
+	GLuint diffuseMap;
+	GLuint specularMap;
+};
+
+// Helper structs for OBJ loading
+// Stores unique combinations of indices
+struct VertexIndices {
+		unsigned int vertex;
+		unsigned int normal;
+		unsigned int uv;
+		unsigned int color;
+};
+
+// Stores a face with all indices
+struct FaceIndices {
+	VertexIndices v[3];
 };
 
 class GLMesh : public IGLComponent {
@@ -172,6 +189,7 @@ public:
 private:
 	std::vector<unsigned int> groupIndex; // Stores which index in faces a group starts at.
 	std::vector<Sigma::Face> faces; // Stores vectors of face groupings.
+	std::vector<std::map<std::string, std::vector<unsigned int>>> materialGroups; // This is probably an abuse of the STL
 	std::vector<Sigma::Vertex> verts; // The verts that the faces refers to. Can be used for later refinement.
 	std::vector<Sigma::Vertex> vertNorms; // The vertex normals for each vert.
 	std::vector<texCoord> texCoords; // The texture coords for each vertex.

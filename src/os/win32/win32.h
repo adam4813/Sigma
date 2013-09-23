@@ -27,9 +27,9 @@ public:
 
 	void Present();
 
-	unsigned int GetWindowWidth();
+	virtual unsigned int GetWindowWidth();
+	virtual unsigned int GetWindowHeight();
 
-	unsigned int GetWindowHeight();
 private:
 	HWND hwnd; // The current window handle.
 	HGLRC hrc; // OpenGL Rendering Context.

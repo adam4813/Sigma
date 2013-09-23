@@ -23,6 +23,14 @@ std::map<std::string,IFactory::FactoryFunction>
     retval["GLIcoSphere"] = std::bind(&OpenGLSystem::createGLIcoSphere,this,_1,_2,_3);
     retval["GLCubeSphere"] = std::bind(&OpenGLSystem::createGLCubeSphere,this,_1,_2,_3);
     retval["GLMesh"] = std::bind(&OpenGLSystem::createGLMesh,this,_1,_2,_3);
+
+	// Not supported in VS2012
+    /*{
+        {"GLSprite",std::bind(&OpenGLSystem::createGLSprite,this,_1,_2,_3)},
+        {"GLIcoSphere",std::bind(&OpenGLSystem::createGLIcoSphere,this,_1,_2,_3)},
+        {"GLCubeSphere",std::bind(&OpenGLSystem::createGLCubeSphere,this,_1,_2,_3)},
+        {"GLMesh",std::bind(&OpenGLSystem::createGLMesh,this,_1,_2,_3)}
+    };*/
     return retval;
 }
 
@@ -69,7 +77,14 @@ void OpenGLSystem::createGLIcoSphere(const std::string type, const unsigned int 
 
 void OpenGLSystem::createGLCubeSphere(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
 		GLCubeSphere* sphere = new GLCubeSphere(entityID);
-		sphere->InitializeBuffers();
+
+		std::string texture_name = "";
+		std::string shader_name = "";
+		std::string cull_face = "back";
+		int subdivision_levels = 1;
+		float rotation_speed = 0.0f;
+		bool fix_to_camera = false;
+
 		float scale = 1.0f;
 		float x = 0.0f;
 		float y = 0.0f;
@@ -89,21 +104,45 @@ void OpenGLSystem::createGLCubeSphere(const std::string type, const unsigned int
 			} else if (p->GetName() == "z") {
 				z = p->Get<float>();
 				continue;
+			} else if (p->GetName() == "subdivision_levels") {
+				subdivision_levels = p->Get<int>();
+			} else if (p->GetName() == "texture_name") {
+				texture_name = p->Get<std::string>();
+			} else if (p->GetName() == "shader") {
+				shader_name = p->Get<std::string>();
 			} else if (p->GetName() == "id") {
 				componentID = p->Get<int>();
+			} else if (p->GetName() == "cullface") {
+				cull_face = p->Get<std::string>();
+			} else if (p->GetName() == "rotation_speed") {
+				rotation_speed = p->Get<float>();
+			} else if (p->GetName() == "fix_to_camera") {
+				fix_to_camera = p->Get<bool>();
 			}
 		}
+
+		sphere->SetFixToCamera(fix_to_camera);
+		sphere->SetRotationSpeed(rotation_speed);
+		sphere->SetCullFace(cull_face);
+		sphere->SetSubdivisions(subdivision_levels);
+		sphere->LoadShader(shader_name);
+		sphere->InitializeBuffers();
+		sphere->LoadTexture(texture_name);
+
 		sphere->Transform()->Scale(scale,scale,scale);
 		sphere->Transform()->Translate(x,y,z);
 		this->addComponent(entityID,sphere);
 }
 void OpenGLSystem::createGLMesh(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
         GLMesh* mesh = new GLMesh(entityID);
+
 		float scale = 1.0f;
 		float x = 0.0f;
 		float y = 0.0f;
 		float z = 0.0f;
 		int componentID = 0;
+		std::string cull_face = "back";
+
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			Property*  p = &*propitr;
 			if (p->GetName() == "scale") {
@@ -122,9 +161,13 @@ void OpenGLSystem::createGLMesh(const std::string type, const unsigned int entit
 				mesh->LoadMesh(p->Get<std::string>());
 			} else if (p->GetName() == "id") {
 				componentID = p->Get<int>();
+			} else if (p->GetName() == "cullface") {
+				cull_face = p->Get<std::string>();
 			}
 		}
+
 		mesh->InitializeBuffers();
+		mesh->SetCullFace(cull_face);
 		mesh->Transform()->Scale(scale,scale,scale);
 		mesh->Transform()->Translate(x,y,z);
 		this->addComponent(entityID,mesh);
@@ -132,6 +175,8 @@ void OpenGLSystem::createGLMesh(const std::string type, const unsigned int entit
 
 bool OpenGLSystem::Update(const double delta) {
 	this->deltaAccumulator += delta;
+	this->view->UpdateViewMatrix();
+
 	// Check if the deltaAccumulator is greater than 1/60 of a second.
 	if (deltaAccumulator > 16.7) {
 		this->view->UpdateViewMatrix();
@@ -165,9 +210,8 @@ const int* OpenGLSystem::Start() {
 	// Now that GL is up and running load the shaders
 	GLSprite::LoadShader();
 	GLIcoSphere::LoadShader();
-	GLCubeSphere::LoadShader();
 
-	// Generates a really hard-to-read matrix, but a normal, standard 4x4 matrix nonetheless
+	// Generates a floatly hard-to-read matrix, but a normal, standard 4x4 matrix nonetheless
 	this->ProjectionMatrix = glm::perspective(
 		45.0f,
 		(float)this->windowWidth / (float)this->windowHeight,
@@ -181,6 +225,8 @@ const int* OpenGLSystem::Start() {
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 	glEnable(GL_MULTISAMPLE_ARB);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 
 	return OpenGLVersion;
 }

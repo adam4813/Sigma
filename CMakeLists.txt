@@ -30,6 +30,13 @@ source_group("Header Files\\systems" FILES ${Sigma_SRC_SYSTEM_H})
 file(GLOB Sigma_SRC_SYSTEM_CPP "src/systems/*.cpp")
 source_group("Source Files\\systems" FILES ${Sigma_SRC_SYSTEM_CPP})
 
+# Put all Controller files into a filter
+file(GLOB Sigma_SRC_CONTROLLERS_H "src/controllers/*.h")
+message("Controllers: " ${Sigma_SRC_CONTROLLERS_H})
+source_group("Header Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_H})
+file(GLOB Sigma_SRC_CONTROLLERS_CPP "src/controllers/*.cpp")
+source_group("Source Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_CPP})
+
 # Outpit the compiler ID.
 message("Compiler ID: " ${CMAKE_CXX_COMPILER_ID})
 
@@ -45,7 +52,6 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
         # compiler is gcc 4.7 or higher. Force c++11.
         add_definitions(-std=c++11)
     endif ()
-elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
 elseif (MSVC AND (MSVC10 OR MSVC11))
     message("Support Visual Studio!")
 else ()
@@ -55,6 +61,7 @@ endif ()
 add_definitions(
   -DGLEW_STATIC # Add a define to prevent GLEW linker warnings
 )
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 # Link aganst OpenGL and GLEW
 find_package(OpenGL REQUIRED)
@@ -108,7 +115,7 @@ message("Using ${IOPSYS}...")
 add_subdirectory("src/os")
 
 # add the executable
-add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP})
+add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP} ${Sigma_SRC_CONTROLLERS_H} ${Sigma_SRC_CONTROLLERS_CPP})
 
 add_definitions(-D${IOPSYS})
 

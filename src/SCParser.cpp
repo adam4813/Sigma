@@ -50,6 +50,9 @@ namespace Sigma {
 							else if (propType == "i") {
 								p.Set<int>(atoi(propValue.c_str()));
 							}
+							else if (propType == "b") {
+								p.Set<bool>(atoi(propValue.c_str()));
+							}
 							c.properties.push_back(p);
 						} else if (line.substr(0,1) == "#") {
 							Property p("id");

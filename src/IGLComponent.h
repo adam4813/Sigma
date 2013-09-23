@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GL/glew.h"
 #include "IComponent.h"
 #include "GLTransform.h"
 
@@ -74,6 +75,25 @@ public:
 
 	unsigned int Vao() const { return this->vao; }
 
+	/**
+	 * \brief Sets the face culling mode
+	 *
+	 */
+	virtual void SetCullFace(std::string cull_face) {
+		if(cull_face == "back") {
+			this->cull_face = GL_BACK;
+		}
+		else if (cull_face == "front") {
+			this->cull_face = GL_FRONT;
+		}
+		else if (cull_face == "none") {
+			this->cull_face = 0;
+		}
+		else {
+			assert(0 && "Invalid cull_face parameter");
+		}
+	};
+
 	int ElemBufIndex;
 	int VertBufIndex;
 	int UVBufIndex;
@@ -84,5 +104,6 @@ protected:
 	unsigned int buffers[10];
 	unsigned int vao; // The VAO that describes this component's data.
 	unsigned int drawMode;
+	GLuint cull_face;
 	GLTransform transform;
 };

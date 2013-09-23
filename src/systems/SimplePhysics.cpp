@@ -9,6 +9,12 @@ std::map<std::string,IFactory::FactoryFunction> SimplePhysics::getFactoryFunctio
     std::map<std::string,IFactory::FactoryFunction> retval;
 	retval["PhysicsMover"] = std::bind(&SimplePhysics::createPhysicsMover,this,_1,_2,_3);
     retval["ViewMover"] = std::bind(&SimplePhysics::createViewMover,this,_1,_2,_3);
+
+	// Not supported in VS2012
+    /*{
+        {"PhysicsMover",std::bind(&SimplePhysics::createPhysicsMover,this,_1,_2,_3)},
+        {"ViewMover",std::bind(&SimplePhysics::createViewMover,this,_1,_2,_3)}
+    };*/
     return retval;
 }
 

@@ -3,6 +3,7 @@
 #include "../IFactory.h"
 #include <memory>
 #include <mutex>
+#include <string>
 #include <unordered_map>
 
 class FactorySystem
