@@ -2,7 +2,6 @@
 #define FACTORYSYSTEM_H
 #include "../IFactory.h"
 #include <memory>
-#include <mutex>
 #include <string>
 #include <unordered_map>
 
@@ -30,7 +29,6 @@ class FactorySystem
         FactorySystem(const FactorySystem& rhs);
         FactorySystem& operator=(const FactorySystem& rhs);
         static std::shared_ptr<FactorySystem> _instance;
-        static std::once_flag only_once;
         std::unordered_map<std::string,IFactory::FactoryFunction>
                 registeredFactoryFunctions;
 };
