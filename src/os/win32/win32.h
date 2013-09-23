@@ -7,7 +7,7 @@ public:
 	win32() { }
 	~win32();
 
-	virtual void* CreateGraphicsWindow( const unsigned int width = 800, const unsigned int height = 600 );
+	void* CreateGraphicsWindow(const unsigned int width = 800, const unsigned int height = 600);
 
 	void ToggleFullscreen();
 

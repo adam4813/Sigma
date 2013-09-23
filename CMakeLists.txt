@@ -30,17 +30,15 @@ source_group("Header Files\\systems" FILES ${Sigma_SRC_SYSTEM_H})
 file(GLOB Sigma_SRC_SYSTEM_CPP "src/systems/*.cpp")
 source_group("Source Files\\systems" FILES ${Sigma_SRC_SYSTEM_CPP})
 
-# Put all OS files into a filter
-file(GLOB Sigma_SRC_OS_H "src/OS/*.h")
-source_group("Header Files\\OS" FILES ${Sigma_SRC_OS_H})
-file(GLOB Sigma_SRC_OS_CPP "src/OS/*.cpp")
-source_group("Source Files\\OS" FILES ${Sigma_SRC_OS_CPP})
-
 # Put all Controller files into a filter
-file(GLOB Sigma_SRC_CONTROLLERS_H "src/Controllers/*.h")
-source_group("Header Files\\Controllers" FILES ${Sigma_CONTROLLERS_OS_H})
-file(GLOB Sigma_SRC_CONTROLLERS_CPP "src/Controllers/*.cpp")
-source_group("Source Files\\Controllers" FILES ${Sigma_SRC_CONTROLLERS_CPP})
+file(GLOB Sigma_SRC_CONTROLLERS_H "src/controllers/*.h")
+message("Controllers: " ${Sigma_SRC_CONTROLLERS_H})
+source_group("Header Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_H})
+file(GLOB Sigma_SRC_CONTROLLERS_CPP "src/controllers/*.cpp")
+source_group("Source Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_CPP})
+
+# Outpit the compiler ID.
+message("Compiler ID: " ${CMAKE_CXX_COMPILER_ID})
 
 # check for gcc version to set c++11 or c++0x
 # thanks to http://stackoverflow.com/questions/10984442/how-to-detect-c11-support-of-a-compiler-with-cmake
@@ -54,8 +52,10 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
         # compiler is gcc 4.7 or higher. Force c++11.
         add_definitions(-std=c++11)
     endif ()
-#else ()
-#    message(FATAL_ERROR "Your C++ compiler does not support C++11.")
+elseif (MSVC AND (MSVC10 OR MSVC11))
+    message("Support Visual Studio!")
+else ()
+    message(FATAL_ERROR "Your C++ compiler does not support C++11.")
 endif ()
 
 add_definitions(
@@ -112,10 +112,10 @@ set_property(CACHE IOPSYS PROPERTY STRINGS "OS_SDL" "OS_Win32")
 
 message("Using ${IOPSYS}...")
 
-#add_subdirectory("src/os")
+add_subdirectory("src/os")
 
 # add the executable
-add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP})
+add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP} ${Sigma_SRC_CONTROLLERS_H} ${Sigma_SRC_CONTROLLERS_CPP})
 
 add_definitions(-D${IOPSYS})
 

@@ -1,8 +1,5 @@
 #include <iostream>
 
-#undef OS_Win32
-#define OS_SDL
-
 #include "systems/OpenGLSystem.h"
 #include "systems/SimplePhysics.h"
 #include "systems/FactorySystem.h"
@@ -43,10 +40,10 @@ int main(int argCount, char **argValues) {
 
 	Sigma::parser::SCParser parser;
 
-	if (!parser.Parse("../../../test.sc")) {
+	if (!parser.Parse("test.sc")) {
 		assert(0 && "Failed to load entities from file.");
 	}
-	
+
 	for (unsigned int i = 0; i < parser.EntityCount(); ++i) {
 		const Sigma::parser::Entity* e = parser.GetEntity(i);
 		for (auto itr = e->components.begin(); itr != e->components.end(); ++itr) {
@@ -58,8 +55,7 @@ int main(int argCount, char **argValues) {
 
 	std::vector<Property> props;
 	physys.createViewMover("ViewMover", 9, props);
-	ViewMover* mover = reinterpret_cast<ViewMover*>(physys.GetComponent(9));
-
+	ViewMover* mover = reinterpret_cast<ViewMover*>(physys.getComponent(9,ViewMover::getStaticComponentID()));
 	Sigma::event::handler::GLSixDOFViewController cameraController(glsys.View(), mover);
 	IOpSys::KeyboardEventSystem.Register(&cameraController);
 
@@ -70,7 +66,7 @@ int main(int argCount, char **argValues) {
 
 	while (os->MessageLoop()) {
 		delta = os->GetDeltaTime();
-		double deltaSec = (double)delta/1000.0f;
+		double deltaSec = (double)delta/100.0f;
 
 		if (os->KeyReleased('P', true)) { // Wireframe mode
 			if (!isWireframe) {

@@ -27,9 +27,8 @@ class FactorySystem
     protected:
     private:
         FactorySystem();
-		// Visual Studio 2012 doesn't support deleted functions
-//        FactorySystem(const FactorySystem& rhs) = delete;
-//        FactorySystem& operator=(const FactorySystem& rhs) = delete;
+        FactorySystem(const FactorySystem& rhs);
+        FactorySystem& operator=(const FactorySystem& rhs);
         static std::shared_ptr<FactorySystem> _instance;
         static std::once_flag only_once;
         std::unordered_map<std::string,IFactory::FactoryFunction>

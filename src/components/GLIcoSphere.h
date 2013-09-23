@@ -12,6 +12,7 @@ struct IcoScphereFace {
 
 class GLIcoSphere : public GLMesh {
 public:
+    SET_COMPONENT_ID("GLIcoSphere");
 	// We have a private ctor so the factory method must be used.
 	GLIcoSphere(const int entityID = 0);
 	/**
@@ -32,8 +33,8 @@ public:
 	 * \param[in/out] std::vector<Vertex> & verts The verts that will be used as a starting point. Any new verts created will be added to this.
 	 * \param[in/out] std::vector<Face> & faces The faces to refine. The set of faces will be stored here when complete.
 	 * \param[in] int level The number of refinements to apply.
-	 * \returns   void 
-	 * \exception  
+	 * \returns   void
+	 * \exception
 	 */
 	void Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::Face> &faces, int level);
 

@@ -1,6 +1,7 @@
 #pragma  once
 
 #include "../IFactory.h"
+#include "../ISystem.h"
 
 #include <string>
 #include <vector>
@@ -10,10 +11,10 @@ class Property;
 class IMoverComponent;
 
 class SimplePhysics
-    : public IFactory  {
+    : public IFactory, public ISystem<IMoverComponent> {
 public:
 	SimplePhysics() { }
-	~SimplePhysics();
+	~SimplePhysics() { };
 	/**
 	 * \brief Starts the Simple Physics system.
 	 *
@@ -30,17 +31,8 @@ public:
 	 */
 	bool Update(const double delta);
 
-	/**
-	 * \brief Retrieve the component that belongs to the given entity ID
-	 *
-	 * \param[in] int entityID
-	 * \returns   void* The component that belongs to the entity ID or nullptr if no component exists for the given ID.
-	 */
-	void* GetComponent(int entityID);
-
     std::map<std::string,FactoryFunction> getFactoryFunctions();
 	void createPhysicsMover(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
 	void createViewMover(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
 private:
-	std::map<int, std::vector<IMoverComponent*> > components; // A mapping of entity ID to a vector containing all of it's components.
 };

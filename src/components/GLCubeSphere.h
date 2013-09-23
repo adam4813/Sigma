@@ -8,6 +8,7 @@
 
 class GLCubeSphere : public IGLComponent {
 public:
+    SET_COMPONENT_ID("GLCubeSphere");
 	// We have a private ctor so the factory method must be used.
 	GLCubeSphere(const int entityID = 0);
 	virtual ~GLCubeSphere();
@@ -20,7 +21,7 @@ public:
 	 * \returns   void
 	 */
 	virtual void InitializeBuffers();
-	
+
 	/**
 	 * \brief Updates the rotation and renders the mesh
 	 *
@@ -39,7 +40,7 @@ public:
 	 * \params[in] Group - the index of the mesh group to count
 	 * \returns unsigned int The number of elements to draw.
 	 */
-	virtual unsigned int MeshGroup_ElementCount(const unsigned int group = 0) const { 
+	virtual unsigned int MeshGroup_ElementCount(const unsigned int group = 0) const {
 		if (group > 0) {
 			return 0;
 		}

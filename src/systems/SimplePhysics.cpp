@@ -7,7 +7,6 @@ std::map<std::string,IFactory::FactoryFunction> SimplePhysics::getFactoryFunctio
 {
     using namespace std::placeholders;
     std::map<std::string,IFactory::FactoryFunction> retval;
-	
 	retval["PhysicsMover"] = std::bind(&SimplePhysics::createPhysicsMover,this,_1,_2,_3);
     retval["ViewMover"] = std::bind(&SimplePhysics::createViewMover,this,_1,_2,_3);
 
@@ -29,42 +28,27 @@ void SimplePhysics::createPhysicsMover(const std::string type, const unsigned in
             mover->Transform(t);
         }
 	}
-    this->components[entityID].push_back(mover);
+	this->addComponent(entityID,mover);
 }
 
 void SimplePhysics::createViewMover(const std::string type, const unsigned int entityID, std::vector<Property> &properties)
 {
 	ViewMover* mover = new ViewMover(entityID);
-    this->components[entityID].push_back(mover);
+	this->addComponent(entityID,mover);
 }
 
 bool SimplePhysics::Update(const double delta) {
 	// Move
-	for (auto eitr = this->components.begin(); eitr != this->components.end(); ++eitr) {
+	for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
 		for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
-			(*citr)->ApplyForces(delta);
+			citr->second->ApplyForces(delta);
 		}
 	}
 
 	// Check for collisions and set position to contact point
-	for (auto itr = this->components.begin(); itr != this->components.end(); ++itr) {
+	for (auto itr = this->_Components.begin(); itr != this->_Components.end(); ++itr) {
 
 	}
 
 	return true;
-}
-
-void* SimplePhysics::GetComponent(int entityID) {
-	if (this->components.find(entityID) != this->components.end()) {
-		return this->components[entityID][0];
-	}
-	return nullptr;
-}
-
-SimplePhysics::~SimplePhysics() {
-	for (auto eitr = this->components.begin(); eitr != this->components.end(); ++eitr) {
-		for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
-			delete (*citr);
-		}
-	}
 }
