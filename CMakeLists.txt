@@ -30,6 +30,9 @@ source_group("Header Files\\systems" FILES ${Sigma_SRC_SYSTEM_H})
 file(GLOB Sigma_SRC_SYSTEM_CPP "src/systems/*.cpp")
 source_group("Source Files\\systems" FILES ${Sigma_SRC_SYSTEM_CPP})
 
+# Outpit the compiler ID.
+message("Compiler ID: " ${CMAKE_CXX_COMPILER_ID})
+
 # check for gcc version to set c++11 or c++0x
 # thanks to http://stackoverflow.com/questions/10984442/how-to-detect-c11-support-of-a-compiler-with-cmake
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
@@ -42,6 +45,9 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
         # compiler is gcc 4.7 or higher. Force c++11.
         add_definitions(-std=c++11)
     endif ()
+elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
+elseif (MSVC AND (MSVC10 OR MSVC11))
+    message("Support Visual Studio!")
 else ()
     message(FATAL_ERROR "Your C++ compiler does not support C++11.")
 endif ()
