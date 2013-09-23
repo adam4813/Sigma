@@ -6,11 +6,9 @@
 std::map<std::string,IFactory::FactoryFunction> SimplePhysics::getFactoryFunctions()
 {
     using namespace std::placeholders;
-    std::map<std::string,IFactory::FactoryFunction> retval=
-    {
-        {"PhysicsMover",std::bind(&SimplePhysics::createPhysicsMover,this,_1,_2,_3)},
-        {"ViewMover",std::bind(&SimplePhysics::createViewMover,this,_1,_2,_3)}
-    };
+    std::map<std::string,IFactory::FactoryFunction> retval;
+	retval["PhysicsMover"] = std::bind(&SimplePhysics::createPhysicsMover,this,_1,_2,_3);
+    retval["ViewMover"] = std::bind(&SimplePhysics::createViewMover,this,_1,_2,_3);
     return retval;
 }
 

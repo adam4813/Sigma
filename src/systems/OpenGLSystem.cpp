@@ -18,13 +18,11 @@ std::map<std::string,IFactory::FactoryFunction>
         OpenGLSystem::getFactoryFunctions()
 {
     using namespace std::placeholders;
-    std::map<std::string,IFactory::FactoryFunction> retval=
-    {
-        {"GLSprite",std::bind(&OpenGLSystem::createGLSprite,this,_1,_2,_3)},
-        {"GLIcoSphere",std::bind(&OpenGLSystem::createGLIcoSphere,this,_1,_2,_3)},
-        {"GLCubeSphere",std::bind(&OpenGLSystem::createGLCubeSphere,this,_1,_2,_3)},
-        {"GLMesh",std::bind(&OpenGLSystem::createGLMesh,this,_1,_2,_3)}
-    };
+    std::map<std::string,IFactory::FactoryFunction> retval;
+	retval["GLSprite"] = std::bind(&OpenGLSystem::createGLSprite,this,_1,_2,_3);
+    retval["GLIcoSphere"] = std::bind(&OpenGLSystem::createGLIcoSphere,this,_1,_2,_3);
+    retval["GLCubeSphere"] = std::bind(&OpenGLSystem::createGLCubeSphere,this,_1,_2,_3);
+    retval["GLMesh"] = std::bind(&OpenGLSystem::createGLMesh,this,_1,_2,_3);
     return retval;
 }
 
