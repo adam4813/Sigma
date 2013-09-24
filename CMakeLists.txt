@@ -8,7 +8,7 @@ set(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x86)
 
 # change output directory of executable so that relative paths in the code are correct
 # note that test.sc must also be moved to build/bin
-SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
+SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/debug/bin)
 
 set(Sigma_SRC "")
 set(Sigma_LIB "")
@@ -93,12 +93,13 @@ if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
   endif(NOT SDL2_FOUND AND NOT SDL2IMAGE_FOUND)
 
   # Link the libraries
-  set(SIGMA_LIBS ${SIGMA_LIBS} ${SDL2_LIBRARY} ${SDL2IMAGE_LIBRARY} ${GLEW_LIBRARY} SDL2main)
+  set(SIGMA_LIBS ${SIGMA_LIBS} ${SDL2_LIBRARY} ${SDL2IMAGE_LIBRARY} ${GLEW_LIBRARY} SDL2main SOIL)
   link_libraries (
     ${SDL2_LIBRARY}
     ${SDL2IMAGE_LIBRARY} # if using SDL_image, obviously
     ${GLEW_LIBRARY} # FindGLEW.cmake set this variable
     SDL2main # Sadly not included in SDL_LIBRARY variable
+    SOIL
   )
 
   set(IOPSYS "OS_SDL" CACHE STRING "Select the Op Sys you want to use")
