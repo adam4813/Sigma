@@ -6,7 +6,7 @@
 
 #include "GLMesh.h"
 #include "GL/glew.h"
-#include "SOIL\SOIL.h"
+#include "SOIL/SOIL.h"
 #include "GLIcoSphere.h"
 
 GLMesh::GLMesh(const int entityID) : IGLComponent(entityID) {
