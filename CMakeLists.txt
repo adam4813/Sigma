@@ -113,6 +113,7 @@ set_property(CACHE IOPSYS PROPERTY STRINGS "OS_SDL" "OS_Win32")
 message("Using ${IOPSYS}...")
 
 add_subdirectory("src/os")
+add_subdirectory("tests")
 
 # add the executable
 add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP} ${Sigma_SRC_CONTROLLERS_H} ${Sigma_SRC_CONTROLLERS_CPP})
