@@ -9,10 +9,19 @@ Requires CMake and a compiler that supports C++11.
 Installing
 ===
 
+GUI Mode
 * Run CMake and set the source directory to the root folder.
 * Set the build directory to root/build/
 * Configure and generate your make/project/solutions files.
 * Build and run.
+
+Command Mode
+* mkdir build/
+* cd build/
+* cmake ..
+* make
+
+Finally you must copy the shaders folder and test.sc into the executable folder. E.g. build/bin/ or maybe build/bin/Debug|Release.
 
 Visual Studio
 ===
