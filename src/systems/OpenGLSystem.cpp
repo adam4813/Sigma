@@ -189,7 +189,7 @@ bool OpenGLSystem::Update(const double delta) {
 		// Loop through and draw each component.
 		for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
 			for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
-				citr->second->Update(&this->view->ViewMatrix[0][0], &this->ProjectionMatrix[0][0]);
+				citr->second->Render(&this->view->ViewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 			}
 		}
 

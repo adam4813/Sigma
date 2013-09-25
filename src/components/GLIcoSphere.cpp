@@ -143,8 +143,8 @@ void GLIcoSphere::LoadShader() {
 }
 
 
-void GLIcoSphere::Update(glm::mediump_float *view, glm::mediump_float *proj) {
-	GLMesh::Update(view, proj);
+void GLIcoSphere::Render(glm::mediump_float *view, glm::mediump_float *proj) {
+	GLMesh::Render(view, proj);
 }
 
 glm::vec3 GetMidPoint(Sigma::Vertex v1, Sigma::Vertex v2) {

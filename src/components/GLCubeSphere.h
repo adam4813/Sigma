@@ -28,7 +28,7 @@ public:
 	 * \param[in] None
 	 * \returns   void
 	 */
-	virtual void Update(glm::mediump_float *view, glm::mediump_float *proj);
+	virtual void Render(glm::mediump_float *view, glm::mediump_float *proj);
 
 	/// The shader used for rendering GLCubeSphere.
 	void LoadShader(std::string shader_name);

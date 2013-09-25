@@ -256,7 +256,7 @@ void GLCubeSphere::LoadShader(std::string shader_name) {
 	this->_shader.CreateAndLinkProgram();
 }
 
-void GLCubeSphere::Update(glm::mediump_float *view, glm::mediump_float *proj) {
+void GLCubeSphere::Render(glm::mediump_float *view, glm::mediump_float *proj) {
 	this->_shader.Use();
 
 	if(this->fix_to_camera) {

@@ -5,18 +5,19 @@
 #include "GLTransform.h"
 
 namespace Sigma {
-	// A helper to store which index each of its verts are.
+	// A struct to store which index each of its verts are.
 	struct Face {
 		Face(unsigned short v1, unsigned short v2, unsigned short v3) : v1(v1), v2(v2), v3(v3) { }
 		unsigned short v1, v2, v3;
 	};
 
-	// A helper to store the location for each vertex.
+	// A struct to store the location for each vertex.
 	struct Vertex {
 		Vertex(float x, float y, float z) : x(x), y(y), z(z) { }
 		float x,y,z;
 	};
 
+	// A struct to store the color value for each vertex
 	struct Color {
 		Color(float r, float g, float b) : r(r), g(g), b(b) { }
 		float r,g,b;
@@ -53,17 +54,19 @@ namespace Sigma {
 		virtual unsigned int MeshGroup_ElementCount(const unsigned int group = 0) const = 0;
 
 		/**
-		 * \brief Returns the draw type for this component.
+		 * \brief Returns the draw mode for this component.
 		 *
-		 * \returns unsigned int The draw type (ex. GL_TRIANGLES, GL_TRIANGLE_STRIP).
+		 * \returns unsigned int The draw mode (ex. GL_TRIANGLES, GL_TRIANGLE_STRIP).
 		 */
 		unsigned int DrawMode() const { return this->drawMode; }
 
 		/**
-		 * \brief Update renders the object
+		 * \brief Renders the component.
 		 *
+		 * \param[in/out] glm::mediump_float * view The current view matrix
+		 * \param[in/out] glm::mediump_float * proj The current project matrix
 		 */
-		virtual void Update(glm::mediump_float *view, glm::mediump_float *proj)=0;
+		virtual void Render(glm::mediump_float *view, glm::mediump_float *proj)=0;
 
 		/**
 		 * \brief Retrieves the transform object for this component.
@@ -72,6 +75,11 @@ namespace Sigma {
 		 */
 		GLTransform* Transform() { return &transform; }
 
+		/**
+		 * \brief Return the VAO ID of this component.
+		 *
+		 * \returns   unsigned int The VAO ID.
+		 */
 		unsigned int Vao() const { return this->vao; }
 
 		/**
@@ -93,6 +101,7 @@ namespace Sigma {
 			}
 		};
 
+		// The index in buffers for each type of buffer.
 		int ElemBufIndex;
 		int VertBufIndex;
 		int UVBufIndex;
@@ -100,10 +109,10 @@ namespace Sigma {
 		int NormalBufIndex;
 
 	protected:
-		unsigned int buffers[10];
+		unsigned int buffers[10]; // The various buffer IDs.
 		unsigned int vao; // The VAO that describes this component's data.
-		unsigned int drawMode;
-		GLuint cull_face;
-		GLTransform transform;
+		unsigned int drawMode; // The current draw mode (ex. GL_TRIANGLES, GL_TRIANGLE_STRIP).
+		GLuint cull_face; // The current culling method for this component.
+		GLTransform transform; // The transform of this component.
 	};
 }
