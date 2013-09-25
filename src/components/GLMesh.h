@@ -101,7 +101,7 @@ public:
 	const Sigma::Vertex* GetVertex(const unsigned int index) {
 		try {
 			return &this->verts.at(index);
-    } catch (std::out_of_range& oor) {
+    } catch (std::out_of_range&) {
 			return nullptr;
 		}
 	}
@@ -125,7 +125,7 @@ public:
 	const Sigma::Face* GetFace(const unsigned int index) {
 		try {
 			return &this->faces.at(index);
-    } catch (std::out_of_range& oor) {
+    } catch (std::out_of_range&) {
 			return nullptr;
 		}
 	}
@@ -134,7 +134,7 @@ public:
 		try {
 			this->faces.erase(this->faces.begin() + index);
 			return true;
-    } catch (std::out_of_range& oor) {
+    } catch (std::out_of_range&) {
 			return false;
 		}
 	}
@@ -182,7 +182,7 @@ public:
 	const Sigma::Color* GetVertexColor(const unsigned int index) {
 		try {
 			return &this->colors.at(index);
-    } catch (std::out_of_range& oor) {
+    } catch (std::out_of_range&) {
 			return nullptr;
 		}
 	}
