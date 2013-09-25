@@ -2,12 +2,15 @@
 #include "Property.h"
 #include <fstream>
 #include <iostream>
+#include <sstream>
 
 namespace Sigma {
 	namespace parser {
 		bool SCParser::Parse(const std::string& fname) {
 			this->fname = fname;
 			std::ifstream in(this->fname, std::ios::in);
+
+			// Some type of error opening the file
 			if (!in) {
 				std::cerr << "Cannot open " << fname << std::endl;
 				return false;
@@ -19,44 +22,49 @@ namespace Sigma {
 
 				char key[1];
 				key[0] = line.substr(0,1)[0];
-				if (key[0] == '@') {
+				if (key[0] == '@') { // name
 					if (currentEntity != nullptr) {
-						this->entities.push_back(*currentEntity);
-						delete currentEntity;
+						this->entities.push_back(*currentEntity); // Copy
+						delete currentEntity; // delete the heap original
 					}
 					currentEntity = new Sigma::parser::Entity();
 					currentEntity->name = line.substr(1);
 				}
-				else if (key[0] == '#') {
+				else if (key[0] == '#') { // id
 					currentEntity->id = atoi(line.substr(1).c_str());
 				}
-				else if (key[0] == '&') {
+				else if (key[0] == '&') { // component type
 					Sigma::parser::Component c;
 					c.type = line.substr(1);
 					while (getline(in, line)) {
-						if (line.substr(0,1) == ">") {
+						if (line.substr(0,1) == ">") { // property line
 							std::string propName = line.substr(1, line.find("=") - 1);
 							std::string propValue = line.substr(line.find("=") + 1);
 							std::string propType = propValue.substr(propValue.size() - 1);
 							propValue = propValue.substr(0, propValue.size() - 1);
 
-							if (propType == "f") {
+							if (propType == "f") { // float
 								Property p(propName, static_cast<float>(atof(propValue.c_str())));
 								c.properties.push_back(p);
 							}
-							else if (propType == "s") {
+							else if (propType == "s") { // string
 								Property p(propName, propValue);
 								c.properties.push_back(p);
 							}
-							else if (propType == "i") {
+							else if (propType == "i") { // int
 								Property p(propName, atoi(propValue.c_str()));
 								c.properties.push_back(p);
 							}
 							else if (propType == "b") {
+								// bool can be represented in many ways.
+								// Let us rely on the implementation of the std lib to match the value against the representations it knows.
+								bool b;
+								std::stringstream ss(propValue);
+								ss >> b;
 								Property p(propName, atoi(propValue.c_str()));
 								c.properties.push_back(p);
 							}
-						} else if (line.substr(0,1) == "#") {
+						} else if (line.substr(0,1) == "#") { // id
 							Property p("id", atoi(line.substr(1).c_str()));
 							c.properties.push_back(p);
 						} else {
@@ -67,10 +75,10 @@ namespace Sigma {
 				}
 			}
 			if (currentEntity != nullptr) {
-				this->entities.push_back(*currentEntity);
-				delete currentEntity;
+				this->entities.push_back(*currentEntity); // copy
+				delete currentEntity; // delete the heap original
 			}
-			return true;
+			return true; // Successfully parsed a file. It might have been empty though.
 		}
 
 		unsigned int SCParser::EntityCount() {
