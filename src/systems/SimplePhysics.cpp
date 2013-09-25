@@ -1,5 +1,5 @@
 #include "SimplePhysics.h"
-#include "../Property.h"
+#include "Property.h"
 #include "../components/PhysicsMover.h"
 #include "../components/ViewMover.h"
 
