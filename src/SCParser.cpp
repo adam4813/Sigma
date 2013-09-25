@@ -39,24 +39,25 @@ namespace Sigma {
 							std::string propValue = line.substr(line.find("=") + 1);
 							std::string propType = propValue.substr(propValue.size() - 1);
 							propValue = propValue.substr(0, propValue.size() - 1);
-							Property p(propName);
 
 							if (propType == "f") {
-								p.Set<float>(static_cast<float>(atof(propValue.c_str())));
+								Property p(propName, static_cast<float>(atof(propValue.c_str())));
+								c.properties.push_back(p);
 							}
 							else if (propType == "s") {
-								p.Set<std::string>(propValue);
+								Property p(propName, propValue);
+								c.properties.push_back(p);
 							}
 							else if (propType == "i") {
-								p.Set<int>(atoi(propValue.c_str()));
+								Property p(propName, atoi(propValue.c_str()));
+								c.properties.push_back(p);
 							}
 							else if (propType == "b") {
-								p.Set<bool>(atoi(propValue.c_str()));
+								Property p(propName, atoi(propValue.c_str()));
+								c.properties.push_back(p);
 							}
-							c.properties.push_back(p);
 						} else if (line.substr(0,1) == "#") {
-							Property p("id");
-							p.Set<int>(atoi(line.substr(1).c_str()));
+							Property p("id", atoi(line.substr(1).c_str()));
 							c.properties.push_back(p);
 						} else {
 							break;
