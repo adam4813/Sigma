@@ -137,8 +137,8 @@ void GLIcoSphere::InitializeBuffers() {
 }
 
 void GLIcoSphere::LoadShader() {
-	GLIcoSphere::shader.LoadFromFile(GL_VERTEX_SHADER, "../../../shaders/icosphere.vert");
-	GLIcoSphere::shader.LoadFromFile(GL_FRAGMENT_SHADER, "../../../shaders/icosphere.frag");
+	GLIcoSphere::shader.LoadFromFile(GL_VERTEX_SHADER, "shaders/icosphere.vert");
+	GLIcoSphere::shader.LoadFromFile(GL_FRAGMENT_SHADER, "shaders/icosphere.frag");
 	GLIcoSphere::shader.CreateAndLinkProgram();
 }
 
