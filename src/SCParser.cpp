@@ -61,7 +61,7 @@ namespace Sigma {
 								bool b;
 								std::stringstream ss(propValue);
 								ss >> b;
-								Property p(propName, atoi(propValue.c_str()));
+								Property p(propName, b);
 								c.properties.push_back(p);
 							}
 						} else if (line.substr(0,1) == "#") { // id
