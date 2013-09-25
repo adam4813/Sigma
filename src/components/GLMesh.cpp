@@ -9,7 +9,7 @@
 #include "SOIL/SOIL.h"
 #include "GLIcoSphere.h"
 
-GLMesh::GLMesh(const int entityID) : IGLComponent(entityID) {
+GLMesh::GLMesh(const int entityID) : Sigma::IGLComponent(entityID) {
 	memset(&this->buffers, 0, sizeof(this->buffers));
 	this->vao = 0;
 	this->drawMode = GL_TRIANGLES;
@@ -67,7 +67,7 @@ void GLMesh::InitializeBuffers() {
 	glBindVertexArray(0); // Reset the buffer binding because we are good programmers.
 }
 
-void GLMesh::Update(glm::mediump_float *view, glm::mediump_float *proj) {
+void GLMesh::Render(glm::mediump_float *view, glm::mediump_float *proj) {
 	//this->Transform()->Rotate(0.0f, 1.0f, 0.0f);
 
 	GLIcoSphere::shader.Use();

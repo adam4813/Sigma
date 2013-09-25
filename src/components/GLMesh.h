@@ -47,7 +47,7 @@ struct FaceIndices {
 	VertexIndices v[3];
 };
 
-class GLMesh : public IGLComponent {
+class GLMesh : public Sigma::IGLComponent {
 public:
     SET_COMPONENT_ID("GLMesh");
 	GLMesh(const int entityID); // Ctor that sets the entity ID.
@@ -58,7 +58,7 @@ public:
 	 * \returns IGLCompoent* the newly created component.
 	 */
 	void InitializeBuffers() ;
-	virtual void Update(glm::mediump_float *view, glm::mediump_float *proj);
+	virtual void Render(glm::mediump_float *view, glm::mediump_float *proj);
 
 	/**
 	 * \brief Returns the number of elements to draw for this component.
