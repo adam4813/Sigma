@@ -96,7 +96,7 @@ void GLCubeSphere::LoadTexture(std::string texture_name) {
 	// There are always six files
 	char filenames[6][100];
 	for(int i=0; i < 6; i++) {
-		_snprintf(filenames[i],100, "%s%d.jpg", texture_name.c_str(), i+1);
+		sprintf(filenames[i], "%s%d.jpg", texture_name.c_str(), i+1);
 	}
 
 	this->_cubeMap = SOIL_load_OGL_cubemap(filenames[0], filenames[1], filenames[2], filenames[3], filenames[4], filenames[5], SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
@@ -134,7 +134,7 @@ void GLCubeSphere::LoadTexture(std::string texture_name) {
 
 	// There are always six files
 	for(int i=0; i < 6; i++) {
-		_snprintf(filenames[i],100, "%s_nm%d.jpg", texture_name.c_str(), i+1);
+		sprintf(filenames[i], "%s_nm%d.jpg", texture_name.c_str(), i+1);
 	}
 
 	this->_cubeNormalMap = SOIL_load_OGL_cubemap(filenames[0], filenames[1], filenames[2], filenames[3], filenames[4], filenames[5], SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
@@ -248,8 +248,8 @@ void GLCubeSphere::SubDivide(int levels) {
 
 void GLCubeSphere::LoadShader(std::string shader_name) {
 	char vertex_shader[100], fragment_shader[100];
-	_snprintf(vertex_shader,100, "shaders/%s.vert", shader_name.c_str());
-	_snprintf(fragment_shader,100, "shaders/%s.frag", shader_name.c_str());
+	sprintf(vertex_shader, "shaders/%s.vert", shader_name.c_str());
+	sprintf(fragment_shader, "shaders/%s.frag", shader_name.c_str());
 
 	this->_shader.LoadFromFile(GL_VERTEX_SHADER, vertex_shader);
 	this->_shader.LoadFromFile(GL_FRAGMENT_SHADER, fragment_shader);
