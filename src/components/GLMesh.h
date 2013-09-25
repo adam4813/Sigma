@@ -47,7 +47,7 @@ struct FaceIndices {
 	VertexIndices v[3];
 };
 
-class GLMesh : public IGLComponent {
+class GLMesh : public Sigma::IGLComponent {
 public:
     SET_COMPONENT_ID("GLMesh");
 	GLMesh(const int entityID); // Ctor that sets the entity ID.

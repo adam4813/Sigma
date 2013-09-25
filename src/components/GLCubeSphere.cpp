@@ -16,7 +16,7 @@ namespace Sigma {
 																	 (abs(rhs.z - lhs.z) < std::numeric_limits<float>::epsilon())); }
 }
 
-GLCubeSphere::GLCubeSphere( const int entityID /*= 0*/ ) : IGLComponent(entityID) {
+GLCubeSphere::GLCubeSphere( const int entityID /*= 0*/ ) : Sigma::IGLComponent(entityID) {
 	this->drawMode = GL_TRIANGLES;
 	this->VertBufIndex = 0;
 	this->ColorBufIndex = 1;

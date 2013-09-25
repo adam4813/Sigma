@@ -8,7 +8,7 @@
 	#include "SDL/SDL_image.h"
 #endif
 
-GLSprite::GLSprite( const int entityID /*= 0*/ ) : IGLComponent(entityID)  {
+GLSprite::GLSprite( const int entityID /*= 0*/ ) : Sigma::IGLComponent(entityID)  {
 	this->drawMode = GL_TRIANGLES;
 	this->ElemBufIndex = 2;
 	this->ColorBufIndex = 1;

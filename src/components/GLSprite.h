@@ -3,7 +3,7 @@
 #include "../systems/GLSLShader.h"
 #include "../IGLComponent.h"
 
-class GLSprite : public IGLComponent {
+class GLSprite : public Sigma::IGLComponent {
 public:
     SET_COMPONENT_ID("GLSprite");
 	// We have a private ctor so the factory method must be used.

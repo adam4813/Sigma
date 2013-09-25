@@ -9,7 +9,7 @@
 #include "SOIL/SOIL.h"
 #include "GLIcoSphere.h"
 
-GLMesh::GLMesh(const int entityID) : IGLComponent(entityID) {
+GLMesh::GLMesh(const int entityID) : Sigma::IGLComponent(entityID) {
 	memset(&this->buffers, 0, sizeof(this->buffers));
 	this->vao = 0;
 	this->drawMode = GL_TRIANGLES;

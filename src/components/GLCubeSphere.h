@@ -6,7 +6,7 @@
 #include "../GLTransform.h"
 #include "../IGLComponent.h"
 
-class GLCubeSphere : public IGLComponent {
+class GLCubeSphere : public Sigma::IGLComponent {
 public:
     SET_COMPONENT_ID("GLCubeSphere");
 	// We have a private ctor so the factory method must be used.
