@@ -6,7 +6,7 @@
 
 #include "GLMesh.h"
 #include "GL/glew.h"
-#include "SOIL\SOIL.h"
+#include "SOIL/SOIL.h"
 #include "GLIcoSphere.h"
 
 GLMesh::GLMesh(const int entityID) : IGLComponent(entityID) {
@@ -259,9 +259,17 @@ void GLMesh::LoadMesh(std::string fname) {
 				v[j] = this->verts.size();
 
 				this->verts.push_back(temp_verts[temp_face_indices[i].v[j].vertex]);
-				this->texCoords.push_back(temp_uvs[temp_face_indices[i].v[j].uv]);
-				this->vertNorms.push_back(temp_normals[temp_face_indices[i].v[j].normal]);
 				this->colors.push_back(temp_colors[temp_face_indices[i].v[j].color]);
+				
+				// Make sure we actually have uvs
+				if(temp_face_indices[i].v[j].uv < temp_uvs.size()) {
+					this->texCoords.push_back(temp_uvs[temp_face_indices[i].v[j].uv]);
+				}
+
+				// Make sure we actually have normals
+				if(temp_face_indices[i].v[j].normal < temp_normals.size()) {
+					this->vertNorms.push_back(temp_normals[temp_face_indices[i].v[j].normal]);
+				}
 
 				unique_vertices.push_back(temp_face_indices[i].v[j]);
 			}

@@ -21,32 +21,42 @@ int main(int argCount, char **argValues) {
 	SimplePhysics physys;
 	FactorySystem::getInstance().register_Factory(&glsys);
 	FactorySystem::getInstance().register_Factory(&physys);
+
 	IOpSys* os = nullptr;
+
 #if defined OS_Win32
 	os = new win32();
 #elif defined OS_SDL
 	os = new SDLSys();
 #endif
 
+	// Create the window
 	if(os->CreateGraphicsWindow(1024,768) == 0) {
-		std::cout << "Error creating window!" << std::endl;
+		std::cerr << "Error creating window!" << std::endl;
+		delete os;
+		return -1;
 	}
 
+	// Start the openGL system
 	const int* version = glsys.Start();
 	glsys.SetViewportSize(os->GetWindowWidth(), os->GetWindowHeight());
 
 	if (version[0] == -1) {
-		std::cout << "Error starting OpenGL!" << std::endl;
+		std::cerr << "Error starting OpenGL!" << std::endl;
+		delete os;
+		return -1;
 	} else {
 		std::cout << "OpenGL version: " << version[0] << "." << version[1] << std::endl;
 	}
 
+	// Parse the scene file to retrieve entities
 	Sigma::parser::SCParser parser;
 
 	if (!parser.Parse("test.sc")) {
 		assert(0 && "Failed to load entities from file.");
 	}
 
+	// Create the entity's components
 	for (unsigned int i = 0; i < parser.EntityCount(); ++i) {
 		const Sigma::parser::Entity* e = parser.GetEntity(i);
 		for (auto itr = e->components.begin(); itr != e->components.end(); ++itr) {
@@ -57,20 +67,27 @@ int main(int argCount, char **argValues) {
 	}
 
 	std::vector<Property> props;
+
+	// Create the player view controller
 	physys.createViewMover("ViewMover", 9, props);
 	ViewMover* mover = reinterpret_cast<ViewMover*>(physys.getComponent(9,ViewMover::getStaticComponentID()));
 	Sigma::event::handler::GLSixDOFViewController cameraController(glsys.View(), mover);
 	IOpSys::KeyboardEventSystem.Register(&cameraController);
 
+	// Setup the timer
 	os->SetupTimer();
 
+	// Begin main loop
 	double delta;
 	bool isWireframe=false;
 
 	while (os->MessageLoop()) {
+
+		// Get time in ms, store it in seconds too
 		delta = os->GetDeltaTime();
 		double deltaSec = (double)delta/1000.0f;
 
+		// Debug keys
 		if (os->KeyReleased('P', true)) { // Wireframe mode
 			if (!isWireframe) {
 				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
@@ -89,12 +106,12 @@ int main(int argCount, char **argValues) {
 		// Pass in delta time in seconds
 		physys.Update(deltaSec);
 
+		// Update the renderer and present
 		if (glsys.Update(delta)) {
 			os->Present();
 		}
 	}
 
 	delete os;
-
 	return 0;
 }
