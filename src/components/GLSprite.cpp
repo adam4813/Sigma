@@ -76,8 +76,8 @@ void GLSprite::InitializeBuffers() {
 }
 
 void GLSprite::LoadShader() {
-	GLSprite::shader.LoadFromFile(GL_VERTEX_SHADER, "../../../shaders/vert.shade");
-	GLSprite::shader.LoadFromFile(GL_FRAGMENT_SHADER, "../../../shaders/frag.shade");
+	GLSprite::shader.LoadFromFile(GL_VERTEX_SHADER, "shaders/vert.shade");
+	GLSprite::shader.LoadFromFile(GL_FRAGMENT_SHADER, "shaders/frag.shade");
 	GLSprite::shader.CreateAndLinkProgram();
 }
 

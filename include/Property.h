@@ -2,7 +2,6 @@
 
 #include <string>
 
-
 /**
   * \brief A class to contain a generic property.
   *
@@ -15,10 +14,20 @@ class Property {
 private:
 	Property() { }
 public:
+	// Copy
 	Property(const Property &other) {
 		this->name = other.name;
-		this->vholder = other.vholder;
-		const_cast<Property&>(other).vholder = nullptr;
+		if (other.vholder != nullptr) {
+			this->vholder = other.vholder->Clone();
+		}
+		else {
+			this->vholder = nullptr;
+		}
+	}
+
+	// Move
+	Property(Property&& other) : name(other.name), vholder(other.vholder) {
+		other.vholder = nullptr;
 	}
 
 	/**
@@ -29,7 +38,6 @@ public:
 	 */
 	template <typename t>
 	Property(std::string name, t value) : name(name), vholder(new ValueHolder<t>(value)) { }
-
 
 	~Property() { delete this->vholder; }
 
@@ -56,6 +64,12 @@ private:
 	class ValueHolderBase {
 	public:
 		virtual ~ValueHolderBase() { }
+		/**
+		 * \brief Creates a clone of the held object.
+		 *
+		 * \returns   ValueHolderBase* A clone of the held object.
+		 */
+		virtual ValueHolderBase* Clone() const = 0;
 	};
 
 	
@@ -67,6 +81,7 @@ private:
 	class ValueHolder : public ValueHolderBase {
 	public:
 		ValueHolder(t value) : value(value) {}
+		virtual ValueHolder* Clone() const { return new ValueHolder(value); }
 		t Get() { return this->value; }
 	private:
 		t value;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Property.h"
+#include "Property.h"
 #include "../IFactory.h"
 #include "../ISystem.h"
 #include "../IGLComponent.h"

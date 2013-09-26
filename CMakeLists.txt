@@ -128,3 +128,6 @@ add_definitions(-D${IOPSYS})
 
 # Link the executable to the Hello library.
 target_link_libraries (Sigma ${Sigma_LIB} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})
+
+# Now we add the SigmaTests project
+add_subdirectory("tests")
