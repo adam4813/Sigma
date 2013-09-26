@@ -23,6 +23,19 @@ Command Mode
 
 Finally you must copy the shaders folder and test.sc into the executable folder. E.g. build/bin/ or maybe build/bin/Debug|Release.
 
+Using the makefile-wrapper
+* make rebuild # make clean; make
+
+Eclipse CDT (Unix/Linux)
+* make eclipse
+
+Running
+===
+
+__(Unix/Linux)__
+
+The binary `Sigma` is written to `build/bin`, `build/bin/debug`, or `build/debug/bin`
+
 Visual Studio
 ===
 You must change the startup project via right-clicking on the project in the solution explorer in order for Debugging to launch the correct program.

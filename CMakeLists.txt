@@ -47,7 +47,8 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
         COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
     if (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
         # c++11 std only appears in gcc 4.7 or higher. c++0x will work for lesser versions.
-        add_definitions(-std=c++0x)
+        message("gcc ${GCC_VERSION} does not support c++11, only c++0x. This may cause some problems in the future. We recommend upgrading to gcc-4.7 or greater.")
+	add_definitions(-std=c++0x)
     else()
         # compiler is gcc 4.7 or higher. Force c++11.
         add_definitions(-std=c++11)
@@ -62,6 +63,11 @@ add_definitions(
   -DGLEW_STATIC # Add a define to prevent GLEW linker warnings
 )
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+if(DEBUG)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
+endif(DEBUG)
+
 
 # Link aganst OpenGL and GLEW
 find_package(OpenGL REQUIRED)
@@ -93,12 +99,13 @@ if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
   endif(NOT SDL2_FOUND AND NOT SDL2IMAGE_FOUND)
 
   # Link the libraries
-  set(SIGMA_LIBS ${SIGMA_LIBS} ${SDL2_LIBRARY} ${SDL2IMAGE_LIBRARY} ${GLEW_LIBRARY} SDL2main)
+  set(SIGMA_LIBS ${SIGMA_LIBS} ${SDL2_LIBRARY} ${SDL2IMAGE_LIBRARY} ${GLEW_LIBRARY} SDL2main SOIL)
   link_libraries (
     ${SDL2_LIBRARY}
     ${SDL2IMAGE_LIBRARY} # if using SDL_image, obviously
     ${GLEW_LIBRARY} # FindGLEW.cmake set this variable
     SDL2main # Sadly not included in SDL_LIBRARY variable
+    SOIL
   )
 
   set(IOPSYS "OS_SDL" CACHE STRING "Select the Op Sys you want to use")
