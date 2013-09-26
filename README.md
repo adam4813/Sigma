@@ -34,9 +34,7 @@ Running
 
 __(Unix/Linux)__
 
-The binary `Sigma` is written to `build/bin`, and can be run with:
-
-	./build/bin/Sigma
+The binary `Sigma` is written to `build/bin`, `build/bin/debug`, or `build/debug/bin`
 
 Visual Studio
 ===
