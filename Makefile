@@ -12,10 +12,19 @@ $(EXEC): src CMakeLists.txt
 	cd build/debug/bin
 
 clean:
-	rm -r build
+	@if [ -d build ] ; \
+	then \
+		rm -r build; \
+	fi;	
 .PHONY: clean
 
 rebuild:
 	make clean
 	make all
 .PHONY: rebuild
+
+eclipse: CMakeLists.txt
+	make clean
+	mkdir build
+	cd build && cmake -G"Eclipse CDT4 - Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ..
+.PHONY: eclipse
