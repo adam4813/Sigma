@@ -21,6 +21,8 @@ Command Mode
 * cmake ..
 * make
 
+Finally you must copy the shaders folder and test.sc into the executable folder. E.g. build/bin/ or maybe build/bin/Debug|Release.
+
 Using the makefile-wrapper
 * make rebuild # make clean; make
 
@@ -32,9 +34,9 @@ Running
 
 __(Unix/Linux)__
 
-The binary `Sigma` is written to `build/debug/bin`, and can be run with:
+The binary `Sigma` is written to `build/bin`, and can be run with:
 
-	./build/debug/bin/Sigma
+	./build/bin/Sigma
 
 Visual Studio
 ===

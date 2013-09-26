@@ -8,7 +8,7 @@ set(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x86)
 
 # change output directory of executable so that relative paths in the code are correct
 # note that test.sc must also be moved to build/bin
-SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/debug/bin)
+SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 
 set(Sigma_SRC "")
 set(Sigma_LIB "")
