@@ -86,31 +86,14 @@ namespace {
 	}
 
 	// Testing get without a different type than the set
-	TEST(PropertyTest, PropertyGetPODDifferentType) {
+	TEST(PropertyTest, PropertyGetDifferentType) {
 		const std::string name = "PropertyTestName";
-
-		// First we make sure storing and retrieving the complex type works.
-		std::vector<int> testVec;
-		testVec.push_back(10);
-		Property p(name, testVec);
-		EXPECT_NO_THROW(p.Get<std::vector<int>>());
-
-		// Next we will try to retrieve the complex type when we only stored a POD.
 		int testINT = 10;
 		Property p2(name, testINT);
 		EXPECT_ANY_THROW(p2.Get<std::vector<int>>());
 	}
 	TEST(PropertyTest, PropertyGetPTRDifferentType) {
 		const std::string name = "PropertyTestName";
-
-		// First we make sure storing and retrieving the complex type works.
-		std::vector<int>* testVec = new std::vector<int>();
-		testVec->push_back(10);
-		Property p(name, testVec);
-		EXPECT_NO_THROW(p.Get<std::vector<int>*>());
-		delete testVec;
-
-		// Next we will try to retrieve the complex type when we only stored a POD.
 		int* testINT = new int();
 		*testINT = 10;
 		Property p2(name, testINT);
