@@ -121,6 +121,7 @@ if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
       message(ERROR "Please install SOIL, or if you have it installed, make sure that modules/FindSOIL.cmake looks for it")
     endif(NOT ${SOIL_FOUND})
     set(SIGMA_LIBS ${SIGMA_LIBS} ${SOIL_LIBRARY})
+    link_libraries(${SOIL_LIBRARY})
   endif(${FORCE_SOIL})
   
 
