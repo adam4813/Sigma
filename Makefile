@@ -6,10 +6,11 @@ all: $(EXEC)
 .PHONY: all
 
 $(EXEC): src CMakeLists.txt
-	mkdir build
+	mkdir -p build/debug/bin
+	mkdir -p build/bin
 	cd build && cmake .. && make
 	cp test.sc build/debug/bin
-	cd build/debug/bin
+	cp test.sc build/bin
 
 clean:
 	@if [ -d build ] ; \

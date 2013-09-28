@@ -130,4 +130,9 @@ add_definitions(-D${IOPSYS})
 target_link_libraries (Sigma ${Sigma_LIB} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})
 
 # Now we add the SigmaTests project
-add_subdirectory("tests")
+if(WIN32)
+  # because we can't link against gtest.lib on non-windows
+  add_subdirectory("tests")
+endif(WIN32)
+
+
