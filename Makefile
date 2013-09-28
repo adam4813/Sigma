@@ -27,5 +27,11 @@ rebuild:
 eclipse: CMakeLists.txt
 	make clean
 	mkdir build
-	cd build && cmake -G"Eclipse CDT4 - Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ..
+	cd build && cmake -G "Eclipse CDT4 - Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ..
 .PHONY: eclipse
+
+codeblocks: CMakeLists.txt
+	make clean
+	mkdir build
+	cd build && cmake -G "CodeBlocks - Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ..
+.PHONY: codeblocks
