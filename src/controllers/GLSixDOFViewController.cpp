@@ -1,5 +1,3 @@
-#pragma once
-
 #include "GLSixDOFViewController.h"
 
 Sigma::event::handler::GLSixDOFViewController::GLSixDOFViewController(IGLView* view, ViewMover* mover) : mover(mover) {

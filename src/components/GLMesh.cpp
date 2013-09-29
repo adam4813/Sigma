@@ -17,6 +17,7 @@ GLMesh::GLMesh(const int entityID) : Sigma::IGLComponent(entityID) {
 	this->ColorBufIndex = 1;
 	this->VertBufIndex = 0;
 	this->NormalBufIndex = 3;
+	this->UVBufIndex = 4;
 }
 
 void GLMesh::InitializeBuffers() {
@@ -35,6 +36,16 @@ void GLMesh::InitializeBuffers() {
 		GLint posLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Position"); // Find the location in the shader where the vertex buffer data will be placed.
 		glVertexAttribPointer(posLocation, 3, GL_FLOAT, GL_FALSE, 0, 0); // Tell the VAO the vertex data will be stored at the location we just found.
 		glEnableVertexAttribArray(posLocation); // Enable the VAO line for vertex data.
+	}
+	if (this->texCoords.size() > 0) {
+		if (this->buffers[this->UVBufIndex] == 0) {
+			glGenBuffers(1, &this->buffers[this->UVBufIndex]); 	// Generate the vertex buffer.
+		}
+		glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->UVBufIndex]); // Bind the vertex buffer.
+		glBufferData(GL_ARRAY_BUFFER, sizeof(texCoord) * this->texCoords.size(), &this->texCoords.front(), GL_STATIC_DRAW); // Stores the verts in the vertex buffer.
+		GLint uvLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_UV"); // Find the location in the shader where the vertex buffer data will be placed.
+		glVertexAttribPointer(uvLocation, 3, GL_FLOAT, GL_FALSE, 0, 0); // Tell the VAO the vertex data will be stored at the location we just found.
+		glEnableVertexAttribArray(uvLocation); // Enable the VAO line for vertex data.
 	}
 	if (this->colors.size() > 0) {
 		if (this->buffers[this->ColorBufIndex] == 0) {
@@ -369,11 +380,11 @@ void GLMesh::ParseMTL(std::string fname) {
 				} else if (label == "map_Kd") {
 					std::string filepath;
 					s >> filepath;
-					m.diffuseMap = SOIL_load_OGL_texture(filepath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+					m.diffuseMap = SOIL_load_OGL_texture(filepath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
 				} else if (label == "map_Ka") {
 					std::string filepath;
 					s >> filepath;
-					m.ambientMap = SOIL_load_OGL_texture(filepath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+					m.ambientMap = SOIL_load_OGL_texture(filepath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
 				} else {
 					// Blank line
 				}
