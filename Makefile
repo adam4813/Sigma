@@ -1,6 +1,7 @@
 # Makefile for wrapping cmake commands
 
 EXEC=build/debug/bin/Sigma
+CMAKE_FLAGS = #empty on purpose. set from command line like 'make rebuild CMAKE_FLAGS="cmakecmd=value"
 
 all: $(EXEC)
 .PHONY: all
@@ -8,7 +9,7 @@ all: $(EXEC)
 $(EXEC): src CMakeLists.txt
 	mkdir -p build/debug/bin
 	mkdir -p build/bin
-	cd build && cmake .. && make
+	cd build && cmake .. $(CMAKE_FLAGS) && make
 	cp test.sc build/debug/bin
 	cp test.sc build/bin
 
@@ -18,6 +19,10 @@ clean:
 		rm -r build; \
 	fi;	
 .PHONY: clean
+
+debug:
+	make rebuild CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Debug"
+.PHONY: debug
 
 rebuild:
 	make clean
