@@ -16,8 +16,9 @@
 int main(int argCount, char **argValues) {
 	OpenGLSystem glsys;
 	SimplePhysics physys;
-	FactorySystem::getInstance().register_Factory(&glsys);
-	FactorySystem::getInstance().register_Factory(&physys);
+	FactorySystem& factory = FactorySystem::getInstance();
+	factory.register_Factory(&glsys);
+	factory.register_Factory(&physys);
 	IOpSys* os = nullptr;
 #if defined OS_Win32
 	os = new win32();
@@ -47,7 +48,7 @@ int main(int argCount, char **argValues) {
 	for (unsigned int i = 0; i < parser.EntityCount(); ++i) {
 		const Sigma::parser::Entity* e = parser.GetEntity(i);
 		for (auto itr = e->components.begin(); itr != e->components.end(); ++itr) {
-            FactorySystem::getInstance().create(
+            factory.create(
                         itr->type,e->id,
                         const_cast<std::vector<Property>&>(itr->properties));
 		}
