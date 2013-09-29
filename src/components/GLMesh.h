@@ -69,12 +69,15 @@ public:
 	 * \returns unsigned int The number of elements to draw for the given mesh group.
 	 */
 	unsigned int MeshGroup_ElementCount(const unsigned int group = 0) const {
-		if (group < (groupIndex.size() - 1)) {
-			return (groupIndex[group+1] - groupIndex[group]) * 3;
-		} else if (group > (groupIndex.size() - 1)) {
+		if (this->groupIndex.size() == 0) {
+			return 0;
+		}
+		if ((group + 1) < (this->groupIndex.size())) {
+			return (this->groupIndex[group+1] - this->groupIndex[group]) * 3;
+		} else if (group > (this->groupIndex.size() - 1)) {
 			return 0;
 		} else {
-			return (this->faces.size() - groupIndex[group]) * 3;
+			return (this->faces.size() - this->groupIndex[group]) * 3;
 		}
 	}
 
