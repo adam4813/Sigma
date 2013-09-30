@@ -12,7 +12,7 @@
 struct IGLView;
 
 class OpenGLSystem
-    : public IFactory, public ISystem<Sigma::IGLComponent> {
+    : public Sigma::IFactory, public ISystem<Sigma::IGLComponent> {
 public:
 	OpenGLSystem();
 

@@ -14,11 +14,11 @@ OpenGLSystem::~OpenGLSystem() {
 	delete this->view;
 }
 
-std::map<std::string,IFactory::FactoryFunction>
+std::map<std::string, Sigma::IFactory::FactoryFunction>
         OpenGLSystem::getFactoryFunctions()
 {
     using namespace std::placeholders;
-    std::map<std::string,IFactory::FactoryFunction> retval;
+    std::map<std::string, Sigma::IFactory::FactoryFunction> retval;
 	retval["GLSprite"] = std::bind(&OpenGLSystem::createGLSprite,this,_1,_2,_3);
     retval["GLIcoSphere"] = std::bind(&OpenGLSystem::createGLIcoSphere,this,_1,_2,_3);
     retval["GLCubeSphere"] = std::bind(&OpenGLSystem::createGLCubeSphere,this,_1,_2,_3);

@@ -11,7 +11,7 @@ class Property;
 class IMoverComponent;
 
 class SimplePhysics
-    : public IFactory, public ISystem<IMoverComponent> {
+    : public Sigma::IFactory, public ISystem<IMoverComponent> {
 public:
 	SimplePhysics() { }
 	~SimplePhysics() { };

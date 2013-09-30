@@ -3,10 +3,11 @@
 #include "../components/PhysicsMover.h"
 #include "../components/ViewMover.h"
 
-std::map<std::string,IFactory::FactoryFunction> SimplePhysics::getFactoryFunctions()
+std::map<std::string,Sigma::IFactory::FactoryFunction>
+    SimplePhysics::getFactoryFunctions()
 {
     using namespace std::placeholders;
-    std::map<std::string,IFactory::FactoryFunction> retval;
+    std::map<std::string,Sigma::IFactory::FactoryFunction> retval;
 	retval["PhysicsMover"] = std::bind(&SimplePhysics::createPhysicsMover,this,_1,_2,_3);
     retval["ViewMover"] = std::bind(&SimplePhysics::createViewMover,this,_1,_2,_3);
 
