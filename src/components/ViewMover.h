@@ -28,6 +28,7 @@ public:
 	 * \param[in] IGLView * view The view to apply the forces on.
 	 */
 	void View(IGLView* view);
+	const IGLView* View();
 private:
 	IGLView* view;
 
