@@ -140,6 +140,9 @@ void OpenGLSystem::createGLMesh(const std::string type, const unsigned int entit
 		float x = 0.0f;
 		float y = 0.0f;
 		float z = 0.0f;
+		float rx = 0.0f;
+		float ry = 0.0f;
+		float rz = 0.0f;
 		int componentID = 0;
 		std::string cull_face = "back";
 
@@ -157,6 +160,15 @@ void OpenGLSystem::createGLMesh(const std::string type, const unsigned int entit
 			} else if (p->GetName() == "z") {
 				z = p->Get<float>();
 				continue;
+			} else if (p->GetName() == "rx") {
+				rx = p->Get<float>();
+				continue;
+			} else if (p->GetName() == "ry") {
+				ry = p->Get<float>();
+				continue;
+			} else if (p->GetName() == "rz") {
+				rz = p->Get<float>();
+				continue;
 			} else if (p->GetName() == "meshFile") {
 				mesh->LoadMesh(p->Get<std::string>());
 			} else if (p->GetName() == "id") {
@@ -170,6 +182,7 @@ void OpenGLSystem::createGLMesh(const std::string type, const unsigned int entit
 		mesh->SetCullFace(cull_face);
 		mesh->Transform()->Scale(scale,scale,scale);
 		mesh->Transform()->Translate(x,y,z);
+		mesh->Transform()->Rotate(rx,ry,rz);
 		this->addComponent(entityID,mesh);
 }
 
