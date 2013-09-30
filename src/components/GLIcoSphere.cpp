@@ -3,7 +3,7 @@
 #include <map>
 #include <stdint.h>
 
-GLIcoSphere::GLIcoSphere( const int entityID /*= 0*/ ) : GLMesh(entityID) {
+GLIcoSphere::GLIcoSphere( const int entityID /*= 0*/ ) : Sigma::GLMesh(entityID) {
 }
 
 void GLIcoSphere::InitializeBuffers() {
@@ -136,13 +136,6 @@ void GLIcoSphere::InitializeBuffers() {
 	GLMesh::InitializeBuffers();
 }
 
-void GLIcoSphere::LoadShader() {
-	GLIcoSphere::shader.LoadFromFile(GL_VERTEX_SHADER, "shaders/icosphere.vert");
-	GLIcoSphere::shader.LoadFromFile(GL_FRAGMENT_SHADER, "shaders/icosphere.frag");
-	GLIcoSphere::shader.CreateAndLinkProgram();
-}
-
-
 void GLIcoSphere::Render(glm::mediump_float *view, glm::mediump_float *proj) {
 	GLMesh::Render(view, proj);
 }
@@ -191,7 +184,7 @@ void GLIcoSphere::Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::F
 					if (GetVertexColor(v2)->g > 0.0f) {
 						green++;
 					}
-					
+
 					if (blue == green) {
 						int val = rand() % 2;
 						if (val > 0) {
@@ -379,5 +372,3 @@ void GLIcoSphere::Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::F
 //	}
 //	GLMesh::InitializeBuffers();
 //}
-
-GLSLShader GLIcoSphere::shader;

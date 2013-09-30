@@ -10,7 +10,7 @@ struct IcoScphereFace {
 	Sigma::Color colors[3];
 };
 
-class GLIcoSphere : public GLMesh {
+class GLIcoSphere : public Sigma::GLMesh {
 public:
     SET_COMPONENT_ID("GLIcoSphere");
 	// We have a private ctor so the factory method must be used.
@@ -39,11 +39,8 @@ public:
 	void Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::Face> &faces, int level);
 
 	void RefineFace(const unsigned int index);
-
-	// The shader used for rendering GLIcoSphere.
-	static void LoadShader();
-	static GLSLShader shader;
 private:
 	std::vector<Sigma::Vertex> verts; // The verts that the faces refers to. Can be used for later refinement.
 	std::vector<IcoScphereFace> icofaces;
+
 };

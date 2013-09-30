@@ -46,12 +46,13 @@ void OpenGLSystem::createGLSprite(const std::string type, const unsigned int ent
 
 void OpenGLSystem::createGLIcoSphere(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
 		GLIcoSphere* sphere = new GLIcoSphere(entityID);
-		sphere->InitializeBuffers();
 		float scale = 1.0f;
 		float x = 0.0f;
 		float y = 0.0f;
 		float z = 0.0f;
 		int componentID = 0;
+		std::string shader = "shaders/icosphere";
+
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			Property*  p = &(*propitr);
 			if (p->GetName() == "scale") {
@@ -68,10 +69,14 @@ void OpenGLSystem::createGLIcoSphere(const std::string type, const unsigned int 
 				continue;
 			} else if (p->GetName() == "id") {
 				componentID = p->Get<int>();
+			} else if (p->GetName() == "shader"){
+                shader = p->Get<std::string>();
 			}
 		}
 		sphere->Transform()->Scale(scale,scale,scale);
 		sphere->Transform()->Translate(x,y,z);
+		sphere->LoadShader(shader);
+		sphere->InitializeBuffers();
 		this->addComponent(entityID,sphere);
 }
 
@@ -126,15 +131,15 @@ void OpenGLSystem::createGLCubeSphere(const std::string type, const unsigned int
 		sphere->SetCullFace(cull_face);
 		sphere->SetSubdivisions(subdivision_levels);
 		sphere->LoadShader(shader_name);
-		sphere->InitializeBuffers();
 		sphere->LoadTexture(texture_name);
 
 		sphere->Transform()->Scale(scale,scale,scale);
 		sphere->Transform()->Translate(x,y,z);
+		sphere->InitializeBuffers();
 		this->addComponent(entityID,sphere);
 }
 void OpenGLSystem::createGLMesh(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
-        GLMesh* mesh = new GLMesh(entityID);
+        Sigma::GLMesh* mesh = new Sigma::GLMesh(entityID);
 
 		float scale = 1.0f;
 		float x = 0.0f;
@@ -142,6 +147,7 @@ void OpenGLSystem::createGLMesh(const std::string type, const unsigned int entit
 		float z = 0.0f;
 		int componentID = 0;
 		std::string cull_face = "back";
+		std::string shaderfile = "";
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			Property*  p = &*propitr;
@@ -159,17 +165,21 @@ void OpenGLSystem::createGLMesh(const std::string type, const unsigned int entit
 				continue;
 			} else if (p->GetName() == "meshFile") {
 				mesh->LoadMesh(p->Get<std::string>());
-			} else if (p->GetName() == "id") {
+			} else if (p->GetName() == "shader"){
+                shaderfile = p->Get<std::string>();
+            } else if (p->GetName() == "id") {
 				componentID = p->Get<int>();
 			} else if (p->GetName() == "cullface") {
 				cull_face = p->Get<std::string>();
 			}
 		}
 
-		mesh->InitializeBuffers();
 		mesh->SetCullFace(cull_face);
 		mesh->Transform()->Scale(scale,scale,scale);
 		mesh->Transform()->Translate(x,y,z);
+		if(shaderfile != "") mesh->LoadShader(shaderfile);
+        else mesh->LoadShader(); // load default
+		mesh->InitializeBuffers();
 		this->addComponent(entityID,mesh);
 }
 
@@ -209,7 +219,6 @@ const int* OpenGLSystem::Start() {
 
 	// Now that GL is up and running load the shaders
 	GLSprite::LoadShader();
-	GLIcoSphere::LoadShader();
 
 	// Generates a floatly hard-to-read matrix, but a normal, standard 4x4 matrix nonetheless
 	this->ProjectionMatrix = glm::perspective(
