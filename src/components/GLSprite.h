@@ -13,7 +13,7 @@ public:
 	 *
 	 * This is the factory method to create a new GLSprite. This method creates all the required buffers and fills them.
 	 * \param[in] int entityID The entity this component belongs to
-	 * \returns   GLSprite* The newly creates GLSprite
+	 * \return   GLSprite* The newly creates GLSprite
 	 */
 	void InitializeBuffers();
 	virtual void Render(glm::mediump_float *view, glm::mediump_float *proj);
@@ -28,7 +28,7 @@ public:
 	/**
 	 * \brief Returns the number of elements to draw for this component.
 	 *
-	 * \returns unsigned int The number of elements to draw.
+	 * \return unsigned int The number of elements to draw.
 	 */
 	unsigned int MeshGroup_ElementCount(const unsigned int group = 0) const {
 		if (group > 0) {

@@ -30,7 +30,7 @@ public:
 	/**
 	 * \brief Retrieves the transform object for this component.
 	 *
-	 * \returns GLTransform& The transform object.
+	 * \return GLTransform& The transform object.
 	 */
 	GLTransform* Transform() const { return this->transform; }
 protected:

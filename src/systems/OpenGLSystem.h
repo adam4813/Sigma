@@ -25,7 +25,7 @@ public:
 	 *
 	 * Starts the OpenGL rendering system and creates a rendering context. It will also attempt to create a newer rendering context (>3) if available.
 	 * \param[in] HWND hwnd The window handle to associate the rendering context with.
-	 * \returns   const int* Returns -1 in the 0 index on failure, else the major and minor version in index 0 and 1 respectively.
+	 * \return   const int* Returns -1 in the 0 index on failure, else the major and minor version in index 0 and 1 respectively.
 	 */
 	const int* Start();
 
@@ -34,7 +34,7 @@ public:
 	 *
 	 * Updates the state of the system based off how much time has elapsed since the last update.
 	 * \param[in] const float delta The change in time since the last update
-	 * \returns bool Returns true if we had an update interval passed.
+	 * \return bool Returns true if we had an update interval passed.
 	 */
 	bool Update(const double delta);
 
@@ -45,7 +45,7 @@ public:
 	 * \param[in/out] float x
 	 * \param[in/out] float y
 	 * \param[in/out] float z
-	 * \returns   void
+	 * \return   void
 	 */
 	void Move(float x, float y, float z);
 
@@ -56,7 +56,7 @@ public:
 	 * \param[in/out] float x
 	 * \param[in/out] float y
 	 * \param[in/out] float z
-	 * \returns   void
+	 * \return   void
 	 */
 	void Rotate(float x, float y, float z);
 
@@ -65,7 +65,7 @@ public:
 	 *
 	 * \param[in] int width
 	 * \param[in] int height
-	 * \returns void
+	 * \return void
 	 */
 	void SetWindowDim(int width, int height) { this->windowWidth = width; this->windowHeight = height; }
 

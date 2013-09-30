@@ -55,7 +55,7 @@ public:
 	 * \brief Creates a new IGLComponent.
 	 *
 	 * \param[in] int entityID The entity this component belongs to.
-	 * \returns IGLCompoent* the newly created component.
+	 * \return IGLCompoent* the newly created component.
 	 */
 	void InitializeBuffers() ;
 	virtual void Render(glm::mediump_float *view, glm::mediump_float *proj);
@@ -66,7 +66,7 @@ public:
 	 * Call this multiple times to get the elements for each mesh group. A return of 0 indicates all
 	 * mesh groups have been returned, and the call loop should end.
 	 * \param[in] const unsigned int group The mesh group to render.
-	 * \returns unsigned int The number of elements to draw for the given mesh group.
+	 * \return unsigned int The number of elements to draw for the given mesh group.
 	 */
 	unsigned int MeshGroup_ElementCount(const unsigned int group = 0) const {
 		if (this->groupIndex.size() == 0) {
@@ -99,7 +99,7 @@ public:
 	 *
 	 * Returns the vertex at the specific index.
 	 * \param[in] const unsigned int index The index of the vertex to get.
-	 * \returns   const Sigma::Vertex* The vertex at the index or nullptr if the index was invalid.
+	 * \return   const Sigma::Vertex* The vertex at the index or nullptr if the index was invalid.
 	 */
 	const Sigma::Vertex* GetVertex(const unsigned int index) {
 		try {
@@ -123,7 +123,7 @@ public:
 	 *
 	 * Returns the face at the specific index.
 	 * \param[in] const unsigned int index The index of the face to get.
-	 * \returns   const Sigma::Face* The face at the index or nullptr if the index was invalid.
+	 * \return   const Sigma::Face* The face at the index or nullptr if the index was invalid.
 	 */
 	const Sigma::Face* GetFace(const unsigned int index) {
 		try {
@@ -180,7 +180,7 @@ public:
 	 *
 	 * Returns the vertex color at the specific index.
 	 * \param[in] const unsigned int index The index of the color to get.
-	 * \returns   const Sigma::Color* The color at the index or nullptr if the index was invalid.
+	 * \return   const Sigma::Color* The color at the index or nullptr if the index was invalid.
 	 */
 	const Sigma::Color* GetVertexColor(const unsigned int index) {
 		try {

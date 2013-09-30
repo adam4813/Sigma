@@ -43,7 +43,7 @@ namespace Sigma {
 		 * \brief Retrieves the specified buffer.
 		 *
 		 * \param[in] const int index The index of the buffer to retrieve
-		 * \returns   unsigned int THe ID of the buffer
+		 * \return   unsigned int THe ID of the buffer
 		 */
 		unsigned int GetBuffer(const int index) {
 			return this->buffers[index];
@@ -52,14 +52,14 @@ namespace Sigma {
 		/**
 		 * \brief Returns the number of elements to draw for this component.
 		 *
-		 * \returns unsigned int The number of elements to draw.
+		 * \return unsigned int The number of elements to draw.
 		 */
 		virtual unsigned int MeshGroup_ElementCount(const unsigned int group = 0) const = 0;
 
 		/**
 		 * \brief Returns the draw mode for this component.
 		 *
-		 * \returns unsigned int The draw mode (ex. GL_TRIANGLES, GL_TRIANGLE_STRIP).
+		 * \return unsigned int The draw mode (ex. GL_TRIANGLES, GL_TRIANGLE_STRIP).
 		 */
 		unsigned int DrawMode() const { return this->drawMode; }
 
@@ -74,14 +74,14 @@ namespace Sigma {
 		/**
 		 * \brief Retrieves the transform object for this component.
 		 *
-		 * \returns GLTransform& The transform object.
+		 * \return GLTransform& The transform object.
 		 */
 		GLTransform* Transform() { return &transform; }
 
 		/**
 		 * \brief Return the VAO ID of this component.
 		 *
-		 * \returns   unsigned int The VAO ID.
+		 * \return   unsigned int The VAO ID.
 		 */
 		unsigned int Vao() const { return this->vao; }
 

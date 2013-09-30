@@ -18,7 +18,7 @@ public:
 	/**
 	 * \brief Starts the Simple Physics system.
 	 *
-	 * \returns bool Returns false on startup failure.
+	 * \return bool Returns false on startup failure.
 	 */
 	bool Start() { }
 
@@ -27,7 +27,7 @@ public:
 	 *
 	 * Updates the state of the system based off how much time has elapsed since the last update.
 	 * \param[in] const float delta The change in time since the last update
-	 * \returns bool Returns true if we had an update interval passed.
+	 * \return bool Returns true if we had an update interval passed.
 	 */
 	bool Update(const double delta);
 

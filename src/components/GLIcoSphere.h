@@ -20,7 +20,7 @@ public:
 	 *
 	 * This is the factory method to create a new GLIcoSphere. This method creates all the required buffers and fills them.
 	 * \param[in] int entityID The entity this component belongs to
-	 * \returns   GLIcoSphere* The newly creates GLIcoSphere
+	 * \return   GLIcoSphere* The newly creates GLIcoSphere
 	 */
 	void InitializeBuffers();
 	virtual void Render(glm::mediump_float *view, glm::mediump_float *proj);
@@ -33,7 +33,7 @@ public:
 	 * \param[in/out] std::vector<Vertex> & verts The verts that will be used as a starting point. Any new verts created will be added to this.
 	 * \param[in/out] std::vector<Face> & faces The faces to refine. The set of faces will be stored here when complete.
 	 * \param[in] int level The number of refinements to apply.
-	 * \returns   void
+	 * \return   void
 	 * \exception
 	 */
 	void Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::Face> &faces, int level);
