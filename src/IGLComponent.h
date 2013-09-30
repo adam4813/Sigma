@@ -1,4 +1,6 @@
 #pragma once
+#ifndef IGLCOMPONENT_H
+#define IGLCOMPONENT_H
 
 #include "GL/glew.h"
 #include "IComponent.h"
@@ -27,11 +29,12 @@ namespace Sigma {
 	public:
 		IGLComponent() : IComponent(0) { } // Default ctor setting entity ID to 0.
 		IGLComponent(const int entityID) : IComponent(entityID) { } // Ctor that sets the entity ID.
+
 		/**
-		 * \brief Creates a new IGLComponent.
+		 * \brief Initializes the IGLComponent.
 		 *
-		 * \param[in] int entityID The entity this component belongs to.
-		 * \returns IGLCompoent* the newly created component.
+		 * \param entityID The entity this component belongs to.
+		 * \return IGLCompoent* the newly created component.
 		 */
 		virtual void InitializeBuffers() = 0;
 
@@ -89,14 +92,11 @@ namespace Sigma {
 		virtual void SetCullFace(std::string cull_face) {
 			if(cull_face == "back") {
 				this->cull_face = GL_BACK;
-			}
-			else if (cull_face == "front") {
+			} else if (cull_face == "front") {
 				this->cull_face = GL_FRONT;
-			}
-			else if (cull_face == "none") {
+			} else if (cull_face == "none") {
 				this->cull_face = 0;
-			}
-			else {
+			} else {
 				assert(0 && "Invalid cull_face parameter");
 			}
 		};
@@ -114,5 +114,7 @@ namespace Sigma {
 		unsigned int drawMode; // The current draw mode (ex. GL_TRIANGLES, GL_TRIANGLE_STRIP).
 		GLuint cull_face; // The current culling method for this component.
 		GLTransform transform; // The transform of this component.
-	};
-}
+	}; // class IGLComponent
+} // namespace Sigma
+
+#endif // IGLCOMPONENT_H
