@@ -19,7 +19,6 @@ void main(void)
         	vec4 diffColor = texture(texDiff,ex_UV) * vec4(ex_Color / 2.0f,1.0f);
         	vec4 ambColor = texture(texAmb,ex_UV) * vec4(ex_Color / 2.0f,1.0f);
 		out_Color = ambColor + diffColor;
-        	//out_Color = vec4(ex_UV.x,ex_UV.y,0.0f,0.0f) * vec4(ex_Color,1.0f);
 	} else {
         	out_Color = vec4(ex_Color,1.0f);
 	}
