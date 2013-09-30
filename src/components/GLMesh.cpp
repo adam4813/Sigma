@@ -86,20 +86,6 @@ void GLMesh::Render(glm::mediump_float *view, glm::mediump_float *proj) {
 	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_View"), 1, GL_FALSE, view);
 	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, proj);
 
-	if (this->mats.size() > 0) {
-		glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texEnabled"), 1);
-		glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texDiff"), 0);
-		glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texAmb"), 1);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, this->mats["01___Default"].diffuseMap);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, this->mats["01___Default"].ambientMap);
-	}
-	else {
-		glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texEnabled"), 0);
-		glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "tex"), 0);
-	}
-
 	glBindVertexArray(this->Vao());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->GetBuffer(this->ElemBufIndex));
 
@@ -110,7 +96,22 @@ void GLMesh::Render(glm::mediump_float *view, glm::mediump_float *proj) {
 		glCullFace(this->cull_face);
 	}
 
+	if (this->faceGroups.size() == 0) {
+		glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texEnabled"), 0);
+	}
+	else {
+		glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texEnabled"), 1);
+		glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texDiff"), 0);
+		glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texAmb"), 1);
+	}
 	for (int i = 0, cur = this->MeshGroup_ElementCount(0), prev = 0; cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
+		if (this->faceGroups.size() > 0) {
+			material& mat = this->mats[this->faceGroups[prev]];
+			glBindTexture(GL_TEXTURE_2D, mat.diffuseMap);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, mat.ambientMap);
+			glActiveTexture(GL_TEXTURE1);
+		}
 		glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_SHORT, (void*)prev);
 	}
 
@@ -229,17 +230,10 @@ void GLMesh::LoadMesh(std::string fname) {
 			current_face.v[1].color = current_color;
 			current_face.v[2].color = current_color;
 
-			// Set this face as part of the current material group
-			if(this->groupIndex.size() > 0) {
-				this->materialGroups[this->groupIndex.size()-1][currentMtlGroup].push_back(temp_face_indices.size());
-			}
-
 			// Store the face
 			temp_face_indices.push_back(current_face);
 		} else if (line[0] == 'g') { // Face group
 			this->groupIndex.push_back(temp_face_indices.size());
-			std::map<std::string, std::vector<unsigned int>> newMatGroup;
-			this->materialGroups.push_back(newMatGroup);
 		} else if (line.substr(0, line.find(' ')) == "mtllib") { // Material library
 			ParseMTL(line.substr(line.find(' ') + 1));
 		} else if (line.substr(0, line.find(' ')) == "usemtl") { // Use material
@@ -256,7 +250,7 @@ void GLMesh::LoadMesh(std::string fname) {
 
 			glm::vec3 color = amb + dif + spec;
 			temp_colors.push_back(Sigma::Color(color.r, color.g, color.b));
-			//current_color = Sigma::Color(color.r, color.g, color.b);
+			this->faceGroups[temp_face_indices.size()] = currentMtlGroup;
 			current_color++;
 		} else if ((line[0] == '#') || (line.size() == 0)) { // Comment or blank line
 			/* ignoring this line comment or blank*/

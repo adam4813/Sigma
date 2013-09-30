@@ -192,7 +192,7 @@ public:
 private:
 	std::vector<unsigned int> groupIndex; // Stores which index in faces a group starts at.
 	std::vector<Sigma::Face> faces; // Stores vectors of face groupings.
-	std::vector<std::map<std::string, std::vector<unsigned int>>> materialGroups; // This is probably an abuse of the STL
+	std::map<unsigned int, std::string> faceGroups; // Stores a mapping of material name to face grouping
 	std::vector<Sigma::Vertex> verts; // The verts that the faces refers to. Can be used for later refinement.
 	std::vector<Sigma::Vertex> vertNorms; // The vertex normals for each vert.
 	std::vector<texCoord> texCoords; // The texture coords for each vertex.
