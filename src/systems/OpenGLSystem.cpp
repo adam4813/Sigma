@@ -232,7 +232,7 @@ const int* OpenGLSystem::Start() {
 		10000.0f
 		);
 
-	this->view->Move(4.0f,3.0f,-10.f);
+	this->view->Move(4.0f,50.0f,-10.f);
 
 	// App specific global gl settings
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
