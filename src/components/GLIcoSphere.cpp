@@ -84,7 +84,7 @@ namespace Sigma{
         }
 
         GLMesh::InitializeBuffers();
-    }
+    } // function InitializeBuffers
 
     void GLIcoSphere::Render(glm::mediump_float *view, glm::mediump_float *proj) {
         GLMesh::Render(view, proj);

@@ -41,6 +41,7 @@ namespace Sigma{
         typedef std::unordered_map<std::string, std::shared_ptr<GLSLShader>> ShaderMap;
         SET_COMPONENT_ID("GLMesh");
         GLMesh(const int entityID);
+        virtual ~GLMesh(){}
 
         /**
          * \brief Initializes the mesh in the OpenGL context.
@@ -48,6 +49,15 @@ namespace Sigma{
          * \param entityID The entity this component belongs to.
          */
         void InitializeBuffers();
+
+        /** \brief render the mesh with
+         *
+         * Uses the given view and projection matrices. additional uniforms may be set in the args array.
+         *
+         * \param view the view matrix
+         * \param proj the projection matrix
+         * \return void
+         */
         virtual void Render(glm::mediump_float *view, glm::mediump_float *proj);
 
         /**

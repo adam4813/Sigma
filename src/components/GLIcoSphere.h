@@ -17,6 +17,7 @@ namespace Sigma{
         SET_COMPONENT_ID("GLIcoSphere");
         // We have a private ctor so the factory method must be used.
         GLIcoSphere(const int entityID = 0);
+        ~GLIcoSphere(){}
 
         /**
          * \brief Creates a new GLSprite

@@ -112,6 +112,7 @@ namespace Sigma{
             glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_SHORT, (void*)prev);
         }
 
+        // reset defaults
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);

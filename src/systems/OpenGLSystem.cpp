@@ -51,7 +51,7 @@ void OpenGLSystem::createGLIcoSphere(const std::string type, const unsigned int 
 		float y = 0.0f;
 		float z = 0.0f;
 		int componentID = 0;
-		std::string shader = "shaders/icosphere";
+		std::string shader_name = "shaders/icosphere";
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			Property*  p = &(*propitr);
@@ -70,21 +70,22 @@ void OpenGLSystem::createGLIcoSphere(const std::string type, const unsigned int 
 			} else if (p->GetName() == "id") {
 				componentID = p->Get<int>();
 			} else if (p->GetName() == "shader"){
-                shader = p->Get<std::string>();
+                shader_name = p->Get<std::string>();
 			}
 		}
 		sphere->Transform()->Scale(scale,scale,scale);
 		sphere->Transform()->Translate(x,y,z);
-		sphere->LoadShader(shader);
+		sphere->LoadShader(shader_name);
 		sphere->InitializeBuffers();
+		sphere->SetCullFace("back");
 		this->addComponent(entityID,sphere);
 }
 
 void OpenGLSystem::createGLCubeSphere(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
-		GLCubeSphere* sphere = new GLCubeSphere(entityID);
+		Sigma::GLCubeSphere* sphere = new Sigma::GLCubeSphere(entityID);
 
 		std::string texture_name = "";
-		std::string shader_name = "";
+		std::string shader_name = "shaders/cubesphere";
 		std::string cull_face = "back";
 		int subdivision_levels = 1;
 		float rotation_speed = 0.0f;
@@ -111,7 +112,7 @@ void OpenGLSystem::createGLCubeSphere(const std::string type, const unsigned int
 				continue;
 			} else if (p->GetName() == "subdivision_levels") {
 				subdivision_levels = p->Get<int>();
-			} else if (p->GetName() == "texture_name") {
+			} else if (p->GetName() == "texture") {
 				texture_name = p->Get<std::string>();
 			} else if (p->GetName() == "shader") {
 				shader_name = p->Get<std::string>();
