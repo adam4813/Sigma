@@ -102,7 +102,7 @@ if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
   endif(NOT SDL2_FOUND)
 
   # Link the libraries
-  set(SIGMA_LIBS ${SIGMA_LIBS} ${SDL2_LIBRARY} ${SDL2IMAGE_LIBRARY} ${GLEW_LIBRARY} SDL2main)
+  set(SIGMA_LIBS ${SIGMA_LIBS} ${SDL2_LIBRARY} ${GLEW_LIBRARY} SDL2main)
   link_libraries (
     ${SDL2_LIBRARY}
     ${GLEW_LIBRARY} # FindGLEW.cmake set this variable
