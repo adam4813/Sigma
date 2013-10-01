@@ -45,7 +45,7 @@ void OpenGLSystem::createGLSprite(const std::string type, const unsigned int ent
 }
 
 void OpenGLSystem::createGLIcoSphere(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
-		GLIcoSphere* sphere = new GLIcoSphere(entityID);
+		Sigma::GLIcoSphere* sphere = new Sigma::GLIcoSphere(entityID);
 		float scale = 1.0f;
 		float x = 0.0f;
 		float y = 0.0f;

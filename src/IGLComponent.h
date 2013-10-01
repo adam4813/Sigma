@@ -19,6 +19,13 @@ namespace Sigma {
 		float x,y,z;
 	};
 
+	// Avoiding using Vertices as Vectors, even though it may be convenient
+	struct Vector3f{
+        Vector3f(float x, float y, float z) : x(x), y(y), z(z) {}
+        void normalize(){ float len = glm::sqrt(x*x + y*y + z*z); x/=len; y/=len; z/=len; }
+        float x, y, z;
+	};
+
 	// A struct to store the color value for each vertex
 	struct Color {
 		Color(float r, float g, float b) : r(r), g(g), b(b) { }

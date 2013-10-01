@@ -4,6 +4,7 @@ namespace Sigma{
 
     // static member initialization
     GLMesh::ShaderMap GLMesh::loadedShaders;
+    const std::string GLMesh::DEFAULT_SHADER = "shaders/mesh";
 
     GLMesh::GLMesh(const int entityID) : IGLComponent(entityID) {
         memset(&this->buffers, 0, sizeof(this->buffers));
@@ -65,7 +66,7 @@ namespace Sigma{
                 glGenBuffers(1, &this->buffers[this->NormalBufIndex]);
             }
             glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->NormalBufIndex]);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*this->vertNorms.size(), &this->vertNorms[0], GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3f)*this->vertNorms.size(), &this->vertNorms[0], GL_STATIC_DRAW);
             GLint normalLocation = glGetAttribLocation((*shader).GetProgram(), "in_Normal");
             glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
             glEnableVertexAttribArray(normalLocation);
@@ -134,7 +135,7 @@ namespace Sigma{
 
         std::vector<Vertex> temp_verts;
         std::vector<TexCoord> temp_uvs;
-        std::vector<Vertex> temp_normals;
+        std::vector<Vector3f> temp_normals;
         std::vector<Color> temp_colors;
 
         std::string currentMtlGroup = "";
@@ -168,7 +169,7 @@ namespace Sigma{
                 float x, y, z;
                 std::istringstream s(line.substr(2));
                 s >> x; s >> y; s >> z;
-                temp_normals.push_back(Vertex(x,y,z));
+                temp_normals.push_back(Vector3f(x,y,z));
             }
             else if (line.substr(0,2) == "f ") { // Face
                 FaceIndices current_face;
@@ -295,7 +296,7 @@ namespace Sigma{
 
         // Check if vertex normals exist
         if(vertNorms.size() == 0) {
-            std::vector<Vertex> surfaceNorms;
+            std::vector<Vector3f> surfaceNorms;
 
             // compute surface normals
             for(size_t i = 0; i < faces.size(); i++) {
@@ -307,13 +308,13 @@ namespace Sigma{
                 cross = glm::cross(vector1, vector2);
                 normal = glm::normalize(cross);
 
-                surfaceNorms.push_back(Vertex(normal.x, normal.y, normal.z));
+                surfaceNorms.push_back(Vector3f(normal.x, normal.y, normal.z));
             }
 
             // compute vertex normals
             // should probably compute adjacency first, this could be slow
             for(size_t i = 0; i < verts.size(); i++) {
-                Vertex total_normals(0.0f, 0.0f, 0.0f);
+                Vector3f total_normals(0.0f, 0.0f, 0.0f);
 
                 for(size_t j = 0; j < faces.size(); j++) {
                     if (faces[j].v1 == i || faces[j].v2 == i || faces[j].v3 == i) {
@@ -326,10 +327,10 @@ namespace Sigma{
                 if(!(total_normals.x == 0.0f && total_normals.y == 0.0f && total_normals.z == 0.0f)) {
                     glm::vec3 final_normal(total_normals.x, total_normals.y, total_normals.z);
                     final_normal = glm::normalize(final_normal);
-                    vertNorms.push_back(Vertex(final_normal.x, final_normal.y, final_normal.z));
+                    vertNorms.push_back(Vector3f(final_normal.x, final_normal.y, final_normal.z));
                 }
                 else {
-                    vertNorms.push_back(Vertex(total_normals.x, total_normals.y, total_normals.z));
+                    vertNorms.push_back(Vector3f(total_normals.x, total_normals.y, total_normals.z));
                 }
             }
 
@@ -362,7 +363,7 @@ namespace Sigma{
     }
 
     void GLMesh::LoadShader(){
-        this->LoadShader("shaders/mesh");
+        this->LoadShader(GLMesh::DEFAULT_SHADER);
     }
 
     void GLMesh::ParseMTL(std::string fname) {
