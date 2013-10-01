@@ -47,7 +47,7 @@ struct FaceIndices {
 	VertexIndices v[3];
 };
 
-class GLMesh : public IGLComponent {
+class GLMesh : public Sigma::IGLComponent {
 public:
     SET_COMPONENT_ID("GLMesh");
 	GLMesh(const int entityID); // Ctor that sets the entity ID.
@@ -58,7 +58,7 @@ public:
 	 * \returns IGLCompoent* the newly created component.
 	 */
 	void InitializeBuffers() ;
-	virtual void Update(glm::mediump_float *view, glm::mediump_float *proj);
+	virtual void Render(glm::mediump_float *view, glm::mediump_float *proj);
 
 	/**
 	 * \brief Returns the number of elements to draw for this component.
@@ -69,12 +69,15 @@ public:
 	 * \returns unsigned int The number of elements to draw for the given mesh group.
 	 */
 	unsigned int MeshGroup_ElementCount(const unsigned int group = 0) const {
-		if (group < (groupIndex.size() - 1)) {
-			return (groupIndex[group+1] - groupIndex[group]) * 3;
-		} else if (group > (groupIndex.size() - 1)) {
+		if (this->groupIndex.size() == 0) {
+			return 0;
+		}
+		if ((group + 1) < (this->groupIndex.size())) {
+			return (this->groupIndex[group+1] - this->groupIndex[group]) * 3;
+		} else if (group > (this->groupIndex.size() - 1)) {
 			return 0;
 		} else {
-			return (this->faces.size() - groupIndex[group]) * 3;
+			return (this->faces.size() - this->groupIndex[group]) * 3;
 		}
 	}
 
@@ -101,7 +104,7 @@ public:
 	const Sigma::Vertex* GetVertex(const unsigned int index) {
 		try {
 			return &this->verts.at(index);
-    } catch (std::out_of_range& oor) {
+    } catch (std::out_of_range&) {
 			return nullptr;
 		}
 	}
@@ -125,7 +128,7 @@ public:
 	const Sigma::Face* GetFace(const unsigned int index) {
 		try {
 			return &this->faces.at(index);
-    } catch (std::out_of_range& oor) {
+    } catch (std::out_of_range&) {
 			return nullptr;
 		}
 	}
@@ -134,7 +137,7 @@ public:
 		try {
 			this->faces.erase(this->faces.begin() + index);
 			return true;
-    } catch (std::out_of_range& oor) {
+    } catch (std::out_of_range&) {
 			return false;
 		}
 	}
@@ -182,14 +185,14 @@ public:
 	const Sigma::Color* GetVertexColor(const unsigned int index) {
 		try {
 			return &this->colors.at(index);
-    } catch (std::out_of_range& oor) {
+    } catch (std::out_of_range&) {
 			return nullptr;
 		}
 	}
 private:
 	std::vector<unsigned int> groupIndex; // Stores which index in faces a group starts at.
 	std::vector<Sigma::Face> faces; // Stores vectors of face groupings.
-	std::vector<std::map<std::string, std::vector<unsigned int>>> materialGroups; // This is probably an abuse of the STL
+	std::map<unsigned int, std::string> faceGroups; // Stores a mapping of material name to face grouping
 	std::vector<Sigma::Vertex> verts; // The verts that the faces refers to. Can be used for later refinement.
 	std::vector<Sigma::Vertex> vertNorms; // The vertex normals for each vert.
 	std::vector<texCoord> texCoords; // The texture coords for each vertex.

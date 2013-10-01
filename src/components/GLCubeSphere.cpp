@@ -11,12 +11,12 @@
 
 // For std::find
 namespace Sigma {
-	bool operator ==(const Vertex &lhs, const Vertex &rhs) { return ((abs(rhs.x - lhs.x) < std::numeric_limits<float>::epsilon()) && 
-																	 (abs(rhs.y - lhs.y) < std::numeric_limits<float>::epsilon()) && 
+	bool operator ==(const Vertex &lhs, const Vertex &rhs) { return ((abs(rhs.x - lhs.x) < std::numeric_limits<float>::epsilon()) &&
+																	 (abs(rhs.y - lhs.y) < std::numeric_limits<float>::epsilon()) &&
 																	 (abs(rhs.z - lhs.z) < std::numeric_limits<float>::epsilon())); }
 }
 
-GLCubeSphere::GLCubeSphere( const int entityID /*= 0*/ ) : IGLComponent(entityID) {
+GLCubeSphere::GLCubeSphere( const int entityID /*= 0*/ ) : Sigma::IGLComponent(entityID) {
 	this->drawMode = GL_TRIANGLES;
 	this->VertBufIndex = 0;
 	this->ColorBufIndex = 1;
@@ -86,7 +86,7 @@ void GLCubeSphere::LoadTexture(std::string texture_name) {
 	/*glGenTextures(1, &this->_cubeMap);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeMap);
-	
+
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
@@ -125,7 +125,7 @@ void GLCubeSphere::LoadTexture(std::string texture_name) {
 	/*glGenTextures(1, &this->_cubeNormalMap);
 	glActiveTexture(GL_TEXTURE0+1);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeNormalMap);
-	
+
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
@@ -154,7 +154,7 @@ void GLCubeSphere::LoadTexture(std::string texture_name) {
 			//assert(0 && "Texture file did not load correctly.");
 		//}
 	//}
-	
+
 	//glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 }
 
@@ -248,21 +248,22 @@ void GLCubeSphere::SubDivide(int levels) {
 
 void GLCubeSphere::LoadShader(std::string shader_name) {
 	char vertex_shader[100], fragment_shader[100];
-	sprintf(vertex_shader, "../../../shaders/%s.vert", shader_name.c_str());
-	sprintf(fragment_shader, "../../../shaders/%s.frag", shader_name.c_str());
+
+	sprintf(vertex_shader, "shaders/%s.vert", shader_name.c_str());
+	sprintf(fragment_shader, "shaders/%s.frag", shader_name.c_str());
 
 	this->_shader.LoadFromFile(GL_VERTEX_SHADER, vertex_shader);
 	this->_shader.LoadFromFile(GL_FRAGMENT_SHADER, fragment_shader);
 	this->_shader.CreateAndLinkProgram();
 }
 
-void GLCubeSphere::Update(glm::mediump_float *view, glm::mediump_float *proj) {
+void GLCubeSphere::Render(glm::mediump_float *view, glm::mediump_float *proj) {
 	this->_shader.Use();
-	
+
 	if(this->fix_to_camera) {
 		glm::mediump_float *view_ptr = view;
 		glm::mat4 view_matrix;
-	
+
 		for(int i=0; i < 4; i++) {
 			for(int j=0; j < 4; j++) {
 				view_matrix[i][j] = (*view_ptr++);
@@ -300,12 +301,12 @@ void GLCubeSphere::Update(glm::mediump_float *view, glm::mediump_float *proj) {
 	for (int i = 0, cur = this->MeshGroup_ElementCount(0), prev = 0; cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
 		glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_SHORT, (void*)prev);
 	}
-	
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	glCullFace(GL_BACK);
 	glDepthFunc(GL_LESS);
-	
+
 	this->_shader.UnUse();
 }

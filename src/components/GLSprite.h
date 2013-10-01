@@ -3,7 +3,7 @@
 #include "../systems/GLSLShader.h"
 #include "../IGLComponent.h"
 
-class GLSprite : public IGLComponent {
+class GLSprite : public Sigma::IGLComponent {
 public:
     SET_COMPONENT_ID("GLSprite");
 	// We have a private ctor so the factory method must be used.
@@ -16,7 +16,7 @@ public:
 	 * \returns   GLSprite* The newly creates GLSprite
 	 */
 	void InitializeBuffers();
-	virtual void Update(glm::mediump_float *view, glm::mediump_float *proj);
+	virtual void Render(glm::mediump_float *view, glm::mediump_float *proj);
 
 	unsigned int LoadTexture();
 	GLuint GetTexture() { return texture_; }

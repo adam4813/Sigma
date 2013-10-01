@@ -9,7 +9,7 @@
 #include "SOIL/SOIL.h"
 #include "GLIcoSphere.h"
 
-GLMesh::GLMesh(const int entityID) : IGLComponent(entityID) {
+GLMesh::GLMesh(const int entityID) : Sigma::IGLComponent(entityID) {
 	memset(&this->buffers, 0, sizeof(this->buffers));
 	this->vao = 0;
 	this->drawMode = GL_TRIANGLES;
@@ -17,6 +17,7 @@ GLMesh::GLMesh(const int entityID) : IGLComponent(entityID) {
 	this->ColorBufIndex = 1;
 	this->VertBufIndex = 0;
 	this->NormalBufIndex = 3;
+	this->UVBufIndex = 4;
 }
 
 void GLMesh::InitializeBuffers() {
@@ -35,6 +36,16 @@ void GLMesh::InitializeBuffers() {
 		GLint posLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_Position"); // Find the location in the shader where the vertex buffer data will be placed.
 		glVertexAttribPointer(posLocation, 3, GL_FLOAT, GL_FALSE, 0, 0); // Tell the VAO the vertex data will be stored at the location we just found.
 		glEnableVertexAttribArray(posLocation); // Enable the VAO line for vertex data.
+	}
+	if (this->texCoords.size() > 0) {
+		if (this->buffers[this->UVBufIndex] == 0) {
+			glGenBuffers(1, &this->buffers[this->UVBufIndex]); 	// Generate the vertex buffer.
+		}
+		glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->UVBufIndex]); // Bind the vertex buffer.
+		glBufferData(GL_ARRAY_BUFFER, sizeof(texCoord) * this->texCoords.size(), &this->texCoords.front(), GL_STATIC_DRAW); // Stores the verts in the vertex buffer.
+		GLint uvLocation = glGetAttribLocation(GLIcoSphere::shader.GetProgram(), "in_UV"); // Find the location in the shader where the vertex buffer data will be placed.
+		glVertexAttribPointer(uvLocation, 2, GL_FLOAT, GL_FALSE, 0, 0); // Tell the VAO the vertex data will be stored at the location we just found.
+		glEnableVertexAttribArray(uvLocation); // Enable the VAO line for vertex data.
 	}
 	if (this->colors.size() > 0) {
 		if (this->buffers[this->ColorBufIndex] == 0) {
@@ -67,13 +78,14 @@ void GLMesh::InitializeBuffers() {
 	glBindVertexArray(0); // Reset the buffer binding because we are good programmers.
 }
 
-void GLMesh::Update(glm::mediump_float *view, glm::mediump_float *proj) {
+void GLMesh::Render(glm::mediump_float *view, glm::mediump_float *proj) {
 	//this->Transform()->Rotate(0.0f, 1.0f, 0.0f);
 
 	GLIcoSphere::shader.Use();
 	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &this->Transform()->ModelMatrix()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_View"), 1, GL_FALSE, view);
 	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, proj);
+
 	glBindVertexArray(this->Vao());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->GetBuffer(this->ElemBufIndex));
 
@@ -84,7 +96,22 @@ void GLMesh::Update(glm::mediump_float *view, glm::mediump_float *proj) {
 		glCullFace(this->cull_face);
 	}
 
+	if (this->faceGroups.size() == 0) {
+		glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texEnabled"), 0);
+	}
+	else {
+		glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texEnabled"), 1);
+		glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texDiff"), 0);
+		glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texAmb"), 1);
+	}
 	for (int i = 0, cur = this->MeshGroup_ElementCount(0), prev = 0; cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
+		if (this->faceGroups.size() > 0) {
+			material& mat = this->mats[this->faceGroups[prev]];
+			glBindTexture(GL_TEXTURE_2D, mat.diffuseMap);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, mat.ambientMap);
+			glActiveTexture(GL_TEXTURE1);
+		}
 		glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_SHORT, (void*)prev);
 	}
 
@@ -92,6 +119,7 @@ void GLMesh::Update(glm::mediump_float *view, glm::mediump_float *proj) {
 	glCullFace(GL_BACK);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 	glBindVertexArray(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 	GLIcoSphere::shader.UnUse();
 }
 
@@ -202,17 +230,10 @@ void GLMesh::LoadMesh(std::string fname) {
 			current_face.v[1].color = current_color;
 			current_face.v[2].color = current_color;
 
-			// Set this face as part of the current material group
-			if(this->groupIndex.size() > 0) {
-				this->materialGroups[this->groupIndex.size()-1][currentMtlGroup].push_back(temp_face_indices.size());
-			}
-
 			// Store the face
 			temp_face_indices.push_back(current_face);
 		} else if (line[0] == 'g') { // Face group
 			this->groupIndex.push_back(temp_face_indices.size());
-			std::map<std::string, std::vector<unsigned int>> newMatGroup;
-			this->materialGroups.push_back(newMatGroup);
 		} else if (line.substr(0, line.find(' ')) == "mtllib") { // Material library
 			ParseMTL(line.substr(line.find(' ') + 1));
 		} else if (line.substr(0, line.find(' ')) == "usemtl") { // Use material
@@ -229,7 +250,7 @@ void GLMesh::LoadMesh(std::string fname) {
 
 			glm::vec3 color = amb + dif + spec;
 			temp_colors.push_back(Sigma::Color(color.r, color.g, color.b));
-			//current_color = Sigma::Color(color.r, color.g, color.b);
+			this->faceGroups[temp_face_indices.size()] = currentMtlGroup;
 			current_color++;
 		} else if ((line[0] == '#') || (line.size() == 0)) { // Comment or blank line
 			/* ignoring this line comment or blank*/
@@ -377,11 +398,11 @@ void GLMesh::ParseMTL(std::string fname) {
 				} else if (label == "map_Kd") {
 					std::string filepath;
 					s >> filepath;
-					m.diffuseMap = SOIL_load_OGL_texture(filepath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+					m.diffuseMap = SOIL_load_OGL_texture(filepath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
 				} else if (label == "map_Ka") {
 					std::string filepath;
 					s >> filepath;
-					m.ambientMap = SOIL_load_OGL_texture(filepath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+					m.ambientMap = SOIL_load_OGL_texture(filepath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
 				} else {
 					// Blank line
 				}

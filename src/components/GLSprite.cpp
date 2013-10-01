@@ -8,7 +8,7 @@
 	#include "SDL/SDL_image.h"
 #endif
 
-GLSprite::GLSprite( const int entityID /*= 0*/ ) : IGLComponent(entityID)  {
+GLSprite::GLSprite( const int entityID /*= 0*/ ) : Sigma::IGLComponent(entityID)  {
 	this->drawMode = GL_TRIANGLES;
 	this->ElemBufIndex = 2;
 	this->ColorBufIndex = 1;
@@ -76,12 +76,12 @@ void GLSprite::InitializeBuffers() {
 }
 
 void GLSprite::LoadShader() {
-	GLSprite::shader.LoadFromFile(GL_VERTEX_SHADER, "../../../shaders/vert.shade");
-	GLSprite::shader.LoadFromFile(GL_FRAGMENT_SHADER, "../../../shaders/frag.shade");
+	GLSprite::shader.LoadFromFile(GL_VERTEX_SHADER, "shaders/vert.shade");
+	GLSprite::shader.LoadFromFile(GL_FRAGMENT_SHADER, "shaders/frag.shade");
 	GLSprite::shader.CreateAndLinkProgram();
 }
 
-void GLSprite::Update(glm::mediump_float *view, glm::mediump_float *proj) {
+void GLSprite::Render(glm::mediump_float *view, glm::mediump_float *proj) {
 	GLSprite::shader.Use();
 
 	glUniform1i(glGetUniformLocation(GLSprite::shader.GetProgram(), "tex"), GL_TEXTURE0);

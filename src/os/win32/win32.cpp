@@ -216,7 +216,7 @@ bool win32::KeyReleased(int key, bool focused /*= false*/) {
 			return false;
 		}
 	}
-	return keyUp[key];
+	return (keyUp[key] != 0 ? true : false);
 }
 
 bool win32::KeyUp(int key, bool focused /*= false */) {

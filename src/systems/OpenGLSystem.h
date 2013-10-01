@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Property.h"
+#include "Property.h"
 #include "../IFactory.h"
 #include "../ISystem.h"
 #include "../IGLComponent.h"
@@ -12,7 +12,7 @@
 struct IGLView;
 
 class OpenGLSystem
-    : public IFactory, public ISystem<IGLComponent> {
+    : public IFactory, public ISystem<Sigma::IGLComponent> {
 public:
 	OpenGLSystem();
 

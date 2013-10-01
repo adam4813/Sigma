@@ -6,7 +6,7 @@
 #include "../GLTransform.h"
 #include "../IGLComponent.h"
 
-class GLCubeSphere : public IGLComponent {
+class GLCubeSphere : public Sigma::IGLComponent {
 public:
     SET_COMPONENT_ID("GLCubeSphere");
 	// We have a private ctor so the factory method must be used.
@@ -28,7 +28,7 @@ public:
 	 * \param[in] None
 	 * \returns   void
 	 */
-	virtual void Update(glm::mediump_float *view, glm::mediump_float *proj);
+	virtual void Render(glm::mediump_float *view, glm::mediump_float *proj);
 
 	/// The shader used for rendering GLCubeSphere.
 	void LoadShader(std::string shader_name);

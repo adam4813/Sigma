@@ -19,6 +19,9 @@ void ViewMover::ApplyForces(const double delta) {
 void ViewMover::View(IGLView* view) {
 	this->view = view;
 }
+const IGLView* ViewMover::View() {
+	return this->view;
+}
 
 void ViewMover::AddRotationForce(glm::vec3 rotation) {
 	for (auto rotitr = this->rotationForces.begin(); rotitr != this->rotationForces.end(); ++rotitr) {

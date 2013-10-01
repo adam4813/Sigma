@@ -137,14 +137,14 @@ void GLIcoSphere::InitializeBuffers() {
 }
 
 void GLIcoSphere::LoadShader() {
-	GLIcoSphere::shader.LoadFromFile(GL_VERTEX_SHADER, "../../../shaders/icosphere.vert");
-	GLIcoSphere::shader.LoadFromFile(GL_FRAGMENT_SHADER, "../../../shaders/icosphere.frag");
+	GLIcoSphere::shader.LoadFromFile(GL_VERTEX_SHADER, "shaders/icosphere.vert");
+	GLIcoSphere::shader.LoadFromFile(GL_FRAGMENT_SHADER, "shaders/icosphere.frag");
 	GLIcoSphere::shader.CreateAndLinkProgram();
 }
 
 
-void GLIcoSphere::Update(glm::mediump_float *view, glm::mediump_float *proj) {
-	GLMesh::Update(view, proj);
+void GLIcoSphere::Render(glm::mediump_float *view, glm::mediump_float *proj) {
+	GLMesh::Render(view, proj);
 }
 
 glm::vec3 GetMidPoint(Sigma::Vertex v1, Sigma::Vertex v2) {
@@ -177,8 +177,20 @@ void GLIcoSphere::Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::F
 
 					AddVertex(Sigma::Vertex(middle.x, middle.y, middle.z));
 					this->verts.push_back(Sigma::Vertex(middle.x, middle.y, middle.z));
-					int blue = GetVertexColor(v1)->b + GetVertexColor(v2)->b;
-					int green = GetVertexColor(v1)->g + GetVertexColor(v2)->g;
+					int blue = 0;
+					if (GetVertexColor(v1)->b > 0.0f) {
+						blue++;
+					}
+					if (GetVertexColor(v2)->b > 0.0f) {
+						blue++;
+					}
+					int green = 0;
+					if (GetVertexColor(v1)->g > 0.0f) {
+						green++;
+					}
+					if (GetVertexColor(v2)->g > 0.0f) {
+						green++;
+					}
 					
 					if (blue == green) {
 						int val = rand() % 2;
@@ -198,7 +210,7 @@ void GLIcoSphere::Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::F
 						}
 					}
 
-					AddVertexColor(Sigma::Color(0,green,blue));
+					AddVertexColor(Sigma::Color(0,static_cast<float>(green),static_cast<float>(blue)));
 
 					a = cache[key] = this->verts.size() - 1;
 				}
@@ -219,8 +231,20 @@ void GLIcoSphere::Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::F
 
 					AddVertex(Sigma::Vertex(middle.x, middle.y, middle.z));
 					this->verts.push_back(Sigma::Vertex(middle.x, middle.y, middle.z));
-					int blue = GetVertexColor(v1)->b + GetVertexColor(v2)->b;
-					int green = GetVertexColor(v1)->g + GetVertexColor(v2)->g;
+					int blue = 0;
+					if (GetVertexColor(v1)->b > 0.0f) {
+						blue++;
+					}
+					if (GetVertexColor(v2)->b > 0.0f) {
+						blue++;
+					}
+					int green = 0;
+					if (GetVertexColor(v1)->g > 0.0f) {
+						green++;
+					}
+					if (GetVertexColor(v2)->g > 0.0f) {
+						green++;
+					}
 
 					if (blue == green) {
 						int val = rand() % 2;
@@ -239,7 +263,7 @@ void GLIcoSphere::Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::F
 							blue = 0;
 						}
 					}
-					AddVertexColor(Sigma::Color(0,green,blue));
+					AddVertexColor(Sigma::Color(0,static_cast<float>(green),static_cast<float>(blue)));
 
 					b = cache[key] = this->verts.size() - 1;
 				}
@@ -260,8 +284,20 @@ void GLIcoSphere::Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::F
 
 					AddVertex(Sigma::Vertex(middle.x, middle.y, middle.z));
 					this->verts.push_back(Sigma::Vertex(middle.x, middle.y, middle.z));
-					int blue = GetVertexColor(v1)->b + GetVertexColor(v2)->b;
-					int green = GetVertexColor(v1)->g + GetVertexColor(v2)->g;
+					int blue = 0;
+					if (GetVertexColor(v1)->b > 0.0f) {
+						blue++;
+					}
+					if (GetVertexColor(v2)->b > 0.0f) {
+						blue++;
+					}
+					int green = 0;
+					if (GetVertexColor(v1)->g > 0.0f) {
+						green++;
+					}
+					if (GetVertexColor(v2)->g > 0.0f) {
+						green++;
+					}
 
 					if (blue == green) {
 						int val = rand() % 2;
@@ -280,7 +316,7 @@ void GLIcoSphere::Refine(std::vector<Sigma::Vertex> &verts, std::vector<Sigma::F
 							blue = 0;
 						}
 					}
-					AddVertexColor(Sigma::Color(0,green,blue));
+					AddVertexColor(Sigma::Color(0,static_cast<float>(green),static_cast<float>(blue)));
 
 					c = cache[key] = this->verts.size() - 1;
 				}
