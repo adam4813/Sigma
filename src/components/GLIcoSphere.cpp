@@ -1,9 +1,4 @@
 #include "GLIcoSphere.h"
-#include "GL/glew.h"
-#include <map>
-#include <stdint.h>
-
-#include <iostream>
 
 namespace Sigma{
 
@@ -74,48 +69,20 @@ namespace Sigma{
 
         // Refine the IcoSphere by 4 levels. This results in 20*4^4 = 5120 faces.
         Refine(4);
-        std::cout << "after refinement, there are " << this->faces.size() << " faces " << std::endl;
 
         AddMeshGroupIndex(0);
 
-        std::vector<glm::vec3> surfaceNorms;
-
-        // compute surface normals
-        for(size_t i = 0; i < GetFaceCount(); i++) {
-            glm::vec3 vector1, vector2, cross, normal;
-            const Face* f = GetFace(i);
-            Vertex vert1(verts[f->v1]), vert2(verts[f->v2]), vert3(verts[f->v3]);
-
-            // make vectors out of 2 of the edges of this face
-            vector1 = glm::normalize(glm::vec3(vert2.x-vert1.x, vert2.y-vert1.y, vert2.z-vert1.z));
-            vector2 = glm::normalize(glm::vec3(vert3.x-vert1.x, vert3.y-vert1.y, vert3.z-vert1.z));
-            // cross of 2 vectors gives a vector perpendicular to both (i.e. the normal vector)
-            cross = glm::cross(vector1, vector2);
-            normal = glm::normalize(cross);
-            surfaceNorms.push_back(normal);
-        }
-
-        // compute vertex normals (average of normals of its 3 faces)
-        // TODO: should probably compute adjacency first, this could be slow
-        // TODO(2): isn't the vertex normal the same as the normalized coordinate of the vertex...?
+        // compute vertex normals
+        // the really nice thing about a sphere is that, if it is centered at the origin,
+        //  each vertex's normal direction is just the vertex itself!
+        //  normal = vertex / |vertex|;
         for(size_t i = 0; i < verts.size(); i++) {
-            glm::vec3 total_normals(0.0f, 0.0f, 0.0f);
-
-            for(size_t j = 0; j < GetFaceCount(); j++) {
-                const Face* f = GetFace(j);
-                if (f->v1 == i || f->v2 == i || f->v3 == i) {
-                    total_normals.x += surfaceNorms[j].x;
-                    total_normals.y += surfaceNorms[j].y;
-                    total_normals.z += surfaceNorms[j].z;
-                }
-            }
-
-            glm::vec3 final_normal(total_normals.x, total_normals.y, total_normals.z);
-            final_normal = glm::normalize(final_normal);
-            AddVertexNormal(Vector3f(final_normal.x, final_normal.y, final_normal.z));
+            Vertex v = this->verts[i];
+            Vector3f direction(v.x, v.y, v.z);
+            direction.normalize();
+            AddVertexNormal(direction);
         }
 
-        surfaceNorms.clear();
         GLMesh::InitializeBuffers();
     }
 

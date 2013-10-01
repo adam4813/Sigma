@@ -1,7 +1,13 @@
 #pragma once
+#ifndef GLICOSPHERE_H
+#define GLICOSPHERE_H
 
 #include "GLMesh.h"
 
+#include "GL/glew.h"
+
+#include <map>
+#include <stdint.h>
 #include <vector>
 
 namespace Sigma{
@@ -45,3 +51,5 @@ namespace Sigma{
     }; // class GLIcoSphere
 
 } // namespace Sigma
+
+#endif // GLICOSPHERE_H
