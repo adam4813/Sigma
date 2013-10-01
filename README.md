@@ -9,25 +9,41 @@ Requires CMake and a compiler that supports C++11.
 Installing
 ===
 
+If you want to compile Sigma on Linux, you need to install dependencies separately. On Debian-based distributions, you can use the following command as root to obtain them:
+
+    apt-get install libsdl2-dev libglew-dev libsoil-dev
+
 GUI Mode
+---
+
 * Run CMake and set the source directory to the root folder.
 * Set the build directory to root/build/
 * Configure and generate your make/project/solutions files.
 * Build and run.
 
 Command Mode
+---
+
 * mkdir build/
 * cd build/
 * cmake ..
 * make
 
-Finally you must copy the shaders folder and test.sc into the executable folder. E.g. build/bin/ or maybe build/bin/Debug|Release.
 
 Using the makefile-wrapper
+---
+
 * make rebuild # make clean; make
 
 Eclipse CDT (Unix/Linux)
+---
+
 * make eclipse
+
+After compiling
+---
+
+Finally you must copy the shaders folder and test.sc into the executable folder. E.g. build/bin/ or maybe build/bin/Debug|Release.
 
 Running
 ===
