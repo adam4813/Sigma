@@ -90,24 +90,21 @@ endif(WIN32 AND NOT MINGW)
 if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
   # We need SDL to build for *nix
   find_package(SDL2 REQUIRED)
-  find_package(SDL2_image REQUIRED)
   
   # Debug Options (to work out compiling issues for cross platform development)
   #XXX: Force SOIL use until Resource Management gets implemented, since SDL2 can do the same thing
   set(FORCE_SOIL true CACHE STRING "Set this to true if you want to force SOIL usage")
 
   # Work around for CMake <=2.4.6 (REQUIRED doesn't work)
-  if(NOT SDL2_FOUND OR NOT SDL2IMAGE_FOUND)
+  if(NOT SDL2_FOUND)
     message(ERROR "SDL2 located: ${SDL2_FOUND}")
-    message(ERROR "SDL2_image located: ${SDL2IMAGE_FOUND}")
     message(FATAL_ERROR "SDL2 or SDL not found!")
-  endif(NOT SDL2_FOUND OR NOT SDL2IMAGE_FOUND)
+  endif(NOT SDL2_FOUND)
 
   # Link the libraries
-  set(SIGMA_LIBS ${SIGMA_LIBS} ${SDL2_LIBRARY} ${SDL2IMAGE_LIBRARY} ${GLEW_LIBRARY} SDL2main)
+  set(SIGMA_LIBS ${SIGMA_LIBS} ${SDL2_LIBRARY} ${GLEW_LIBRARY} SDL2main)
   link_libraries (
     ${SDL2_LIBRARY}
-    ${SDL2IMAGE_LIBRARY} # if using SDL2_image, obviously
     ${GLEW_LIBRARY} # FindGLEW.cmake set this variable
     SDL2main # Sadly not included in SDL2_LIBRARY variable
   )
