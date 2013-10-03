@@ -102,7 +102,7 @@ void GLCubeSphere::LoadTexture(std::string texture_name) {
 	this->_cubeMap = SOIL_load_OGL_cubemap(filenames[0], filenames[1], filenames[2], filenames[3], filenames[4], filenames[5], SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
 
 	if( 0 == this->_cubeMap ) {
-		std::cerr << "SOIL loading error: " << SOIL_last_result() << std::endl;
+		std::cerr << "SOIL loading error: " << texture_name.c_str() << " - " << SOIL_last_result() << std::endl;
 	}
 	// There are always six files
 	/*for(int i=0; i < 6; i++) {
@@ -141,7 +141,7 @@ void GLCubeSphere::LoadTexture(std::string texture_name) {
 
 	if( 0 == this->_cubeNormalMap ) {
 		// It's ok not to have a normal map
-		//printf( "SOIL loading error: '%s'\n", SOIL_last_result() );
+		std::cerr << "SOIL loading error: " << texture_name.c_str() << "_nm - " << SOIL_last_result() << std::endl;
 	}
 		//SDL_Surface *img=0;
 		//img = IMG_Load(filename);

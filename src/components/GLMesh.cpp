@@ -96,17 +96,19 @@ void GLMesh::Render(glm::mediump_float *view, glm::mediump_float *proj) {
 		glCullFace(this->cull_face);
 	}
 
-	if (this->faceGroups.size() == 0) {
-		glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texEnabled"), 0);
-	}
-	else {
-		glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texEnabled"), 1);
-		glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texDiff"), 0);
-		glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texAmb"), 1);
-	}
 	for (int i = 0, cur = this->MeshGroup_ElementCount(0), prev = 0; cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
 		if (this->faceGroups.size() > 0) {
 			material& mat = this->mats[this->faceGroups[prev]];
+
+			if (mat.ambientMap == 0 && mat.diffuseMap == 0) {
+				glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texEnabled"), 0);
+			}
+			else {
+				glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texEnabled"), 1);
+				glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texDiff"), 0);
+				glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texAmb"), 1);
+			}
+
 			glBindTexture(GL_TEXTURE_2D, mat.diffuseMap);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, mat.ambientMap);
@@ -366,6 +368,9 @@ void GLMesh::ParseMTL(std::string fname) {
 			std::string name;
 			s >> name;
 			material m;
+			m.ambientMap = 0;
+			m.diffuseMap = 0;
+
 			getline(in, line);
 			s.str(line);
 			s.seekg(0);
@@ -399,10 +404,18 @@ void GLMesh::ParseMTL(std::string fname) {
 					std::string filepath;
 					s >> filepath;
 					m.diffuseMap = SOIL_load_OGL_texture(filepath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+
+					if(m.diffuseMap == 0) {
+						std::cerr << "SOIL loading error: " << filepath.c_str() << " - " << SOIL_last_result() << std::endl;
+					}
 				} else if (label == "map_Ka") {
 					std::string filepath;
 					s >> filepath;
 					m.ambientMap = SOIL_load_OGL_texture(filepath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+
+					if(m.ambientMap == 0) {
+						std::cerr << "SOIL loading error: " << filepath.c_str() << " - " << SOIL_last_result() << std::endl;
+					}
 				} else {
 					// Blank line
 				}

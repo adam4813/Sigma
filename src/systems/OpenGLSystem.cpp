@@ -51,6 +51,7 @@ void OpenGLSystem::createGLIcoSphere(const std::string type, const unsigned int 
 		float x = 0.0f;
 		float y = 0.0f;
 		float z = 0.0f;
+
 		int componentID = 0;
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			Property*  p = &(*propitr);
