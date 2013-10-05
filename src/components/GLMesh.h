@@ -20,6 +20,9 @@ struct material {
 		tr = 1.0f;
 		ns = 0.0f;
 		illum = 1;
+		ambientMap = 0;
+		diffuseMap = 0;
+		specularMap = 0;
 	}
 	float ka[3];
 	float kd[3];

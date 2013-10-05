@@ -107,13 +107,14 @@ void GLMesh::Render(glm::mediump_float *view, glm::mediump_float *proj) {
 				glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texEnabled"), 1);
 				glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texDiff"), 0);
 				glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texAmb"), 1);
-			}
 
-			glBindTexture(GL_TEXTURE_2D, mat.diffuseMap);
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, mat.ambientMap);
-			glActiveTexture(GL_TEXTURE1);
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, mat.diffuseMap);
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, mat.ambientMap);
+			}
 		}
+
 		glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_SHORT, (void*)prev);
 	}
 
@@ -368,8 +369,6 @@ void GLMesh::ParseMTL(std::string fname) {
 			std::string name;
 			s >> name;
 			material m;
-			m.ambientMap = 0;
-			m.diffuseMap = 0;
 
 			getline(in, line);
 			s.str(line);
@@ -403,6 +402,7 @@ void GLMesh::ParseMTL(std::string fname) {
 				} else if (label == "map_Kd") {
 					std::string filepath;
 					s >> filepath;
+					std::cout << "Loading map_Kd: " << filepath << std::endl;
 					m.diffuseMap = SOIL_load_OGL_texture(filepath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
 
 					if(m.diffuseMap == 0) {
@@ -411,6 +411,7 @@ void GLMesh::ParseMTL(std::string fname) {
 				} else if (label == "map_Ka") {
 					std::string filepath;
 					s >> filepath;
+					std::cout << "Loading map_Ka: " << filepath << std::endl;
 					m.ambientMap = SOIL_load_OGL_texture(filepath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
 
 					if(m.ambientMap == 0) {
