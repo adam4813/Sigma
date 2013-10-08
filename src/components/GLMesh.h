@@ -6,19 +6,10 @@
 #include "../IGLComponent.h"
 #include "../systems/GLSLShader.h"
 
-#include "GL/glew.h"
-#include "SOIL/SOIL.h"
-
 #include <vector>
 #include <map>
 #include <unordered_map>
-#include <algorithm>
-#include <stdexcept>
 #include <memory>
-
-#include <fstream>
-#include <iostream>
-#include <sstream>
 
 namespace Sigma{
 
@@ -157,7 +148,7 @@ namespace Sigma{
          *
          * \param v The vertex normal to add. It is copied.
          */
-        void AddVertexNormal(const Vector3f& vn) {
+        void AddVertexNormal(const Vertex& vn) {
             this->vertNorms.push_back(vn);
         }
 
@@ -203,7 +194,8 @@ namespace Sigma{
         std::vector<Face> faces; // Stores vectors of face groupings.
         std::map<unsigned int, std::string> faceGroups; // Stores a mapping of material name to face grouping
         std::vector<Vertex> verts; // The verts that the faces refers to. Can be used for later refinement.
-        std::vector<Vector3f> vertNorms; // The vertex normals for each vert.
+        std::vector<Vertex> vertNorms;  // The vertex normals for each vert. Note that by some sleight of hand,
+                                        // we are using a vertex as a vector, since both are just 3 floats..
         std::vector<TexCoord> texCoords; // The texture coords for each vertex.
         std::vector<Color> colors;
         std::map<std::string, Material> mats;

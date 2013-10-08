@@ -2,16 +2,9 @@
 #ifndef GLCUBESPHERE_H
 #define GLCUBESPHERE_H
 
-#include "../systems/GLSLShader.h"
-#include "../GLTransform.h"
 #include "GLMesh.h"
-#include "SOIL/SOIL.h"
 
 #include <stdint.h>
-#include <vector>
-#include <algorithm>
-#include <limits>
-#include <sstream>
 
 namespace Sigma{
 

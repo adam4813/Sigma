@@ -4,11 +4,8 @@
 
 #include "GLMesh.h"
 
-#include "GL/glew.h"
-
 #include <map>
 #include <stdint.h>
-#include <vector>
 
 namespace Sigma{
 

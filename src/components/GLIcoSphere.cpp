@@ -1,5 +1,7 @@
 #include "GLIcoSphere.h"
 
+#include <vector>
+
 namespace Sigma{
 
     GLIcoSphere::GLIcoSphere( const int entityID ) : GLMesh(entityID) {
@@ -78,9 +80,9 @@ namespace Sigma{
         //  normal = vertex / |vertex|;
         for(size_t i = 0; i < verts.size(); i++) {
             Vertex v = this->verts[i];
-            Vector3f direction(v.x, v.y, v.z);
-            direction.normalize();
-            AddVertexNormal(direction);
+            glm::vec3 radial_direction(v.x, v.y, v.z);
+            glm::vec3 norm = glm::normalize(radial_direction);
+            AddVertexNormal(Vertex(norm.x, norm.y, norm.z));
         }
 
         GLMesh::InitializeBuffers();
@@ -91,9 +93,9 @@ namespace Sigma{
     }
 
     Vertex GLIcoSphere::GetUnitSphereMidPoint(const Vertex &v1, const Vertex &v2) const {
-        Vector3f vec((v1.x + v2.x) / 2.0, (v1.y + v2.y) / 2.0, (v1.z + v2.z) / 2.0);
-        vec.normalize();
-        return Vertex(vec.x, vec.y, vec.z);
+        glm::vec3 midpoint_direction((v1.x + v2.x) / 2.0, (v1.y + v2.y) / 2.0, (v1.z + v2.z) / 2.0);
+        glm::vec3 norm = glm::normalize(midpoint_direction);
+        return Vertex(norm.x, norm.y, norm.z);
     }
 
     void GLIcoSphere::Refine(int level) {

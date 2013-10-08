@@ -1,5 +1,10 @@
 #include "GLCubeSphere.h"
 
+#include "SOIL.h"
+
+#include <vector>
+#include <sstream>
+
 // For std::find
 namespace Sigma {
 
