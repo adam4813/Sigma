@@ -33,6 +33,7 @@ int main(int argCount, char **argValues) {
 #endif
 
 	// Create the window
+	std::cout << "Creating graphics window." << std::endl;
 	if(os->CreateGraphicsWindow(1024,768) == 0) {
 		std::cerr << "Error creating window!" << std::endl;
 		delete os;
@@ -40,6 +41,7 @@ int main(int argCount, char **argValues) {
 	}
 
 	// Start the openGL system
+	std::cout << "Initializeing opengl system." << std::endl;
 	const int* version = glsys.Start();
 	glsys.SetViewportSize(os->GetWindowWidth(), os->GetWindowHeight());
 
@@ -54,10 +56,12 @@ int main(int argCount, char **argValues) {
 	// Parse the scene file to retrieve entities
 	Sigma::parser::SCParser parser;
 
+	std::cout << "Parsing test.sc scene file." << std::endl;
 	if (!parser.Parse("test.sc")) {
 		assert(0 && "Failed to load entities from file.");
 	}
 
+	std::cout << "Generating Entities." << std::endl;
 	// Create the entity's components
 	for (unsigned int i = 0; i < parser.EntityCount(); ++i) {
 		const Sigma::parser::Entity* e = parser.GetEntity(i);
@@ -71,10 +75,13 @@ int main(int argCount, char **argValues) {
 	std::vector<Property> props;
 
 	// Create the player view controller
-	physys.createViewMover("ViewMover", 9, props);
-	ViewMover* mover = reinterpret_cast<ViewMover*>(physys.getComponent(9,ViewMover::getStaticComponentID()));
+	physys.createViewMover("ViewMover", 1, props);
+	ViewMover* mover = reinterpret_cast<ViewMover*>(physys.getComponent(1,ViewMover::getStaticComponentID()));
 	Sigma::event::handler::GLSixDOFViewController cameraController(glsys.View(), mover);
 	IOpSys::KeyboardEventSystem.Register(&cameraController);
+
+	//glsys.View()->Move(4.0f,50.0f,-10.f);
+	glsys.View()->Move(0.0f,36.0f,614.897f);
 
 	// Setup the timer
 	os->SetupTimer();

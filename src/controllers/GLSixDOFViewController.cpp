@@ -179,7 +179,6 @@ void Sigma::event::handler::GLSixDOFViewController::KeyStateChange(const unsigne
 	}
 
 	// Add and remove rotation forces based on the variables set above.
-	float pi = 3.14159f;
-	this->mover->AddRotationForce(glm::vec3(add_x*pi*10.0f, add_y*pi*10.0f, add_z*pi*10.0f));
-	this->mover->RemoveRotationForce(glm::vec3(rem_x*pi*10.0f, rem_y*pi*10.0f, rem_z*pi*10.0f));
+	this->mover->AddRotationForce(glm::vec3(add_x*45.0f, add_y*45.0f, add_z*45.0f));
+	this->mover->RemoveRotationForce(glm::vec3(rem_x*45.0f, rem_y*45.0f, rem_z*45.0f));
 }

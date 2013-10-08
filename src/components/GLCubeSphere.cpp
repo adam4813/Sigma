@@ -9,11 +9,13 @@
 
 #include "GLCubeSphere.h"
 
+const float epsilon = 0.0001f;
+
 // For std::find
 namespace Sigma {
-	bool operator ==(const Vertex &lhs, const Vertex &rhs) { return ((abs(rhs.x - lhs.x) < std::numeric_limits<float>::epsilon()) &&
-																	 (abs(rhs.y - lhs.y) < std::numeric_limits<float>::epsilon()) &&
-																	 (abs(rhs.z - lhs.z) < std::numeric_limits<float>::epsilon())); }
+	bool operator ==(const Vertex &lhs, const Vertex &rhs) { return ((abs(rhs.x - lhs.x) < epsilon) &&
+																	 (abs(rhs.y - lhs.y) < epsilon) &&
+																	 (abs(rhs.z - lhs.z) < epsilon)); }
 }
 
 GLCubeSphere::GLCubeSphere( const int entityID /*= 0*/ ) : Sigma::IGLComponent(entityID) {
@@ -62,8 +64,10 @@ void GLCubeSphere::InitializeBuffers() {
     this->faces.push_back(Sigma::Face(1, 5, 6));
     this->faces.push_back(Sigma::Face(6, 2, 1));
 
+	std::cout << "Subdividing cube sphere..." << std::endl;
 	this->SubDivide(this->_subdivisionLevels);
 
+	std::cout << "Loading cube sphere data..." << std::endl;
 	glGenVertexArrays(1, &this->vao); // Generate the VAO
 	glBindVertexArray(this->vao); // Bind the VAO
 
@@ -93,16 +97,28 @@ void GLCubeSphere::LoadTexture(std::string texture_name) {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);*/
 
-	// There are always six files
+	std::cout << "Loading cube map" << std::endl;
+
+	// First try dds file
+	char filename[100];
 	char filenames[6][100];
-	for(int i=0; i < 6; i++) {
-		sprintf(filenames[i], "%s%d.jpg", texture_name.c_str(), i+1);
-	}
 
-	this->_cubeMap = SOIL_load_OGL_cubemap(filenames[0], filenames[1], filenames[2], filenames[3], filenames[4], filenames[5], SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+	sprintf(filename, "%s.dds", texture_name.c_str());
 
-	if( 0 == this->_cubeMap ) {
-		std::cerr << "SOIL loading error: " << texture_name.c_str() << " - " << SOIL_last_result() << std::endl;
+	this->_cubeMap = SOIL_load_OGL_single_cubemap(filename, SOIL_DDS_CUBEMAP_FACE_ORDER, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	
+	// if that didn't work, load individual files
+	if(this->_cubeMap == 0) {
+		// There are always six files
+		for(int i=0; i < 6; i++) {
+			sprintf(filenames[i], "%s%d.jpg", texture_name.c_str(), i+1);
+		}
+
+		this->_cubeMap = SOIL_load_OGL_cubemap(filenames[0], filenames[1], filenames[2], filenames[3], filenames[4], filenames[5], SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+
+		if( 0 == this->_cubeMap ) {
+			std::cerr << "SOIL loading error: " << texture_name.c_str() << " - " << SOIL_last_result() << std::endl;
+		}
 	}
 	// There are always six files
 	/*for(int i=0; i < 6; i++) {
@@ -132,16 +148,26 @@ void GLCubeSphere::LoadTexture(std::string texture_name) {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);*/
 
-	// There are always six files
-	for(int i=0; i < 6; i++) {
-		sprintf(filenames[i], "%s_nm%d.jpg", texture_name.c_str(), i+1);
-	}
+	std::cout << "Loading cube normal map" << std::endl;
 
-	this->_cubeNormalMap = SOIL_load_OGL_cubemap(filenames[0], filenames[1], filenames[2], filenames[3], filenames[4], filenames[5], SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+	// First try dds file
+	sprintf(filename, "%s_nm.dds", texture_name.c_str());
 
-	if( 0 == this->_cubeNormalMap ) {
-		// It's ok not to have a normal map
-		std::cerr << "SOIL loading error: " << texture_name.c_str() << "_nm - " << SOIL_last_result() << std::endl;
+	this->_cubeNormalMap = SOIL_load_OGL_single_cubemap(filename, SOIL_DDS_CUBEMAP_FACE_ORDER, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	
+	if(this->_cubeNormalMap==0) {
+		// if that didn't work, load individual files
+		// There are always six files
+		for(int i=0; i < 6; i++) {
+			sprintf(filenames[i], "%s_nm%d.jpg", texture_name.c_str(), i+1);
+		}
+
+		this->_cubeNormalMap = SOIL_load_OGL_cubemap(filenames[0], filenames[1], filenames[2], filenames[3], filenames[4], filenames[5], SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+
+		if( 0 == this->_cubeNormalMap ) {
+			// It's ok not to have a normal map
+			std::cerr << "SOIL loading error: " << texture_name.c_str() << "_nm - " << SOIL_last_result() << std::endl;
+		}
 	}
 		//SDL_Surface *img=0;
 		//img = IMG_Load(filename);
@@ -161,12 +187,13 @@ void GLCubeSphere::LoadTexture(std::string texture_name) {
 void GLCubeSphere::SubDivide(int levels) {
 	std::vector<Sigma::Face> newFaces;
 
+	Sigma::Vertex v1(0, 0, 0), v2(0, 0, 0), newVert(0, 0, 0);
+	Sigma::Face newFace(0, 0, 0);
+
+	short i1, i2, i3;
+
 	// Iterate over each face and subdivide it
 	for(std::vector<Sigma::Face>::iterator i = this->faces.begin(); i != this->faces.end(); ++i) {
-		Sigma::Vertex v1(0, 0, 0), v2(0, 0, 0), newVert(0, 0, 0);
-		Sigma::Face newFace(0, 0, 0);
-
-		short i1, i2, i3;
 
 		// Split each edge
 		v1 = this->verts[(*i).v1];
@@ -186,6 +213,7 @@ void GLCubeSphere::SubDivide(int levels) {
 			i1 = std::distance(this->verts.begin(), existingVert);
 		}
 
+		// Second edge
 		v1 = this->verts[(*i).v1];
 		v2 = this->verts[(*i).v3];
 
@@ -202,6 +230,7 @@ void GLCubeSphere::SubDivide(int levels) {
 			i2 = std::distance(this->verts.begin(), existingVert);
 		}
 
+		// third edge
 		v1 = this->verts[(*i).v2];
 		v2 = this->verts[(*i).v3];
 
@@ -218,6 +247,7 @@ void GLCubeSphere::SubDivide(int levels) {
 			i3 = std::distance(this->verts.begin(), existingVert);
 		}
 
+		// Create 4 new faces
 		newFace.v1 = (*i).v1;
 		newFace.v2 = i1;
 		newFace.v3 = i2;

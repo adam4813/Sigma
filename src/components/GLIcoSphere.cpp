@@ -88,6 +88,7 @@ void GLIcoSphere::InitializeBuffers() {
 	// Refine the IcoSphere by 2 levels.
 	// We are using a temp face buffer as it will be replaced by a new set.
 	// The vertex buffer is the actual buffer as we will add to it.
+	std::cout << "Subdividing icosphere..." << std::endl;
 	Refine(this->verts, faceLevelZero, 4);
 
 	// Store the new faces.
