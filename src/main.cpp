@@ -14,7 +14,7 @@
 #endif
 
 int main(int argCount, char **argValues) {
-	OpenGLSystem glsys;
+	Sigma::OpenGLSystem glsys;
 	SimplePhysics physys;
 	Sigma::FactorySystem& factory = Sigma::FactorySystem::getInstance();
 	factory.register_Factory(glsys);
