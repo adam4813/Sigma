@@ -6,17 +6,12 @@
 #include "../components/GLCubeSphere.h"
 #include "../components/GLMesh.h"
 
-OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumulator(0.0) {
-	this->view = new GLSixDOFView();
+OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumulator(0.0), framerate(60.0f) {
+	this->view = std::unique_ptr<IGLView>(new GLSixDOFView());
 }
 
-OpenGLSystem::~OpenGLSystem() {
-	delete this->view;
-}
-
-std::map<std::string, Sigma::IFactory::FactoryFunction>
-        OpenGLSystem::getFactoryFunctions()
-{
+std::map<std::string, Sigma::IFactory::FactoryFunction> OpenGLSystem::getFactoryFunctions(){
+    // construct a map from componenet names to their factory functions
     using namespace std::placeholders;
     std::map<std::string, Sigma::IFactory::FactoryFunction> retval;
 	retval["GLSprite"] = std::bind(&OpenGLSystem::createGLSprite,this,_1,_2,_3);
@@ -24,13 +19,6 @@ std::map<std::string, Sigma::IFactory::FactoryFunction>
     retval["GLCubeSphere"] = std::bind(&OpenGLSystem::createGLCubeSphere,this,_1,_2,_3);
     retval["GLMesh"] = std::bind(&OpenGLSystem::createGLMesh,this,_1,_2,_3);
 
-	// Not supported in VS2012
-    /*{
-        {"GLSprite",std::bind(&OpenGLSystem::createGLSprite,this,_1,_2,_3)},
-        {"GLIcoSphere",std::bind(&OpenGLSystem::createGLIcoSphere,this,_1,_2,_3)},
-        {"GLCubeSphere",std::bind(&OpenGLSystem::createGLCubeSphere,this,_1,_2,_3)},
-        {"GLMesh",std::bind(&OpenGLSystem::createGLMesh,this,_1,_2,_3)}
-    };*/
     return retval;
 }
 
@@ -199,17 +187,16 @@ void OpenGLSystem::createGLMesh(const std::string type, const unsigned int entit
 
 bool OpenGLSystem::Update(const double delta) {
 	this->deltaAccumulator += delta;
-	this->view->UpdateViewMatrix();
 
-	// Check if the deltaAccumulator is greater than 1/60 of a second.
-	if (deltaAccumulator > 16.7) {
+	// Check if the deltaAccumulator is greater than 1/<framerate>th of a second.
+	//  ..if so, it's time to render a new frame
+	if (this->deltaAccumulator > 1000.0 / this->framerate) {
 		this->view->UpdateViewMatrix();
 		// Set up the scene to a "clean" state.
 		glClearColor(0.0f,0.0f,0.0f,0.0f);
 		glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
-		// Set the ViewProjection matrix to be used in the shader.
 		// Loop through and draw each component.
 		for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
 			for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
@@ -224,29 +211,25 @@ bool OpenGLSystem::Update(const double delta) {
 }
 
 const int* OpenGLSystem::Start() {
-	//Checking GL version
-	const GLubyte *GLVersionString = glGetString(GL_VERSION);
 
-	//Or better yet, use the GL3 way to get the version number
+	// Use the GL3 way to get the version number
 	glGetIntegerv(GL_MAJOR_VERSION, &OpenGLVersion[0]);
 	glGetIntegerv(GL_MINOR_VERSION, &OpenGLVersion[1]);
 
 	// Now that GL is up and running load the shaders
 	GLSprite::LoadShader();
 
-	// Generates a floatly hard-to-read matrix, but a normal, standard 4x4 matrix nonetheless
+	// Generate a projection matrix (the "view") based on basic window dimensions
 	this->ProjectionMatrix = glm::perspective(
-		45.0f,
-		(float)this->windowWidth / (float)this->windowHeight,
-		0.1f,
-		10000.0f
+		45.0f, // field-of-view (height)
+		(float)this->windowWidth / (float)this->windowHeight, // aspect ratio
+		0.1f, // near culling plane
+		10000.0f // far culling plane
 		);
-
-	this->view->Move(4.0f,50.0f,-10.f);
 
 	// App specific global gl settings
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // allows for cube-mapping without seams
 	glEnable(GL_MULTISAMPLE_ARB);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
@@ -265,6 +248,7 @@ void OpenGLSystem::Rotate(float x, float y, float z) {
 void OpenGLSystem::SetViewportSize(const unsigned int width, const unsigned int height) {
 	this->windowHeight = height;
 	this->windowWidth = width;
+	// update projection matrix based on new aspect ratio
 	this->ProjectionMatrix = glm::perspective(
 		45.0f,
 		(float)this->windowWidth / (float)this->windowHeight,
