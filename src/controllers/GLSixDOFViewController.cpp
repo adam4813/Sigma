@@ -1,185 +1,74 @@
 #include "GLSixDOFViewController.h"
 
-Sigma::event::handler::GLSixDOFViewController::GLSixDOFViewController(IGLView* view, ViewMover* mover) : mover(mover) {
-	// Set the view mover's view pointer.
-	this->mover->View(view);
-					
-	// Clear out the internal key state buffers.
-	memset(this->keys, 0, sizeof(this->keys));
-	memset(this->keyState, 0, sizeof(this->keyState));
-	this->keys['W'] = 1; this->keys['B'] = 1; this->keys['S'] = 1;
-	this->keys['A'] = 1; this->keys['D'] = 1; this->keys['F'] = 1;
-	this->keys['G'] = 1; this->keys['E'] = 1; this->keys['C'] = 1;
-	this->keys['Q'] = 1; this->keys['Z'] = 1; this->keys['R'] = 1;
-	this->keys['T'] = 1;
-}
-				
-void Sigma::event::handler::GLSixDOFViewController::KeyStateChange(const unsigned int key, const KEY_STATE state) {
-	// Store the new key state
-	this->keyState[key] = state;
+namespace Sigma{
+namespace event{
+namespace handler{
 
-	// Translation keys
+    const float GLSixDOFViewController::SPEED_TRANSLATE   = 10.0f;
+    const float GLSixDOFViewController::SPEED_ROTATE      = 2.0f * 3.14159f;
+    const float GLSixDOFViewController::BOOST_MULTIPLIER  = 10.0f;
 
-	if (key == 'W') { // Move forward
-		if (state == KS_UP) {
-			if (this->keyState['B'] == KS_DOWN) {
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, 100.0f));
-			}
-			else {
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, 10.0f));
-			}
-		} else {
-			if (this->keyState['B'] == KS_DOWN) {
-				this->mover->AddForce(glm::vec3(0.0f, 0.0f, 100.0f));
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -100.0f));
-			}
-			else {
-				this->mover->AddForce(glm::vec3(0.0f, 0.0f, 10.0f));
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -10.0f));
-			}
-		}
-	} else if (key == 'S') { // Move backward
-		if (state == KS_UP) {
-			if (this->keyState['B'] == KS_DOWN) {
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -100.0f));
-			}
-			else {
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -10.0f));
-			}
-		}
-		else {
-			if (this->keyState['B'] == KS_DOWN) {
-				this->mover->AddForce(glm::vec3(0.0f, 0.0f, -100.0f));
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, 100.0f));
-			}
-			else {
-				this->mover->AddForce(glm::vec3(0.0f, 0.0f, -10.0f));
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, 10.0f));
-			}
-		}
-	}
-	if (key == 'B') { // Boost on
-		if (state == KS_DOWN) {
-			if (this->keyState['W'] == KS_DOWN) {
-				this->mover->AddForce(glm::vec3(0.0f, 0.0f, 100.0f));
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, 10.0f));
-			} else if (this->keyState['S'] == KS_DOWN) {
-				this->mover->AddForce(glm::vec3(0.0f, 0.0f, -100.0f));
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -10.0f));
-			}
-		}
-		else { // Boost off
-			if (this->keyState['W'] == KS_DOWN) {
-				this->mover->AddForce(glm::vec3(0.0f, 0.0f, 10.0f));
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, 100.0f));
-			} else if (this->keyState['S'] == KS_DOWN) {
-				this->mover->AddForce(glm::vec3(0.0f, 0.0f, -10.0f));
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -100.0f));
-			}
-		}
-	}
 
-	if (key == 'F') { // Strafe left
-		if (state == KS_UP) {
-			this->mover->RemoveForce(glm::vec3(-10.0f,0.0f,0.0f));
-		}
-		else {
-			this->mover->AddForce(glm::vec3(-10.0f,0.0f,0.0f));
-			this->mover->RemoveForce(glm::vec3(10.0f,0.0f,0.0f));
-		}
-	} else if (key == 'G') { // Strafe right
-		if (state == KS_UP) {
-			this->mover->RemoveForce(glm::vec3(10.0f,0.0f,0.0f));
-		}
-		else {
-			this->mover->AddForce(glm::vec3(10.0f,0.0f,0.0f));
-			this->mover->RemoveForce(glm::vec3(-10.0f,0.0f,0.0f));
-		}
-	}
+    GLSixDOFViewController::GLSixDOFViewController(IGLView* view, ViewMover* mover) : mover(mover) {
+        // Set the view mover's view pointer.
+        this->mover->View(view);
 
-	if (key == 'E') { // Move up
-		if (state == KS_UP) {
-			this->mover->RemoveForce(glm::vec3(0.0f,10.0f,0.0f));
-		}
-		else {
-			this->mover->AddForce(glm::vec3(0.0f,10.0f,0.0f));
-			this->mover->RemoveForce(glm::vec3(0.0f,-10.0f,0.0f));
-		}
-	} else if (key == 'C') { // Move down
-		if (state == KS_UP) {
-			this->mover->RemoveForce(glm::vec3(0.0f,-10.0f,0.0f));
-		}
-		else {
-			this->mover->AddForce(glm::vec3(0.0f,-10.0f,0.0f));
-			this->mover->RemoveForce(glm::vec3(0.0f,10.0f,0.0f));
-		}
-	}
+        // Clear out the internal key state buffers.
+        memset(this->keys, 0, sizeof(this->keys));
+        memset(this->keyState, 0, sizeof(this->keyState));
+        // set to 1 all keys that should trigger an event in this class
+        this->keys['W'] = 1; this->keys['B'] = 1; this->keys['S'] = 1;
+        this->keys['A'] = 1; this->keys['D'] = 1; this->keys['F'] = 1;
+        this->keys['G'] = 1; this->keys['E'] = 1; this->keys['C'] = 1;
+        this->keys['Q'] = 1; this->keys['Z'] = 1; this->keys['R'] = 1;
+        this->keys['T'] = 1;
+    }
 
-	// Rotation Keys
+    void GLSixDOFViewController::KeyStateChange(const unsigned int key, const KEY_STATE state) {
 
-	// Set the value to positive or negative for forward/backward and 0 for no change.
-	// To remove a force on an axis set its rem_ to the correct direction.
-	// To add a force on an axis set its add_ to the correct direction,
-	//	and set the corresponding rem_ to the opposite direction to remove it.
-	int add_x = 0, add_y = 0, add_z = 0;
-	int rem_x = 0, rem_y = 0, rem_z = 0;
+        // Store the new key state
+        this->keyState[key] = state;
 
-	if (key == 'A') {
-		if (state == KS_UP) {
-			rem_y = -1;
-		}
-		else {
-			add_y = -1;
-			rem_y = 1;
-		}
-	} else if (key == 'D') {
-		if (state == KS_UP) {
-			rem_y = 1;
-		}
-		else {
-			add_y = 1;
-			rem_y = -1;
-		}
-	}
+        float speed = this->keyState['B'] == KS_DOWN ? SPEED_TRANSLATE * BOOST_MULTIPLIER : SPEED_TRANSLATE;
 
-	if (key == 'Q') { // Pitch Up
-		if (state == KS_UP) {
-			rem_x  = -1;
-		}
-		else {
-			add_x = -1;
-			rem_x = 1;
-		}
-	} else if (key == 'Z') { // Pitch Down
-		if (state == KS_UP) {
-			rem_x = 1;
-		}
-		else {
-			add_x = 1;
-			rem_x = -1;
-		}
-	}
+        // Translation keys
+        float fwd = 0.0f, strafe = 0.0f, rise = 0.0f;
+        if (this->keyState['W'] == KS_DOWN) // Move forward
+            fwd += speed;
+        if (this->keyState['S'] == KS_DOWN) // Move backward
+            fwd -= speed;
+        if (this->keyState['F'] == KS_DOWN) // Strafe left
+            strafe -= speed;
+        if (this->keyState['G'] == KS_DOWN) // Strafe right
+            strafe += speed;
+        if (this->keyState['E'] == KS_DOWN) // Move up
+           rise += speed;
+        if (this->keyState['C'] == KS_DOWN) // Move down
+            rise -= speed;
+        // remove previous force and add new one
+        this->mover->RemoveForce(this->_translate);
+        this->_translate = glm::vec3(strafe, rise, fwd);
+        this->mover->AddForce(this->_translate);
 
-	if (key == 'R') { // Roll left
-		if (state == KS_UP) {
-			rem_z = -1;
-		}
-		else {
-			add_z = -1;
-			rem_z = 1;
-		}
-	} else if (key == 'T') { // Roll right
-		if (state == KS_UP) {
-			rem_z = 1;
-		}
-		else {
-			add_z = 1;
-			rem_z = -1;
-		}
-	}
+        // Rotation Keys
+        float pitch = 0.0f, yaw = 0.0f, roll = 0.0f;
+        if (this->keyState['A'] == KS_DOWN) // pan (yaw) left
+            yaw -= SPEED_ROTATE;
+        if (this->keyState['D'] == KS_DOWN) // pan (yaw) right
+            yaw += SPEED_ROTATE;
+        if (this->keyState['Q'] == KS_DOWN) // pitch Up
+            pitch -= SPEED_ROTATE;
+        if (this->keyState['Z'] == KS_DOWN) // pitch Down
+            pitch += SPEED_ROTATE;
+        if (this->keyState['R'] == KS_DOWN) // roll left
+            roll -= SPEED_ROTATE;
+        if (this->keyState['T'] == KS_DOWN) // roll right
+            roll += SPEED_ROTATE;
 
-	// Add and remove rotation forces based on the variables set above.
-	float pi = 3.14159f;
-	this->mover->AddRotationForce(glm::vec3(add_x*pi*4.0f, add_y*pi*4.0f, add_z*pi*4.0f));
-	this->mover->RemoveRotationForce(glm::vec3(rem_x*pi*4.0f, rem_y*pi*4.0f, rem_z*pi*4.0f));
-}
+        // remove previous force and add new one
+        this->mover->RemoveRotationForce(this->_rotate);
+        this->_rotate = glm::vec3(pitch, yaw, roll);
+        this->mover->AddRotationForce(this->_rotate);
+
+    } // function KeyStateChange
+} } } // namespace Sigma::event::handler

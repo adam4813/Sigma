@@ -1,3 +1,7 @@
+#pragma once
+#ifndef GLSIXDOFVIEWCONTROLLER_H
+#define GLSIXDOFVIEWCONTROLLER_H
+
 #include "../systems/KeyboardInputSystem.h"
 #include "../components/ViewMover.h"
 #include "../systems/IGLView.h"
@@ -16,15 +20,18 @@ namespace Sigma {
 				 * \brief Triggered whenever a key state change event happens
 				 *
 				 * This method adjusts the view mover according to various key state changes.
-				 * \param[in] const unsigned int key The key for which the state change is happening
-				 * \param[in] const KEY_STATE state // The new state of the key.
-				 * \return   void
-				 * \exception
+				 * \param key The key for which the state change is happening
+				 * \param state The new state of the key (KS_UP or KS_DOWN)
+				 * \return void
 				 */
 				void KeyStateChange(const unsigned int key, const KEY_STATE state);
 			private:
 				ViewMover* mover; // The view mover component that applies the rotations and forces set in the trigger method.
+                static const float SPEED_TRANSLATE, SPEED_ROTATE, BOOST_MULTIPLIER;
+                glm::vec3 _translate, _rotate;
 			};
 		}
 	}
 }
+
+#endif // GLSIXDOFVIEWCONTROLLER_H
