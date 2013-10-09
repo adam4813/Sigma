@@ -24,8 +24,9 @@ namespace Sigma{
     }
 
     void OpenGLSystem::createGLSprite(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
-            GLSprite* spr = new GLSprite(entityID);
+            Sigma::GLSprite* spr = new Sigma::GLSprite(entityID);
             spr->InitializeBuffers();
+            spr->LoadShader();
             if (entityID == 2) {
                 spr->Transform()->Translate(2,2,0);
             }
@@ -216,9 +217,6 @@ namespace Sigma{
         // Use the GL3 way to get the version number
         glGetIntegerv(GL_MAJOR_VERSION, &OpenGLVersion[0]);
         glGetIntegerv(GL_MINOR_VERSION, &OpenGLVersion[1]);
-
-        // Now that GL is up and running load the shaders
-        GLSprite::LoadShader();
 
         // Generate a projection matrix (the "view") based on basic window dimensions
         this->ProjectionMatrix = glm::perspective(

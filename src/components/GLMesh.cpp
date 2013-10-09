@@ -13,7 +13,6 @@
 namespace Sigma{
 
     // static member initialization
-    GLMesh::ShaderMap GLMesh::loadedShaders;
     const std::string GLMesh::DEFAULT_SHADER = "shaders/mesh";
 
     GLMesh::GLMesh(const int entityID) : IGLComponent(entityID) {
@@ -349,32 +348,8 @@ namespace Sigma{
         }
     } // function LoadMesh
 
-    void GLMesh::LoadShader(const std::string& filename) {
-        // look up shader that is already loaded
-        ShaderMap::iterator existingShader = GLMesh::loadedShaders.find(filename.c_str());
-        if(existingShader != GLMesh::loadedShaders.end()){
-            // shader already exists!
-            this->shader = existingShader->second;
-        }
-        else{
-            // need to create and save the shader
-            std::string vertFilename = filename + ".vert";
-            std::string fragFilename = filename + ".frag";
-
-            GLSLShader* theShader = new GLSLShader();
-            theShader->LoadFromFile(GL_VERTEX_SHADER, vertFilename);
-            theShader->LoadFromFile(GL_FRAGMENT_SHADER, fragFilename);
-            theShader->CreateAndLinkProgram();
-
-            // assign it to this instance
-            this->shader = std::shared_ptr<GLSLShader>(theShader);
-            // save it in the static map
-            GLMesh::loadedShaders[filename] = this->shader;
-        }
-    }
-
     void GLMesh::LoadShader(){
-        this->LoadShader(GLMesh::DEFAULT_SHADER);
+        IGLComponent::LoadShader(GLMesh::DEFAULT_SHADER);
     }
 
     void GLMesh::ParseMTL(std::string fname) {

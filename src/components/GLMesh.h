@@ -4,11 +4,9 @@
 
 #include "../GLTransform.h"
 #include "../IGLComponent.h"
-#include "../systems/GLSLShader.h"
 
 #include <vector>
 #include <map>
-#include <unordered_map>
 #include <memory>
 
 namespace Sigma{
@@ -29,7 +27,8 @@ namespace Sigma{
 
     class GLMesh : public IGLComponent {
     public:
-        typedef std::unordered_map<std::string, std::shared_ptr<GLSLShader>> ShaderMap;
+        using IGLComponent::LoadShader;
+
         SET_COMPONENT_ID("GLMesh");
         GLMesh(const int entityID);
         virtual ~GLMesh(){}
@@ -174,14 +173,6 @@ namespace Sigma{
             return nullptr;
         }
 
-        /** \brief load the given shader
-         *
-         * \param filename the base name of the shader. loads filename.vert and filename.frag.
-         *  filename should be a relative path, like "shaders/mesh"
-         * \return void
-         */
-        void LoadShader(const std::string& filename);
-
         /** \brief load the default shader "shaders/mesh" */
         void LoadShader();
 
@@ -199,10 +190,6 @@ namespace Sigma{
         std::vector<TexCoord> texCoords; // The texture coords for each vertex.
         std::vector<Color> colors;
         std::map<std::string, Material> mats;
-
-        std::shared_ptr<GLSLShader> shader; // A mesh may use any shader, and they may be shared
-        // name-->shader map to look up already-loaded shaders
-        static ShaderMap loadedShaders;
     }; // class GLMesh
 
 } // namespace Sigma
