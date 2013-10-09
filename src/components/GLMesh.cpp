@@ -79,7 +79,6 @@ void GLMesh::InitializeBuffers() {
 }
 
 void GLMesh::Render(glm::mediump_float *view, glm::mediump_float *proj) {
-	//this->Transform()->Rotate(0.0f, 1.0f, 0.0f);
 
 	GLIcoSphere::shader.Use();
 	glUniformMatrix4fv(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &this->Transform()->ModelMatrix()[0][0]);
@@ -100,16 +99,24 @@ void GLMesh::Render(glm::mediump_float *view, glm::mediump_float *proj) {
 		if (this->faceGroups.size() > 0) {
 			material& mat = this->mats[this->faceGroups[prev]];
 
-			if (mat.ambientMap == 0 && mat.diffuseMap == 0) {
-				glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texEnabled"), 0);
+			if (mat.diffuseMap == 0) {
+				glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "diffuseTexEnabled"), 0);
 			}
 			else {
-				glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texEnabled"), 1);
+				glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "diffuseTexEnabled"), 1);
 				glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texDiff"), 0);
-				glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texAmb"), 1);
 
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, mat.diffuseMap);
+			}
+
+			if (mat.ambientMap == 0) {
+				glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "ambientTexEnabled"), 0);
+			}
+			else {
+				glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "ambientTexEnabled"), 1);
+				glUniform1i(glGetUniformLocation(GLIcoSphere::shader.GetProgram(), "texAmb"), 1);
+
 				glActiveTexture(GL_TEXTURE1);
 				glBindTexture(GL_TEXTURE_2D, mat.ambientMap);
 			}
@@ -360,6 +367,8 @@ void GLMesh::ParseMTL(std::string fname) {
 		return;
 	}
 
+	std::cout << "Loading material file " << fname << std::endl;
+
 	std::string line;
 	while (getline(in, line)) {
 		std::stringstream s(line);
@@ -403,7 +412,7 @@ void GLMesh::ParseMTL(std::string fname) {
 					std::string filepath;
 					s >> filepath;
 					std::cout << "Loading map_Kd: " << filepath << std::endl;
-					m.diffuseMap = SOIL_load_OGL_texture(filepath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+					m.diffuseMap = SOIL_load_OGL_texture(filepath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y | SOIL_FLAG_MIPMAPS);
 
 					if(m.diffuseMap == 0) {
 						std::cerr << "SOIL loading error: " << filepath.c_str() << " - " << SOIL_last_result() << std::endl;
@@ -412,7 +421,7 @@ void GLMesh::ParseMTL(std::string fname) {
 					std::string filepath;
 					s >> filepath;
 					std::cout << "Loading map_Ka: " << filepath << std::endl;
-					m.ambientMap = SOIL_load_OGL_texture(filepath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+					m.ambientMap = SOIL_load_OGL_texture(filepath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y | SOIL_FLAG_MIPMAPS);
 
 					if(m.ambientMap == 0) {
 						std::cerr << "SOIL loading error: " << filepath.c_str() << " - " << SOIL_last_result() << std::endl;
@@ -420,11 +429,13 @@ void GLMesh::ParseMTL(std::string fname) {
 				} else {
 					// Blank line
 				}
+
 				std::streamoff pre = in.tellg();
 				getline(in, line);
 				if (in.eof()) {
 					break;
 				}
+
 				s.str(line);
 				s.seekg(0);
 				s >> label;
