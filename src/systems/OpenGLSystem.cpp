@@ -23,16 +23,37 @@ namespace Sigma{
         return retval;
     }
 
-    void OpenGLSystem::createGLSprite(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
-            Sigma::GLSprite* spr = new Sigma::GLSprite(entityID);
-            spr->InitializeBuffers();
-            spr->LoadShader();
-            if (entityID == 2) {
-                spr->Transform()->Translate(2,2,0);
-            }
-            spr->Transform()->Translate(0,0,0);
-            this->addComponent(entityID,spr);
-    }
+void OpenGLSystem::createGLSprite(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
+	Sigma::GLSprite* spr = new Sigma::GLSprite(entityID);
+	float scale = 1.0f;
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
+	int componentID = 0;
+	std::string textureFilename;
+
+	for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
+		Property*  p = &(*propitr);
+		if (p->GetName() == "scale") {
+			scale = p->Get<float>();
+		} else if (p->GetName() == "x") {
+			x = p->Get<float>();
+		} else if (p->GetName() == "y") {
+			y = p->Get<float>();
+		} else if (p->GetName() == "z") {
+			z = p->Get<float>();
+		} else if (p->GetName() == "id") {
+			componentID = p->Get<int>();
+		} else if (p->GetName() == "textureFilename"){
+			textureFilename = p->Get<std::string>();
+		}
+	}
+	spr->LoadTexture(textureFilename);
+	spr->Transform()->Scale(glm::vec3(scale));
+	spr->Transform()->Translate(x,y,z);
+	spr->InitializeBuffers();
+	this->addComponent(entityID,spr);
+}
 
     void OpenGLSystem::createGLIcoSphere(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
             Sigma::GLIcoSphere* sphere = new Sigma::GLIcoSphere(entityID);
@@ -42,7 +63,6 @@ namespace Sigma{
             float z = 0.0f;
             int componentID = 0;
             std::string shader_name = "shaders/icosphere";
-
             for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
                 Property*  p = &(*propitr);
                 if (p->GetName() == "scale") {

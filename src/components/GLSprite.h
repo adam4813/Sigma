@@ -25,7 +25,10 @@ namespace Sigma{
         virtual void Render(glm::mediump_float *view, glm::mediump_float *proj);
 
         unsigned int LoadTexture();
+        unsigned int LoadTexture(const std::string& filename);
         GLuint GetTexture() const { return texture_; }
+        void SetTextureData(const unsigned char* data, unsigned int width, unsigned int height);
+
 
         // Load the default shader, "shaders/vert"
         void LoadShader();
