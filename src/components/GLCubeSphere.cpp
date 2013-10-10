@@ -1,6 +1,6 @@
 #include "GLCubeSphere.h"
 
-#include "SOIL.h"
+#include "SOIL/SOIL.h"
 
 #include <vector>
 #include <sstream>
@@ -131,7 +131,7 @@ namespace Sigma {
         } else{
             // create and save vertex
             int next_index = cache[key] = this->verts.size();
-            Vertex midpt();
+            //Vertex midpt();
             AddVertex(GetMidPoint(this->verts[v1], this->verts[v2]));
             return next_index;
         }
