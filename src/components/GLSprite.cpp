@@ -18,14 +18,13 @@ GLSprite::GLSprite( const int entityID /*= 0*/ ) : Sigma::IGLComponent(entityID)
 
 
 void GLSprite::InitializeBuffers() {
-	texture_ = LoadTexture();
 	static const GLfloat vert[] = {
 		1.0f, 1.0f, 0.0f,
-		-1.0f, 1.0f, 0.0f,
-		-1.0f,  -1.0f, 0.0f,
-		1.0f, -1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
 		1.0f, 1.0f, 0.0f,
-		-1.0f, -1.0f, 0.0f
+		0.0f, 0.0f, 0.0f
 	};
 
 	static const GLfloat col[] = {
@@ -38,12 +37,12 @@ void GLSprite::InitializeBuffers() {
 	};
 
 	static const GLfloat uv[] = {
-		0.0f, 0.0f,
 		1.0f, 0.0f,
-		1.0f, 1.0f,
-		0.0f, 1.0f,
 		0.0f, 0.0f,
+		0.0f, 1.0f,
 		1.0f, 1.0f,
+		1.0f, 0.0f,
+		0.0f, 1.0f,
 	};
 
 	// We must create a vao and then store it in our GLSprite.
@@ -78,7 +77,7 @@ void GLSprite::InitializeBuffers() {
 	
 	glBindVertexArray(0);
 
-	this->texture_ = LoadTexture();
+	glGenTextures(1, &this->texture_);
 }
 
 void GLSprite::LoadShader() {
@@ -109,36 +108,18 @@ void GLSprite::Render(glm::mediump_float *view, glm::mediump_float *proj) {
 	GLSprite::shader.UnUse();
 }
 
-unsigned int GLSprite::LoadTexture() {
+unsigned int GLSprite::LoadTexture(std::string filename) {
 	GLuint textureID;
-#ifdef OS_Win32
-	textureID = SOIL_load_OGL_texture("test.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
-#elif OS_SDL
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_2D, textureID);
-
-	SDL_Surface *img;
-	//img = IMG_Load("test.jpg");
-	
-	if(img==0) {
-		assert(0 && "Failed to load test.jpg");
-	} else {
-		glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,img->w,img->h,0,GL_RGB,GL_UNSIGNED_BYTE,(img->pixels));
-		//SDL_FreeSurface(img);
-	}
-
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);
-
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-#endif
-
+	textureID = SOIL_load_OGL_texture(filename.c_str(), SOIL_LOAD_AUTO, this->texture_, 0);
 	return textureID;
+}
+
+void GLSprite::SetTextureData(const unsigned char* data, unsigned int width, unsigned int height) {
+	glBindTexture(GL_TEXTURE_2D, this->texture_);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, data);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 GLSLShader GLSprite::shader;

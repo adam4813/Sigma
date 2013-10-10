@@ -35,13 +35,35 @@ std::map<std::string, Sigma::IFactory::FactoryFunction>
 }
 
 void OpenGLSystem::createGLSprite(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
-		GLSprite* spr = new GLSprite(entityID);
-		spr->InitializeBuffers();
-		if (entityID == 2) {
-			spr->Transform()->Translate(2,2,0);
+	GLSprite* spr = new GLSprite(entityID);
+	float scale = 1.0f;
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
+	int componentID = 0;
+	std::string textureFilename;
+	spr->InitializeBuffers();
+
+	for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
+		Property*  p = &(*propitr);
+		if (p->GetName() == "scale") {
+			scale = p->Get<float>();
+		} else if (p->GetName() == "x") {
+			x = p->Get<float>();
+		} else if (p->GetName() == "y") {
+			y = p->Get<float>();
+		} else if (p->GetName() == "z") {
+			z = p->Get<float>();
+		} else if (p->GetName() == "id") {
+			componentID = p->Get<int>();
+		} else if (p->GetName() == "textureFilename"){
+			textureFilename = p->Get<std::string>();
 		}
-		spr->Transform()->Translate(0,0,0);
-		this->addComponent(entityID,spr);
+	}
+	spr->LoadTexture(textureFilename);
+	spr->Transform()->Scale(glm::vec3(scale));
+	spr->Transform()->Translate(x,y,z);
+	this->addComponent(entityID,spr);
 }
 
 void OpenGLSystem::createGLIcoSphere(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {

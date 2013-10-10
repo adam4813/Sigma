@@ -18,7 +18,7 @@ public:
 	void InitializeBuffers();
 	virtual void Render(glm::mediump_float *view, glm::mediump_float *proj);
 
-	unsigned int LoadTexture();
+	unsigned int LoadTexture(std::string filename);
 	GLuint GetTexture() { return texture_; }
 
 	// The shader used for rendering GLSprites.
@@ -36,6 +36,8 @@ public:
 		}
 		return 6;
 	}
+
+	void SetTextureData(const unsigned char* data, unsigned int width, unsigned int height);
 private:
 	GLuint texture_;
 };
