@@ -20,10 +20,12 @@ GLSprite::GLSprite( const int entityID /*= 0*/ ) : Sigma::IGLComponent(entityID)
 void GLSprite::InitializeBuffers() {
 	texture_ = LoadTexture();
 	static const GLfloat vert[] = {
-		-1.0f, 1.0f, 0.0f,
 		1.0f, 1.0f, 0.0f,
+		-1.0f, 1.0f, 0.0f,
 		-1.0f,  -1.0f, 0.0f,
-		1.0f,  -1.0f, 0.0f,
+		1.0f, -1.0f, 0.0f,
+		1.0f, 1.0f, 0.0f,
+		-1.0f, -1.0f, 0.0f
 	};
 
 	static const GLfloat col[] = {
@@ -31,13 +33,17 @@ void GLSprite::InitializeBuffers() {
 		0.0f, 1.0f, 0.0f,
 		0.0f, 0.0f, 1.0f,
 		1.0f, 0.0f, 1.0f,
+		1.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 1.0f,
 	};
 
 	static const GLfloat uv[] = {
-		0.0f, 1.0f,
-		1.0f, 1.0f,
 		0.0f, 0.0f,
 		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+		0.0f, 0.0f,
+		1.0f, 1.0f,
 	};
 
 	// We must create a vao and then store it in our GLSprite.
@@ -51,7 +57,7 @@ void GLSprite::InitializeBuffers() {
 	glVertexAttribPointer(posLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(posLocation);
 
-	static const GLushort elem[] = { 0, 1, 2, 1, 3, 2 }; 
+	static const GLushort elem[] = { 0, 1, 2, 3, 4, 5 }; 
 	glGenBuffers(1, &this->buffers[this->ElemBufIndex]);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buffers[this->ElemBufIndex]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elem), elem, GL_STATIC_DRAW);
@@ -76,7 +82,7 @@ void GLSprite::InitializeBuffers() {
 }
 
 void GLSprite::LoadShader() {
-	GLSprite::shader.LoadFromFile(GL_VERTEX_SHADER, "shaders/vert.shade");
+	GLSprite::shader.LoadFromFile(GL_VERTEX_SHADER, "shaders/sprite.vert");
 	GLSprite::shader.LoadFromFile(GL_FRAGMENT_SHADER, "shaders/frag.shade");
 	GLSprite::shader.CreateAndLinkProgram();
 }
@@ -84,7 +90,7 @@ void GLSprite::LoadShader() {
 void GLSprite::Render(glm::mediump_float *view, glm::mediump_float *proj) {
 	GLSprite::shader.Use();
 
-	glUniform1i(glGetUniformLocation(GLSprite::shader.GetProgram(), "tex"), GL_TEXTURE0);
+	glUniform1i(glGetUniformLocation(GLSprite::shader.GetProgram(), "tex"), 0);
 	glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &this->Transform()->ModelMatrix()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_View"), 1, GL_FALSE, view);
 	glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, proj);
