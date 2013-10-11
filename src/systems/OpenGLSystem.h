@@ -4,12 +4,13 @@
 #include "../IFactory.h"
 #include "../ISystem.h"
 #include "../IGLComponent.h"
+#include "../systems/IGLView.h"
 
 #include "GL/glew.h"
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 
-struct IGLView;
+//struct IGLView;
 
 class OpenGLSystem
     : public IFactory, public ISystem<Sigma::IGLComponent> {
@@ -81,12 +82,19 @@ public:
 
     std::map<std::string,FactoryFunction> getFactoryFunctions();
 
+	// Component creation methods
 	void createGLSprite(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
 	void createGLIcoSphere(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
 	void createGLCubeSphere(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
 	void createGLMesh(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
 
+	// Views are not technically components, but perhaps they should be
+	void OpenGLSystem::createGLView(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
+
 	IGLView* View() const { return view; }
+
+	GLTransform* GetTransformFor(const unsigned int entityID);
+
 private:
 	unsigned int windowWidth; // Store the width of our window
 	unsigned int windowHeight; // Store the height of our window

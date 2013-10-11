@@ -18,100 +18,102 @@ void Sigma::event::handler::GLSixDOFViewController::KeyStateChange(const unsigne
 	// Store the new key state
 	this->keyState[key] = state;
 
+	const float movement_speed = 15.0f;
+
 	// Translation keys
 
 	if (key == 'W') { // Move forward
 		if (state == KS_UP) {
 			if (this->keyState['B'] == KS_DOWN) {
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, 100.0f));
+				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, movement_speed*10.0f));
 			}
 			else {
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, 10.0f));
+				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, movement_speed));
 			}
 		} else {
 			if (this->keyState['B'] == KS_DOWN) {
-				this->mover->AddForce(glm::vec3(0.0f, 0.0f, 100.0f));
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -100.0f));
+				this->mover->AddForce(glm::vec3(0.0f, 0.0f, movement_speed*10.0f));
+				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -movement_speed*10.0f));
 			}
 			else {
-				this->mover->AddForce(glm::vec3(0.0f, 0.0f, 10.0f));
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -10.0f));
+				this->mover->AddForce(glm::vec3(0.0f, 0.0f, movement_speed));
+				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -movement_speed));
 			}
 		}
 	} else if (key == 'S') { // Move backward
 		if (state == KS_UP) {
 			if (this->keyState['B'] == KS_DOWN) {
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -100.0f));
+				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -movement_speed*10.0f));
 			}
 			else {
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -10.0f));
+				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -movement_speed));
 			}
 		}
 		else {
 			if (this->keyState['B'] == KS_DOWN) {
-				this->mover->AddForce(glm::vec3(0.0f, 0.0f, -100.0f));
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, 100.0f));
+				this->mover->AddForce(glm::vec3(0.0f, 0.0f, -movement_speed*10.0f));
+				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, movement_speed*10.0f));
 			}
 			else {
-				this->mover->AddForce(glm::vec3(0.0f, 0.0f, -10.0f));
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, 10.0f));
+				this->mover->AddForce(glm::vec3(0.0f, 0.0f, -movement_speed));
+				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, movement_speed));
 			}
 		}
 	}
 	if (key == 'B') { // Boost on
 		if (state == KS_DOWN) {
 			if (this->keyState['W'] == KS_DOWN) {
-				this->mover->AddForce(glm::vec3(0.0f, 0.0f, 100.0f));
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, 10.0f));
+				this->mover->AddForce(glm::vec3(0.0f, 0.0f, movement_speed*10.0f));
+				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, movement_speed));
 			} else if (this->keyState['S'] == KS_DOWN) {
-				this->mover->AddForce(glm::vec3(0.0f, 0.0f, -100.0f));
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -10.0f));
+				this->mover->AddForce(glm::vec3(0.0f, 0.0f, -movement_speed*10.0f));
+				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -movement_speed));
 			}
 		}
 		else { // Boost off
 			if (this->keyState['W'] == KS_DOWN) {
-				this->mover->AddForce(glm::vec3(0.0f, 0.0f, 10.0f));
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, 100.0f));
+				this->mover->AddForce(glm::vec3(0.0f, 0.0f, movement_speed));
+				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, movement_speed*10.0f));
 			} else if (this->keyState['S'] == KS_DOWN) {
-				this->mover->AddForce(glm::vec3(0.0f, 0.0f, -10.0f));
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -100.0f));
+				this->mover->AddForce(glm::vec3(0.0f, 0.0f, -movement_speed));
+				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -movement_speed*10.0f));
 			}
 		}
 	}
 
 	if (key == 'F') { // Strafe left
 		if (state == KS_UP) {
-			this->mover->RemoveForce(glm::vec3(-10.0f,0.0f,0.0f));
+			this->mover->RemoveForce(glm::vec3(-movement_speed,0.0f,0.0f));
 		}
 		else {
-			this->mover->AddForce(glm::vec3(-10.0f,0.0f,0.0f));
-			this->mover->RemoveForce(glm::vec3(10.0f,0.0f,0.0f));
+			this->mover->AddForce(glm::vec3(-movement_speed,0.0f,0.0f));
+			this->mover->RemoveForce(glm::vec3(movement_speed,0.0f,0.0f));
 		}
 	} else if (key == 'G') { // Strafe right
 		if (state == KS_UP) {
-			this->mover->RemoveForce(glm::vec3(10.0f,0.0f,0.0f));
+			this->mover->RemoveForce(glm::vec3(movement_speed,0.0f,0.0f));
 		}
 		else {
-			this->mover->AddForce(glm::vec3(10.0f,0.0f,0.0f));
-			this->mover->RemoveForce(glm::vec3(-10.0f,0.0f,0.0f));
+			this->mover->AddForce(glm::vec3(movement_speed,0.0f,0.0f));
+			this->mover->RemoveForce(glm::vec3(-movement_speed,0.0f,0.0f));
 		}
 	}
 
 	if (key == 'E') { // Move up
 		if (state == KS_UP) {
-			this->mover->RemoveForce(glm::vec3(0.0f,10.0f,0.0f));
+			this->mover->RemoveForce(glm::vec3(0.0f,movement_speed,0.0f));
 		}
 		else {
-			this->mover->AddForce(glm::vec3(0.0f,10.0f,0.0f));
-			this->mover->RemoveForce(glm::vec3(0.0f,-10.0f,0.0f));
+			this->mover->AddForce(glm::vec3(0.0f,movement_speed,0.0f));
+			this->mover->RemoveForce(glm::vec3(0.0f,-movement_speed,0.0f));
 		}
 	} else if (key == 'C') { // Move down
 		if (state == KS_UP) {
-			this->mover->RemoveForce(glm::vec3(0.0f,-10.0f,0.0f));
+			this->mover->RemoveForce(glm::vec3(0.0f,-movement_speed,0.0f));
 		}
 		else {
-			this->mover->AddForce(glm::vec3(0.0f,-10.0f,0.0f));
-			this->mover->RemoveForce(glm::vec3(0.0f,10.0f,0.0f));
+			this->mover->AddForce(glm::vec3(0.0f,-movement_speed,0.0f));
+			this->mover->RemoveForce(glm::vec3(0.0f,movement_speed,0.0f));
 		}
 	}
 

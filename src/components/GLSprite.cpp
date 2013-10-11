@@ -84,8 +84,10 @@ void GLSprite::LoadShader() {
 void GLSprite::Render(glm::mediump_float *view, glm::mediump_float *proj) {
 	GLSprite::shader.Use();
 
+	glm::mat4 modelMatrix = this->Transform()->GetMatrix();
+
 	glUniform1i(glGetUniformLocation(GLSprite::shader.GetProgram(), "tex"), GL_TEXTURE0);
-	glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &this->Transform()->ModelMatrix()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &modelMatrix[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_View"), 1, GL_FALSE, view);
 	glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, proj);
 	

@@ -87,16 +87,6 @@ void GLCubeSphere::InitializeBuffers() {
 
 void GLCubeSphere::LoadTexture(std::string texture_name) {
 	// albedo map
-	/*glGenTextures(1, &this->_cubeMap);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeMap);
-
-	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);*/
-
 	std::cout << "Loading cube map" << std::endl;
 
 	// First try dds file
@@ -120,33 +110,6 @@ void GLCubeSphere::LoadTexture(std::string texture_name) {
 			std::cerr << "SOIL loading error: " << texture_name.c_str() << " - " << SOIL_last_result() << std::endl;
 		}
 	}
-	// There are always six files
-	/*for(int i=0; i < 6; i++) {
-		char filename[100];
-		sprintf_s(filename, "%s%d.jpg", texture_name.c_str(), i+1);
-		SDL_Surface *img=0;
-		img = IMG_Load(filename);
-
-		if(img) {
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+i,0,GL_RGB,img->w,img->h,0,GL_RGB,GL_UNSIGNED_BYTE,(img->pixels));
-			SDL_FreeSurface(img);
-		} else {
-			assert(0 && "Texture file did not load correctly.");
-		}
-	}*/
-
-	//glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-
-	// normal map
-	/*glGenTextures(1, &this->_cubeNormalMap);
-	glActiveTexture(GL_TEXTURE0+1);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeNormalMap);
-
-	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);*/
 
 	std::cout << "Loading cube normal map" << std::endl;
 
@@ -169,19 +132,6 @@ void GLCubeSphere::LoadTexture(std::string texture_name) {
 			std::cerr << "SOIL loading error: " << texture_name.c_str() << "_nm - " << SOIL_last_result() << std::endl;
 		}
 	}
-		//SDL_Surface *img=0;
-		//img = IMG_Load(filename);
-
-		//if(img) {
-			//glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+i,0,GL_RGB,img->w,img->h,0,GL_RGB,GL_UNSIGNED_BYTE,(img->pixels));
-			//SDL_FreeSurface(img);
-		//} else {
-			// some may not have normal maps
-			//assert(0 && "Texture file did not load correctly.");
-		//}
-	//}
-
-	//glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 }
 
 void GLCubeSphere::SubDivide(int levels) {
@@ -290,6 +240,8 @@ void GLCubeSphere::LoadShader(std::string shader_name) {
 void GLCubeSphere::Render(glm::mediump_float *view, glm::mediump_float *proj) {
 	this->_shader.Use();
 
+	// Hack to fix the skybox to the camera
+	// Will ultimately use scene graph to accomplish this
 	if(this->fix_to_camera) {
 		glm::mediump_float *view_ptr = view;
 		glm::mat4 view_matrix;
@@ -307,12 +259,14 @@ void GLCubeSphere::Render(glm::mediump_float *view, glm::mediump_float *proj) {
 		this->Transform()->TranslateTo(position);
 	}
 
-	this->Transform()->Rotate(0.0f,this->rotation_speed,0.0f);
+	//this->Transform()->Rotate(0.0f,this->rotation_speed,0.0f);
+
+	glm::mat4 modelMatrix = this->Transform()->GetMatrix();
 
 	glUniform1i(glGetUniformLocation(this->_shader.GetProgram(), "cubeMap"), GL_TEXTURE0);
 	glUniform1i(glGetUniformLocation(this->_shader.GetProgram(), "cubeNormMap"), GL_TEXTURE0+1);
 
-	glUniformMatrix4fv(glGetUniformLocation(this->_shader.GetProgram(), "in_Model"), 1, GL_FALSE, &this->Transform()->ModelMatrix()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(this->_shader.GetProgram(), "in_Model"), 1, GL_FALSE, &modelMatrix[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(this->_shader.GetProgram(), "in_View"), 1, GL_FALSE, view);
 	glUniformMatrix4fv(glGetUniformLocation(this->_shader.GetProgram(), "in_Proj"), 1, GL_FALSE, proj);
 

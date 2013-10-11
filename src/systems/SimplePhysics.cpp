@@ -19,14 +19,26 @@ std::map<std::string,IFactory::FactoryFunction> SimplePhysics::getFactoryFunctio
 }
 
 void SimplePhysics::createPhysicsMover(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
-		PhysicsMover* mover = new PhysicsMover(entityID);
+	PhysicsMover* mover = new PhysicsMover(entityID);
 
     for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
         Property*  p = &(*propitr);
         if (p->GetName() == "transform") {
             GLTransform* t = p->Get<GLTransform*>();
-            mover->Transform(t);
-        }
+            mover->SetTransform(t);
+		} else if(p->GetName() == "rx") {
+			mover->AddRotationForce(glm::vec3(p->Get<float>(), 0.0f, 0.0f));
+        } else if(p->GetName() == "ry") {
+			mover->AddRotationForce(glm::vec3(0.0f, p->Get<float>(), 0.0f));
+		} else if(p->GetName() == "rz") {
+			mover->AddRotationForce(glm::vec3(0.0f, 0.0f, p->Get<float>()));
+		} else if(p->GetName() == "r") {
+			mover->AddForce(glm::vec3(p->Get<float>(), 0.0f, 0.0f));
+		} else if(p->GetName() == "u") {
+			mover->AddForce(glm::vec3(0.0f, p->Get<float>(), 0.0f));
+		} else if(p->GetName() == "f") {
+			mover->AddForce(glm::vec3(0.0f, 0.0f, p->Get<float>()));
+		}
 	}
 	this->addComponent(entityID,mover);
 }

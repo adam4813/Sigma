@@ -1,8 +1,5 @@
 #include <iostream>
 
-#undef OS_Win32
-#define OS_SDL
-
 #include "systems/OpenGLSystem.h"
 #include "systems/SimplePhysics.h"
 #include "systems/FactorySystem.h"
@@ -62,26 +59,66 @@ int main(int argCount, char **argValues) {
 	}
 
 	std::cout << "Generating Entities." << std::endl;
-	// Create the entity's components
+
+	// Create each entity's components
 	for (unsigned int i = 0; i < parser.EntityCount(); ++i) {
-		const Sigma::parser::Entity* e = parser.GetEntity(i);
+		Sigma::parser::Entity* e = parser.GetEntity(i);
 		for (auto itr = e->components.begin(); itr != e->components.end(); ++itr) {
+
+			// Currently, physicsmover components must come after gl* components
+			if((*itr).type == "PhysicsMover") {
+				GLTransform *transform = glsys.GetTransformFor(e->id); 
+				if(transform) {
+					Property p("transform", transform);
+					itr->properties.push_back(p);
+				}
+				else {
+					assert(0 && "Invalid entity id");
+				}
+			}
+
             factory.create(
                         itr->type,e->id,
                         const_cast<std::vector<Property>&>(itr->properties));
 		}
 	}
 
-	std::vector<Property> props;
+	// View and ViewMover creation has been moved to test.sc, but for
+	// now provide sensible defaults.  Final engine should require 
+	// definition in scene file.  Currently entity ID for view must be 1
+	// for this to work.
 
-	// Create the player view controller
-	physys.createViewMover("ViewMover", 1, props);
+	// No view provided, create a default
+	if(!glsys.View()) {
+		std::vector<Property> props;
+
+		Property p_x("x", 0.0f);
+		Property p_y("y", 0.0f);
+		Property p_z("z", 0.0f);
+
+		props.push_back(p_x);
+		props.push_back(p_y);
+		props.push_back(p_z);
+
+		glsys.createGLView("GLView", 1, props);
+	}
+
+	// Still hard coded to use entity ID #1
+	// Link the graphics view to the physics system's view mover
 	ViewMover* mover = reinterpret_cast<ViewMover*>(physys.getComponent(1,ViewMover::getStaticComponentID()));
+
+	// If no view mover was created,
+	// create a default
+	if(!mover) {
+		std::cout << "No view mover provided, creating default..." << std::endl;
+		std::vector<Property> props;
+		physys.createViewMover("ViewMover", 1, props);
+		mover = reinterpret_cast<ViewMover*>(physys.getComponent(1,ViewMover::getStaticComponentID()));
+	}
+
+	// Create the controller
 	Sigma::event::handler::GLSixDOFViewController cameraController(glsys.View(), mover);
 	IOpSys::KeyboardEventSystem.Register(&cameraController);
-
-	//glsys.View()->Move(4.0f,50.0f,-10.f);
-	glsys.View()->Move(0.0f,36.0f,614.897f);
 
 	// Setup the timer
 	os->SetupTimer();

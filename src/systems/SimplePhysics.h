@@ -2,6 +2,7 @@
 
 #include "../IFactory.h"
 #include "../ISystem.h"
+#include "../components/ViewMover.h"
 
 #include <string>
 #include <vector>
@@ -34,5 +35,6 @@ public:
     std::map<std::string,FactoryFunction> getFactoryFunctions();
 	void createPhysicsMover(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
 	void createViewMover(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
+
 private:
 };

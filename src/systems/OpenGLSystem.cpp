@@ -7,7 +7,8 @@
 #include "../components/GLMesh.h"
 
 OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumulator(0.0) {
-	this->view = new GLSixDOFView();
+	//this->view = new GLSixDOFView();
+	this->view = 0;
 }
 
 OpenGLSystem::~OpenGLSystem() {
@@ -23,6 +24,7 @@ std::map<std::string,IFactory::FactoryFunction>
     retval["GLIcoSphere"] = std::bind(&OpenGLSystem::createGLIcoSphere,this,_1,_2,_3);
     retval["GLCubeSphere"] = std::bind(&OpenGLSystem::createGLCubeSphere,this,_1,_2,_3);
     retval["GLMesh"] = std::bind(&OpenGLSystem::createGLMesh,this,_1,_2,_3);
+	retval["GLView"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2,_3);
 
 	// Not supported in VS2012
     /*{
@@ -32,6 +34,39 @@ std::map<std::string,IFactory::FactoryFunction>
         {"GLMesh",std::bind(&OpenGLSystem::createGLMesh,this,_1,_2,_3)}
     };*/
     return retval;
+}
+
+void OpenGLSystem::createGLView(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
+	this->view = new GLSixDOFView();
+	
+	float x=0.0f, y=0.0f, z=0.0f, rx=0.0f, ry=0.0f, rz=0.0f;
+
+	for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
+		Property*  p = &(*propitr);
+
+		if (p->GetName() == "x") {
+			x = p->Get<float>();
+			continue;
+		} else if (p->GetName() == "y") {
+			y = p->Get<float>();
+			continue;
+		} else if (p->GetName() == "z") {
+			z = p->Get<float>();
+			continue;
+		}else if (p->GetName() == "rx") {
+			rx = p->Get<float>();
+			continue;
+		} else if (p->GetName() == "ry") {
+			ry = p->Get<float>();
+			continue;
+		} else if (p->GetName() == "rz") {
+			rz = p->Get<float>();
+			continue;
+		}
+	}
+
+	this->view->Transform.Move(x,y,z);
+	this->view->Transform.Rotate(rx,ry,rz);
 }
 
 void OpenGLSystem::createGLSprite(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
@@ -187,13 +222,29 @@ void OpenGLSystem::createGLMesh(const std::string type, const unsigned int entit
 		this->addComponent(entityID,mesh);
 }
 
+GLTransform *OpenGLSystem::GetTransformFor(const unsigned int entityID) {
+	auto entity = &(_Components[entityID]);
+
+	// for now, just returns the first component's transform
+	// bigger question: should entities be able to have multiple GLComponents?
+	for(auto compItr = entity->begin(); compItr != entity->end(); compItr++) {
+		GLTransform *transform = ((*compItr).second)->Transform();
+		return transform;
+	}
+
+	// no components
+	return 0;
+}
+
 bool OpenGLSystem::Update(const double delta) {
 	this->deltaAccumulator += delta;
-	this->view->UpdateViewMatrix();
+	//this->view->UpdateViewMatrix();
 
 	// Check if the deltaAccumulator is greater than 1/60 of a second.
 	if (deltaAccumulator > 16.7) {
-		this->view->UpdateViewMatrix();
+		//this->view->UpdateViewMatrix();
+		glm::mat4 viewMatrix = this->view->GetViewMatrix();
+
 		// Set up the scene to a "clean" state.
 		glClearColor(0.0f,0.0f,0.0f,0.0f);
 		glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window
@@ -203,7 +254,7 @@ bool OpenGLSystem::Update(const double delta) {
 		// Loop through and draw each component.
 		for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
 			for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
-				citr->second->Render(&this->view->ViewMatrix[0][0], &this->ProjectionMatrix[0][0]);
+				citr->second->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 			}
 		}
 
@@ -233,8 +284,6 @@ const int* OpenGLSystem::Start() {
 		10000.0f
 		);
 
-	//this->view->Move(4.0f,50.0f,-10.f);
-
 	// App specific global gl settings
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
@@ -246,11 +295,11 @@ const int* OpenGLSystem::Start() {
 }
 
 void OpenGLSystem::Move(float x, float y, float z) {
-	this->view->Move(x,y,z);
+	this->view->Transform.Move(x,y,z);
 }
 
 void OpenGLSystem::Rotate(float x, float y, float z) {
-	this->view->Rotate(x,y,z);
+	this->view->Transform.Rotate(x,y,z);
 }
 
 void OpenGLSystem::SetViewportSize(const unsigned int width, const unsigned int height) {
