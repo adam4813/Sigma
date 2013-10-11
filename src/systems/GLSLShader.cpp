@@ -14,6 +14,7 @@ GLSLShader::GLSLShader(void)
 	_shaders[GEOMETRY_SHADER]=0;
 	_attributeList.clear();
 	_uniformLocationList.clear();
+	_program = 0;
 }
 
 GLSLShader::~GLSLShader(void)

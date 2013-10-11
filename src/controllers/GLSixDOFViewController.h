@@ -18,8 +18,8 @@ namespace Sigma {
 				 * This method adjusts the view mover according to various key state changes.
 				 * \param[in] const unsigned int key The key for which the state change is happening
 				 * \param[in] const KEY_STATE state // The new state of the key.
-				 * \returns   void 
-				 * \exception  
+				 * \return   void
+				 * \exception
 				 */
 				void KeyStateChange(const unsigned int key, const KEY_STATE state);
 			private:

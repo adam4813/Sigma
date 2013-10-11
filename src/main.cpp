@@ -17,9 +17,9 @@ int main(int argCount, char **argValues) {
 	OpenGLSystem glsys;
 	SimplePhysics physys;
 
-	FactorySystem& factory = FactorySystem::getInstance();
-	factory.register_Factory(&glsys);
-	factory.register_Factory(&physys);
+	Sigma::FactorySystem& factory = Sigma::FactorySystem::getInstance();
+	factory.register_Factory(glsys);
+	factory.register_Factory(physys);
 
 	IOpSys* os = nullptr;
 

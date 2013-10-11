@@ -1,4 +1,6 @@
 #pragma once
+#ifndef IGLCOMPONENT_H
+#define IGLCOMPONENT_H
 
 #include "GL/glew.h"
 #include "IComponent.h"
@@ -23,15 +25,45 @@ namespace Sigma {
 		float r,g,b;
 	};
 
+	// A struct to store 2D or 1D texture coordinates for each vertex
+	struct TexCoord {
+        TexCoord(float u, float v = 0.0f) : u(u), v(v) { }
+        float u, v;
+    };
+
+    // A struct to store material information for each vertex.
+    // Wikipedia explains what's going on:
+    // http://en.wikipedia.org/wiki/Wavefront_.obj_file#Basic_materials
+    struct Material {
+        Material() {
+            ka[0] = 0.2f; ka[1] = 0.2f; ka[2] = 0.2f;
+            kd[0] = 0.8f; kd[1] = 0.8f; kd[2] = 0.8f;
+            ks[0] = 1.0f; ks[1] = 1.0f; ks[2] = 1.0f;
+            tr = 1.0f;
+            ns = 0.0f;
+            illum = 1;
+        }
+        float ka[3];
+        float kd[3];
+        float ks[3];
+        float tr; // Aka d
+        float ns;
+        int illum;
+        // TODO: Add maps
+        GLuint ambientMap;
+        GLuint diffuseMap;
+        GLuint specularMap;
+    };
+
 	class IGLComponent : public IComponent {
 	public:
 		IGLComponent() : IComponent(0) { } // Default ctor setting entity ID to 0.
 		IGLComponent(const int entityID) : IComponent(entityID) { } // Ctor that sets the entity ID.
+
 		/**
-		 * \brief Creates a new IGLComponent.
+		 * \brief Initializes the IGLComponent.
 		 *
-		 * \param[in] int entityID The entity this component belongs to.
-		 * \returns IGLCompoent* the newly created component.
+		 * \param entityID The entity this component belongs to.
 		 */
 		virtual void InitializeBuffers() = 0;
 
@@ -39,8 +71,8 @@ namespace Sigma {
 		/**
 		 * \brief Retrieves the specified buffer.
 		 *
-		 * \param[in] const int index The index of the buffer to retrieve
-		 * \returns   unsigned int THe ID of the buffer
+		 * \param const int index The index of the buffer to retrieve
+		 * \return   unsigned int THe ID of the buffer
 		 */
 		unsigned int GetBuffer(const int index) {
 			return this->buffers[index];
@@ -49,14 +81,14 @@ namespace Sigma {
 		/**
 		 * \brief Returns the number of elements to draw for this component.
 		 *
-		 * \returns unsigned int The number of elements to draw.
+		 * \return unsigned int The number of elements to draw.
 		 */
 		virtual unsigned int MeshGroup_ElementCount(const unsigned int group = 0) const = 0;
 
 		/**
 		 * \brief Returns the draw mode for this component.
 		 *
-		 * \returns unsigned int The draw mode (ex. GL_TRIANGLES, GL_TRIANGLE_STRIP).
+		 * \return unsigned int The draw mode (ex. GL_TRIANGLES, GL_TRIANGLE_STRIP).
 		 */
 		unsigned int DrawMode() const { return this->drawMode; }
 
@@ -71,14 +103,14 @@ namespace Sigma {
 		/**
 		 * \brief Retrieves the transform object for this component.
 		 *
-		 * \returns GLTransform& The transform object.
+		 * \return GLTransform& The transform object.
 		 */
 		GLTransform* Transform() { return &transform; }
 
 		/**
 		 * \brief Return the VAO ID of this component.
 		 *
-		 * \returns   unsigned int The VAO ID.
+		 * \return   unsigned int The VAO ID.
 		 */
 		unsigned int Vao() const { return this->vao; }
 
@@ -89,14 +121,11 @@ namespace Sigma {
 		virtual void SetCullFace(std::string cull_face) {
 			if(cull_face == "back") {
 				this->cull_face = GL_BACK;
-			}
-			else if (cull_face == "front") {
+			} else if (cull_face == "front") {
 				this->cull_face = GL_FRONT;
-			}
-			else if (cull_face == "none") {
+			} else if (cull_face == "none") {
 				this->cull_face = 0;
-			}
-			else {
+			} else {
 				assert(0 && "Invalid cull_face parameter");
 			}
 		};
@@ -114,5 +143,7 @@ namespace Sigma {
 		unsigned int drawMode; // The current draw mode (ex. GL_TRIANGLES, GL_TRIANGLE_STRIP).
 		GLuint cull_face; // The current culling method for this component.
 		GLTransform transform; // The transform of this component.
-	};
-}
+	}; // class IGLComponent
+} // namespace Sigma
+
+#endif // IGLCOMPONENT_H

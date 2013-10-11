@@ -1,8 +1,8 @@
 #include "GLSprite.h"
 #include "GL/glew.h"
+#include "SOIL/SOIL.h"
 
 #ifdef OS_Win32
-	#include "SOIL/SOIL.h"
 #elif OS_SDL
 	#include "SDL/SDL.h"
 	#include "SDL/SDL_image.h"
@@ -18,12 +18,13 @@ GLSprite::GLSprite( const int entityID /*= 0*/ ) : Sigma::IGLComponent(entityID)
 
 
 void GLSprite::InitializeBuffers() {
-	texture_ = LoadTexture();
 	static const GLfloat vert[] = {
-		-1.0f, 1.0f, 0.0f,
 		1.0f, 1.0f, 0.0f,
-		-1.0f,  -1.0f, 0.0f,
-		1.0f,  -1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f
 	};
 
 	static const GLfloat col[] = {
@@ -31,13 +32,17 @@ void GLSprite::InitializeBuffers() {
 		0.0f, 1.0f, 0.0f,
 		0.0f, 0.0f, 1.0f,
 		1.0f, 0.0f, 1.0f,
+		1.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 1.0f,
 	};
 
 	static const GLfloat uv[] = {
+		1.0f, 0.0f,
+		0.0f, 0.0f,
 		0.0f, 1.0f,
 		1.0f, 1.0f,
-		0.0f, 0.0f,
 		1.0f, 0.0f,
+		0.0f, 1.0f,
 	};
 
 	// We must create a vao and then store it in our GLSprite.
@@ -51,7 +56,7 @@ void GLSprite::InitializeBuffers() {
 	glVertexAttribPointer(posLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(posLocation);
 
-	static const GLushort elem[] = { 0, 1, 2, 1, 3, 2 }; 
+	static const GLushort elem[] = { 0, 1, 2, 3, 4, 5 }; 
 	glGenBuffers(1, &this->buffers[this->ElemBufIndex]);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buffers[this->ElemBufIndex]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elem), elem, GL_STATIC_DRAW);
@@ -72,11 +77,11 @@ void GLSprite::InitializeBuffers() {
 	
 	glBindVertexArray(0);
 
-	this->texture_ = LoadTexture();
+	glGenTextures(1, &this->texture_);
 }
 
 void GLSprite::LoadShader() {
-	GLSprite::shader.LoadFromFile(GL_VERTEX_SHADER, "shaders/vert.shade");
+	GLSprite::shader.LoadFromFile(GL_VERTEX_SHADER, "shaders/sprite.vert");
 	GLSprite::shader.LoadFromFile(GL_FRAGMENT_SHADER, "shaders/frag.shade");
 	GLSprite::shader.CreateAndLinkProgram();
 }
@@ -86,7 +91,7 @@ void GLSprite::Render(glm::mediump_float *view, glm::mediump_float *proj) {
 
 	glm::mat4 modelMatrix = this->Transform()->GetMatrix();
 
-	glUniform1i(glGetUniformLocation(GLSprite::shader.GetProgram(), "tex"), GL_TEXTURE0);
+	glUniform1i(glGetUniformLocation(GLSprite::shader.GetProgram(), "tex"), 0);
 	glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Model"), 1, GL_FALSE, &modelMatrix[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_View"), 1, GL_FALSE, view);
 	glUniformMatrix4fv(glGetUniformLocation(GLSprite::shader.GetProgram(), "in_Proj"), 1, GL_FALSE, proj);
@@ -105,36 +110,18 @@ void GLSprite::Render(glm::mediump_float *view, glm::mediump_float *proj) {
 	GLSprite::shader.UnUse();
 }
 
-unsigned int GLSprite::LoadTexture() {
+unsigned int GLSprite::LoadTexture(std::string filename) {
 	GLuint textureID;
-#ifdef OS_Win32
-	textureID = SOIL_load_OGL_texture("test.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
-#elif OS_SDL
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_2D, textureID);
-
-	SDL_Surface *img;
-	//img = IMG_Load("test.jpg");
-	
-	if(img==0) {
-		assert(0 && "Failed to load test.jpg");
-	} else {
-		glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,img->w,img->h,0,GL_RGB,GL_UNSIGNED_BYTE,(img->pixels));
-		//SDL_FreeSurface(img);
-	}
-
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);
-
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-#endif
-
+	textureID = SOIL_load_OGL_texture(filename.c_str(), SOIL_LOAD_AUTO, this->texture_, 0);
 	return textureID;
+}
+
+void GLSprite::SetTextureData(const unsigned char* data, unsigned int width, unsigned int height) {
+	glBindTexture(GL_TEXTURE_2D, this->texture_);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, data);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 GLSLShader GLSprite::shader;

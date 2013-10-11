@@ -25,6 +25,7 @@ public:
 	GLuint operator()(const std::string uniform);
 	//Program deletion
 	void DeleteProgram() {glDeleteProgram(_program);_program=-1;}
+	bool isLoaded() { return _program != 0; }
 private:
 	enum ShaderType {VERTEX_SHADER, FRAGMENT_SHADER, GEOMETRY_SHADER};
 	GLuint	_program;

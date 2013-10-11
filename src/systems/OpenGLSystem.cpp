@@ -15,16 +15,16 @@ OpenGLSystem::~OpenGLSystem() {
 	delete this->view;
 }
 
-std::map<std::string,IFactory::FactoryFunction>
+std::map<std::string, Sigma::IFactory::FactoryFunction>
         OpenGLSystem::getFactoryFunctions()
 {
     using namespace std::placeholders;
-    std::map<std::string,IFactory::FactoryFunction> retval;
-	retval["GLSprite"] = std::bind(&OpenGLSystem::createGLSprite,this,_1,_2,_3);
-    retval["GLIcoSphere"] = std::bind(&OpenGLSystem::createGLIcoSphere,this,_1,_2,_3);
-    retval["GLCubeSphere"] = std::bind(&OpenGLSystem::createGLCubeSphere,this,_1,_2,_3);
-    retval["GLMesh"] = std::bind(&OpenGLSystem::createGLMesh,this,_1,_2,_3);
-	retval["GLView"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2,_3);
+
+	std::map<std::string, Sigma::IFactory::FactoryFunction> retval;
+	retval["GLSprite"] = std::bind(&OpenGLSystem::createGLSprite,this,_1,_2);
+    retval["GLIcoSphere"] = std::bind(&OpenGLSystem::createGLIcoSphere,this,_1,_2);
+    retval["GLCubeSphere"] = std::bind(&OpenGLSystem::createGLCubeSphere,this,_1,_2);
+    retval["GLMesh"] = std::bind(&OpenGLSystem::createGLMesh,this,_1,_2);
 
 	// Not supported in VS2012
     /*{
@@ -69,25 +69,48 @@ void OpenGLSystem::createGLView(const std::string type, const unsigned int entit
 	this->view->Transform.Rotate(rx,ry,rz);
 }
 
-void OpenGLSystem::createGLSprite(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
-		GLSprite* spr = new GLSprite(entityID);
-		spr->InitializeBuffers();
-		if (entityID == 2) {
-			spr->Transform()->Translate(2,2,0);
+void OpenGLSystem::createGLSprite(const unsigned int entityID, std::vector<Property> &properties) {
+	GLSprite* spr = new GLSprite(entityID);
+	float scale = 1.0f;
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
+	int componentID = 0;
+	std::string textureFilename;
+	spr->InitializeBuffers();
+
+	for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
+		Property*  p = &(*propitr);
+		if (p->GetName() == "scale") {
+			scale = p->Get<float>();
+		} else if (p->GetName() == "x") {
+			x = p->Get<float>();
+		} else if (p->GetName() == "y") {
+			y = p->Get<float>();
+		} else if (p->GetName() == "z") {
+			z = p->Get<float>();
+		} else if (p->GetName() == "id") {
+			componentID = p->Get<int>();
+		} else if (p->GetName() == "textureFilename"){
+			textureFilename = p->Get<std::string>();
 		}
-		spr->Transform()->Translate(0,0,0);
-		this->addComponent(entityID,spr);
+	}
+	spr->LoadTexture(textureFilename);
+	spr->Transform()->Scale(glm::vec3(scale));
+	spr->Transform()->Translate(x,y,z);
+	this->addComponent(entityID,spr);
 }
 
-void OpenGLSystem::createGLIcoSphere(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
-		GLIcoSphere* sphere = new GLIcoSphere(entityID);
-		sphere->InitializeBuffers();
+void OpenGLSystem::createGLIcoSphere(const unsigned int entityID, std::vector<Property> &properties) {
+		Sigma::GLIcoSphere* sphere = new Sigma::GLIcoSphere(entityID);
 		float scale = 1.0f;
 		float x = 0.0f;
 		float y = 0.0f;
 		float z = 0.0f;
 
 		int componentID = 0;
+		std::string shader_name = "shaders/icosphere";
+
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			Property*  p = &(*propitr);
 			if (p->GetName() == "scale") {
@@ -104,18 +127,23 @@ void OpenGLSystem::createGLIcoSphere(const std::string type, const unsigned int 
 				continue;
 			} else if (p->GetName() == "id") {
 				componentID = p->Get<int>();
+			} else if (p->GetName() == "shader"){
+                shader_name = p->Get<std::string>();
 			}
 		}
 		sphere->Transform()->Scale(scale,scale,scale);
 		sphere->Transform()->Translate(x,y,z);
+		sphere->LoadShader(shader_name);
+		sphere->InitializeBuffers();
+		sphere->SetCullFace("back");
 		this->addComponent(entityID,sphere);
 }
 
-void OpenGLSystem::createGLCubeSphere(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
-		GLCubeSphere* sphere = new GLCubeSphere(entityID);
+void OpenGLSystem::createGLCubeSphere(const unsigned int entityID, std::vector<Property> &properties) {
+		Sigma::GLCubeSphere* sphere = new Sigma::GLCubeSphere(entityID);
 
 		std::string texture_name = "";
-		std::string shader_name = "";
+		std::string shader_name = "shaders/cubesphere";
 		std::string cull_face = "back";
 		int subdivision_levels = 1;
 		float rotation_speed = 0.0f;
@@ -142,7 +170,7 @@ void OpenGLSystem::createGLCubeSphere(const std::string type, const unsigned int
 				continue;
 			} else if (p->GetName() == "subdivision_levels") {
 				subdivision_levels = p->Get<int>();
-			} else if (p->GetName() == "texture_name") {
+			} else if (p->GetName() == "texture") {
 				texture_name = p->Get<std::string>();
 			} else if (p->GetName() == "shader") {
 				shader_name = p->Get<std::string>();
@@ -162,15 +190,15 @@ void OpenGLSystem::createGLCubeSphere(const std::string type, const unsigned int
 		sphere->SetCullFace(cull_face);
 		sphere->SetSubdivisions(subdivision_levels);
 		sphere->LoadShader(shader_name);
-		sphere->InitializeBuffers();
 		sphere->LoadTexture(texture_name);
 
 		sphere->Transform()->Scale(scale,scale,scale);
 		sphere->Transform()->Translate(x,y,z);
+		sphere->InitializeBuffers();
 		this->addComponent(entityID,sphere);
 }
-void OpenGLSystem::createGLMesh(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
-        GLMesh* mesh = new GLMesh(entityID);
+void OpenGLSystem::createGLMesh(const unsigned int entityID, std::vector<Property> &properties) {
+        Sigma::GLMesh* mesh = new Sigma::GLMesh(entityID);
 
 		float scale = 1.0f;
 		float x = 0.0f;
@@ -181,6 +209,7 @@ void OpenGLSystem::createGLMesh(const std::string type, const unsigned int entit
 		float rz = 0.0f;
 		int componentID = 0;
 		std::string cull_face = "back";
+		std::string shaderfile = "";
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			Property*  p = &*propitr;
@@ -207,18 +236,22 @@ void OpenGLSystem::createGLMesh(const std::string type, const unsigned int entit
 				continue;
 			} else if (p->GetName() == "meshFile") {
 				mesh->LoadMesh(p->Get<std::string>());
-			} else if (p->GetName() == "id") {
+			} else if (p->GetName() == "shader"){
+                shaderfile = p->Get<std::string>();
+            } else if (p->GetName() == "id") {
 				componentID = p->Get<int>();
 			} else if (p->GetName() == "cullface") {
 				cull_face = p->Get<std::string>();
 			}
 		}
 
-		mesh->InitializeBuffers();
 		mesh->SetCullFace(cull_face);
 		mesh->Transform()->Scale(scale,scale,scale);
 		mesh->Transform()->Translate(x,y,z);
 		mesh->Transform()->Rotate(rx,ry,rz);
+		if(shaderfile != "") mesh->LoadShader(shaderfile);
+        else mesh->LoadShader(); // load default
+		mesh->InitializeBuffers();
 		this->addComponent(entityID,mesh);
 }
 
@@ -274,7 +307,6 @@ const int* OpenGLSystem::Start() {
 
 	// Now that GL is up and running load the shaders
 	GLSprite::LoadShader();
-	GLIcoSphere::LoadShader();
 
 	// Generates a floatly hard-to-read matrix, but a normal, standard 4x4 matrix nonetheless
 	this->ProjectionMatrix = glm::perspective(

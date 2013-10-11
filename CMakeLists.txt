@@ -65,11 +65,6 @@ add_definitions(
 )
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-if(DEBUG)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
-endif(DEBUG)
-
-
 # Link aganst OpenGL and GLEW
 find_package(OpenGL REQUIRED)
 if(NOT OPENGL_FOUND)

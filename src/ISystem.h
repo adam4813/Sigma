@@ -23,7 +23,7 @@ class ISystem
          * In case t
          * \param[in] std::size_t EntityId the Id of the Entity the wanted Component belongs to
          * \param[in] IComponent::ComponentID ID The Id of the wanted Component
-         * \returns   T* returns the Component or NULL, if either the Entity doesn't exist or the Entity doesn't have that Component
+         * \return   T* returns the Component or NULL, if either the Entity doesn't exist or the Entity doesn't have that Component
          */
         T* getComponent(std::size_t EntityID, IComponent::ComponentID ID)
         {

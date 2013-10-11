@@ -3,12 +3,13 @@
 #include "../components/PhysicsMover.h"
 #include "../components/ViewMover.h"
 
-std::map<std::string,IFactory::FactoryFunction> SimplePhysics::getFactoryFunctions()
+std::map<std::string,Sigma::IFactory::FactoryFunction>
+    SimplePhysics::getFactoryFunctions()
 {
     using namespace std::placeholders;
-    std::map<std::string,IFactory::FactoryFunction> retval;
-	retval["PhysicsMover"] = std::bind(&SimplePhysics::createPhysicsMover,this,_1,_2,_3);
-    retval["ViewMover"] = std::bind(&SimplePhysics::createViewMover,this,_1,_2,_3);
+    std::map<std::string,Sigma::IFactory::FactoryFunction> retval;
+	retval["PhysicsMover"] = std::bind(&SimplePhysics::createPhysicsMover,this,_1,_2);
+    retval["ViewMover"] = std::bind(&SimplePhysics::createViewMover,this,_1,_2);
 
 	// Not supported in VS2012
     /*{
@@ -18,8 +19,8 @@ std::map<std::string,IFactory::FactoryFunction> SimplePhysics::getFactoryFunctio
     return retval;
 }
 
-void SimplePhysics::createPhysicsMover(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
-	PhysicsMover* mover = new PhysicsMover(entityID);
+void SimplePhysics::createPhysicsMover(const unsigned int entityID, std::vector<Property> &properties) {
+		PhysicsMover* mover = new PhysicsMover(entityID);
 
     for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
         Property*  p = &(*propitr);
@@ -43,7 +44,7 @@ void SimplePhysics::createPhysicsMover(const std::string type, const unsigned in
 	this->addComponent(entityID,mover);
 }
 
-void SimplePhysics::createViewMover(const std::string type, const unsigned int entityID, std::vector<Property> &properties)
+void SimplePhysics::createViewMover(const unsigned int entityID, std::vector<Property> &properties)
 {
 	ViewMover* mover = new ViewMover(entityID);
 	this->addComponent(entityID,mover);
