@@ -139,6 +139,14 @@ namespace Sigma{
     }
 
     void GLMesh::LoadMesh(std::string fname) {
+		// Extract the path from the filename.
+		std::string path;
+		if (fname.find("/") != std::string::npos) {
+			path = fname.substr(0, fname.find_last_of("/") + 1); // Keep the separator.
+		} else {
+			path = fname.substr(0, fname.find_last_of("\\") + 1); // Keep the separator.
+		}
+
         unsigned int current_color = 0;
 
         std::vector<FaceIndices> temp_face_indices;
@@ -243,7 +251,8 @@ namespace Sigma{
             } else if (line[0] == 'g') { // Face group
                 this->groupIndex.push_back(temp_face_indices.size());
             } else if (line.substr(0, line.find(' ')) == "mtllib") { // Material library
-                ParseMTL(line.substr(line.find(' ') + 1));
+				// Add the path to the filename to load it relative to the obj file.
+                ParseMTL(path + line.substr(line.find(' ') + 1));
             } else if (line.substr(0, line.find(' ')) == "usemtl") { // Use material
                 std::string mtlname = line.substr(line.find(' ') + 1);
 
@@ -378,7 +387,15 @@ namespace Sigma{
     }
 
     void GLMesh::ParseMTL(std::string fname) {
-        std::ifstream in(fname, std::ios::in);
+		// Extract the path from the filename.
+		std::string path;
+		if (fname.find("/") != std::string::npos) {
+			path = fname.substr(0, fname.find_last_of("/") + 1); // Keep the separator.
+		} else {
+			path = fname.substr(0, fname.find_last_of("\\") + 1); // Keep the separator.
+		}
+
+		std::ifstream in(fname, std::ios::in);
 
         if (!in) {
             std::cerr << "Cannot open " << fname << std::endl;
@@ -424,13 +441,21 @@ namespace Sigma{
                         s >> i;
                         m.illum = i;
                     } else if (label == "map_Kd") {
-                        std::string filepath;
-                        s >> filepath;
-                        m.diffuseMap = SOIL_load_OGL_texture(filepath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+                        std::string filename;
+						s >> filename;
+						// Add the path to the filename to load it relative to the mtl file
+						m.diffuseMap = SOIL_load_OGL_texture((path + filename).c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+						if (m.diffuseMap == 0) {
+							std::cerr << "Error loading diffuse texture: " << path + filename << std::endl;
+						}
                     } else if (label == "map_Ka") {
-                        std::string filepath;
-                        s >> filepath;
-                        m.ambientMap = SOIL_load_OGL_texture(filepath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+                        std::string filename;
+						s >> filename;
+						// Add the path to the filename to load it relative to the mtl file
+                        m.ambientMap = SOIL_load_OGL_texture((path + filename).c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+						if (m.ambientMap == 0) {
+							std::cerr << "Error loading ambient texture: " << path + filename << std::endl;
+						}
                     } else {
                         // Blank line
                     }
