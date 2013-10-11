@@ -78,10 +78,11 @@ namespace Sigma {
 
     void GLCubeSphere::LoadTexture(std::string texture_name) {
         // SOIL makes this straightforward..
+		char filename[100];
+		std::string filenames[6];
         {
             // LOAD CUBE VISUAL TEXTURES
-			char filename[100];
-			std::string filenames[6];
+			std::cout << "Loading cube texture: " << texture_name << std::endl;
 			sprintf(filename, "%s.dds", texture_name.c_str());
 
 			this->_cubeMap = SOIL_load_OGL_single_cubemap(filename, SOIL_DDS_CUBEMAP_FACE_ORDER, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
@@ -114,7 +115,6 @@ namespace Sigma {
 	
 			if(this->_cubeNormalMap==0) {
 				// LOAD CUBE NORMAL TEXTURES
-				std::string filenames[6];
 				for(int i=0; i < 6; i++) {
 					std::stringstream sstm;
 					sstm << texture_name << "_nm" << (i+1) << ".jpg";

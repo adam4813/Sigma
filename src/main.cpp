@@ -100,7 +100,7 @@ int main(int argCount, char **argValues) {
 		props.push_back(p_y);
 		props.push_back(p_z);
 
-		glsys.createGLView("GLView", 1, props);
+		glsys.createGLView(1, props);
 	}
 
 	// Still hard coded to use entity ID #1
@@ -112,7 +112,7 @@ int main(int argCount, char **argValues) {
 	if(!mover) {
 		std::cout << "No view mover provided, creating default..." << std::endl;
 		std::vector<Property> props;
-		physys.createViewMover("ViewMover", 1, props);
+		physys.createViewMover(1, props);
 		mover = reinterpret_cast<ViewMover*>(physys.getComponent(1,ViewMover::getStaticComponentID()));
 	}
 

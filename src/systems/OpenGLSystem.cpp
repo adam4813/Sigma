@@ -25,6 +25,7 @@ std::map<std::string, Sigma::IFactory::FactoryFunction>
     retval["GLIcoSphere"] = std::bind(&OpenGLSystem::createGLIcoSphere,this,_1,_2);
     retval["GLCubeSphere"] = std::bind(&OpenGLSystem::createGLCubeSphere,this,_1,_2);
     retval["GLMesh"] = std::bind(&OpenGLSystem::createGLMesh,this,_1,_2);
+	retval["GLView"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2);
 
 	// Not supported in VS2012
     /*{
@@ -36,7 +37,7 @@ std::map<std::string, Sigma::IFactory::FactoryFunction>
     return retval;
 }
 
-void OpenGLSystem::createGLView(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
+void OpenGLSystem::createGLView(const unsigned int entityID, std::vector<Property> &properties) {
 	this->view = new GLSixDOFView();
 	
 	float x=0.0f, y=0.0f, z=0.0f, rx=0.0f, ry=0.0f, rz=0.0f;

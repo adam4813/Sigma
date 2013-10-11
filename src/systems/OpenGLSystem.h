@@ -88,7 +88,7 @@ public:
 	void createGLMesh(const unsigned int entityID, std::vector<Property> &properties) ;
 
 	// Views are not technically components, but perhaps they should be
-	void OpenGLSystem::createGLView(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
+	void OpenGLSystem::createGLView(const unsigned int entityID, std::vector<Property> &properties) ;
 
 	IGLView* View() const { return view; }
 
