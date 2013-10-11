@@ -264,7 +264,8 @@ const int* OpenGLSystem::Start() {
 		10000.0f
 		);
 
-	this->view->Move(4.0f,50.0f,-10.f);
+	this->view->Move(0.0f,1.0f,2.0f);
+	this->view->Rotate(0.0f,180.0f,0.0f);
 
 	// App specific global gl settings
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
