@@ -1,3 +1,13 @@
+@player
+#1
+&ViewMover
+
+&GLView
+>x=0.0f
+>y=33.0f
+>z=614.897f
+>ry=180.0f
+
 @planet1
 #3
 &GLIcoSphere
@@ -5,6 +15,9 @@
 >y=0.0f
 >z=3000.0f
 >scale=1000.0f
+
+&PhysicsMover
+>ry=0.675f
 
 @planet2
 #4
@@ -14,6 +27,9 @@
 >z=6000.0f
 >scale=2000.0f
 
+&PhysicsMover
+>ry=0.2f
+
 @planet3
 #5
 &GLIcoSphere
@@ -21,6 +37,9 @@
 >y=0.0f
 >z=8000.0f
 >scale=1500.0f
+
+&PhysicsMover
+>ry=0.5f
 
 @mars
 #6
@@ -32,21 +51,27 @@
 >texture_name=marss
 >subdivision_levels=5i
 >shader=cubespheres
->rotation_speed=0.01f
 >cull_face=backs
+
+&PhysicsMover
+>ry=0.1f
 
 @ship
 #7
 &GLMesh
 >scale=0.5f
->x=3000.0f
->meshFile=trillek_dev_ship_2_clonk2u.objs
+>x=3800.0f
+>meshFile=dev_ship_clonk2u.objs
 >cullface=nones
+
+&PhysicsMover
+>f=100.0f
+>ry=0.75f
 
 @stars
 #8
 &GLCubeSphere
->scale=10.0f
+>scale=1.0f
 >texture_name=starss
 >subdivision_levels=1i
 >shader=skyboxs
@@ -274,7 +299,7 @@
 &GLMesh
 >scale=781.25f
 >x=0.0f
->y=20.827f
+>y=16.72437f
 >z=626.628f
 >meshFile=console.objs
 >cullface=backs
