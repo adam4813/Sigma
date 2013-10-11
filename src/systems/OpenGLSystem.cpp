@@ -19,10 +19,10 @@ std::map<std::string, Sigma::IFactory::FactoryFunction>
 {
     using namespace std::placeholders;
     std::map<std::string, Sigma::IFactory::FactoryFunction> retval;
-	retval["GLSprite"] = std::bind(&OpenGLSystem::createGLSprite,this,_1,_2,_3);
-    retval["GLIcoSphere"] = std::bind(&OpenGLSystem::createGLIcoSphere,this,_1,_2,_3);
-    retval["GLCubeSphere"] = std::bind(&OpenGLSystem::createGLCubeSphere,this,_1,_2,_3);
-    retval["GLMesh"] = std::bind(&OpenGLSystem::createGLMesh,this,_1,_2,_3);
+	retval["GLSprite"] = std::bind(&OpenGLSystem::createGLSprite,this,_1,_2);
+    retval["GLIcoSphere"] = std::bind(&OpenGLSystem::createGLIcoSphere,this,_1,_2);
+    retval["GLCubeSphere"] = std::bind(&OpenGLSystem::createGLCubeSphere,this,_1,_2);
+    retval["GLMesh"] = std::bind(&OpenGLSystem::createGLMesh,this,_1,_2);
 
 	// Not supported in VS2012
     /*{
@@ -34,7 +34,7 @@ std::map<std::string, Sigma::IFactory::FactoryFunction>
     return retval;
 }
 
-void OpenGLSystem::createGLSprite(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
+void OpenGLSystem::createGLSprite(const unsigned int entityID, std::vector<Property> &properties) {
 	GLSprite* spr = new GLSprite(entityID);
 	float scale = 1.0f;
 	float x = 0.0f;
@@ -66,7 +66,7 @@ void OpenGLSystem::createGLSprite(const std::string type, const unsigned int ent
 	this->addComponent(entityID,spr);
 }
 
-void OpenGLSystem::createGLIcoSphere(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
+void OpenGLSystem::createGLIcoSphere(const unsigned int entityID, std::vector<Property> &properties) {
 		Sigma::GLIcoSphere* sphere = new Sigma::GLIcoSphere(entityID);
 		float scale = 1.0f;
 		float x = 0.0f;
@@ -103,7 +103,7 @@ void OpenGLSystem::createGLIcoSphere(const std::string type, const unsigned int 
 		this->addComponent(entityID,sphere);
 }
 
-void OpenGLSystem::createGLCubeSphere(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
+void OpenGLSystem::createGLCubeSphere(const unsigned int entityID, std::vector<Property> &properties) {
 		Sigma::GLCubeSphere* sphere = new Sigma::GLCubeSphere(entityID);
 
 		std::string texture_name = "";
@@ -161,7 +161,7 @@ void OpenGLSystem::createGLCubeSphere(const std::string type, const unsigned int
 		sphere->InitializeBuffers();
 		this->addComponent(entityID,sphere);
 }
-void OpenGLSystem::createGLMesh(const std::string type, const unsigned int entityID, std::vector<Property> &properties) {
+void OpenGLSystem::createGLMesh(const unsigned int entityID, std::vector<Property> &properties) {
         Sigma::GLMesh* mesh = new Sigma::GLMesh(entityID);
 
 		float scale = 1.0f;

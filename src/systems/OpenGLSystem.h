@@ -81,10 +81,10 @@ public:
 
     std::map<std::string,FactoryFunction> getFactoryFunctions();
 
-	void createGLSprite(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
-	void createGLIcoSphere(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
-	void createGLCubeSphere(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
-	void createGLMesh(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
+	void createGLSprite(const unsigned int entityID, std::vector<Property> &properties) ;
+	void createGLIcoSphere(const unsigned int entityID, std::vector<Property> &properties) ;
+	void createGLCubeSphere(const unsigned int entityID, std::vector<Property> &properties) ;
+	void createGLMesh(const unsigned int entityID, std::vector<Property> &properties) ;
 
 	IGLView* View() const { return view; }
 private:

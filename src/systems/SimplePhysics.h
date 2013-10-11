@@ -32,7 +32,7 @@ public:
 	bool Update(const double delta);
 
     std::map<std::string,FactoryFunction> getFactoryFunctions();
-	void createPhysicsMover(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
-	void createViewMover(const std::string type, const unsigned int entityID, std::vector<Property> &properties) ;
+	void createPhysicsMover(const unsigned int entityID, std::vector<Property> &properties) ;
+	void createViewMover(const unsigned int entityID, std::vector<Property> &properties) ;
 private:
 };
