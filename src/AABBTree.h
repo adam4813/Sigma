@@ -34,13 +34,13 @@ public:
 	~AABBTree() { }
 
 	/**
-	 * \brief Subdivides the AABB Tree to maxDepth.
+	 * \brief Subdivides the AABB Tree to depth.
 	 * 
 	 * \param[in/out] Node * node The node to subdivide (nullptr for root down)
-	 * \param[in/out] unsigned int maxDepth The maximum depth to subdivide to.
+	 * \param[in/out] int depth The current depth of the subdivision.
 	 * \returns   void
 	 */
-	void Subdivivde(Node* node, int maxDepth);
+	void Subdivivde(Node* node = nullptr, int depth = 0);
 
 	/**
 	 * \brief Populate the internal lists from a GLMesh.
@@ -64,5 +64,5 @@ private:
 	Node root;
 	std::vector<const Sigma::Face*> faces;
 	std::vector<const Sigma::Vertex*> verts;
-	unsigned int depth;
+	int currentDepth;
 };

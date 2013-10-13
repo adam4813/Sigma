@@ -5,21 +5,24 @@
 #include <stack>
 
 AABBTree::AABBTree() : root(5.0f) {
-	this->depth = 0;
+	this->currentDepth = 0;
 
 	float center[3] = {0,0,0};
-	float halfsize = 2.5f;
+	float halfsize = 2.6f;
 	this->root.center[0] = center[0];
 	this->root.center[1] = center[1];
 	this->root.center[2] = center[2];
 }
 
-void AABBTree::Subdivivde(Node* node, int maxDepth) {
+void AABBTree::Subdivivde(Node* node /*= nullptr*/, int depth /*= 0*/) {
 	if (node == nullptr) {
 		node = &this->root;
 	}
-	// Check if the current recursion depth is greater than the previous max depth
-	if (maxDepth >= 0) {
+	if (depth > (currentDepth + 1)) {
+		depth = currentDepth + 1;
+	}
+	// Check if the depth is greater than the previous current depth
+	if (depth >= 0) {
 		for (int i = 0; i < 8; ++i) {
 			if (node->expanded == false) { // This level of children have never been expanded before so create new children.
 					Node* n2b = new Node(node->halfsize / 2); // Quad 2 back
@@ -163,12 +166,12 @@ void AABBTree::Subdivivde(Node* node, int maxDepth) {
 			else { // We have already expanded this level
 				// If the child is null it means there are no faces that would intersect it.
 				if (node->children[i] != nullptr) {
-					Subdivivde(node->children[i], maxDepth - 1);
+					Subdivivde(node->children[i], depth - 1);
 				}
 			}
 		}
 	}
-	this->depth = maxDepth;
+	this->currentDepth = depth;
 }
 
 void AABBTree::Populate(Sigma::GLMesh* mesh) {
