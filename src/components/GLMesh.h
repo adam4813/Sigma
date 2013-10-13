@@ -98,6 +98,10 @@ namespace Sigma{
             return nullptr;
         }
 
+		unsigned int GetVertexCount() const {
+			return this->verts.size();
+		}
+
         /**
          * \brief Add a face to the list.
          *
