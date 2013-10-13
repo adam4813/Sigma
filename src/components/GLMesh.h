@@ -154,7 +154,13 @@ namespace Sigma{
          */
         void AddVertexNormal(const Vertex& vn) {
             this->vertNorms.push_back(vn);
-        }
+		}
+
+		const Sigma::Vertex* GetVertexNormal( const unsigned int index ) {
+			if (index < this->vertNorms.size()) {
+				return &this->vertNorms[index];
+			}
+		}
 
         /**
          * \brief Add a vertex color to the list.
@@ -184,9 +190,9 @@ namespace Sigma{
          *  filename should be a relative path, like "shaders/mesh"
          * \return void
          */
-        void LoadShader(const std::string& filename);
+		void LoadShader(const std::string& filename);
 
-        /** \brief load the default shader "shaders/mesh" */
+		/** \brief load the default shader "shaders/mesh" */
         void LoadShader();
 
         static const std::string DEFAULT_SHADER;
