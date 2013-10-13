@@ -1,6 +1,8 @@
 #include "AABBTree.h"
 
 #include "components/GLMesh.h"
+#include <queue>
+#include <stack>
 
 AABBTree::AABBTree() : root(5.0f) {
 	this->depth = 0;
@@ -166,8 +168,7 @@ void AABBTree::Subdivivde(Node* node, int maxDepth) {
 			}
 		}
 	}
-
-
+	this->depth = maxDepth;
 }
 
 void AABBTree::Populate(Sigma::GLMesh* mesh) {
@@ -212,59 +213,75 @@ bool AABBTree::SAT(Node* n2b, const Sigma::Face* face) {
 Sigma::GLMesh* AABBTree::GenerateMesh(unsigned int entityID) {
 	Sigma::GLMesh* mesh = new Sigma::GLMesh(entityID);
 	mesh->AddMeshGroupIndex(0);
-	for (unsigned int i = 0; i < 8; ++i) {
-		for (unsigned int j = 0; j < 8; ++j) {
-			if (this->root.children[i]->children[j] != nullptr) {
-				float center[3] = {this->root.children[i]->children[j]->center[0], this->root.children[i]->children[j]->center[1], this->root.children[i]->children[j]->center[2]};
-				float halfsize = this->root.children[i]->children[j]->halfsize;
+	std::stack<Node*> endStack;
+	std::stack<Node*> openStack;
+	openStack.push(&root);
 
-				unsigned int offset = mesh->GetVertexCount();
-				
-				mesh->AddVertex(Sigma::Vertex(center[0] - halfsize, center[1] - halfsize, center[2] + halfsize)); // q3f
-				mesh->AddVertexNormal(Sigma::Vertex(center[0] - halfsize, center[1] - halfsize, center[2] + halfsize)); // q3f
-				mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
-				mesh->AddVertex(Sigma::Vertex(center[0] + halfsize, center[1] - halfsize, center[2] + halfsize)); // q4f
-				mesh->AddVertexNormal(Sigma::Vertex(center[0] + halfsize, center[1] - halfsize, center[2] + halfsize)); // q4f
-				mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
-				mesh->AddVertex(Sigma::Vertex(center[0] + halfsize, center[1] + halfsize, center[2] + halfsize)); // q1f
-				mesh->AddVertexNormal(Sigma::Vertex(center[0] + halfsize, center[1] + halfsize, center[2] + halfsize)); // q1f
-				mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
-				mesh->AddVertex(Sigma::Vertex(center[0] - halfsize, center[1] + halfsize, center[2] + halfsize)); // q2f
-				mesh->AddVertexNormal(Sigma::Vertex(center[0] - halfsize, center[1] + halfsize, center[2] + halfsize)); // q2f
-				mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
-
-				mesh->AddVertex(Sigma::Vertex(center[0] - halfsize, center[1] - halfsize, center[2] - halfsize)); // q3b
-				mesh->AddVertexNormal(Sigma::Vertex(center[0] - halfsize, center[1] - halfsize, center[2] - halfsize)); // q3b
-				mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
-				mesh->AddVertex(Sigma::Vertex(center[0] + halfsize, center[1] - halfsize, center[2] - halfsize)); // q4b
-				mesh->AddVertexNormal(Sigma::Vertex(center[0] + halfsize, center[1] - halfsize, center[2] - halfsize)); // q4b
-				mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
-				mesh->AddVertex(Sigma::Vertex(center[0] + halfsize, center[1] + halfsize, center[2] - halfsize)); // q1b
-				mesh->AddVertexNormal(Sigma::Vertex(center[0] + halfsize, center[1] + halfsize, center[2] - halfsize)); // q1b
-				mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
-				mesh->AddVertex(Sigma::Vertex(center[0] - halfsize, center[1] + halfsize, center[2] - halfsize)); // q2b
-				mesh->AddVertexNormal(Sigma::Vertex(center[0] - halfsize, center[1] + halfsize, center[2] - halfsize)); // q2b
-				mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
-
-				mesh->AddFace(Sigma::Face(0 + offset,1 + offset,2 + offset));
-				mesh->AddFace(Sigma::Face(2 + offset,3 + offset,0 + offset));
-
-				mesh->AddFace(Sigma::Face(3 + offset,2 + offset,6 + offset));
-				mesh->AddFace(Sigma::Face(6 + offset,7 + offset,3 + offset));
-
-				mesh->AddFace(Sigma::Face(7 + offset,6 + offset,5 + offset));
-				mesh->AddFace(Sigma::Face(5 + offset,4 + offset,7 + offset));
-
-				mesh->AddFace(Sigma::Face(4 + offset,0 + offset,3 + offset));
-				mesh->AddFace(Sigma::Face(3 + offset,7 + offset,4 + offset));
-
-				mesh->AddFace(Sigma::Face(0 + offset,1 + offset,5 + offset));
-				mesh->AddFace(Sigma::Face(5 + offset,4 + offset,0 + offset));
-
-				mesh->AddFace(Sigma::Face(1 + offset,5 + offset,6 + offset));
-				mesh->AddFace(Sigma::Face(6 + offset,2 + offset,1 + offset));
+	while (openStack.size() > 0) {
+		Node* top = openStack.top();
+		openStack.pop();
+		for (unsigned int i = 0; i < 8; ++i) {
+			if (top->children[i] != nullptr) {
+				if (top->children[i]->expanded == true) {
+					openStack.push(top->children[i]);
+				}
+				else {
+					endStack.push(top->children[i]);
+				}
 			}
 		}
+	}
+
+	while (endStack.size() > 0) {
+		float center[3] = {endStack.top()->center[0], endStack.top()->center[1], endStack.top()->center[2]};
+		float halfsize = endStack.top()->halfsize;
+
+		unsigned int offset = mesh->GetVertexCount();
+
+		mesh->AddVertex(Sigma::Vertex(center[0] - halfsize, center[1] - halfsize, center[2] + halfsize)); // q3f
+		mesh->AddVertexNormal(Sigma::Vertex(1, 1, -1)); // q3f
+		mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		mesh->AddVertex(Sigma::Vertex(center[0] + halfsize, center[1] - halfsize, center[2] + halfsize)); // q4f
+		mesh->AddVertexNormal(Sigma::Vertex(-1, 1, -1)); // q3f
+		mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		mesh->AddVertex(Sigma::Vertex(center[0] + halfsize, center[1] + halfsize, center[2] + halfsize)); // q1f
+		mesh->AddVertexNormal(Sigma::Vertex(-1, -1, -1)); // q3f
+		mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		mesh->AddVertex(Sigma::Vertex(center[0] - halfsize, center[1] + halfsize, center[2] + halfsize)); // q2f
+		mesh->AddVertexNormal(Sigma::Vertex(1, -1, -1)); // q3f
+		mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+
+		mesh->AddVertex(Sigma::Vertex(center[0] - halfsize, center[1] - halfsize, center[2] - halfsize)); // q3b
+		mesh->AddVertexNormal(Sigma::Vertex(1, 1, 1)); // q3f
+		mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		mesh->AddVertex(Sigma::Vertex(center[0] + halfsize, center[1] - halfsize, center[2] - halfsize)); // q4b
+		mesh->AddVertexNormal(Sigma::Vertex(-1, 1, 1)); // q3f
+		mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		mesh->AddVertex(Sigma::Vertex(center[0] + halfsize, center[1] + halfsize, center[2] - halfsize)); // q1b
+		mesh->AddVertexNormal(Sigma::Vertex(-1, -1, 1)); // q3f
+		mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		mesh->AddVertex(Sigma::Vertex(center[0] - halfsize, center[1] + halfsize, center[2] - halfsize)); // q2b
+		mesh->AddVertexNormal(Sigma::Vertex(1, -1, 1)); // q3f
+		mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+
+		mesh->AddFace(Sigma::Face(0 + offset,1 + offset,2 + offset));
+		mesh->AddFace(Sigma::Face(2 + offset,3 + offset,0 + offset));
+
+		mesh->AddFace(Sigma::Face(3 + offset,2 + offset,6 + offset));
+		mesh->AddFace(Sigma::Face(6 + offset,7 + offset,3 + offset));
+
+		mesh->AddFace(Sigma::Face(7 + offset,6 + offset,5 + offset));
+		mesh->AddFace(Sigma::Face(5 + offset,4 + offset,7 + offset));
+
+		mesh->AddFace(Sigma::Face(4 + offset,0 + offset,3 + offset));
+		mesh->AddFace(Sigma::Face(3 + offset,7 + offset,4 + offset));
+
+		mesh->AddFace(Sigma::Face(0 + offset,1 + offset,5 + offset));
+		mesh->AddFace(Sigma::Face(5 + offset,4 + offset,0 + offset));
+
+		mesh->AddFace(Sigma::Face(1 + offset,5 + offset,6 + offset));
+		mesh->AddFace(Sigma::Face(6 + offset,2 + offset,1 + offset));
+		endStack.pop();
 	}
 
 	float scale = 1.0f;
