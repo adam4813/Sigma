@@ -2,6 +2,16 @@
 
 #include "components/GLMesh.h"
 
+AABBTree::AABBTree() : root(5.0f) {
+	this->depth = 0;
+
+	float center[3] = {0,0,0};
+	float halfsize = 2.5f;
+	this->root.center[0] = center[0];
+	this->root.center[1] = center[1];
+	this->root.center[2] = center[2];
+}
+
 void AABBTree::Subdivivde(Node* node, int maxDepth) {
 	if (node == nullptr) {
 		node = &this->root;
@@ -178,66 +188,6 @@ void AABBTree::Populate(Sigma::GLMesh* mesh) {
 	Subdivivde(nullptr, 1);
 }
 
-AABBTree::AABBTree() : root(5.0f) {
-	this->depth = 0;
-
-	float center[3] = {0,0,0};
-	float halfsize = 2.5f;
-	this->root.center[0] = center[0];
-	this->root.center[1] = center[1];
-	this->root.center[2] = center[2];
-
-	/*Node* n2b = new Node(halfsize / 2); // Quad 2 back
-	n2b->center[0] = center[0] - halfsize / 2;
-	n2b->center[1] = center[1] + halfsize / 2;
-	n2b->center[2] = center[2] - halfsize / 2;
-
-	Node* n1b = new Node(halfsize / 2); // Quad 1 back
-	n1b->center[0] = center[0] + halfsize / 2;
-	n1b->center[1] = center[1] + halfsize / 2;
-	n1b->center[2] = center[2] - halfsize / 2;
-
-	Node* n3b = new Node(halfsize / 2); // Quad 3 back
-	n3b->center[0] = center[0] - halfsize / 2;
-	n3b->center[1] = center[1] - halfsize / 2;
-	n3b->center[2] = center[2] - halfsize / 2;
-
-	Node* n4b = new Node(halfsize / 2); // Quad 4 back
-	n4b->center[0] = center[0] + halfsize / 2;
-	n4b->center[1] = center[1] - halfsize / 2;
-	n4b->center[2] = center[2] - halfsize / 2;
-
-	Node* n2f = new Node(halfsize / 2); // Quad 2 back
-	n2f->center[0] = center[0] - halfsize / 2;
-	n2f->center[1] = center[1] + halfsize / 2;
-	n2f->center[2] = center[2] + halfsize / 2;
-
-	Node* n1f = new Node(halfsize / 2); // Quad 1 back
-	n1f->center[0] = center[0] + halfsize / 2;
-	n1f->center[1] = center[1] + halfsize / 2;
-	n1f->center[2] = center[2] + halfsize / 2;
-
-	Node* n3f = new Node(halfsize / 2); // Quad 3 back
-	n3f->center[0] = center[0] - halfsize / 2;
-	n3f->center[1] = center[1] - halfsize / 2;
-	n3f->center[2] = center[2] + halfsize / 2;
-
-	Node* n4f = new Node(halfsize / 2); // Quad 4 back
-	n4f->center[0] = center[0] + halfsize / 2;
-	n4f->center[1] = center[1] - halfsize / 2;
-	n4f->center[2] = center[2] + halfsize / 2;
-
-	this->root.children[0] = n2b;
-	this->root.children[1] = n1b;
-	this->root.children[2] = n3b;
-	this->root.children[3] = n4b;
-	this->root.children[4] = n2f;
-	this->root.children[5] = n1f;
-	this->root.children[6] = n3f;
-	this->root.children[7] = n4f;
-	this->root.expanded = true;*/
-}
-
 #include "tribox.h"
 
 bool AABBTree::SAT(Node* n2b, const Sigma::Face* face) {
@@ -257,5 +207,76 @@ bool AABBTree::SAT(Node* n2b, const Sigma::Face* face) {
 	float halfsize[3] = {n2b->halfsize,n2b->halfsize,n2b->halfsize};
 
 	return triBoxOverlap(n2b->center, halfsize, verts);
+}
+
+Sigma::GLMesh* AABBTree::GenerateMesh(unsigned int entityID) {
+	Sigma::GLMesh* mesh = new Sigma::GLMesh(entityID);
+	mesh->AddMeshGroupIndex(0);
+	for (unsigned int i = 0; i < 8; ++i) {
+		for (unsigned int j = 0; j < 8; ++j) {
+			if (this->root.children[i]->children[j] != nullptr) {
+				float center[3] = {this->root.children[i]->children[j]->center[0], this->root.children[i]->children[j]->center[1], this->root.children[i]->children[j]->center[2]};
+				float halfsize = this->root.children[i]->children[j]->halfsize;
+
+				unsigned int offset = mesh->GetVertexCount();
+				
+				mesh->AddVertex(Sigma::Vertex(center[0] - halfsize, center[1] - halfsize, center[2] + halfsize)); // q3f
+				mesh->AddVertexNormal(Sigma::Vertex(center[0] - halfsize, center[1] - halfsize, center[2] + halfsize)); // q3f
+				mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+				mesh->AddVertex(Sigma::Vertex(center[0] + halfsize, center[1] - halfsize, center[2] + halfsize)); // q4f
+				mesh->AddVertexNormal(Sigma::Vertex(center[0] + halfsize, center[1] - halfsize, center[2] + halfsize)); // q4f
+				mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+				mesh->AddVertex(Sigma::Vertex(center[0] + halfsize, center[1] + halfsize, center[2] + halfsize)); // q1f
+				mesh->AddVertexNormal(Sigma::Vertex(center[0] + halfsize, center[1] + halfsize, center[2] + halfsize)); // q1f
+				mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+				mesh->AddVertex(Sigma::Vertex(center[0] - halfsize, center[1] + halfsize, center[2] + halfsize)); // q2f
+				mesh->AddVertexNormal(Sigma::Vertex(center[0] - halfsize, center[1] + halfsize, center[2] + halfsize)); // q2f
+				mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+
+				mesh->AddVertex(Sigma::Vertex(center[0] - halfsize, center[1] - halfsize, center[2] - halfsize)); // q3b
+				mesh->AddVertexNormal(Sigma::Vertex(center[0] - halfsize, center[1] - halfsize, center[2] - halfsize)); // q3b
+				mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+				mesh->AddVertex(Sigma::Vertex(center[0] + halfsize, center[1] - halfsize, center[2] - halfsize)); // q4b
+				mesh->AddVertexNormal(Sigma::Vertex(center[0] + halfsize, center[1] - halfsize, center[2] - halfsize)); // q4b
+				mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+				mesh->AddVertex(Sigma::Vertex(center[0] + halfsize, center[1] + halfsize, center[2] - halfsize)); // q1b
+				mesh->AddVertexNormal(Sigma::Vertex(center[0] + halfsize, center[1] + halfsize, center[2] - halfsize)); // q1b
+				mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+				mesh->AddVertex(Sigma::Vertex(center[0] - halfsize, center[1] + halfsize, center[2] - halfsize)); // q2b
+				mesh->AddVertexNormal(Sigma::Vertex(center[0] - halfsize, center[1] + halfsize, center[2] - halfsize)); // q2b
+				mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+
+				mesh->AddFace(Sigma::Face(0 + offset,1 + offset,2 + offset));
+				mesh->AddFace(Sigma::Face(2 + offset,3 + offset,0 + offset));
+
+				mesh->AddFace(Sigma::Face(3 + offset,2 + offset,6 + offset));
+				mesh->AddFace(Sigma::Face(6 + offset,7 + offset,3 + offset));
+
+				mesh->AddFace(Sigma::Face(7 + offset,6 + offset,5 + offset));
+				mesh->AddFace(Sigma::Face(5 + offset,4 + offset,7 + offset));
+
+				mesh->AddFace(Sigma::Face(4 + offset,0 + offset,3 + offset));
+				mesh->AddFace(Sigma::Face(3 + offset,7 + offset,4 + offset));
+
+				mesh->AddFace(Sigma::Face(0 + offset,1 + offset,5 + offset));
+				mesh->AddFace(Sigma::Face(5 + offset,4 + offset,0 + offset));
+
+				mesh->AddFace(Sigma::Face(1 + offset,5 + offset,6 + offset));
+				mesh->AddFace(Sigma::Face(6 + offset,2 + offset,1 + offset));
+			}
+		}
+	}
+
+	float scale = 1.0f;
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
+	mesh->SetCullFace("none");
+	mesh->Transform()->Scale(scale,scale,scale);
+	mesh->Transform()->Translate(x,y,z);
+	mesh->LoadShader(); // load default
+	mesh->InitializeBuffers();
+
+	return mesh;
 }
 

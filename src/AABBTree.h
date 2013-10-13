@@ -1,5 +1,7 @@
 #pragma once
+
 #include "IGLComponent.h"
+
 #include <vector>
 
 namespace Sigma {
@@ -56,6 +58,8 @@ public:
 	 * \return   bool True if the overlap or intersect.
 	 */
 	bool SAT( Node* n2b, const Sigma::Face* face );
+
+	Sigma::GLMesh* GenerateMesh(unsigned int entityID);
 private:
 	Node root;
 	std::vector<const Sigma::Face*> faces;
