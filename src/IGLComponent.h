@@ -9,8 +9,8 @@
 namespace Sigma {
 	// A struct to store which index each of its verts are.
 	struct Face {
-		Face(unsigned short v1, unsigned short v2, unsigned short v3) : v1(v1), v2(v2), v3(v3) { }
-		unsigned short v1, v2, v3;
+		Face(unsigned int v1, unsigned int v2, unsigned int v3) : v1(v1), v2(v2), v3(v3) { }
+		unsigned int v1, v2, v3;
 	};
 
 	// A struct to store the location for each vertex.
