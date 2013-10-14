@@ -4,11 +4,10 @@
 #include <queue>
 #include <stack>
 
-AABBTree::AABBTree() : root(5.0f) {
+AABBTree::AABBTree() : root(2.5f) {
 	this->currentDepth = 0;
 
 	float center[3] = {0,0,0};
-	float halfsize = 2.6f;
 	this->root.center[0] = center[0];
 	this->root.center[1] = center[1];
 	this->root.center[2] = center[2];
@@ -243,29 +242,69 @@ Sigma::GLMesh* AABBTree::GenerateMesh(unsigned int entityID) {
 
 		mesh->AddVertex(Sigma::Vertex(center[0] - halfsize, center[1] - halfsize, center[2] + halfsize)); // q3f
 		mesh->AddVertexNormal(Sigma::Vertex(1, 1, -1)); // q3f
-		mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		if (endStack.top()->inCollision) {
+			mesh->AddVertexColor(Sigma::Color(1.0f,0.0f,0.0f));
+		}
+		else {
+			mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		}
 		mesh->AddVertex(Sigma::Vertex(center[0] + halfsize, center[1] - halfsize, center[2] + halfsize)); // q4f
 		mesh->AddVertexNormal(Sigma::Vertex(-1, 1, -1)); // q3f
-		mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		if (endStack.top()->inCollision) {
+			mesh->AddVertexColor(Sigma::Color(1.0f,0.0f,0.0f));
+		}
+		else {
+			mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		}
 		mesh->AddVertex(Sigma::Vertex(center[0] + halfsize, center[1] + halfsize, center[2] + halfsize)); // q1f
 		mesh->AddVertexNormal(Sigma::Vertex(-1, -1, -1)); // q3f
-		mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		if (endStack.top()->inCollision) {
+			mesh->AddVertexColor(Sigma::Color(1.0f,0.0f,0.0f));
+		}
+		else {
+			mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		}
 		mesh->AddVertex(Sigma::Vertex(center[0] - halfsize, center[1] + halfsize, center[2] + halfsize)); // q2f
 		mesh->AddVertexNormal(Sigma::Vertex(1, -1, -1)); // q3f
-		mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		if (endStack.top()->inCollision) {
+			mesh->AddVertexColor(Sigma::Color(1.0f,0.0f,0.0f));
+		}
+		else {
+			mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		}
 
 		mesh->AddVertex(Sigma::Vertex(center[0] - halfsize, center[1] - halfsize, center[2] - halfsize)); // q3b
 		mesh->AddVertexNormal(Sigma::Vertex(1, 1, 1)); // q3f
-		mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		if (endStack.top()->inCollision) {
+			mesh->AddVertexColor(Sigma::Color(1.0f,0.0f,0.0f));
+		}
+		else {
+			mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		}
 		mesh->AddVertex(Sigma::Vertex(center[0] + halfsize, center[1] - halfsize, center[2] - halfsize)); // q4b
 		mesh->AddVertexNormal(Sigma::Vertex(-1, 1, 1)); // q3f
-		mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		if (endStack.top()->inCollision) {
+			mesh->AddVertexColor(Sigma::Color(1.0f,0.0f,0.0f));
+		}
+		else {
+			mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		}
 		mesh->AddVertex(Sigma::Vertex(center[0] + halfsize, center[1] + halfsize, center[2] - halfsize)); // q1b
 		mesh->AddVertexNormal(Sigma::Vertex(-1, -1, 1)); // q3f
-		mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		if (endStack.top()->inCollision) {
+			mesh->AddVertexColor(Sigma::Color(1.0f,0.0f,0.0f));
+		}
+		else {
+			mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		}
 		mesh->AddVertex(Sigma::Vertex(center[0] - halfsize, center[1] + halfsize, center[2] - halfsize)); // q2b
 		mesh->AddVertexNormal(Sigma::Vertex(1, -1, 1)); // q3f
-		mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		if (endStack.top()->inCollision) {
+			mesh->AddVertexColor(Sigma::Color(1.0f,0.0f,0.0f));
+		}
+		else {
+			mesh->AddVertexColor(Sigma::Color(1.0f,1.0f,1.0f));
+		}
 
 		mesh->AddFace(Sigma::Face(0 + offset,1 + offset,2 + offset));
 		mesh->AddFace(Sigma::Face(2 + offset,3 + offset,0 + offset));
@@ -299,4 +338,77 @@ Sigma::GLMesh* AABBTree::GenerateMesh(unsigned int entityID) {
 
 	return mesh;
 }
+bool AABBSphereTest(glm::vec3 AABBCenter, float AABBHalfsize, glm::vec3 SphereCenter, float SphereRadius);
 
+bool AABBTree::CollisionCheck(glm::vec3 SphereCenter, float SphereRadius) {
+	std::stack<Node*> trace;
+	trace.push(&this->root);
+	int numCollisions = 0;
+
+	while (trace.size() > 0) {
+		Node* top = trace.top();
+		trace.pop();
+		for (unsigned int i = 0; i < 8; ++i) {
+			if (top->children[i] != nullptr) {
+				if (top->children[i]->expanded == true) {
+					trace.push(top->children[i]);
+				}
+				else {
+					if (AABBSphereTest(glm::vec3(top->children[i]->center[0], top->children[i]->center[1], top->children[i]->center[2]), top->children[i]->halfsize, SphereCenter, SphereRadius)) {
+						top->children[i]->inCollision = true;
+						++numCollisions;
+					}
+				}
+			}
+		}
+	}
+	return numCollisions > 0;
+}
+
+bool AABBSphereTest(glm::vec3 AABBCenter, float AABBHalfsize, glm::vec3 SphereCenter, float SphereRadius) {
+	// Get the center of the sphere relative to the center of the box
+	glm::vec3 sphereCenterRelBox = SphereCenter - glm::vec3(AABBCenter);
+	// Point on surface of box that is closest to the center of the sphere
+	glm::vec3 boxPoint;
+
+	// Check sphere center against box along the X axis alone. 
+	// If the sphere is off past the left edge of the box, 
+	// then the left edge is closest to the sphere. 
+	// Similar if it's past the right edge. If it's between 
+	// the left and right edges, then the sphere's own X 
+	// is closest, because that makes the X distance 0, 
+	// and you can't get much closer than that :)
+
+	if (sphereCenterRelBox.x < -AABBHalfsize)
+		boxPoint.x = -AABBHalfsize;
+	else if (sphereCenterRelBox.x > AABBHalfsize)
+		boxPoint.x = AABBHalfsize;
+	else
+		boxPoint.x = sphereCenterRelBox.x;
+
+	// ...same for Y axis
+	if (sphereCenterRelBox.y < -AABBHalfsize)
+		boxPoint.y = -AABBHalfsize;
+	else if (sphereCenterRelBox.y > AABBHalfsize)
+		boxPoint.y = AABBHalfsize;
+	else
+		boxPoint.y = sphereCenterRelBox.y;
+
+	// ... same for Z axis
+	if (sphereCenterRelBox.z < -AABBHalfsize)
+		boxPoint.z = -AABBHalfsize;
+	else if (sphereCenterRelBox.z > AABBHalfsize)
+		boxPoint.z = AABBHalfsize;
+	else
+		boxPoint.z = sphereCenterRelBox.z;
+
+	// Now we have the closest point on the box, so get the distance from 
+	// that to the sphere center, and see if it's less than the radius
+
+	glm::vec3 dist = sphereCenterRelBox - boxPoint;
+
+	if (dist.x*dist.x + dist.y*dist.y + dist.z*dist.z < SphereRadius*SphereRadius)
+		return true;
+	else
+		return false;
+}
