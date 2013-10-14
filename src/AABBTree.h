@@ -70,11 +70,15 @@ namespace Sigma {
 		 * \return    bool true if the object collides with the tree.
 		 */
 		bool CollisionCheck(glm::vec3 SphereCenter, float sphereradius);
+
+		void Offset(glm::vec3 val) { offset = val; }
+		glm::vec3 Offset() const { return offset; }
 	private:
 		AABBTreeNode root;
 		std::vector<Sigma::Face> faces;
 		std::vector<Sigma::Vertex> verts;
 		int currentDepth;
+		glm::vec3 offset;
 	};
 }
 
