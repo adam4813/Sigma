@@ -174,13 +174,15 @@ namespace Sigma {
 		this->currentDepth = depth;
 	}
 
-	void AABBTree::Populate(Sigma::GLMesh* mesh) {
-		for (unsigned int i = 0; i < mesh->GetFaceCount(); ++i) {
-			this->faces.push_back(mesh->GetFace(i));
+	void AABBTree::Populate(std::string fname) {
+		Sigma::GLMesh mesh(0);
+		mesh.LoadMesh(fname);
+		for (unsigned int i = 0; i < mesh.GetFaceCount(); ++i) {
+			this->faces.push_back(*mesh.GetFace(i));
 		}
 
-		for (unsigned int i = 0; i < mesh->GetVertexCount(); ++i) {
-			this->verts.push_back(mesh->GetVertex(i));
+		for (unsigned int i = 0; i < mesh.GetVertexCount(); ++i) {
+			this->verts.push_back(*mesh.GetVertex(i));
 		}
 
 		for (unsigned int i = 0; i < this->faces.size(); ++i) {
@@ -194,19 +196,19 @@ namespace Sigma {
 
 	#include "tribox.h"
 
-	bool AABBTree::SAT(AABBTreeNode* n2b, const Sigma::Face* face) {
+	bool AABBTree::SAT(AABBTreeNode* n2b, const Sigma::Face& face) {
 		float verts[3][3];
-		verts[0][0] = this->verts[face->v1]->x;
-		verts[0][1] = this->verts[face->v1]->y;
-		verts[0][2] = this->verts[face->v1]->z;
+		verts[0][0] = this->verts[face.v1].x;
+		verts[0][1] = this->verts[face.v1].y;
+		verts[0][2] = this->verts[face.v1].z;
 
-		verts[1][0] = this->verts[face->v2]->x;
-		verts[1][1] = this->verts[face->v2]->y;
-		verts[1][2] = this->verts[face->v2]->z;
+		verts[1][0] = this->verts[face.v2].x;
+		verts[1][1] = this->verts[face.v2].y;
+		verts[1][2] = this->verts[face.v2].z;
 
-		verts[2][0] = this->verts[face->v3]->x;
-		verts[2][1] = this->verts[face->v3]->y;
-		verts[2][2] = this->verts[face->v3]->z;
+		verts[2][0] = this->verts[face.v3].x;
+		verts[2][1] = this->verts[face.v3].y;
+		verts[2][2] = this->verts[face.v3].z;
 
 		float halfsize[3] = {n2b->halfsize,n2b->halfsize,n2b->halfsize};
 

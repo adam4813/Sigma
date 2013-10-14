@@ -40,26 +40,45 @@ void SimplePhysics::createViewMover(const unsigned int entityID, std::vector<Pro
 
 void SimplePhysics::createAABBTree(const unsigned int entityID, std::vector<Property> &properties) {
 	Sigma::AABBTree* tree = new Sigma::AABBTree(entityID);
-	Sigma::GLMesh* mesh = nullptr;
-	int subs = 0;
+	float scale = 1.0f;
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
+	float rx = 0.0f;
+	float ry = 0.0f;
+	float rz = 0.0f;
+	int componentID = 0;
 
 	for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 		Property*  p = &(*propitr);
-		if (p->GetName() == "mesh") {
-			mesh = p->Get<Sigma::GLMesh*>();
+		if (p->GetName() == "scale") {
+			scale = p->Get<float>();
+			continue;
+		} else if (p->GetName() == "x") {
+			x = p->Get<float>();
+			continue;
+		} else if (p->GetName() == "y") {
+			y = p->Get<float>();
+			continue;
+		} else if (p->GetName() == "z") {
+			z = p->Get<float>();
+			continue;
+		} else if (p->GetName() == "rx") {
+			rx = p->Get<float>();
+			continue;
+		} else if (p->GetName() == "ry") {
+			ry = p->Get<float>();
+			continue;
+		} else if (p->GetName() == "rz") {
+			rz = p->Get<float>();
+			continue;
+		} else if (p->GetName() == "meshFile") {
+			tree->Populate(p->Get<std::string>());
+		} else if (p->GetName() == "subdivisions") {
+			for (int i = 2; i < p->Get<int>(); ++ i) {
+				tree->Subdivivde(nullptr, i);
+			}
 		}
-		else if (p->GetName() == "subdivisions") {
-			subs = p->Get<int>();
-		}
-	}
-
-	if (mesh == nullptr) {
-		delete tree;
-		return;
-	}
-	tree->Populate(mesh);
-	for (int i = 2; i < subs; ++ i) {
-		tree->Subdivivde(nullptr, i);
 	}
 	this->colliders[entityID] = tree;
 }

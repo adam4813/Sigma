@@ -49,7 +49,7 @@ namespace Sigma {
 		 * \param[in/out] Sigma::GLMesh * mesh The mesh to gather faces and verts from to populate the internal lists
 		 * \returns   void 
 		 */
-		void Populate(Sigma::GLMesh* mesh);
+		void Populate(std::string fname);
 
 		/**
 		 * \brief Performs a SAT test on a node and a face.
@@ -58,7 +58,7 @@ namespace Sigma {
 		 * \param[in] const Sigma::Face * face The face to check
 		 * \return   bool True if the overlap or intersect.
 		 */
-		bool SAT( AABBTreeNode* n2b, const Sigma::Face* face );
+		bool SAT( AABBTreeNode* n2b, const Sigma::Face& face );
 
 		Sigma::GLMesh* GenerateMesh(unsigned int entityID);
 
@@ -72,8 +72,8 @@ namespace Sigma {
 		bool CollisionCheck(glm::vec3 SphereCenter, float sphereradius);
 	private:
 		AABBTreeNode root;
-		std::vector<const Sigma::Face*> faces;
-		std::vector<const Sigma::Vertex*> verts;
+		std::vector<Sigma::Face> faces;
+		std::vector<Sigma::Vertex> verts;
 		int currentDepth;
 	};
 }
