@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "../AABBTree.h"
 
 class Property;
 class IMoverComponent;
@@ -34,5 +35,7 @@ public:
     std::map<std::string,FactoryFunction> getFactoryFunctions();
 	void createPhysicsMover(const unsigned int entityID, std::vector<Property> &properties) ;
 	void createViewMover(const unsigned int entityID, std::vector<Property> &properties) ;
+	void createAABBTree(const unsigned int entityID, std::vector<Property> &properties) ;
 private:
+	std::map<unsigned int, Sigma::AABBTree*> colliders;
 };
