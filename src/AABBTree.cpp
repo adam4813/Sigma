@@ -181,8 +181,16 @@ namespace Sigma {
 			this->faces.push_back(*mesh.GetFace(i));
 		}
 
+		glm::quat qX = glm::angleAxis(this->rotation.x, 1.0f,0.0f,0.0f);
+		glm::quat qY = glm::angleAxis(this->rotation.y, 0.0f,1.0f,0.0f);
+		glm::quat qZ = glm::angleAxis(this->rotation.z, 0.0f,0.0f,1.0f);
+		glm::quat orientation = qX * qY * qZ;
+		glm::mat4 rotateMatrix = glm::mat4_cast(orientation);
+
 		for (unsigned int i = 0; i < mesh.GetVertexCount(); ++i) {
-			this->verts.push_back(*mesh.GetVertex(i));
+			glm::vec4 vert(mesh.GetVertex(i)->x, mesh.GetVertex(i)->y, mesh.GetVertex(i)->z, 1.0f);
+			glm::vec4 transformedVert = rotateMatrix * vert;
+			this->verts.push_back(Sigma::Vertex(transformedVert.x, transformedVert.y, transformedVert.z));
 		}
 
 		for (unsigned int i = 0; i < this->faces.size(); ++i) {
@@ -332,7 +340,6 @@ namespace Sigma {
 		mesh->SetCullFace("none");
 		mesh->Transform()->Scale(1.0f,1.0f,1.0f);
 		mesh->Transform()->Translate(this->offset);
-		mesh->Transform()->Rotate(this->rotation);
 		mesh->LoadShader(); // load default
 		mesh->InitializeBuffers();
 
@@ -343,6 +350,7 @@ namespace Sigma {
 		std::stack<AABBTreeNode*> trace;
 		trace.push(&this->root);
 		unsigned int numCollisions = 0;
+		this->collisions.clear();
 
 		while (trace.size() > 0) {
 			AABBTreeNode* top = trace.top();
@@ -356,7 +364,30 @@ namespace Sigma {
 						CollisionPoint cp;
 						if (AABBSphereTest(glm::vec3(top->children[i]->center[0], top->children[i]->center[1], top->children[i]->center[2]), top->children[i]->halfsize, SphereCenter, SphereRadius, cp.position)) {
 							top->children[i]->inCollision = true;
-							cp.normal = glm::normalize(cp.position) * -1.0f;
+							if (cp.position.x == cp.position.z) {
+								top->children[i]->inCollision = false;
+								continue;
+							}
+							else if (cp.position.x == -cp.position.z) {
+								top->children[i]->inCollision = false;
+								continue;
+							}
+
+							if (cp.position.z == top->children[i]->halfsize) {
+								cp.normal.z = 1;
+							}
+							else if (cp.position.z == -top->children[i]->halfsize) {
+								cp.normal.z = -1;
+							}
+
+							if (cp.position.x == top->children[i]->halfsize) {
+								cp.normal.x = 1;
+							}
+							else if (cp.position.x == -top->children[i]->halfsize) {
+								cp.normal.x = -1;
+							}
+
+							cp.normal.y = 0.0f;
 							this->collisions.push_back(cp);
 							++numCollisions;
 						}
