@@ -329,13 +329,10 @@ namespace Sigma {
 			endStack.pop();
 		}
 
-		float scale = 1.0f;
-		float x = 0.0f;
-		float y = 0.0f;
-		float z = 0.0f;
 		mesh->SetCullFace("none");
-		mesh->Transform()->Scale(scale,scale,scale);
-		mesh->Transform()->Translate(x,y,z);
+		mesh->Transform()->Scale(1.0f,1.0f,1.0f);
+		mesh->Transform()->Translate(this->offset);
+		mesh->Transform()->Rotate(this->rotation);
 		mesh->LoadShader(); // load default
 		mesh->InitializeBuffers();
 

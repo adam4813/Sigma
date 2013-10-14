@@ -71,14 +71,17 @@ namespace Sigma {
 		 */
 		bool CollisionCheck(glm::vec3 SphereCenter, float sphereradius);
 
-		void Offset(glm::vec3 val) { offset = val; }
+		void Offset(glm::vec3 val) { this->offset = val; }
 		glm::vec3 Offset() const { return offset; }
+		void Rotation(glm::vec3 val) { this->rotation = val; }
+		glm::vec3 Rotation() const { return this->rotation; }
 	private:
 		AABBTreeNode root;
 		std::vector<Sigma::Face> faces;
 		std::vector<Sigma::Vertex> verts;
 		int currentDepth;
 		glm::vec3 offset;
+		glm::vec3 rotation;
 	};
 }
 

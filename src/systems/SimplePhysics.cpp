@@ -80,6 +80,9 @@ void SimplePhysics::createAABBTree(const unsigned int entityID, std::vector<Prop
 			}
 		}
 	}
+
+	tree->Offset(glm::vec3(x,y,z));
+	tree->Rotation(glm::vec3(rx,ry,rz));
 	this->colliders[entityID] = tree;
 }
 
@@ -92,8 +95,8 @@ bool SimplePhysics::Update(const double delta) {
 	}
 
 	// Check for collisions and set position to contact point
-	for (auto itr = this->_Components.begin(); itr != this->_Components.end(); ++itr) {
-
+	for (auto itr = this->colliders.begin(); itr != this->colliders.end(); ++itr) {
+			glm::vec3 cameraPos = itr->second->Offset();
 	}
 
 	return true;
