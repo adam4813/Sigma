@@ -71,8 +71,8 @@ namespace Sigma {
         // shader program was compiled and linked in GLMesh::InitializeBuffers.
         //  Now we can set relevant custom uniform values
         (*shader).Use();
-        glUniform1i(glGetUniformLocation((*shader).GetProgram(), "cubeMap"), GL_TEXTURE2);
-        glUniform1i(glGetUniformLocation((*shader).GetProgram(), "cubeNormalMap"), GL_TEXTURE2);
+        glUniform1i(glGetUniformLocation((*shader).GetProgram(), "cubeMap"), GL_TEXTURE0);
+        glUniform1i(glGetUniformLocation((*shader).GetProgram(), "cubeNormalMap"), GL_TEXTURE1);
         (*shader).UnUse();
     } // function InitializeBuffers
 
@@ -206,21 +206,22 @@ namespace Sigma {
         }
 
         // bind cubemap textures
-        glActiveTexture(GL_TEXTURE2);
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeMap);
         if(this->_cubeNormalMap != 0){
-            glActiveTexture(GL_TEXTURE3);
+            glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeNormalMap);
         }
+
         // render da mesh
         GLMesh::Render(view, proj);
 
 		// unbind that which GLMesh does not unbind
         if(this->_cubeNormalMap != 0){
-            glActiveTexture(GL_TEXTURE3);
+            glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
         }
-        glActiveTexture(GL_TEXTURE2);
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
         glActiveTexture(GL_TEXTURE0);
     } // function Render
