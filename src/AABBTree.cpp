@@ -356,7 +356,7 @@ namespace Sigma {
 						CollisionPoint cp;
 						if (AABBSphereTest(glm::vec3(top->children[i]->center[0], top->children[i]->center[1], top->children[i]->center[2]), top->children[i]->halfsize, SphereCenter, SphereRadius, cp.position)) {
 							top->children[i]->inCollision = true;
-							cp.normal = glm::normalize(cp.position);
+							cp.normal = glm::normalize(cp.position) * -1.0f;
 							this->collisions.push_back(cp);
 							++numCollisions;
 						}
@@ -370,16 +370,17 @@ namespace Sigma {
 		return numCollisions;
 	}
 
-	glm::vec3 GetCollisionNormal(const unsigned int index) {
-
+	const CollisionPoint* AABBTree::GetCollisionPoint(const unsigned int index) {
+		if (index < this->collisions.size()) {
+			return &this->collisions[index];
+		}
+		return nullptr;
 	}
 }
 
 bool AABBSphereTest(glm::vec3 AABBCenter, float AABBHalfsize, glm::vec3 SphereCenter, float SphereRadius, glm::vec3& collisionPoint) {
 	// Get the center of the sphere relative to the center of the box
 	glm::vec3 sphereCenterRelBox = SphereCenter - glm::vec3(AABBCenter);
-	// Point on surface of box that is closest to the center of the sphere
-	glm::vec3 collisionPoint;
 
 	// Check sphere center against box along the X axis alone. 
 	// If the sphere is off past the left edge of the box, 

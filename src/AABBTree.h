@@ -42,8 +42,8 @@ namespace Sigma {
 		/**
 		 * \brief Subdivides the AABB Tree to depth.
 		 * 
-		 * \param[in/out] AABBTreeNode * node The node to subdivide (nullptr for root down)
-		 * \param[in/out] int depth The current depth of the subdivision.
+		 * \param[in] AABBTreeNode * node The node to subdivide (nullptr for root down)
+		 * \param[in] int depth The current depth of the subdivision.
 		 * \returns   void
 		 */
 		void Subdivivde(AABBTreeNode* node = nullptr, int depth = 0);
@@ -51,7 +51,7 @@ namespace Sigma {
 		/**
 		 * \brief Populate the internal lists from a GLMesh.
 		 * 
-		 * \param[in/out] Sigma::GLMesh * mesh The mesh to gather faces and verts from to populate the internal lists
+		 * \param[in/] std::string fname The name of the mesh file to load.
 		 * \returns   void 
 		 */
 		void Populate(std::string fname);
@@ -76,7 +76,13 @@ namespace Sigma {
 		 */
 		unsigned int CollisionCheck(glm::vec3 SphereCenter, float sphereradius);
 
-		CollisionPoint GetCollisionPoint(const unsigned int index);
+		/**
+		 * \brief Returns a collision point at the given index.
+		 *
+		 * \param[in] const unsigned int index
+		 * \return    const CollisionPoint* The point of collision for the given index.
+		 */
+		const CollisionPoint* GetCollisionPoint(const unsigned int index);
 
 		void Offset(glm::vec3 val) { this->offset = val; }
 		glm::vec3 Offset() const { return offset; }
