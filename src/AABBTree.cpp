@@ -339,10 +339,10 @@ namespace Sigma {
 		return mesh;
 	}
 
-	bool AABBTree::CollisionCheck(glm::vec3 SphereCenter, float SphereRadius) {
+	unsigned int AABBTree::CollisionCheck(glm::vec3 SphereCenter, float SphereRadius) {
 		std::stack<AABBTreeNode*> trace;
 		trace.push(&this->root);
-		int numCollisions = 0;
+		unsigned int numCollisions = 0;
 
 		while (trace.size() > 0) {
 			AABBTreeNode* top = trace.top();
@@ -353,8 +353,11 @@ namespace Sigma {
 						trace.push(top->children[i]);
 					}
 					else {
-						if (AABBSphereTest(glm::vec3(top->children[i]->center[0], top->children[i]->center[1], top->children[i]->center[2]), top->children[i]->halfsize, SphereCenter, SphereRadius)) {
+						CollisionPoint cp;
+						if (AABBSphereTest(glm::vec3(top->children[i]->center[0], top->children[i]->center[1], top->children[i]->center[2]), top->children[i]->halfsize, SphereCenter, SphereRadius, cp.position)) {
 							top->children[i]->inCollision = true;
+							cp.normal = glm::normalize(cp.position);
+							this->collisions.push_back(cp);
 							++numCollisions;
 						}
 						else {
@@ -364,15 +367,19 @@ namespace Sigma {
 				}
 			}
 		}
-		return numCollisions > 0;
+		return numCollisions;
+	}
+
+	glm::vec3 GetCollisionNormal(const unsigned int index) {
+
 	}
 }
 
-bool AABBSphereTest(glm::vec3 AABBCenter, float AABBHalfsize, glm::vec3 SphereCenter, float SphereRadius) {
+bool AABBSphereTest(glm::vec3 AABBCenter, float AABBHalfsize, glm::vec3 SphereCenter, float SphereRadius, glm::vec3& collisionPoint) {
 	// Get the center of the sphere relative to the center of the box
 	glm::vec3 sphereCenterRelBox = SphereCenter - glm::vec3(AABBCenter);
 	// Point on surface of box that is closest to the center of the sphere
-	glm::vec3 boxPoint;
+	glm::vec3 collisionPoint;
 
 	// Check sphere center against box along the X axis alone. 
 	// If the sphere is off past the left edge of the box, 
@@ -383,32 +390,32 @@ bool AABBSphereTest(glm::vec3 AABBCenter, float AABBHalfsize, glm::vec3 SphereCe
 	// and you can't get much closer than that :)
 
 	if (sphereCenterRelBox.x < -AABBHalfsize)
-		boxPoint.x = -AABBHalfsize;
+		collisionPoint.x = -AABBHalfsize;
 	else if (sphereCenterRelBox.x > AABBHalfsize)
-		boxPoint.x = AABBHalfsize;
+		collisionPoint.x = AABBHalfsize;
 	else
-		boxPoint.x = sphereCenterRelBox.x;
+		collisionPoint.x = sphereCenterRelBox.x;
 
 	// ...same for Y axis
 	if (sphereCenterRelBox.y < -AABBHalfsize)
-		boxPoint.y = -AABBHalfsize;
+		collisionPoint.y = -AABBHalfsize;
 	else if (sphereCenterRelBox.y > AABBHalfsize)
-		boxPoint.y = AABBHalfsize;
+		collisionPoint.y = AABBHalfsize;
 	else
-		boxPoint.y = sphereCenterRelBox.y;
+		collisionPoint.y = sphereCenterRelBox.y;
 
 	// ... same for Z axis
 	if (sphereCenterRelBox.z < -AABBHalfsize)
-		boxPoint.z = -AABBHalfsize;
+		collisionPoint.z = -AABBHalfsize;
 	else if (sphereCenterRelBox.z > AABBHalfsize)
-		boxPoint.z = AABBHalfsize;
+		collisionPoint.z = AABBHalfsize;
 	else
-		boxPoint.z = sphereCenterRelBox.z;
+		collisionPoint.z = sphereCenterRelBox.z;
 
 	// Now we have the closest point on the box, so get the distance from 
 	// that to the sphere center, and see if it's less than the radius
 
-	glm::vec3 dist = sphereCenterRelBox - boxPoint;
+	glm::vec3 dist = sphereCenterRelBox - collisionPoint;
 
 	if (dist.x*dist.x + dist.y*dist.y + dist.z*dist.z < SphereRadius*SphereRadius)
 		return true;

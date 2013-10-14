@@ -28,6 +28,11 @@ namespace Sigma {
 		bool inCollision;
 	};
 
+	struct CollisionPoint {
+		glm::vec3 position;
+		glm::vec3 normal;
+	};
+
 	class AABBTree : public IComponent {
 	public:
 		AABBTree(const int entityID);
@@ -67,15 +72,18 @@ namespace Sigma {
 		 *
 		 * \param[in] float center[3] The center of the object's sphere to check against the tree.
 		 * \param[in] float radius The radius of the object's sphere to check against the tree
-		 * \return    bool true if the object collides with the tree.
+		 * \return    unsigned int The number of nodes in collision.
 		 */
-		bool CollisionCheck(glm::vec3 SphereCenter, float sphereradius);
+		unsigned int CollisionCheck(glm::vec3 SphereCenter, float sphereradius);
+
+		CollisionPoint GetCollisionPoint(const unsigned int index);
 
 		void Offset(glm::vec3 val) { this->offset = val; }
 		glm::vec3 Offset() const { return offset; }
 		void Rotation(glm::vec3 val) { this->rotation = val; }
 		glm::vec3 Rotation() const { return this->rotation; }
 	private:
+		std::vector<CollisionPoint> collisions; // A vector to hold nodes that are in collision.
 		AABBTreeNode root;
 		std::vector<Sigma::Face> faces;
 		std::vector<Sigma::Vertex> verts;
@@ -85,4 +93,4 @@ namespace Sigma {
 	};
 }
 
-bool AABBSphereTest(glm::vec3 AABBCenter, float AABBHalfsize, glm::vec3 SphereCenter, float SphereRadius);
+bool AABBSphereTest(glm::vec3 AABBCenter, float AABBHalfsize, glm::vec3 SphereCenter, float SphereRadius, glm::vec3& collisionPoint);
