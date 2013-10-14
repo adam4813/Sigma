@@ -9,7 +9,7 @@ namespace Sigma {
 }
 
 struct Node {
-	Node(float halfsize) : halfsize(halfsize), expanded(false) {
+	Node(float halfsize) : halfsize(halfsize), expanded(false), inCollision(false) {
 		for (int i = 0; i < 8; ++i) {
 			this->children[i] = nullptr;
 		}
@@ -26,6 +26,7 @@ struct Node {
 	Node* children[8];
 	std::vector<unsigned int> faceIndexCache;
 	bool expanded;
+	bool inCollision;
 };
 
 class AABBTree {
@@ -60,6 +61,15 @@ public:
 	bool SAT( Node* n2b, const Sigma::Face* face );
 
 	Sigma::GLMesh* GenerateMesh(unsigned int entityID);
+
+	/**
+	 * \brief Check for a collision within the tree.
+	 *
+	 * \param[in] float center[3] The center of the object's sphere to check against the tree.
+	 * \param[in] float radius The radius of the object's sphere to check against the tree
+	 * \return    bool true if the object collides with the tree.
+	 */
+	bool CollisionCheck(glm::vec3 SphereCenter, float sphereradius);
 private:
 	Node root;
 	std::vector<const Sigma::Face*> faces;
