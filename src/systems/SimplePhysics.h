@@ -15,7 +15,11 @@ class SimplePhysics
     : public Sigma::IFactory, public ISystem<IMoverComponent> {
 public:
 	SimplePhysics() { }
-	~SimplePhysics() { };
+	~SimplePhysics() {
+		for (std::pair<int, Sigma::AABBTree*> tree : this->colliders) {
+			delete tree.second;
+		}
+	};
 	/**
 	 * \brief Starts the Simple Physics system.
 	 *
