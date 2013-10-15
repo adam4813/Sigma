@@ -29,8 +29,10 @@ public:
 	 */
 	void View(IGLView* view);
 	const IGLView* View();
+	void AddNormalForce( glm::vec3 normal );
 private:
 	IGLView* view;
 
 	std::list<glm::vec3> rotationForces;
+	std::list<glm::vec3> normalForces;
 };
