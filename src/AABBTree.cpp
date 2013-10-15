@@ -364,7 +364,7 @@ namespace Sigma {
 						CollisionPoint cp;
 						if (AABBSphereTest(glm::vec3(top->children[i]->center[0], top->children[i]->center[1], top->children[i]->center[2]), top->children[i]->halfsize, SphereCenter, SphereRadius, cp.position)) {
 							top->children[i]->inCollision = true;
-							if (cp.position.x == cp.position.z) {
+							/*if (cp.position.x == cp.position.z) {
 								top->children[i]->inCollision = false;
 								continue;
 							}
@@ -385,8 +385,34 @@ namespace Sigma {
 							}
 							else if (cp.position.x == -top->children[i]->halfsize) {
 								cp.normal.x = -1;
+							}*/
+							glm::vec3 normalAxis;
+							if ((cp.position.z == top->children[i]->halfsize) || (cp.position.z == -top->children[i]->halfsize)) {
+								normalAxis.z = 1.0f;
+							}
+							else {
+								normalAxis.x = 1.0f;
 							}
 
+							glm::vec3 p0,p1,p2;
+							p0.x = -1.0f * normalAxis.x;
+							p1.x = normalAxis.x;
+							p2.x = -1.0f * normalAxis.x;
+
+							p0.y = 1.0f;
+							p1.y = 1.0f;
+							p2.y = -1.0f;
+
+							p0.z = -1.0f * normalAxis.z;
+							p1.z = normalAxis.z;
+							p2.z = -1.0f * normalAxis.z;
+
+							cp.normal = glm::cross(p1 - p0, p2 - p0);
+							if (glm::length(cp.normal) > 0) {
+								//cp.normal = glm::normalize(cp.normal);
+							}
+
+							cp.normal *= 0.4f;
 							cp.normal.y = 0.0f;
 							this->collisions.push_back(cp);
 							++numCollisions;
