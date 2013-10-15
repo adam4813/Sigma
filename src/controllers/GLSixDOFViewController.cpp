@@ -16,8 +16,11 @@ namespace handler{
         memset(this->keys, 0, sizeof(this->keys));
         memset(this->keyState, 0, sizeof(this->keyState));
         // set to 1 all keys that should trigger an event in this class
-        this->keys['W'] = 1; this->keys['S'] = 1;
-        this->keys['A'] = 1; this->keys['D'] = 1;
+		this->keys['W'] = 1; this->keys['B'] = 1; this->keys['S'] = 1;
+        this->keys['A'] = 1; this->keys['D'] = 1; this->keys['F'] = 1;
+        this->keys['G'] = 1; this->keys['E'] = 1; this->keys['C'] = 1;
+		this->keys['Q'] = 1; this->keys['Z'] = 1; this->keys['R'] = 1;
+        this->keys['T'] = 1;
     }
 
     void GLSixDOFViewController::KeyStateChange(const unsigned int key, const KEY_STATE state) {

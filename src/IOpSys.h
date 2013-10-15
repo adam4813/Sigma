@@ -1,6 +1,7 @@
 #pragma  once
 
 #include "systems/KeyboardInputSystem.h"
+#include "systems/MouseInputSystem.h"
 
 class IOpSys {
 public:
@@ -102,6 +103,7 @@ public:
 	static double GetCurrentDelta() { return curDelta; }
 
 	static Sigma::event::KeyboardInputSystem KeyboardEventSystem; // Handles keyboard events
+	static Sigma::event::MouseInputSystem MouseEventSystem; // Handles mouse events
 protected:
 	static double curDelta; // Current delta time
 };

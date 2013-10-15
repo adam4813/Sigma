@@ -1,6 +1,10 @@
 #include "MouseInputSystem.h"
 
-MouseInputSystem::MouseInputSystem()
-{
-    //ctor
+namespace Sigma{
+    namespace event{
+		MouseInputSystem::MouseInputSystem()
+		{
+			//ctor
+		}
+	}
 }
