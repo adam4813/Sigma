@@ -199,6 +199,7 @@ namespace Sigma {
 			}
 		}
 
+		root.halfsize = this->halfsize;
 		Subdivivde(nullptr, 1);
 	}
 
