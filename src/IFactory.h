@@ -10,8 +10,7 @@
 namespace Sigma {
     class IFactory {
     public:
-        typedef std::function<void( const std::string,
-                                    const unsigned int,
+        typedef std::function<void( const unsigned int,
                                     std::vector<Property>&)> FactoryFunction;
         IFactory(){};
         virtual ~IFactory(){};

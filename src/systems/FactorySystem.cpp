@@ -27,7 +27,7 @@ namespace Sigma{
                                std::vector<Property> &properties){
         if(registeredFactoryFunctions.find(type.c_str()) !=
             registeredFactoryFunctions.end()){
-            registeredFactoryFunctions[type.c_str()](type.c_str(), entityID, properties);
+            registeredFactoryFunctions[type.c_str()](entityID, properties);
         } else{
             std::cerr << "Error: Couldn't create Component:" << type.c_str()  << std::endl;
         }

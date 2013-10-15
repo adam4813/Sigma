@@ -97,6 +97,10 @@ namespace Sigma{
             return nullptr;
         }
 
+		unsigned int GetVertexCount() const {
+			return this->verts.size();
+		}
+
         /**
          * \brief Add a face to the list.
          *
@@ -149,7 +153,13 @@ namespace Sigma{
          */
         void AddVertexNormal(const Vertex& vn) {
             this->vertNorms.push_back(vn);
-        }
+		}
+
+		const Sigma::Vertex* GetVertexNormal( const unsigned int index ) {
+			if (index < this->vertNorms.size()) {
+				return &this->vertNorms[index];
+			}
+		}
 
         /**
          * \brief Add a vertex color to the list.
@@ -173,7 +183,7 @@ namespace Sigma{
             return nullptr;
         }
 
-        /** \brief load the default shader "shaders/mesh" */
+		/** \brief load the default shader "shaders/mesh" */
         void LoadShader();
 
         static const std::string DEFAULT_SHADER;

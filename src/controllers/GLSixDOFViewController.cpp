@@ -8,7 +8,6 @@ namespace handler{
     const float GLSixDOFViewController::SPEED_ROTATE      = 2.0f * 3.14159f;
     const float GLSixDOFViewController::BOOST_MULTIPLIER  = 10.0f;
 
-
     GLSixDOFViewController::GLSixDOFViewController(IGLView* view, ViewMover* mover) : mover(mover) {
         // Set the view mover's view pointer.
         this->mover->View(view);
