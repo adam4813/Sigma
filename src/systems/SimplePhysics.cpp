@@ -2,7 +2,7 @@
 #include "Property.h"
 #include "../components/PhysicsMover.h"
 #include "../components/ViewMover.h"
-#include "IGLVIew.h"
+#include "IGLView.h"
 
 std::map<std::string,Sigma::IFactory::FactoryFunction>
     SimplePhysics::getFactoryFunctions()
@@ -51,7 +51,7 @@ void SimplePhysics::createAABBTree(const unsigned int entityID, std::vector<Prop
 	float halfsize = 0.0f;
 	int componentID = 0;
 	unsigned int subdivisions;
-	std::string filename;
+	std::string filename = "";
 
 	for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 		Property*  p = &(*propitr);
@@ -94,7 +94,7 @@ bool SimplePhysics::Update(const double delta) {
 		for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
 			for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
 				ViewMover* mover = reinterpret_cast<ViewMover*>(citr->second.get());
-				
+
 				glm::vec3 cameraPos = mover->View()->position - itr->second->Offset();
 
 				unsigned int collisions = itr->second->CollisionCheck(cameraPos, 0.15f);

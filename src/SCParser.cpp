@@ -1,5 +1,6 @@
 #include "SCParser.h"
 #include "Property.h"
+#include "strutils.h"
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -12,13 +13,15 @@ namespace Sigma {
 
 			// Some type of error opening the file
 			if (!in) {
-				std::cerr << "Cannot open " << fname << std::endl;
+				std::cerr << "Cannot open sc file " << fname << std::endl;
 				return false;
 			}
 
 			std::string line;
 			Sigma::parser::Entity* currentEntity = nullptr;
 			while (getline(in, line)) {
+                // strip line's whitespace
+                line = rtrim(line);
 
 				char key[1];
 				key[0] = line.substr(0,1)[0];
@@ -37,6 +40,8 @@ namespace Sigma {
 					Sigma::parser::Component c;
 					c.type = line.substr(1);
 					while (getline(in, line)) {
+                        // strip line's whitespace
+                        line = rtrim(line);
 						if (line.substr(0,1) == ">") { // property line
 							std::string propName = line.substr(1, line.find("=") - 1);
 							std::string propValue = line.substr(line.find("=") + 1);

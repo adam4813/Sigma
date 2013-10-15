@@ -14,7 +14,7 @@
 #endif
 
 int main(int argCount, char **argValues) {
-	OpenGLSystem glsys;
+	Sigma::OpenGLSystem glsys;
 	SimplePhysics physys;
 	Sigma::FactorySystem& factory = Sigma::FactorySystem::getInstance();
 	factory.register_Factory(glsys);
@@ -67,7 +67,7 @@ int main(int argCount, char **argValues) {
 
 	while (os->MessageLoop()) {
 		delta = os->GetDeltaTime();
-		double deltaSec = (double)delta/100.0f;
+		double deltaSec = (double)delta/1000.0f;
 
 		if (os->KeyReleased('P', true)) { // Wireframe mode
 			if (!isWireframe) {

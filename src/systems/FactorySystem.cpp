@@ -22,21 +22,20 @@ namespace Sigma{
         return *FactorySystem::_instance;
     }
 
-    void FactorySystem::create(const std::string type,
+    void FactorySystem::create(const std::string& type,
                                const unsigned int entityID,
                                std::vector<Property> &properties){
-        if(registeredFactoryFunctions.find(type.c_str()) !=
-			registeredFactoryFunctions.end()){
-				std::cerr << "Creating component of type: " << type.c_str() << std::endl;
-            registeredFactoryFunctions[type.c_str()](entityID, properties);
+        if(registeredFactoryFunctions.find(type) != registeredFactoryFunctions.end()){
+			std::cerr << "Creating component of type: " << type << std::endl;
+            registeredFactoryFunctions[type](entityID, properties);
         } else{
-            std::cerr << "Error: Couldn't create Component:" << type.c_str()  << std::endl;
+            std::cerr << "Error: Couldn't find component: " << type << std::endl;
         }
     }
 
     void FactorySystem::register_Factory(IFactory& Factory){
-		auto& factoryfunctions = Factory.getFactoryFunctions();
-		for(auto& FactoryFunc = factoryfunctions.begin(); FactoryFunc != factoryfunctions.end(); ++FactoryFunc){
+		const auto& factoryfunctions = Factory.getFactoryFunctions();
+		for(auto FactoryFunc = factoryfunctions.begin(); FactoryFunc != factoryfunctions.end(); ++FactoryFunc){
 			std::cerr << "Registering component factory of type: " << FactoryFunc->first << std::endl;
             registeredFactoryFunctions[FactoryFunc->first]=FactoryFunc->second;
         }

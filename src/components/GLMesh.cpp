@@ -2,6 +2,7 @@
 
 #include "GL/glew.h"
 #include "SOIL/SOIL.h"
+#include "../strutils.h"
 
 #include <algorithm>
 #include <stdexcept>
@@ -13,7 +14,6 @@
 namespace Sigma{
 
     // static member initialization
-    GLMesh::ShaderMap GLMesh::loadedShaders;
     const std::string GLMesh::DEFAULT_SHADER = "shaders/mesh";
 
     GLMesh::GLMesh(const int entityID) : IGLComponent(entityID) {
@@ -165,7 +165,7 @@ namespace Sigma{
         std::ifstream in(fname, std::ios::in);
 
         if (!in) {
-            std::cerr << "Cannot open " << fname << std::endl;
+            std::cerr << "Cannot open mesh " << fname << std::endl;
             return;
         }
 
@@ -174,6 +174,8 @@ namespace Sigma{
 
         // Parse line by line
         while (getline(in, line)) {
+            // strip whitespace (strutils.h)
+            line = trim(line);
             if (line.substr(0,2) == "v ") { // Vertex position
                 float x,y,z;
                 std::istringstream s(line.substr(2));
@@ -358,32 +360,8 @@ namespace Sigma{
         }
     } // function LoadMesh
 
-    void GLMesh::LoadShader(const std::string& filename) {
-        // look up shader that is already loaded
-        ShaderMap::iterator existingShader = GLMesh::loadedShaders.find(filename.c_str());
-        if(existingShader != GLMesh::loadedShaders.end()){
-            // shader already exists!
-            this->shader = existingShader->second;
-        }
-        else{
-            // need to create and save the shader
-            std::string vertFilename = filename + ".vert";
-            std::string fragFilename = filename + ".frag";
-
-            GLSLShader* theShader = new GLSLShader();
-            theShader->LoadFromFile(GL_VERTEX_SHADER, vertFilename);
-            theShader->LoadFromFile(GL_FRAGMENT_SHADER, fragFilename);
-            theShader->CreateAndLinkProgram();
-
-            // assign it to this instance
-            this->shader = std::shared_ptr<GLSLShader>(theShader);
-            // save it in the static map
-            GLMesh::loadedShaders[filename] = this->shader;
-        }
-    }
-
     void GLMesh::LoadShader(){
-        this->LoadShader(GLMesh::DEFAULT_SHADER);
+        IGLComponent::LoadShader(GLMesh::DEFAULT_SHADER);
     }
 
     void GLMesh::ParseMTL(std::string fname) {
@@ -398,12 +376,13 @@ namespace Sigma{
 		std::ifstream in(fname, std::ios::in);
 
         if (!in) {
-            std::cerr << "Cannot open " << fname << std::endl;
+            std::cerr << "Cannot open material " << fname << std::endl;
             return;
         }
 
         std::string line;
         while (getline(in, line)) {
+            line = trim(line);
             std::stringstream s(line);
             std::string label;
             s >> label;
@@ -443,6 +422,7 @@ namespace Sigma{
                     } else if (label == "map_Kd") {
                         std::string filename;
 						s >> filename;
+						filename = convert_path(filename);
 						// Add the path to the filename to load it relative to the mtl file
 						m.diffuseMap = SOIL_load_OGL_texture((path + filename).c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
 						if (m.diffuseMap == 0) {
@@ -451,6 +431,7 @@ namespace Sigma{
                     } else if (label == "map_Ka") {
                         std::string filename;
 						s >> filename;
+						filename = convert_path(filename);
 						// Add the path to the filename to load it relative to the mtl file
                         m.ambientMap = SOIL_load_OGL_texture((path + filename).c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
 						if (m.ambientMap == 0) {
