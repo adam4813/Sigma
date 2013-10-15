@@ -14,9 +14,9 @@ namespace Sigma {
 			}
 		}
 		~AABBTreeNode() {
-			for (AABBTreeNode* child : this->children) {
-				if (child != nullptr) {
-					delete child;
+			for (unsigned int i = 0; i < 8; ++i) {
+				if (this->children[i] != nullptr) {
+					delete this->children[i];
 				}
 			}
 		}

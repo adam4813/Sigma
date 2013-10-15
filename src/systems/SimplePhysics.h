@@ -16,8 +16,8 @@ class SimplePhysics
 public:
 	SimplePhysics() { }
 	~SimplePhysics() {
-		for (std::pair<int, Sigma::AABBTree*> tree : this->colliders) {
-			delete tree.second;
+		for (auto treeitr = this->colliders.begin(); treeitr != this->colliders.end(); ++treeitr) {
+			delete treeitr->second;
 		}
 	};
 	/**
