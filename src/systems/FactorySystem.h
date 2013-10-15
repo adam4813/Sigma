@@ -21,7 +21,7 @@ namespace Sigma {
              * \param[in] const int entityID The ID of the entity this component belongs to.
              * \param[in] std::vector<Property> &properties A vector containing the properties to apply to the created component.
              */
-            void create(const std::string type,
+            void create(const std::string& type,
                         const unsigned int entityID,
                         std::vector<Property> &properties);
 

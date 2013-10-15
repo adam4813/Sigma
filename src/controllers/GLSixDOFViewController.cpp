@@ -5,7 +5,7 @@ namespace event{
 namespace handler{
 
     const float GLSixDOFViewController::SPEED_TRANSLATE   = 10.0f;
-    const float GLSixDOFViewController::SPEED_ROTATE      = 2.0f * 3.14159f;
+    const float GLSixDOFViewController::SPEED_ROTATE      = 20.0f * 3.14159f;
     const float GLSixDOFViewController::BOOST_MULTIPLIER  = 10.0f;
 
     GLSixDOFViewController::GLSixDOFViewController(IGLView* view, ViewMover* mover) : mover(mover) {

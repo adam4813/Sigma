@@ -51,7 +51,7 @@ void SimplePhysics::createAABBTree(const unsigned int entityID, std::vector<Prop
 	float halfsize = 0.0f;
 	int componentID = 0;
 	unsigned int subdivisions;
-	std::string filename;
+	std::string filename = "";
 
 	for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 		Property*  p = &(*propitr);

@@ -67,7 +67,7 @@ int main(int argCount, char **argValues) {
 
 	while (os->MessageLoop()) {
 		delta = os->GetDeltaTime();
-		double deltaSec = (double)delta/100.0f;
+		double deltaSec = (double)delta/1000.0f;
 
 		if (os->KeyReleased('P', true)) { // Wireframe mode
 			if (!isWireframe) {
