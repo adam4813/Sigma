@@ -48,6 +48,7 @@ void SimplePhysics::createAABBTree(const unsigned int entityID, std::vector<Prop
 	float rx = 0.0f;
 	float ry = 0.0f;
 	float rz = 0.0f;
+	float halfsize = 0.0f;
 	int componentID = 0;
 	unsigned int subdivisions;
 	std::string filename;
@@ -56,25 +57,20 @@ void SimplePhysics::createAABBTree(const unsigned int entityID, std::vector<Prop
 		Property*  p = &(*propitr);
 		if (p->GetName() == "scale") {
 			scale = p->Get<float>();
-			continue;
 		} else if (p->GetName() == "x") {
 			x = p->Get<float>();
-			continue;
 		} else if (p->GetName() == "y") {
 			y = p->Get<float>();
-			continue;
 		} else if (p->GetName() == "z") {
 			z = p->Get<float>();
-			continue;
 		} else if (p->GetName() == "rx") {
 			rx = p->Get<float>();
-			continue;
 		} else if (p->GetName() == "ry") {
 			ry = p->Get<float>();
-			continue;
 		} else if (p->GetName() == "rz") {
 			rz = p->Get<float>();
-			continue;
+		} else if (p->GetName() == "halfsize") {
+			halfsize = p->Get<float>();
 		} else if (p->GetName() == "meshFile") {
 			filename = p->Get<std::string>();
 		} else if (p->GetName() == "subdivisions") {
@@ -84,6 +80,7 @@ void SimplePhysics::createAABBTree(const unsigned int entityID, std::vector<Prop
 
 	tree->Offset(glm::vec3(x,y,z));
 	tree->Rotation(glm::vec3(rx,ry,rz));
+	tree->Halfsize(halfsize);
 	tree->Populate(filename);
 	for (unsigned int i = 2; i < subdivisions; ++ i) {
 		tree->Subdivivde(nullptr, i);

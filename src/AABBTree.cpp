@@ -199,6 +199,7 @@ namespace Sigma {
 			}
 		}
 
+		root.halfsize = this->halfsize;
 		Subdivivde(nullptr, 1);
 	}
 
@@ -368,10 +369,20 @@ namespace Sigma {
 							// Determine the axis the normal will be on
 							glm::vec3 normalAxis;
 							if ((cp.position.z == top->children[i]->halfsize) || (cp.position.z == -top->children[i]->halfsize)) {
-								normalAxis.z = 1.0f;
+								if (cp.position.z > 0) {
+									normalAxis.x = 1.0f;
+								}
+								else {
+									normalAxis.x = -1.0f;
+								}
 							}
-							else {
-								normalAxis.x = 1.0f;
+							else if ((cp.position.x == top->children[i]->halfsize) || (cp.position.x == -top->children[i]->halfsize)) {
+								if (cp.position.x > 0) {
+									normalAxis.z = -1.0f;
+								}
+								else {
+									normalAxis.z = 1.0f;
+								}
 							}
 
 							// Compute the normal
