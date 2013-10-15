@@ -17,7 +17,7 @@ void ViewMover::ApplyForces(const double delta) {
 	glm::vec3 outForce = totalForce;
 	for (auto forceitr = this->normalForces.begin(); forceitr != this->normalForces.end(); ++forceitr) {
 		float scalar = glm::dot(*forceitr, totalForce);
-		outForce -= scalar * *forceitr;
+		outForce -= (scalar + 1.0f) * *forceitr;
 	}
 	this->normalForces.clear();
 
