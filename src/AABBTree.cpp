@@ -364,28 +364,8 @@ namespace Sigma {
 						CollisionPoint cp;
 						if (AABBSphereTest(glm::vec3(top->children[i]->center[0], top->children[i]->center[1], top->children[i]->center[2]), top->children[i]->halfsize, SphereCenter, SphereRadius, cp.position)) {
 							top->children[i]->inCollision = true;
-							/*if (cp.position.x == cp.position.z) {
-								top->children[i]->inCollision = false;
-								continue;
-							}
-							else if (cp.position.x == -cp.position.z) {
-								top->children[i]->inCollision = false;
-								continue;
-							}
 
-							if (cp.position.z == top->children[i]->halfsize) {
-								cp.normal.z = 1;
-							}
-							else if (cp.position.z == -top->children[i]->halfsize) {
-								cp.normal.z = -1;
-							}
-
-							if (cp.position.x == top->children[i]->halfsize) {
-								cp.normal.x = 1;
-							}
-							else if (cp.position.x == -top->children[i]->halfsize) {
-								cp.normal.x = -1;
-							}*/
+							// Determine the axis the normal will be on
 							glm::vec3 normalAxis;
 							if ((cp.position.z == top->children[i]->halfsize) || (cp.position.z == -top->children[i]->halfsize)) {
 								normalAxis.z = 1.0f;
@@ -394,6 +374,7 @@ namespace Sigma {
 								normalAxis.x = 1.0f;
 							}
 
+							// Compute the normal
 							glm::vec3 p0,p1,p2;
 							p0.x = -1.0f * normalAxis.x;
 							p1.x = normalAxis.x;
@@ -408,12 +389,10 @@ namespace Sigma {
 							p2.z = -1.0f * normalAxis.z;
 
 							cp.normal = glm::cross(p1 - p0, p2 - p0);
-							if (glm::length(cp.normal) > 0) {
-								//cp.normal = glm::normalize(cp.normal);
-							}
 
-							cp.normal *= 0.4f;
-							cp.normal.y = 0.0f;
+							cp.normal *= 0.5f; // Scale it (normalizing causes penetration
+
+							cp.normal.y = 0.0f; // Remove any y as we have no vertical movement
 							this->collisions.push_back(cp);
 							++numCollisions;
 						}
