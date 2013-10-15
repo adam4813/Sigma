@@ -18,22 +18,23 @@ void Sigma::event::handler::GLSixDOFViewController::KeyStateChange(const unsigne
 	// Store the new key state
 	this->keyState[key] = state;
 
-	const float movement_speed = 15.0f;
+	const float movement_speed = 0.5f;
+	const float boost_factor = 20.0f;
 
 	// Translation keys
 
 	if (key == 'W') { // Move forward
 		if (state == KS_UP) {
 			if (this->keyState['B'] == KS_DOWN) {
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, movement_speed*10.0f));
+				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, (movement_speed*boost_factor)));
 			}
 			else {
 				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, movement_speed));
 			}
 		} else {
 			if (this->keyState['B'] == KS_DOWN) {
-				this->mover->AddForce(glm::vec3(0.0f, 0.0f, movement_speed*10.0f));
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -movement_speed*10.0f));
+				this->mover->AddForce(glm::vec3(0.0f, 0.0f, (movement_speed*boost_factor)));
+				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -(movement_speed*boost_factor)));
 			}
 			else {
 				this->mover->AddForce(glm::vec3(0.0f, 0.0f, movement_speed));
@@ -43,7 +44,7 @@ void Sigma::event::handler::GLSixDOFViewController::KeyStateChange(const unsigne
 	} else if (key == 'S') { // Move backward
 		if (state == KS_UP) {
 			if (this->keyState['B'] == KS_DOWN) {
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -movement_speed*10.0f));
+				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -(movement_speed*boost_factor)));
 			}
 			else {
 				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -movement_speed));
@@ -51,8 +52,8 @@ void Sigma::event::handler::GLSixDOFViewController::KeyStateChange(const unsigne
 		}
 		else {
 			if (this->keyState['B'] == KS_DOWN) {
-				this->mover->AddForce(glm::vec3(0.0f, 0.0f, -movement_speed*10.0f));
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, movement_speed*10.0f));
+				this->mover->AddForce(glm::vec3(0.0f, 0.0f, -(movement_speed*boost_factor)));
+				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, (movement_speed*boost_factor)));
 			}
 			else {
 				this->mover->AddForce(glm::vec3(0.0f, 0.0f, -movement_speed));
@@ -63,20 +64,20 @@ void Sigma::event::handler::GLSixDOFViewController::KeyStateChange(const unsigne
 	if (key == 'B') { // Boost on
 		if (state == KS_DOWN) {
 			if (this->keyState['W'] == KS_DOWN) {
-				this->mover->AddForce(glm::vec3(0.0f, 0.0f, movement_speed*10.0f));
+				this->mover->AddForce(glm::vec3(0.0f, 0.0f, (movement_speed*boost_factor)));
 				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, movement_speed));
 			} else if (this->keyState['S'] == KS_DOWN) {
-				this->mover->AddForce(glm::vec3(0.0f, 0.0f, -movement_speed*10.0f));
+				this->mover->AddForce(glm::vec3(0.0f, 0.0f, -(movement_speed*boost_factor)));
 				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -movement_speed));
 			}
 		}
 		else { // Boost off
 			if (this->keyState['W'] == KS_DOWN) {
 				this->mover->AddForce(glm::vec3(0.0f, 0.0f, movement_speed));
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, movement_speed*10.0f));
+				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, (movement_speed*boost_factor)));
 			} else if (this->keyState['S'] == KS_DOWN) {
 				this->mover->AddForce(glm::vec3(0.0f, 0.0f, -movement_speed));
-				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -movement_speed*10.0f));
+				this->mover->RemoveForce(glm::vec3(0.0f, 0.0f, -(movement_speed*boost_factor)));
 			}
 		}
 	}

@@ -119,7 +119,7 @@ namespace Sigma{
                 glBindTexture(GL_TEXTURE_2D, mat.ambientMap);
                 glActiveTexture(GL_TEXTURE1);
             }
-            glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_SHORT, (void*)prev);
+            glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_INT, (void*)prev);
         }
 
         // reset defaults

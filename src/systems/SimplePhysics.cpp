@@ -9,7 +9,8 @@ std::map<std::string,Sigma::IFactory::FactoryFunction>
     using namespace std::placeholders;
     std::map<std::string,Sigma::IFactory::FactoryFunction> retval;
 	retval["PhysicsMover"] = std::bind(&SimplePhysics::createPhysicsMover,this,_1,_2);
-    retval["ViewMover"] = std::bind(&SimplePhysics::createViewMover,this,_1,_2);
+	retval["ViewMover"] = std::bind(&SimplePhysics::createViewMover,this,_1,_2);
+	retval["AABBTree"] = std::bind(&SimplePhysics::createAABBTree,this,_1,_2);
 
 	// Not supported in VS2012
     /*{
@@ -44,10 +45,57 @@ void SimplePhysics::createPhysicsMover(const unsigned int entityID, std::vector<
 	this->addComponent(entityID,mover);
 }
 
-void SimplePhysics::createViewMover(const unsigned int entityID, std::vector<Property> &properties)
-{
+void SimplePhysics::createViewMover(const unsigned int entityID, std::vector<Property> &properties) {
 	ViewMover* mover = new ViewMover(entityID);
 	this->addComponent(entityID,mover);
+}
+
+void SimplePhysics::createAABBTree(const unsigned int entityID, std::vector<Property> &properties) {
+	Sigma::AABBTree* tree = new Sigma::AABBTree(entityID);
+	float scale = 1.0f;
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
+	float rx = 0.0f;
+	float ry = 0.0f;
+	float rz = 0.0f;
+	int componentID = 0;
+
+	for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
+		Property*  p = &(*propitr);
+		if (p->GetName() == "scale") {
+			scale = p->Get<float>();
+			continue;
+		} else if (p->GetName() == "x") {
+			x = p->Get<float>();
+			continue;
+		} else if (p->GetName() == "y") {
+			y = p->Get<float>();
+			continue;
+		} else if (p->GetName() == "z") {
+			z = p->Get<float>();
+			continue;
+		} else if (p->GetName() == "rx") {
+			rx = p->Get<float>();
+			continue;
+		} else if (p->GetName() == "ry") {
+			ry = p->Get<float>();
+			continue;
+		} else if (p->GetName() == "rz") {
+			rz = p->Get<float>();
+			continue;
+		} else if (p->GetName() == "meshFile") {
+			tree->Populate(p->Get<std::string>());
+		} else if (p->GetName() == "subdivisions") {
+			for (int i = 2; i < p->Get<int>(); ++ i) {
+				tree->Subdivivde(nullptr, i);
+			}
+		}
+	}
+
+	tree->Offset(glm::vec3(x,y,z));
+	tree->Rotation(glm::vec3(rx,ry,rz));
+	this->colliders[entityID] = tree;
 }
 
 bool SimplePhysics::Update(const double delta) {
@@ -59,8 +107,8 @@ bool SimplePhysics::Update(const double delta) {
 	}
 
 	// Check for collisions and set position to contact point
-	for (auto itr = this->_Components.begin(); itr != this->_Components.end(); ++itr) {
-
+	for (auto itr = this->colliders.begin(); itr != this->colliders.end(); ++itr) {
+			glm::vec3 cameraPos = itr->second->Offset();
 	}
 
 	return true;
