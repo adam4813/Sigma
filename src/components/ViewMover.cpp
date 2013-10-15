@@ -14,15 +14,14 @@ void ViewMover::ApplyForces(const double delta) {
 		totalForce += *forceitr;
 	}
 
+	glm::vec3 outForce = totalForce;
 	for (auto forceitr = this->normalForces.begin(); forceitr != this->normalForces.end(); ++forceitr) {
 		float scalar = glm::dot(*forceitr, totalForce);
-		if (scalar < 0) {
-			totalForce = totalForce - scalar * *forceitr;
-		}
+		outForce -= scalar * *forceitr;
 	}
 	this->normalForces.clear();
 
-	this->view->Move(totalForce * deltavec);
+	this->view->Move(outForce * deltavec);
 
 	for (auto rotitr = this->rotationForces.begin(); rotitr != this->rotationForces.end(); ++rotitr) {
 		this->view->Rotate((*rotitr) * deltavec);
