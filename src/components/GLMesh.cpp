@@ -250,7 +250,7 @@ namespace Sigma{
 
                 // Store the face
                 temp_face_indices.push_back(current_face);
-            } else if (line[0] == 'g') { // Face group
+            } else if (line.substr(0,1) == "g") { // Face group
                 this->groupIndex.push_back(temp_face_indices.size());
             } else if (line.substr(0, line.find(' ')) == "mtllib") { // Material library
 				// Add the path to the filename to load it relative to the obj file.
@@ -271,7 +271,7 @@ namespace Sigma{
                 temp_colors.push_back(Color(color.r, color.g, color.b));
                 this->faceGroups[temp_face_indices.size()] = currentMtlGroup;
                 current_color++;
-            } else if ((line[0] == '#') || (line.size() == 0)) { // Comment or blank line
+            } else if ((line.substr(0,1) == "#") || (line.size() == 0)) { // Comment or blank line
                 /* ignoring this line comment or blank*/
             } else { // Unknown
                 /* ignoring this line */
@@ -391,6 +391,7 @@ namespace Sigma{
                 s >> name;
                 Material m;
                 getline(in, line);
+				s.clear();
                 s.str(line);
                 s.seekg(0);
                 s >> label;
@@ -423,6 +424,7 @@ namespace Sigma{
                         std::string filename;
 						s >> filename;
 						filename = convert_path(filename);
+						std::cerr << "Loading diffuse texture: " << path + filename << std::endl;
 						// Add the path to the filename to load it relative to the mtl file
 						m.diffuseMap = SOIL_load_OGL_texture((path + filename).c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
 						if (m.diffuseMap == 0) {
@@ -432,6 +434,7 @@ namespace Sigma{
                         std::string filename;
 						s >> filename;
 						filename = convert_path(filename);
+						std::cerr << "Loading ambient texture: " << path + filename << std::endl;
 						// Add the path to the filename to load it relative to the mtl file
                         m.ambientMap = SOIL_load_OGL_texture((path + filename).c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
 						if (m.ambientMap == 0) {
@@ -445,6 +448,7 @@ namespace Sigma{
                     if (in.eof()) {
                         break;
                     }
+					s.clear();
                     s.str(line);
                     s.seekg(0);
                     s >> label;

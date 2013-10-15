@@ -183,6 +183,7 @@ void OpenGLSystem::createGLIcoSphere(const unsigned int entityID, std::vector<Pr
                 rz = p->Get<float>();
                 continue;
             } else if (p->GetName() == "meshFile") {
+				std::cerr << "Loading mesh: " << p->Get<std::string>() << std::endl;
                 mesh->LoadMesh(p->Get<std::string>());
             } else if (p->GetName() == "shader"){
                 shaderfile = p->Get<std::string>();
@@ -196,7 +197,7 @@ void OpenGLSystem::createGLIcoSphere(const unsigned int entityID, std::vector<Pr
         mesh->SetCullFace(cull_face);
         mesh->Transform()->Scale(scale,scale,scale);
         mesh->Transform()->Translate(x,y,z);
-        mesh->Transform()->Rotate(rx,ry,rz);
+		mesh->Transform()->Rotate(rx,ry,rz);
         if(shaderfile != "") mesh->LoadShader(shaderfile);
         else mesh->LoadShader(); // load default
         mesh->InitializeBuffers();
