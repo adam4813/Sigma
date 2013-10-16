@@ -6,7 +6,7 @@ namespace handler{
 
     const float GLFPSController::SPEED_TRANSLATE   = 2.0f;
     const float GLFPSController::SPEED_ROTATE      = 20.0f * 3.14159f;
-    const float GLFPSController::BOOST_MULTIPLIER  = 10.0f;
+    const float GLFPSController::BOOST_MULTIPLIER  = 2.0f;
 
     GLFPSController::GLFPSController(IGLView* view, ViewMover* mover) : mover(mover) {
         // Set the view mover's view pointer.
@@ -57,6 +57,6 @@ namespace handler{
         this->_rotate = glm::vec3(pitch, yaw, 0.0f);
         this->mover->AddRotationForce(this->_rotate);
 	}
-} 
-} 
+}
+}
 } // namespace Sigma::event::handler

@@ -27,8 +27,8 @@ namespace Sigma {
 				 */
 				void KeyStateChange(const unsigned int key, const KEY_STATE state);
 				virtual void MouseMove(float dx, float dy);
-				virtual void MouseDown() {}
-				virtual void MouseUp() {}
+				virtual void MouseDown(Sigma::event::BUTTON btn) {}
+				virtual void MouseUp(Sigma::event::BUTTON btn) {}
 			private:
 				ViewMover* mover; // The view mover component that applies the rotations and forces set in the trigger method.
                 static const float SPEED_TRANSLATE, SPEED_ROTATE, BOOST_MULTIPLIER;
