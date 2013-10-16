@@ -3,7 +3,8 @@
 #include "systems/OpenGLSystem.h"
 #include "systems/SimplePhysics.h"
 #include "systems/FactorySystem.h"
-#include "controllers/GLSixDOFViewController.h"
+//#include "controllers/GLSixDOFViewController.h"
+#include "controllers/GLFPSController.h"
 #include "components/ViewMover.h"
 #include "SCParser.h"
 
@@ -20,6 +21,7 @@ int main(int argCount, char **argValues) {
 	factory.register_Factory(glsys);
 	factory.register_Factory(physys);
 	IOpSys* os = nullptr;
+
 #if defined OS_Win32
 	os = new win32();
 #elif defined OS_SDL
@@ -57,8 +59,10 @@ int main(int argCount, char **argValues) {
 	std::vector<Property> props;
 	physys.createViewMover(9, props);
 	ViewMover* mover = reinterpret_cast<ViewMover*>(physys.getComponent(9,ViewMover::getStaticComponentID()));
-	Sigma::event::handler::GLSixDOFViewController cameraController(glsys.View(), mover);
+	//Sigma::event::handler::GLSixDOFViewController cameraController(glsys.View(), mover);
+	Sigma::event::handler::GLFPSController cameraController(glsys.View(), mover);
 	IOpSys::KeyboardEventSystem.Register(&cameraController);
+	IOpSys::MouseEventSystem.Register(&cameraController);
 
 	os->SetupTimer();
 
@@ -82,6 +86,11 @@ int main(int argCount, char **argValues) {
 		if (os->KeyReleased('M', true)) {
 			os->ToggleFullscreen();
 			glsys.SetViewportSize(os->GetWindowWidth(), os->GetWindowHeight());
+		}
+
+		// Temporary exit key for when mouse is under control
+		if (os->KeyReleased('P', true)) {
+			break;
 		}
 
 		// Pass in delta time in seconds
