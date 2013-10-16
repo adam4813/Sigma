@@ -32,14 +32,16 @@ void* SDLSys::CreateGraphicsWindow(const unsigned int width, const unsigned int 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	// Set the relative mouse state
-	SDL_SetRelativeMouseMode(SDL_TRUE);
+	// Set the relative mouse state (hide mouse)
+	if(SDL_SetRelativeMouseMode(SDL_TRUE) < 0){
+        std::cerr << "ERROR: SDL could not grab mouse\n" << SDL_GetError() << std::endl;
+	}
 
 	return &this->_Context;
 }
 
 bool SDLSys::MessageLoop() {
-	
+
 	SDL_Event event;
 
 	// Keyboard varables
@@ -47,8 +49,9 @@ bool SDLSys::MessageLoop() {
 
 	// Mouse variables
 	float width, height, dx, dy;
-	float mouse_sensitivity = 100.0f;
+	float mouse_sensitivity = 500.0f;
 	float dampener = 2.0f;
+	bool mouse_moved = false; // if no mouse motion, we will explicitly clear it
 
 	this->_KeyReleased.clear();
 
@@ -76,6 +79,7 @@ bool SDLSys::MessageLoop() {
 			KeyboardEventSystem.KeyUp(key);
 			break;
 		case SDL_MOUSEMOTION:
+		    mouse_moved = true;
             /*printf("Mouse moved by %d,%d to (%d,%d)\n",
                     event.motion.xrel, event.motion.yrel,
                     event.motion.x, event.motion.y);*/
@@ -108,6 +112,15 @@ bool SDLSys::MessageLoop() {
             break;
 		}
 	}
+
+	// explicitly clear mouse motion if no signal was received
+	if(!mouse_moved){
+        MouseEventSystem.MouseMove(0.f, 0.f);
+	}
+	// if mouse is hidden/grabbed, recenter it so it doesn't appear offscreen
+    if(SDL_GetRelativeMouseMode() == SDL_TRUE){
+        SDL_WarpMouseInWindow(this->_Window, this->GetWindowWidth()/2, this->GetWindowHeight()/2);
+    }
 
 	return true;
 }
