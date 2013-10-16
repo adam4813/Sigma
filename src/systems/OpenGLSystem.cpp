@@ -1,6 +1,7 @@
 #include "OpenGLSystem.h"
 #include "GLSLShader.h"
 #include "GLSixDOFView.h"
+#include "GLFPSView.h"
 #include "../components/GLSprite.h"
 #include "../components/GLIcoSphere.h"
 #include "../components/GLCubeSphere.h"
@@ -8,7 +9,7 @@
 
 namespace Sigma{
     OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumulator(0.0), framerate(60.0f) {
-        this->view = std::unique_ptr<IGLView>(new GLSixDOFView());
+        this->view = std::unique_ptr<IGLView>(new GLFPSView());
     }
 
 std::map<std::string, Sigma::IFactory::FactoryFunction>
