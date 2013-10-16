@@ -1,6 +1,7 @@
 #include "OpenGLSystem.h"
 #include "GLSLShader.h"
 #include "GLSixDOFView.h"
+#include "GLFPSView.h"
 #include "../components/GLSprite.h"
 #include "../components/GLIcoSphere.h"
 #include "../components/GLCubeSphere.h"
@@ -25,14 +26,21 @@ namespace Sigma{
 		retval["GLIcoSphere"] = std::bind(&OpenGLSystem::createGLIcoSphere,this,_1,_2);
 		retval["GLCubeSphere"] = std::bind(&OpenGLSystem::createGLCubeSphere,this,_1,_2);
 		retval["GLMesh"] = std::bind(&OpenGLSystem::createGLMesh,this,_1,_2);
-		retval["GLView"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2);
+		retval["GLFPSView"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2, "GLFPSView");
+		retval["GLSixDOFView"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2, "GLSixDOFView");
 
         return retval;
     }
 
-	void OpenGLSystem::createGLView(const unsigned int entityID, std::vector<Property> &properties) {
-		//this->view = new GLSixDOFView();
-		this->view = std::unique_ptr<IGLView>(new GLSixDOFView());
+	void OpenGLSystem::createGLView(const unsigned int entityID, std::vector<Property> &properties, std::string mode) {
+		
+		if(mode=="GLFPSView") {
+			this->view = std::unique_ptr<IGLView>(new GLFPSView());
+		} else if(mode=="GLSixDOFView") {
+			this->view = std::unique_ptr<IGLView>(new GLSixDOFView());
+		} else {
+			std::cerr << "Invalid view type!" << std::endl;
+		}
 	
 		float x=0.0f, y=0.0f, z=0.0f, rx=0.0f, ry=0.0f, rz=0.0f;
 

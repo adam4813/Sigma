@@ -89,7 +89,7 @@ int main(int argCount, char **argValues) {
 	// definition in scene file.  Currently entity ID for view must be 1
 	// for this to work.
 
-	// No view provided, create a default
+	// No view provided, create a default FPS view
 	if(!glsys.View()) {
 		std::vector<Property> props;
 
@@ -101,12 +101,12 @@ int main(int argCount, char **argValues) {
 		props.push_back(p_y);
 		props.push_back(p_z);
 
-		glsys.createGLView(1, props);
+		glsys.createGLView(1, props, "GLFPSView");
 	}
 
 	// Still hard coded to use entity ID #1
 	// Link the graphics view to the physics system's view mover
-	ViewMover* mover = reinterpret_cast<ViewMover*>(physys.getComponent(1,ViewMover::getStaticComponentID()));
+	ViewMover* mover = static_cast<ViewMover*>(physys.getComponent(1,ViewMover::getStaticComponentID()));
 
 	// If no view mover was created,
 	// create a default
@@ -114,7 +114,7 @@ int main(int argCount, char **argValues) {
 		std::cout << "No view mover provided, creating default..." << std::endl;
 		std::vector<Property> props;
 		physys.createViewMover(1, props);
-		mover = reinterpret_cast<ViewMover*>(physys.getComponent(1,ViewMover::getStaticComponentID()));
+		mover = static_cast<ViewMover*>(physys.getComponent(1,ViewMover::getStaticComponentID()));
 	}
 
 	// Create the controller

@@ -67,30 +67,22 @@ public:
 	 * \returns void
 	*/
 	void Move(float right, float up, float forward) {
-		/*this->Translate(((FORWARD_VECTOR * forward) +
-						(UP_VECTOR * up) +
-						(RIGHT_VECTOR * right)) * this->orientation);*/
-		/*this->position += (FORWARD_VECTOR * forward) * this->orientation;
-		this->position += (UP_VECTOR * up) * this->orientation;
-		this->position += (RIGHT_VECTOR * right) * this->orientation;
+		this->Translate((GetForward() * forward) + (GetRight() * right) + (GetUp() * up));
+	}
 
-		this->translateMatrix = glm::translate(this->position);
-		this->MMhasChanged = true;*/
-		glm::vec3 forward_vector(this->rotateMatrix[2][0], this->rotateMatrix[2][1], this->rotateMatrix[2][2]);
-		glm::vec3 right_vector(this->rotateMatrix[0][0], -this->rotateMatrix[0][1], this->rotateMatrix[0][2]);
-		glm::vec3 up_vector(this->rotateMatrix[1][0], this->rotateMatrix[1][1], this->rotateMatrix[1][2]);
-
-		this->Translate((forward_vector * forward) + (right_vector * right) + (up_vector * up));
+	glm::vec3 GetRight() {
+		glm::vec3 right_vector(this->rotateMatrix[0][0], this->rotateMatrix[1][0], this->rotateMatrix[2][0]);
+		return right_vector;
+	}
+	
+	glm::vec3 GetUp() {
+		glm::vec3 up_vector(this->rotateMatrix[0][1], this->rotateMatrix[1][1], this->rotateMatrix[2][1]);
+		return up_vector;
 	}
 
 	glm::vec3 GetForward() {
-		glm::vec3 forward_vector(this->rotateMatrix[2][0], this->rotateMatrix[2][1], this->rotateMatrix[2][2]);
+		glm::vec3 forward_vector(this->rotateMatrix[0][2], this->rotateMatrix[1][2], this->rotateMatrix[2][2]);
 		return forward_vector;
-	}
-
-	glm::vec3 GetUp() {
-		glm::vec3 up_vector(this->rotateMatrix[1][0], this->rotateMatrix[1][1], this->rotateMatrix[1][2]);
-		return up_vector;
 	}
 
 	// Convenience overload
