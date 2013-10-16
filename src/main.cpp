@@ -156,12 +156,14 @@ int main(int argCount, char **argValues) {
 			break;
 		}
 
+
+#ifdef OS_SDL
         // toggle relative-mouse mode (whether mouse is grabbed by SDL or not)
 		if (os->KeyReleased('L', true)){
             int state = SDL_GetRelativeMouseMode();
             SDL_SetRelativeMouseMode(state == SDL_TRUE ? SDL_FALSE : SDL_TRUE);
 		}
-
+#endif
 		// Pass in delta time in seconds
 		physys.Update(deltaSec);
 

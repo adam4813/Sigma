@@ -1,11 +1,15 @@
 #include "win32.h"
+#include <windowsx.h>
 #include <assert.h>
 
 #include "GL/glew.h"
 #include "GL/wglew.h"
 
 Sigma::event::KeyboardInputSystem IOpSys::KeyboardEventSystem; // Handles keyboard events
+Sigma::event::MouseInputSystem IOpSys::MouseEventSystem; // Handles keyboard events
 double IOpSys::curDelta;
+int win32::keyUp[256];
+int win32::mousePos[2];
 
 win32::~win32() {
 	wglMakeCurrent(this->hdc, 0); // Remove the rendering context from our device context
@@ -73,20 +77,44 @@ void* win32::CreateGraphicsWindow(const unsigned int width, const unsigned int h
 }
 
 LRESULT CALLBACK win32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	bool mouseMoved = false;
+	POINT midwindow = {512,384};
 	switch (message) {
 	case WM_KEYUP:
-			KeyboardEventSystem.KeyUp(wParam);
-			keyUp[wParam] = 1;
-			return 0;
+		KeyboardEventSystem.KeyUp(wParam);
+		keyUp[wParam] = 1;
+		return 0;
 		break;
 	case WM_KEYDOWN:
 		KeyboardEventSystem.KeyDown(wParam);
 		return 0;
 		break;
+	case WM_MOUSEMOVE:
+		mouseMoved = true;
+		if ((abs(GET_X_LPARAM(lParam) - midwindow.x) > 2) && (abs(GET_Y_LPARAM(lParam) - midwindow.y) > 2)) {
+			MouseEventSystem.MouseMove((GET_X_LPARAM(lParam) - midwindow.x) / 1024.0f * 500.0f, (GET_Y_LPARAM(lParam) - midwindow.y) / 768.0f * 500.0f);
+		}
+		else if (abs(GET_X_LPARAM(lParam) - midwindow.x) > 2) {
+			MouseEventSystem.MouseMove((GET_X_LPARAM(lParam) - midwindow.x) / 1024.0f * 500.0f, 0.0f);
+		}
+		else if (abs(GET_Y_LPARAM(lParam) - midwindow.y) > 2) {
+			MouseEventSystem.MouseMove(0.0f, (GET_Y_LPARAM(lParam) - midwindow.y) / 768.0f * 500.0f);
+		}
+		else {
+			mouseMoved = false;
+		}
+		ClientToScreen(hWnd, &midwindow);
+		SetCursorPos(midwindow.x, midwindow.y);
+		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
 	}
+
+	if (!mouseMoved) {
+		MouseEventSystem.MouseMove(0.f, 0.f);
+	}
+
 	return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
@@ -255,4 +283,3 @@ unsigned int win32::GetWindowHeight() {
 		return this->windowedSize.bottom - this->windowedSize.top;
 	}
 }
-int win32::keyUp[256];
