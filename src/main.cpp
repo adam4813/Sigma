@@ -89,8 +89,14 @@ int main(int argCount, char **argValues) {
 		}
 
 		// Temporary exit key for when mouse is under control
-		if (os->KeyReleased('P', true)) {
+		if (os->KeyReleased('Q', true)) {
 			break;
+		}
+
+        // toggle relative-mouse mode (whether mouse is grabbed by SDL or not)
+		if (os->KeyReleased('L', true)){
+            int state = SDL_GetRelativeMouseMode();
+            SDL_SetRelativeMouseMode(state == SDL_TRUE ? SDL_FALSE : SDL_TRUE);
 		}
 
 		// Pass in delta time in seconds
