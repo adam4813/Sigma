@@ -7,6 +7,8 @@ namespace Sigma {
 	namespace event {
 		enum KEY_STATE {KS_UP, KS_DOWN};
 
+		static int KEY_ESCAPE;
+
 		// A keyboard event handler interface. Handlers can be controllers, loggers, etc.
 		struct IKeyboardEventHandler {
 			unsigned int keys[256]; // The keys this handler triggers off.
@@ -65,7 +67,6 @@ namespace Sigma {
 					}
 				}
 			}
-
 		private:
 			std::map<unsigned int, std::vector<Sigma::event::IKeyboardEventHandler*> > eventHandlers;
 		};

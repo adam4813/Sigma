@@ -4,7 +4,7 @@
 
 class win32 : public IOpSys {
 public:
-	win32() { }
+	win32() { Sigma::event::KEY_ESCAPE = VK_ESCAPE; }
 	~win32();
 
 	void* CreateGraphicsWindow(const unsigned int width = 800, const unsigned int height = 600);

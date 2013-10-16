@@ -152,7 +152,7 @@ int main(int argCount, char **argValues) {
 		}
 
 		// Temporary exit key for when mouse is under control
-		if (os->KeyReleased('O', true)) {
+		if (os->KeyReleased(Sigma::event::KEY_ESCAPE, true)) {
 			break;
 		}
 
