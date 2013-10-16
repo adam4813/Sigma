@@ -434,7 +434,6 @@ namespace Sigma{
                     } else if (label == "map_Ka") {
                         std::string filename;
 						s >> filename;
-						filename = convert_path(filename);
 						filename = trim(filename);
 						filename = convert_path(filename);
 						std::cerr << "Loading ambient texture: " << path + filename << std::endl;
