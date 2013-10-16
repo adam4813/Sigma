@@ -4,6 +4,7 @@
 #include "systems/SimplePhysics.h"
 #include "systems/FactorySystem.h"
 #include "controllers/GLSixDOFViewController.h"
+#include "controllers/GLFPSController.h"
 #include "components/ViewMover.h"
 #include "SCParser.h"
 
@@ -14,7 +15,7 @@
 #endif
 
 int main(int argCount, char **argValues) {
-	OpenGLSystem glsys;
+	Sigma::OpenGLSystem glsys;
 	SimplePhysics physys;
 
 	Sigma::FactorySystem& factory = Sigma::FactorySystem::getInstance();
@@ -117,8 +118,9 @@ int main(int argCount, char **argValues) {
 	}
 
 	// Create the controller
-	Sigma::event::handler::GLSixDOFViewController cameraController(glsys.View(), mover);
+	Sigma::event::handler::GLFPSController cameraController(glsys.View(), mover);
 	IOpSys::KeyboardEventSystem.Register(&cameraController);
+	IOpSys::MouseEventSystem.Register(&cameraController);
 
 	// Setup the timer
 	os->SetupTimer();
@@ -147,6 +149,11 @@ int main(int argCount, char **argValues) {
 		if (os->KeyReleased('M', true)) {
 			os->ToggleFullscreen();
 			glsys.SetViewportSize(os->GetWindowWidth(), os->GetWindowHeight());
+		}
+
+		// Temporary exit key for when mouse is under control
+		if (os->KeyReleased('O', true)) {
+			break;
 		}
 
 		// Pass in delta time in seconds

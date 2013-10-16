@@ -18,8 +18,8 @@ struct IGLView {
 		this->position = glm::vec3(0.0f,0.0f,0.0f);
 		this->orientation = glm::quat(0.0f,0.0f,1.0f,0.0f);
 	}
-	virtual void UpdateViewMatrix() = 0;
-	*/
+	virtual void UpdateViewMatrix() = 0;*/
+
 	virtual void Move(float right, float up, float forward) = 0;
 
 	// Helper function.

@@ -16,7 +16,11 @@ class SimplePhysics
     : public Sigma::IFactory, public ISystem<IMoverComponent> {
 public:
 	SimplePhysics() { }
-	~SimplePhysics() { };
+	~SimplePhysics() {
+		for (auto treeitr = this->colliders.begin(); treeitr != this->colliders.end(); ++treeitr) {
+			delete treeitr->second;
+		}
+	};
 	/**
 	 * \brief Starts the Simple Physics system.
 	 *

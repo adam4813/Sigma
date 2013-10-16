@@ -14,9 +14,9 @@ namespace Sigma {
 			}
 		}
 		~AABBTreeNode() {
-			for (AABBTreeNode* child : this->children) {
-				if (child != nullptr) {
-					delete child;
+			for (unsigned int i = 0; i < 8; ++i) {
+				if (this->children[i] != nullptr) {
+					delete this->children[i];
 				}
 			}
 		}
@@ -88,6 +88,7 @@ namespace Sigma {
 		glm::vec3 Offset() const { return offset; }
 		void Rotation(glm::vec3 val) { this->rotation = val; }
 		glm::vec3 Rotation() const { return this->rotation; }
+		void Halfsize( float val ) { this->halfsize = val; }
 	private:
 		std::vector<CollisionPoint> collisions; // A vector to hold nodes that are in collision.
 		AABBTreeNode root;
@@ -96,6 +97,7 @@ namespace Sigma {
 		int currentDepth;
 		glm::vec3 offset;
 		glm::vec3 rotation;
+		float halfsize;
 	};
 }
 

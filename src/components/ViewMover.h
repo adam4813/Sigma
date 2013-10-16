@@ -25,7 +25,10 @@ public:
 	 * \param[in] IGLView * view The view to apply the forces on.
 	 */
 	void View(IGLView* view);
-	const IGLView* View();
+	IGLView* View();
+
+	void AddNormalForce( glm::vec3 normal );
 private:
 	IGLView* view;
+	std::list<glm::vec3> normalForces;
 };

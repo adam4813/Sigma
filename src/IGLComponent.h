@@ -5,6 +5,9 @@
 #include "GL/glew.h"
 #include "IComponent.h"
 #include "GLTransform.h"
+#include "systems/GLSLShader.h"
+#include <unordered_map>
+#include <memory>
 
 namespace Sigma {
 	// A struct to store which index each of its verts are.
@@ -60,6 +63,8 @@ namespace Sigma {
 		IGLComponent() : IComponent(0) { } // Default ctor setting entity ID to 0.
 		IGLComponent(const int entityID) : IComponent(entityID) { } // Ctor that sets the entity ID.
 
+        typedef std::unordered_map<std::string, std::shared_ptr<GLSLShader>> ShaderMap;
+
 		/**
 		 * \brief Initializes the IGLComponent.
 		 *
@@ -95,8 +100,8 @@ namespace Sigma {
 		/**
 		 * \brief Renders the component.
 		 *
-		 * \param[in/out] glm::mediump_float * view The current view matrix
-		 * \param[in/out] glm::mediump_float * proj The current project matrix
+		 * \param view The current view matrix
+		 * \param proj The current project matrix
 		 */
 		virtual void Render(glm::mediump_float *view, glm::mediump_float *proj)=0;
 
@@ -130,6 +135,14 @@ namespace Sigma {
 			}
 		};
 
+        /** \brief load the given shader
+         *
+         * \param filename the base name of the shader. loads filename.vert and filename.frag.
+         *  filename should be a relative path, like "shaders/mesh"
+         * \return void
+         */
+        void LoadShader(const std::string& filename);
+
 		// The index in buffers for each type of buffer.
 		int ElemBufIndex;
 		int VertBufIndex;
@@ -143,6 +156,10 @@ namespace Sigma {
 		unsigned int drawMode; // The current draw mode (ex. GL_TRIANGLES, GL_TRIANGLE_STRIP).
 		GLuint cull_face; // The current culling method for this component.
 		GLTransform transform; // The transform of this component.
+
+        std::shared_ptr<GLSLShader> shader; // shaders are shared among components
+        // name-->shader map to look up already-loaded shaders (so each can be loaded only once)
+        static ShaderMap loadedShaders;
 	}; // class IGLComponent
 } // namespace Sigma
 
