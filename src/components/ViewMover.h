@@ -19,20 +19,16 @@ public:
 	 */
 	void ApplyForces(const double delta);
 
-	void AddRotationForce(glm::vec3 rotation);
-	void RemoveRotationForce(glm::vec3 rotation);
-
 	/**
 	 * \brief Sets the view that this mover acts on.
 	 *
 	 * \param[in] IGLView * view The view to apply the forces on.
 	 */
 	void View(IGLView* view);
-	const IGLView* View();
+	IGLView* View();
+
 	void AddNormalForce( glm::vec3 normal );
 private:
 	IGLView* view;
-
-	std::list<glm::vec3> rotationForces;
 	std::list<glm::vec3> normalForces;
 };

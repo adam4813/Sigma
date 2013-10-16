@@ -19,6 +19,7 @@ namespace Sigma {
 
 			std::string line;
 			Sigma::parser::Entity* currentEntity = nullptr;
+
 			while (getline(in, line)) {
                 // strip line's whitespace
                 line = rtrim(line);
@@ -90,7 +91,7 @@ namespace Sigma {
 			return this->entities.size();
 		}
 
-		const Sigma::parser::Entity* SCParser::GetEntity(const unsigned int index) {
+		Sigma::parser::Entity* SCParser::GetEntity(const unsigned int index) {
 			if (index < this->entities.size()) {
 				return &this->entities[index];
 			}

@@ -5,12 +5,13 @@
 #include <vector>
 #include <sstream>
 
+const float epsilon = 0.0001f;
+
 // For std::find
 namespace Sigma {
-
-	bool operator ==(const Vertex &lhs, const Vertex &rhs) { return ((abs(rhs.x - lhs.x) < std::numeric_limits<float>::epsilon()) &&
-																	 (abs(rhs.y - lhs.y) < std::numeric_limits<float>::epsilon()) &&
-																	 (abs(rhs.z - lhs.z) < std::numeric_limits<float>::epsilon())); }
+	bool operator ==(const Vertex &lhs, const Vertex &rhs) { return ((abs(rhs.x - lhs.x) < epsilon) &&
+																	 (abs(rhs.y - lhs.y) < epsilon) &&
+																	 (abs(rhs.z - lhs.z) < epsilon)); }
 
     GLCubeSphere::GLCubeSphere( const int entityID ) : GLMesh(entityID) {
         // initialization handled by GLMesh or InitializeBuffers
@@ -70,52 +71,67 @@ namespace Sigma {
         // shader program was compiled and linked in GLMesh::InitializeBuffers.
         //  Now we can set relevant custom uniform values
         (*shader).Use();
-        glUniform1i(glGetUniformLocation((*shader).GetProgram(), "cubeMap"), GL_TEXTURE2);
-        glUniform1i(glGetUniformLocation((*shader).GetProgram(), "cubeNormalMap"), GL_TEXTURE2);
+        glUniform1i(glGetUniformLocation((*shader).GetProgram(), "cubeMap"), GL_TEXTURE0);
+        glUniform1i(glGetUniformLocation((*shader).GetProgram(), "cubeNormalMap"), GL_TEXTURE1);
         (*shader).UnUse();
     } // function InitializeBuffers
 
     void GLCubeSphere::LoadTexture(std::string texture_name) {
         // SOIL makes this straightforward..
+		char filename[100];
+		std::string filenames[6];
         {
             // LOAD CUBE VISUAL TEXTURES
-            // There are always six files
-            std::string filenames[6];
-            for(int i=0; i < 6; i++) {
-                std::stringstream sstm;
-                sstm << texture_name << (i+1) << ".jpg";
-                filenames[i] = sstm.str();
-            }
+			std::cout << "Loading cube texture: " << texture_name << std::endl;
+			sprintf(filename, "%s.dds", texture_name.c_str());
 
-            // SOIL will load the image files into textures, then return the id
-            //  of the GL_TEXTURE_CUBE_MAP
-            this->_cubeMap = SOIL_load_OGL_cubemap(filenames[0].c_str(), filenames[1].c_str(), filenames[2].c_str(),
-                                                   filenames[3].c_str(), filenames[4].c_str(), filenames[5].c_str(),
-                                                   SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+			this->_cubeMap = SOIL_load_OGL_single_cubemap(filename, SOIL_DDS_CUBEMAP_FACE_ORDER, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	
+			// if that didn't work, load individual files
+			if(this->_cubeMap == 0) {
+				// There are always six files
+				for(int i=0; i < 6; i++) {
+					std::stringstream sstm;
+					sstm << texture_name << (i+1) << ".jpg";
+					filenames[i] = sstm.str();
+				}
 
-            if( 0 == this->_cubeMap ) {
-                printf( "SOIL error loading cubemap: '%s'\n", SOIL_last_result() );
-            }
+				// SOIL will load the image files into textures, then return the id
+				//  of the GL_TEXTURE_CUBE_MAP
+				this->_cubeMap = SOIL_load_OGL_cubemap(filenames[0].c_str(), filenames[1].c_str(), filenames[2].c_str(),
+													   filenames[3].c_str(), filenames[4].c_str(), filenames[5].c_str(),
+													   SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+
+				if( 0 == this->_cubeMap ) {
+					printf( "SOIL error loading cubemap: '%s'\n", SOIL_last_result() );
+				}
+			}
         }
         {
-            // LOAD CUBE NORMAL TEXTURES
-            std::string filenames[6];
-            for(int i=0; i < 6; i++) {
-                std::stringstream sstm;
-                sstm << texture_name << "_nm" << (i+1) << ".jpg";
-                filenames[i] = sstm.str();
-            }
+			// First try dds file
+			sprintf(filename, "%s_nm.dds", texture_name.c_str());
 
-            this->_cubeNormalMap = SOIL_load_OGL_cubemap(filenames[0].c_str(), filenames[1].c_str(), filenames[2].c_str(),
-                                                   filenames[3].c_str(), filenames[4].c_str(), filenames[5].c_str(),
-                                                   SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
-            if( 0 == this->_cubeNormalMap ) {
-                printf( "SOIL error loading cubemap normals: '%s'\n", SOIL_last_result() );
-            }
+			this->_cubeNormalMap = SOIL_load_OGL_single_cubemap(filename, SOIL_DDS_CUBEMAP_FACE_ORDER, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+	
+			if(this->_cubeNormalMap==0) {
+				// LOAD CUBE NORMAL TEXTURES
+				for(int i=0; i < 6; i++) {
+					std::stringstream sstm;
+					sstm << texture_name << "_nm" << (i+1) << ".jpg";
+					filenames[i] = sstm.str();
+				}
+
+				this->_cubeNormalMap = SOIL_load_OGL_cubemap(filenames[0].c_str(), filenames[1].c_str(), filenames[2].c_str(),
+													   filenames[3].c_str(), filenames[4].c_str(), filenames[5].c_str(),
+													   SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+				if( 0 == this->_cubeNormalMap ) {
+					printf( "SOIL error loading cubemap normals: '%s'\n", SOIL_last_result() );
+				}
+			}
         }
     } // function LoadTexture
 
-    Vertex GLCubeSphere::GetMidPoint(const Vertex& v1, const Vertex& v2){
+	Vertex GLCubeSphere::GetMidPoint(const Vertex& v1, const Vertex& v2){
         return Vertex((v1.x + v2.x)/2.0f, (v1.y + v2.y)/2.0f, (v1.z + v2.z)/2.0f);
     }
 
@@ -171,43 +187,42 @@ namespace Sigma {
         }
     } // function Refine
 
-    void GLCubeSphere::Render(glm::mediump_float *view, glm::mediump_float *proj) {
-//        if(this->_fixToCamera) {
-//            glm::mediump_float *view_ptr = view;
-//            glm::mat4 view_matrix;
-//
-//            for(int i=0; i < 4; i++) {
-//                for(int j=0; j < 4; j++) {
-//                    view_matrix[i][j] = (*view_ptr++);
-//                }
-//            }
-//
-//            // Extract position from view matrix
-//            glm::mat3 rotMat(view_matrix);
-//            glm::vec3 d(view_matrix[3]);
-//            glm::vec3 position = -d * rotMat;
-//            this->Transform()->TranslateTo(position);
-//        }
-//
-//        this->Transform()->Rotate(0.0f,this->_rotationSpeed,0.0f);
+	void GLCubeSphere::Render(glm::mediump_float *view, glm::mediump_float *proj) {
+        if(this->_fixToCamera) {
+            glm::mediump_float *view_ptr = view;
+            glm::mat4 view_matrix;
+
+            for(int i=0; i < 4; i++) {
+                for(int j=0; j < 4; j++) {
+                    view_matrix[i][j] = (*view_ptr++);
+                }
+            }
+
+            // Extract position from view matrix
+            glm::mat3 rotMat(view_matrix);
+            glm::vec3 d(view_matrix[3]);
+            glm::vec3 position = -d * rotMat;
+            this->Transform()->TranslateTo(position);
+        }
 
         // bind cubemap textures
-        glActiveTexture(GL_TEXTURE2);
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeMap);
         if(this->_cubeNormalMap != 0){
-            glActiveTexture(GL_TEXTURE3);
+            glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_CUBE_MAP, this->_cubeNormalMap);
         }
+
         // render da mesh
         GLMesh::Render(view, proj);
-        // unbind that which GLMesh does not unbind
+
+		// unbind that which GLMesh does not unbind
         if(this->_cubeNormalMap != 0){
-            glActiveTexture(GL_TEXTURE3);
+            glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
         }
-        glActiveTexture(GL_TEXTURE2);
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
         glActiveTexture(GL_TEXTURE0);
     } // function Render
-
 } // namespace Sigma

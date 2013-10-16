@@ -23,7 +23,7 @@ public:
 	 *
 	 * \param[in] GLTransform * transform The pointer to the transform to manipulate.
 	 */
-	void Transform(GLTransform* transform) {
+	void SetTransform(GLTransform* transform) {
 		this->transform = transform;
 	}
 

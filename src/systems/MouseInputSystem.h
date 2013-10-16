@@ -40,7 +40,7 @@ namespace Sigma{
 				 * Loops through each event handler that is registered and passes mouse movement information.
 				 */
 				void MouseMove(float dx, float dy) {
-					for (auto itr = this->eventHandlers.begin(); itr != this->eventHandlers.end(); ++ itr) {
+					for (auto itr = this->eventHandlers.begin(); itr != this->eventHandlers.end(); ++itr) {
 						(*itr)->MouseMove(dx, dy);
 					}
 				}

@@ -2,6 +2,7 @@
 
 #include "../IFactory.h"
 #include "../ISystem.h"
+#include "../components/ViewMover.h"
 
 #include <string>
 #include <vector>
@@ -37,6 +38,7 @@ public:
 	bool Update(const double delta);
 
     std::map<std::string,FactoryFunction> getFactoryFunctions();
+
 	void createPhysicsMover(const unsigned int entityID, std::vector<Property> &properties) ;
 	void createViewMover(const unsigned int entityID, std::vector<Property> &properties) ;
 	void createAABBTree(const unsigned int entityID, std::vector<Property> &properties) ;
@@ -47,6 +49,7 @@ public:
 		}
 		return nullptr;
 	}
+
 private:
 	std::map<unsigned int, Sigma::AABBTree*> colliders;
 };

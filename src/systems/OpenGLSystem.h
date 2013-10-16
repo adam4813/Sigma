@@ -6,6 +6,7 @@
 #include "../IFactory.h"
 #include "../ISystem.h"
 #include "../IGLComponent.h"
+#include "../systems/IGLView.h"
 
 #include "GL/glew.h"
 #include "glm/glm.hpp"
@@ -87,8 +88,13 @@ namespace Sigma{
         void createGLIcoSphere(const unsigned int entityID, std::vector<Property> &properties) ;
         void createGLCubeSphere(const unsigned int entityID, std::vector<Property> &properties) ;
         void createGLMesh(const unsigned int entityID, std::vector<Property> &properties) ;
+		
+		// Views are not technically components, but perhaps they should be
+		void OpenGLSystem::createGLView(const unsigned int entityID, std::vector<Property> &properties, std::string mode) ;
 
         IGLView* View() const { return this->view.get(); }
+
+		GLTransform* GetTransformFor(const unsigned int entityID);
     private:
         unsigned int windowWidth; // Store the width of our window
         unsigned int windowHeight; // Store the height of our window

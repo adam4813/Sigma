@@ -51,7 +51,7 @@ namespace handler{
 		// Motion from center to far left/right of screen should
 		// result in 90 degree turn
 		yaw = dx*90.0f;
-		pitch = dy*90.0f;
+		pitch = dy*45.0f;
 
 		// remove previous force and add new one
         this->mover->RemoveRotationForce(this->_rotate);

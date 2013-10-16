@@ -4,7 +4,7 @@
 
 #include "GLSLShader.h"
 #include <iostream>
-
+#include <fstream>
 
 GLSLShader::GLSLShader(void)
 {
@@ -103,7 +103,7 @@ GLuint GLSLShader::operator()(const std::string uniform){
 GLuint GLSLShader::GetProgram() const {
 	return _program;
 }
-#include <fstream>
+
 void GLSLShader::LoadFromFile(GLenum whichShader, const std::string filename){
 	std::ifstream fp;
 	fp.open(filename.c_str(), std::ios_base::in);

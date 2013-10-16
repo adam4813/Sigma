@@ -86,10 +86,10 @@ namespace Sigma{
     }
 
     void GLMesh::Render(glm::mediump_float *view, glm::mediump_float *proj) {
-        //this->Transform()->Rotate(0.0f, 1.0f, 0.0f);
+        glm::mat4 modelMatrix = this->Transform()->GetMatrix();
 
         (*shader).Use();
-        glUniformMatrix4fv(glGetUniformLocation((*shader).GetProgram(), "in_Model"), 1, GL_FALSE, &this->Transform()->ModelMatrix()[0][0]);
+        glUniformMatrix4fv(glGetUniformLocation((*shader).GetProgram(), "in_Model"), 1, GL_FALSE, &modelMatrix[0][0]);
         glUniformMatrix4fv(glGetUniformLocation((*shader).GetProgram(), "in_View"), 1, GL_FALSE, view);
         glUniformMatrix4fv(glGetUniformLocation((*shader).GetProgram(), "in_Proj"), 1, GL_FALSE, proj);
 

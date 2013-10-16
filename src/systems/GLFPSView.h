@@ -5,11 +5,6 @@
 struct GLFPSView : public IGLView {
 	GLFPSView();
 
-	void UpdateViewMatrix();
-
+	const glm::mat4 GetViewMatrix();
 	void Move(float right, float up, float forward);
-
-	void Rotate(float x, float y, float z);
-
-	float rotX, rotY;
 };

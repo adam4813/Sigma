@@ -28,8 +28,20 @@ void SimplePhysics::createPhysicsMover(const unsigned int entityID, std::vector<
         Property*  p = &(*propitr);
         if (p->GetName() == "transform") {
             GLTransform* t = p->Get<GLTransform*>();
-            mover->Transform(t);
-        }
+            mover->SetTransform(t);
+		} else if(p->GetName() == "rx") {
+			mover->AddRotationForce(glm::vec3(p->Get<float>(), 0.0f, 0.0f));
+        } else if(p->GetName() == "ry") {
+			mover->AddRotationForce(glm::vec3(0.0f, p->Get<float>(), 0.0f));
+		} else if(p->GetName() == "rz") {
+			mover->AddRotationForce(glm::vec3(0.0f, 0.0f, p->Get<float>()));
+		} else if(p->GetName() == "r") {
+			mover->AddForce(glm::vec3(p->Get<float>(), 0.0f, 0.0f));
+		} else if(p->GetName() == "u") {
+			mover->AddForce(glm::vec3(0.0f, p->Get<float>(), 0.0f));
+		} else if(p->GetName() == "f") {
+			mover->AddForce(glm::vec3(0.0f, 0.0f, p->Get<float>()));
+		}
 	}
 	this->addComponent(entityID,mover);
 }
@@ -93,11 +105,11 @@ bool SimplePhysics::Update(const double delta) {
 	for (auto itr = this->colliders.begin(); itr != this->colliders.end(); ++itr) {
 		for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
 			for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
-				ViewMover* mover = reinterpret_cast<ViewMover*>(citr->second.get());
+				ViewMover* mover = static_cast<ViewMover*>(citr->second.get());
 
-				glm::vec3 cameraPos = mover->View()->position - itr->second->Offset();
+				glm::vec3 cameraPos = mover->View()->Transform.GetPosition() - itr->second->Offset();
 
-				unsigned int collisions = itr->second->CollisionCheck(cameraPos, 0.15f);
+				unsigned int collisions = itr->second->CollisionCheck(cameraPos, 0.10f);
 				for (unsigned int i = 0; i < collisions; ++i) {
 					mover->AddNormalForce(itr->second->GetCollisionPoint(i)->normal);
 				}

@@ -48,10 +48,13 @@ bool SDLSys::MessageLoop() {
 	SDL_Keycode key;
 
 	// Mouse variables
-	float width, height, dx, dy;
-	float mouse_sensitivity = 500.0f;
+	float width, height, dx=0.0f, dy=0.0f;
+	float mouse_sensitivity = 100.0f;
 	float dampener = 2.0f;
 	bool mouse_moved = false; // if no mouse motion, we will explicitly clear it
+
+	width = GetWindowWidth();
+	height = GetWindowHeight();
 
 	this->_KeyReleased.clear();
 
@@ -85,9 +88,6 @@ bool SDLSys::MessageLoop() {
                     event.motion.x, event.motion.y);*/
 
 			// Motion is in pixels, so normalize to -1.0 to 1.0 range
-			width = GetWindowWidth();
-			height = GetWindowHeight();
-
 			// Relative mouse motion is restricted, so scale the movement
 			// and dampen small movements
 			if(abs(event.motion.xrel) < dampener) {
