@@ -89,7 +89,7 @@ int main(int argCount, char **argValues) {
 		}
 
 		// Temporary exit key for when mouse is under control
-		if (os->KeyReleased('P', true)) {
+		if (os->KeyReleased('Q', true)) {
 			break;
 		}
 
