@@ -1,8 +1,9 @@
 #pragma once
-#ifndef GLSIXDOFVIEWCONTROLLER_H
-#define GLSIXDOFVIEWCONTROLLER_H
+#ifndef GLFPSCONTROLLER_H
+#define GLFPSCONTROLLER_H
 
 #include "../systems/KeyboardInputSystem.h"
+#include "../systems/MouseInputSystem.h"
 #include "../components/ViewMover.h"
 #include "../systems/IGLView.h"
 
@@ -10,11 +11,11 @@ namespace Sigma {
 	namespace event {
 		namespace handler {
 			// A type of handler. This handler controls an OpenGL 6 DOF view.
-			class GLSixDOFViewController : public IKeyboardEventHandler {
+			class GLFPSController : public IKeyboardEventHandler, public IMouseHandler {
 			private:
-				GLSixDOFViewController() { }
+				GLFPSController() { }
 			public:
-				GLSixDOFViewController(IGLView* view, ViewMover* mover);
+				GLFPSController(IGLView* view, ViewMover* mover);
 
 				/**
 				 * \brief Triggered whenever a key state change event happens
@@ -25,6 +26,9 @@ namespace Sigma {
 				 * \return void
 				 */
 				void KeyStateChange(const unsigned int key, const KEY_STATE state);
+				virtual void MouseMove(float dx, float dy);
+				virtual void MouseDown(Sigma::event::BUTTON btn) {}
+				virtual void MouseUp(Sigma::event::BUTTON btn) {}
 			private:
 				ViewMover* mover; // The view mover component that applies the rotations and forces set in the trigger method.
                 static const float SPEED_TRANSLATE, SPEED_ROTATE, BOOST_MULTIPLIER;
@@ -34,4 +38,4 @@ namespace Sigma {
 	}
 }
 
-#endif // GLSIXDOFVIEWCONTROLLER_H
+#endif // GLFPSCONTROLLER_H

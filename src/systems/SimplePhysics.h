@@ -2,10 +2,12 @@
 
 #include "../IFactory.h"
 #include "../ISystem.h"
+#include "../components/ViewMover.h"
 
 #include <string>
 #include <vector>
 #include <map>
+#include "../AABBTree.h"
 
 class Property;
 class IMoverComponent;
@@ -14,7 +16,11 @@ class SimplePhysics
     : public Sigma::IFactory, public ISystem<IMoverComponent> {
 public:
 	SimplePhysics() { }
-	~SimplePhysics() { };
+	~SimplePhysics() {
+		for (auto treeitr = this->colliders.begin(); treeitr != this->colliders.end(); ++treeitr) {
+			delete treeitr->second;
+		}
+	};
 	/**
 	 * \brief Starts the Simple Physics system.
 	 *
@@ -32,7 +38,18 @@ public:
 	bool Update(const double delta);
 
     std::map<std::string,FactoryFunction> getFactoryFunctions();
+
 	void createPhysicsMover(const unsigned int entityID, std::vector<Property> &properties) ;
 	void createViewMover(const unsigned int entityID, std::vector<Property> &properties) ;
+	void createAABBTree(const unsigned int entityID, std::vector<Property> &properties) ;
+
+	Sigma::AABBTree* GetCollider(const unsigned int entityID) {
+		if (this->colliders.find(entityID) != this->colliders.end()) {
+			return this->colliders[entityID];
+		}
+		return nullptr;
+	}
+
 private:
+	std::map<unsigned int, Sigma::AABBTree*> colliders;
 };

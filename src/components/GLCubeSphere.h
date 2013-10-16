@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-namespace Sigma{
+namespace Sigma {
 
     class GLCubeSphere : public GLMesh {
     public:

@@ -4,7 +4,7 @@
 
 class win32 : public IOpSys {
 public:
-	win32() { }
+	win32() { Sigma::event::KEY_ESCAPE = VK_ESCAPE; }
 	~win32();
 
 	void* CreateGraphicsWindow(const unsigned int width = 800, const unsigned int height = 600);
@@ -41,7 +41,8 @@ private:
 	LONGLONG lastTime; // The time of the last call to GetDeltaTime.
 
 	int OpenGLVersion[2];
-	static int keyUp[256];
+	static int keyUp[256]; // Stores which keys were released since the last MessageLoop call.
+	static int mousePos[2]; // Stores the last mouse position.
 
 	bool fullscreen;
 	RECT windowedSize;

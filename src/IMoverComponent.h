@@ -1,6 +1,7 @@
 #pragma once
 
 #include <list>
+#include <iostream>
 
 #include "IComponent.h"
 
@@ -35,11 +36,25 @@ public:
 		this->forces.remove(force);
 	}
 
+	void AddRotationForce(glm::vec3 rotation) {
+		for (auto rotitr = this->rotationForces.begin(); rotitr != this->rotationForces.end(); ++rotitr) {
+			if ((*rotitr) == rotation) {
+				return;
+			}
+		}
+		this->rotationForces.push_back(rotation);
+	}
+
+	void RemoveRotationForce(glm::vec3 rotation) {
+		this->rotationForces.remove(rotation);
+	}
+
 	/**
 	 * \brief Removes all forces from the list.
 	 */
 	void ClearForces() {
 		this->forces.clear();
+		this->rotationForces.clear();
 	}
 	
 	/**
@@ -53,4 +68,5 @@ public:
 
 protected:
 	std::list<glm::vec3> forces; // The list of forces to apply each update loop.
+	std::list<glm::vec3> rotationForces;
 };
