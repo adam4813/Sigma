@@ -1,6 +1,7 @@
 #include "BulletPhysics.h"
 #include "..\components\BulletShapeMesh.h"
 #include "..\Components\GLMesh.h"
+#include "GLFPSView.h"
 
 namespace Sigma {
 	BulletPhysics::~BulletPhysics() {
@@ -25,9 +26,13 @@ namespace Sigma {
 		this->broadphase = new btDbvtBroadphase();
 		this->collisionConfiguration = new btDefaultCollisionConfiguration();
 		this->dispatcher = new btCollisionDispatcher(this->collisionConfiguration);
-		this->solver = new btSequentialImpulseConstraintSolver;
+		this->solver = new btSequentialImpulseConstraintSolver();
 		this->dynamicsWorld = new btDiscreteDynamicsWorld(this->dispatcher, this->broadphase, this->solver, this->collisionConfiguration);
 		this->dynamicsWorld->setGravity(btVector3(0,-10,0));
+
+		this->mover.InitializeRigidBody(0,1.5f,0,0,0,0);
+		this->dynamicsWorld->addRigidBody(this->mover.GetRigidBody());
+		
 		return true;
 	}
 	
@@ -47,30 +52,52 @@ namespace Sigma {
 		float x = 0.0f;
 		float y = 0.0f;
 		float z = 0.0f;
+		float rx = 0.0f;
+		float ry = 0.0f;
+		float rz = 0.0f;
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			Property*  p = &*propitr;
 
 			if (p->GetName() == "x") {
 				x = p->Get<float>();
-				continue;
-			} else if (p->GetName() == "y") {
+			}
+			else if (p->GetName() == "y") {
 				y = p->Get<float>();
-				continue;
-			} else if (p->GetName() == "z") {
+			}
+			else if (p->GetName() == "z") {
 				z = p->Get<float>();
-				continue;
-			} else if (p->GetName() == "meshFile") {
+			}
+			else if (p->GetName() == "rx") {
+				rx = p->Get<float>();
+			}
+			else if (p->GetName() == "ry") {
+				ry = p->Get<float>();
+			}
+			else if (p->GetName() == "rz") {
+				rz = p->Get<float>();
+			}
+			else if (p->GetName() == "meshFile") {
 				std::cerr << "Loading mesh: " << p->Get<std::string>() << std::endl;
 				GLMesh meshFile(0);
 				meshFile.LoadMesh(p->Get<std::string>());
 				mesh->SetMesh(&meshFile);
 			}
 		}
-		mesh->InitializeRigidBody(x, y, z);
+		mesh->InitializeRigidBody(x, y, z, rx, ry, rz);
 
 		this->dynamicsWorld->addRigidBody(mesh->GetRigidBody());
 
 		this->addComponent(entityID, mesh);
+	}
+
+	bool BulletPhysics::Update(const double delta) {
+		this->mover.ApplyForces(delta);
+
+		dynamicsWorld->stepSimulation(delta, 10);
+
+		this->mover.UpdateView();
+
+		return true;
 	}
 }

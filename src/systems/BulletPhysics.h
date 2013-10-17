@@ -5,16 +5,18 @@
 #include "bullet/btBulletDynamicsCommon.h"
 #include "../IMoverComponent.h"
 #include "../IBulletShape.h"
+#include "../components/BulletMover.h"
 
 class Property;
 class IMoverComponent;
+struct GLFPSView;
 
 namespace Sigma {
 	class BulletPhysics
 		: public Sigma::IFactory, public ISystem<IBulletShape> {
 	public:
-		BulletPhysics() { }
-		~BulletPhysics();;
+		BulletPhysics() : mover(1) { }
+		~BulletPhysics();
 		/**
 		 * \brief Starts the Simple Physics system.
 		 *
@@ -34,11 +36,15 @@ namespace Sigma {
 		void createBulletShapeMesh(const unsigned int entityID, std::vector<Property> &properties) ;
 
 		std::map<std::string,FactoryFunction> getFactoryFunctions();
+		BulletMover* getViewMover() {
+			return &this->mover;
+		}
 	private:
 		btBroadphaseInterface* broadphase;
 		btDefaultCollisionConfiguration* collisionConfiguration;
 		btCollisionDispatcher* dispatcher;
 		btSequentialImpulseConstraintSolver* solver;
 		btDiscreteDynamicsWorld* dynamicsWorld;
+		BulletMover mover;
 	};
 }
