@@ -4,13 +4,14 @@
 #include "../ISystem.h"
 #include "bullet/btBulletDynamicsCommon.h"
 #include "../IMoverComponent.h"
+#include "../IBulletShape.h"
 
 class Property;
 class IMoverComponent;
 
 namespace Sigma {
 	class BulletPhysics
-		: public Sigma::IFactory, public ISystem<IMoverComponent> {
+		: public Sigma::IFactory, public ISystem<IBulletShape> {
 	public:
 		BulletPhysics() { }
 		~BulletPhysics();;
@@ -29,6 +30,8 @@ namespace Sigma {
 		 * \return bool Returns true if we had an update interval passed.
 		 */
 		bool Update(const double delta);
+
+		void createBulletShapeMesh(const unsigned int entityID, std::vector<Property> &properties) ;
 
 		std::map<std::string,FactoryFunction> getFactoryFunctions();
 	private:
