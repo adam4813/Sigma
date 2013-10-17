@@ -1,11 +1,11 @@
 #include <iostream>
 
 #include "systems/OpenGLSystem.h"
-#include "systems/SimplePhysics.h"
+#include "systems/BulletPhysics.h"
 #include "systems/FactorySystem.h"
 #include "controllers/GLSixDOFViewController.h"
 #include "controllers/GLFPSController.h"
-#include "components/ViewMover.h"
+#include "components/BulletMover.h"
 #include "SCParser.h"
 
 #if defined OS_Win32
@@ -16,11 +16,11 @@
 
 int main(int argCount, char **argValues) {
 	Sigma::OpenGLSystem glsys;
-	SimplePhysics physys;
+	Sigma::BulletPhysics bphys;
 
 	Sigma::FactorySystem& factory = Sigma::FactorySystem::getInstance();
 	factory.register_Factory(glsys);
-	factory.register_Factory(physys);
+	factory.register_Factory(bphys);
 
 	IOpSys* os = nullptr;
 
@@ -39,7 +39,7 @@ int main(int argCount, char **argValues) {
 	}
 
 	// Start the openGL system
-	std::cout << "Initializeing opengl system." << std::endl;
+	std::cout << "Initializing OpenGL system." << std::endl;
 	const int* version = glsys.Start();
 	glsys.SetViewportSize(os->GetWindowWidth(), os->GetWindowHeight());
 
@@ -50,6 +50,8 @@ int main(int argCount, char **argValues) {
 	} else {
 		std::cout << "OpenGL version: " << version[0] << "." << version[1] << std::endl;
 	}
+
+	bphys.Start();
 
 	// Parse the scene file to retrieve entities
 	Sigma::parser::SCParser parser;
@@ -106,16 +108,7 @@ int main(int argCount, char **argValues) {
 
 	// Still hard coded to use entity ID #1
 	// Link the graphics view to the physics system's view mover
-	ViewMover* mover = static_cast<ViewMover*>(physys.getComponent(1,ViewMover::getStaticComponentID()));
-
-	// If no view mover was created,
-	// create a default
-	if(!mover) {
-		std::cout << "No view mover provided, creating default..." << std::endl;
-		std::vector<Property> props;
-		physys.createViewMover(1, props);
-		mover = static_cast<ViewMover*>(physys.getComponent(1,ViewMover::getStaticComponentID()));
-	}
+	Sigma::BulletMover* mover = bphys.getViewMover();
 
 	// Create the controller
 	Sigma::event::handler::GLFPSController cameraController(glsys.View(), mover);
@@ -165,7 +158,7 @@ int main(int argCount, char **argValues) {
 		}
 #endif
 		// Pass in delta time in seconds
-		physys.Update(deltaSec);
+		bphys.Update(deltaSec);
 
 		// Update the renderer and present
 		if (glsys.Update(delta)) {
