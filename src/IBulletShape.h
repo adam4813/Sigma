@@ -20,7 +20,7 @@ namespace Sigma{
 			}
 		}
 
-		void InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz) {
+		virtual void InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz) {
 			btTransform transform;
 			transform.setIdentity();
 			transform.setOrigin(btVector3(x, y, z));
