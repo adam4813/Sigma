@@ -1,6 +1,6 @@
 #include "BulletPhysics.h"
-#include "..\components\BulletShapeMesh.h"
-#include "..\Components\GLMesh.h"
+#include "../components/BulletShapeMesh.h"
+#include "../components/GLMesh.h"
 #include "GLFPSView.h"
 
 namespace Sigma {
@@ -32,10 +32,10 @@ namespace Sigma {
 
 		this->mover.InitializeRigidBody(0,1.5f,0,0,0,0);
 		this->dynamicsWorld->addRigidBody(this->mover.GetRigidBody());
-		
+
 		return true;
 	}
-	
+
 	std::map<std::string,Sigma::IFactory::FactoryFunction>
     BulletPhysics::getFactoryFunctions()
 	{

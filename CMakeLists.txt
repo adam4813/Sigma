@@ -76,6 +76,12 @@ if(NOT GLEW_FOUND)
   message(FATAL_ERROR "GLEW not found! Aborting!")
 endif(NOT GLEW_FOUND)
 
+find_package(Bullet REQUIRED)
+if(NOT (BULLET_DYNAMICS_FOUND AND BULLET_COLLISION_FOUND AND BULLET_LINEARMATH_FOUND))
+    message(FATAL_ERROR "Bullet Physics was not found. Aborting!")
+endif(NOT (BULLET_DYNAMICS_FOUND AND BULLET_COLLISION_FOUND AND BULLET_LINEARMATH_FOUND))
+include_directories("${CMAKE_SOURCE_DIR}/include/bullet")
+
 # Figure out what Operating System to compile against
 if(WIN32 AND NOT MINGW) # Windows
   set(IOPSYS "OS_Win32" CACHE STRING "Select the Op Sys you want to use")
@@ -85,7 +91,7 @@ endif(WIN32 AND NOT MINGW)
 if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
   # We need SDL to build for *nix
   find_package(SDL2 REQUIRED)
-  
+
   # Debug Options (to work out compiling issues for cross platform development)
   #XXX: Force SOIL use until Resource Management gets implemented, since SDL2 can do the same thing
   set(FORCE_SOIL true CACHE STRING "Set this to true if you want to force SOIL usage")
@@ -102,8 +108,11 @@ if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
     ${SDL2_LIBRARY}
     ${GLEW_LIBRARY} # FindGLEW.cmake set this variable
     SDL2main # Sadly not included in SDL2_LIBRARY variable
+    ${BULLET_LINEARMATH_LIBRARY}
+    ${BULLET_COLLISION_LIBRARY}
+    ${BULLET_DYNAMICS_LIBRARY}
   )
-  
+
   #Debug options
   if(${FORCE_SOIL})
     message("Forcing the use of SOIL...")
@@ -115,7 +124,7 @@ if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
     set(SIGMA_LIBS ${SIGMA_LIBS} ${SOIL_LIBRARY})
     link_libraries(${SOIL_LIBRARY})
   endif(${FORCE_SOIL})
-  
+
 
   set(IOPSYS "OS_SDL" CACHE STRING "Select the Op Sys you want to use")
 endif(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -136,7 +145,8 @@ add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT
 add_definitions(-D${IOPSYS})
 
 # Link the executable to the Hello library.
-target_link_libraries (Sigma ${Sigma_LIB} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})
+target_link_libraries (Sigma ${Sigma_LIB} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES}
+    ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${BULLET_LINEARMATH_LIBRARIES})
 
 # Now we add the SigmaTests project
 if(WIN32)
