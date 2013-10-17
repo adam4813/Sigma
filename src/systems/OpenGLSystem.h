@@ -90,7 +90,7 @@ namespace Sigma{
         void createGLMesh(const unsigned int entityID, std::vector<Property> &properties) ;
 		
 		// Views are not technically components, but perhaps they should be
-		void OpenGLSystem::createGLView(const unsigned int entityID, std::vector<Property> &properties, std::string mode) ;
+		void createGLView(const unsigned int entityID, std::vector<Property> &properties, std::string mode) ;
 
         IGLView* View() const { return this->view.get(); }
 
