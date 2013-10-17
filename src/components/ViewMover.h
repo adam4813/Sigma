@@ -17,7 +17,7 @@ public:
 	 * Physics movers apply forces on a transform object.
 	 * \param[in] const double delta Change in time since the last call.
 	 */
-	void ApplyForces(const double delta);
+	virtual void ApplyForces(const double delta);
 
 	/**
 	 * \brief Sets the view that this mover acts on.
@@ -28,7 +28,7 @@ public:
 	IGLView* View();
 
 	void AddNormalForce( glm::vec3 normal );
-private:
+protected:
 	IGLView* view;
 	std::list<glm::vec3> normalForces;
 };
