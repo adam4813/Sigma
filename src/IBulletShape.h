@@ -23,8 +23,8 @@ namespace Sigma{
 		virtual void InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz) {
 			btTransform transform;
 			transform.setIdentity();
+			transform.setRotation(btQuaternion(btVector3(0,1,0), btRadians(ry)));
 			transform.setOrigin(btVector3(x, y, z));
-			transform.setRotation(btQuaternion(rx, ry, rz, 1.0f));
 			this->motionState = new btDefaultMotionState(transform);
 			this->body = new btRigidBody(0, this->motionState, this->shape);
 			this->body->setContactProcessingThreshold(BT_LARGE_FLOAT);
