@@ -27,9 +27,8 @@ namespace Sigma {
 
 		glm::vec3 finalForce = (totalForce.z * -forward_direction) + (totalForce.y * GLTransform::UP_VECTOR) + (totalForce.x * -right_direction);
 
-		std::cerr << finalForce.x << "," << finalForce.y << "," << finalForce.z << "," << std::endl;
-
-		this->body->setLinearVelocity(btVector3(finalForce.x, this->body->getLinearVelocity().y(), finalForce.z));
+		body->setActivationState(DISABLE_DEACTIVATION);
+		this->body->setLinearVelocity(btVector3(finalForce.x, this->body->getLinearVelocity().y() + 0.000000001f, finalForce.z));
 
 		// There are no forces here
 		for (auto rotitr = this->rotationForces.begin(); rotitr != this->rotationForces.end(); ++rotitr) {
@@ -46,7 +45,7 @@ namespace Sigma {
 	}
 
 	void BulletMover::InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz) {
-		this->shape = new btSphereShape(0.5f);
+		this->shape = new btSphereShape(0.3f);
 		btScalar mass = 1;
 		btVector3 fallInertia(0,0,0);
 		this->motionState =	new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(x, y, z)));
