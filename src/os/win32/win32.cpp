@@ -194,30 +194,45 @@ const int* win32::StartOpengGL() {
 	}
 
 	HGLRC tempContext = wglCreateContext(this->hdc);
-	wglMakeCurrent(this->hdc, tempContext);
 
-	GLenum error = glewInit();
-	if (error != GLEW_OK) {
-		return OpenGLVersion;
+	if(!tempContext) {
+		assert(0 && "Failed to create temp context!");
+	}
+
+	if(!wglMakeCurrent(this->hdc, tempContext)) {
+		assert(0 && "Invalid temp context, cannot make current!");
 	}
 
 	int attribs[] =
 	{
 		WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
 		WGL_CONTEXT_MINOR_VERSION_ARB, 1,
-		WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
-		0
+		0,0,0
 	};
 
-	if (wglewIsSupported("WGL_ARB_create_context") == 1) {
-		this->hrc = wglCreateContextAttribsARB(this->hdc, 0, attribs);
-		wglMakeCurrent(NULL,NULL);
-		wglDeleteContext(tempContext);
-		wglMakeCurrent(this->hdc, this->hrc);
-	} else {
+	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
+
+	if (!wglCreateContextAttribsARB) {
 		assert(0 && "Unable to create GL 3.x context.");
 		//It's not possible to make a GL 3.x context. Use the old style context (GL 2.1 and before)
 		this->hrc = tempContext;
+	} else {
+		this->hrc = wglCreateContextAttribsARB(this->hdc, 0, attribs);
+	}
+
+	if(!this->hrc) {
+		assert(0 && "Failed to make context!");
+	}
+	
+	if(!wglMakeCurrent(this->hdc, this->hrc)) {
+		assert(0 && "Invalid context, cannot make current!");
+	} else {
+		wglDeleteContext(tempContext);
+	}
+
+	GLuint error = glewInit();
+	if (error != GLEW_OK) {
+		return OpenGLVersion;
 	}
 
 	//Checking GL version

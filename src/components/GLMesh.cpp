@@ -438,7 +438,7 @@ namespace Sigma{
 						filename = convert_path(filename);
 						std::cerr << "Loading ambient texture: " << path + filename << std::endl;
 						// Add the path to the filename to load it relative to the mtl file
-                        m.ambientMap = SOIL_load_OGL_texture((path + filename).c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+						m.ambientMap = SOIL_load_OGL_texture((path + filename).c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
 						if (m.ambientMap == 0) {
 							std::cerr << "Error loading ambient texture: " << path + filename << std::endl;
 						}
