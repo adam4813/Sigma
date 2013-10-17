@@ -10,7 +10,7 @@
 
 class SDLSys : public IOpSys {
 public:
-	SDLSys() { SDL_Init(SDL_INIT_EVERYTHING); this->Fullscreen = false; }
+	SDLSys() { SDL_Init(SDL_INIT_EVERYTHING); this->Fullscreen = false; Sigma::event::KEY_ESCAPE = SDLK_ESCAPE; }
 	virtual ~SDLSys() { SDL_GL_DeleteContext(this->_Context); SDL_DestroyWindow(this->_Window); SDL_Quit(); }
 
 	virtual void* CreateGraphicsWindow(const unsigned int width = 800, const unsigned int height = 600);

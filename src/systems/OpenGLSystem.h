@@ -95,6 +95,7 @@ namespace Sigma{
         IGLView* View() const { return this->view.get(); }
 
 		GLTransform* GetTransformFor(const unsigned int entityID);
+		std::string GetViewMode() { return this->viewMode; }
     private:
         unsigned int windowWidth; // Store the width of our window
         unsigned int windowHeight; // Store the height of our window
@@ -105,6 +106,7 @@ namespace Sigma{
         std::unique_ptr<IGLView> view;
         double deltaAccumulator; // milliseconds since last render
         double framerate; // default is 60fps
+		std::string viewMode;
     }; // class OpenGLSystem
 } // namespace Sigma
 #endif // OPENGLSYSTEM_H

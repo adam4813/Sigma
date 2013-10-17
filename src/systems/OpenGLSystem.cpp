@@ -8,14 +8,8 @@
 #include "../components/GLMesh.h"
 
 namespace Sigma{
-    OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumulator(0.0), framerate(60.0f) {
-        //this->view = std::unique_ptr<IGLView>(new GLSixDOFView());
-		this->view = 0;
-    }
-
-	//OpenGLSystem::~OpenGLSystem() {
-		//delete this->view;
-	//}
+    OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumulator(0.0),
+		framerate(60.0f), view(nullptr), viewMode("") {}
 
 	std::map<std::string, Sigma::IFactory::FactoryFunction>
         OpenGLSystem::getFactoryFunctions() {
@@ -33,7 +27,8 @@ namespace Sigma{
     }
 
 	void OpenGLSystem::createGLView(const unsigned int entityID, std::vector<Property> &properties, std::string mode) {
-		
+		viewMode = mode;
+
 		if(mode=="GLFPSView") {
 			this->view = std::unique_ptr<IGLView>(new GLFPSView());
 		} else if(mode=="GLSixDOFView") {
@@ -181,15 +176,18 @@ namespace Sigma{
 					componentID = p->Get<int>();
 				} else if (p->GetName() == "cullface") {
 					cull_face = p->Get<std::string>();
-				} else if (p->GetName() == "rotation_speed") {
-					rotation_speed = p->Get<float>();
 				} else if (p->GetName() == "fix_to_camera") {
 					fix_to_camera = p->Get<bool>();
 				}
 			}
+
+			sphere->SetSubdivisions(subdivision_levels);
+			sphere->SetFixToCamera(fix_to_camera);
+			sphere->SetCullFace(cull_face);
 			sphere->Transform()->Scale(scale,scale,scale);
 			sphere->Transform()->Translate(x,y,z);
 			sphere->LoadShader(shader_name);
+			sphere->LoadTexture(texture_name);
 			sphere->InitializeBuffers();
 			this->addComponent(entityID,sphere);
 	}

@@ -53,8 +53,8 @@ bool SDLSys::MessageLoop() {
 	float dampener = 2.0f;
 	bool mouse_moved = false; // if no mouse motion, we will explicitly clear it
 
-	width = GetWindowWidth();
-	height = GetWindowHeight();
+	width = (float)GetWindowWidth();
+	height = (float)GetWindowHeight();
 
 	this->_KeyReleased.clear();
 
