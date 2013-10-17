@@ -111,9 +111,16 @@ int main(int argCount, char **argValues) {
 	Sigma::BulletMover* mover = bphys.getViewMover();
 
 	// Create the controller
-	Sigma::event::handler::GLFPSController cameraController(glsys.View(), mover);
-	IOpSys::KeyboardEventSystem.Register(&cameraController);
-	IOpSys::MouseEventSystem.Register(&cameraController);
+	// Perhaps a little awkward currently, should create a generic 
+	// controller class ancestor
+	if(glsys.GetViewMode() == "GLFPSView") {
+		Sigma::event::handler::GLFPSController cameraController(glsys.View(), mover);
+		IOpSys::KeyboardEventSystem.Register(&cameraController);
+		IOpSys::MouseEventSystem.Register(&cameraController);
+	} else if (glsys.GetViewMode() == "GLSixDOFView") {
+		Sigma::event::handler::GLSixDOFViewController cameraController(glsys.View(), mover);
+		IOpSys::KeyboardEventSystem.Register(&cameraController);
+	}
 
 	// Setup the timer
 	os->SetupTimer();
@@ -149,14 +156,6 @@ int main(int argCount, char **argValues) {
 			break;
 		}
 
-
-#ifdef OS_SDL
-        // toggle relative-mouse mode (whether mouse is grabbed by SDL or not)
-		if (os->KeyReleased('L', true)){
-            int state = SDL_GetRelativeMouseMode();
-            SDL_SetRelativeMouseMode(state == SDL_TRUE ? SDL_FALSE : SDL_TRUE);
-		}
-#endif
 		// Pass in delta time in seconds
 		bphys.Update(deltaSec);
 

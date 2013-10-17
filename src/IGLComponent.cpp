@@ -4,7 +4,6 @@ namespace Sigma{
 	// static member initialization
     IGLComponent::ShaderMap IGLComponent::loadedShaders;
 
-
     void IGLComponent::LoadShader(const std::string& filename) {
         // look up shader that is already loaded
         ShaderMap::iterator existingShader = IGLComponent::loadedShaders.find(filename.c_str());

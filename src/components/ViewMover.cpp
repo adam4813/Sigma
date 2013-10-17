@@ -28,8 +28,6 @@ void ViewMover::ApplyForces(const double delta) {
 	for (auto rotitr = this->rotationForces.begin(); rotitr != this->rotationForces.end(); ++rotitr) {
 		this->view->Transform.Rotate((*rotitr) * deltavec);
 	}
-
-	this->rotationForces.clear();
 }
 
 void ViewMover::View(IGLView* view) {

@@ -108,6 +108,7 @@ namespace Sigma {
 			}
         }
         {
+			std::cout << "Loading cube normal map: " << texture_name << "_nm" << std::endl;
 			// First try dds file
 			sprintf(filename, "%s_nm.dds", texture_name.c_str());
 
@@ -203,6 +204,8 @@ namespace Sigma {
             glm::vec3 d(view_matrix[3]);
             glm::vec3 position = -d * rotMat;
             this->Transform()->TranslateTo(position);
+
+			glDepthFunc(GL_LEQUAL);
         }
 
         // bind cubemap textures
@@ -223,6 +226,7 @@ namespace Sigma {
         }
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-        glActiveTexture(GL_TEXTURE0);
+
+		glDepthFunc(GL_LESS);
     } // function Render
 } // namespace Sigma
