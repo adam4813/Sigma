@@ -132,7 +132,7 @@ bool SDLSys::SetupTimer() {
 
 void SDLSys::ToggleFullscreen() {
 	if(!this->Fullscreen) {
-		SDL_SetWindowFullscreen(this->_Window,SDL_WINDOW_FULLSCREEN);
+		SDL_SetWindowFullscreen(this->_Window,SDL_WINDOW_FULLSCREEN_DESKTOP);
 	}
 	else {
 		SDL_SetWindowFullscreen(this->_Window,0);
