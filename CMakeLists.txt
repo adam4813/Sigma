@@ -80,12 +80,14 @@ find_package(Bullet REQUIRED)
 if(NOT (BULLET_DYNAMICS_FOUND AND BULLET_COLLISION_FOUND AND BULLET_LINEARMATH_FOUND))
     message(FATAL_ERROR "Bullet Physics was not found. Aborting!")
 endif(NOT (BULLET_DYNAMICS_FOUND AND BULLET_COLLISION_FOUND AND BULLET_LINEARMATH_FOUND))
-include_directories("${CMAKE_SOURCE_DIR}/include/bullet")
 
 # Figure out what Operating System to compile against
 if(WIN32 AND NOT MINGW) # Windows
   set(IOPSYS "OS_Win32" CACHE STRING "Select the Op Sys you want to use")
   set(GLEW_LIBRARIES glew32s)
+  set(BULLET_LINEARMATH_LIBRARIES LinearMath)
+  set(BULLET_COLLISION_LIBRARIES BulletCollision)
+  set(BULLET_DYNAMICS_LIBRARIES BulletDynamics)
 endif(WIN32 AND NOT MINGW)
 
 if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
@@ -145,8 +147,7 @@ add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT
 add_definitions(-D${IOPSYS})
 
 # Link the executable to the Hello library.
-target_link_libraries (Sigma ${Sigma_LIB} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES}
-    ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${BULLET_LINEARMATH_LIBRARIES})
+target_link_libraries (Sigma ${Sigma_LIB} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${BULLET_LINEARMATH_LIBRARIES})
 
 # Now we add the SigmaTests project
 if(WIN32)
