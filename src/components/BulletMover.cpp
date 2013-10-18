@@ -45,7 +45,7 @@ namespace Sigma {
 	}
 
 	void BulletMover::InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz) {
-		this->shape = new btSphereShape(0.3f);
+		this->shape = new btCapsuleShape(0.3f, 1.3f);
 		btScalar mass = 1;
 		btVector3 fallInertia(0,0,0);
 		this->motionState =	new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(x, y, z)));
