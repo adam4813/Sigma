@@ -44,12 +44,13 @@ bool SDLSys::MessageLoop() {
 
 	SDL_Event event;
 
-	// Keyboard varables
+	// Keyboard variables
 	SDL_Keycode key;
 
 	// Mouse variables
+	int mouse_relx, mouse_rely;
 	float width, height, dx=0.0f, dy=0.0f;
-	float mouse_sensitivity = 100.0f;
+	float mouse_sensitivity = 250.0f;
 	float dampener = 2.0f;
 	bool mouse_moved = false; // if no mouse motion, we will explicitly clear it
 
@@ -83,6 +84,7 @@ bool SDLSys::MessageLoop() {
 			break;
 		case SDL_MOUSEMOTION:
 		    mouse_moved = true;
+			SDL_GetRelativeMouseState(&mouse_relx, &mouse_rely);
             /*printf("Mouse moved by %d,%d to (%d,%d)\n",
                     event.motion.xrel, event.motion.yrel,
                     event.motion.x, event.motion.y);*/
@@ -90,16 +92,16 @@ bool SDLSys::MessageLoop() {
 			// Motion is in pixels, so normalize to -1.0 to 1.0 range
 			// Relative mouse motion is restricted, so scale the movement
 			// and dampen small movements
-			if(abs(event.motion.xrel) < dampener) {
+			if(abs(mouse_relx) < dampener) {
 				dx = 0.0f;
 			} else {
-				dx = mouse_sensitivity * (event.motion.xrel) / width;
+				dx = mouse_sensitivity * (mouse_relx) / width;
 			}
 
-			if(abs(event.motion.yrel) < dampener) {
+			if(abs(mouse_rely) < dampener) {
 				dy = 0.0f;
 			} else {
-				dy = mouse_sensitivity * (event.motion.yrel) / height;
+				dy = mouse_sensitivity * (mouse_rely) / height;
 			}
 
 			MouseEventSystem.MouseMove(dx, dy);
@@ -117,10 +119,14 @@ bool SDLSys::MessageLoop() {
 	if(!mouse_moved){
         MouseEventSystem.MouseMove(0.f, 0.f);
 	}
-	// if mouse is hidden/grabbed, recenter it so it doesn't appear offscreen
-    if(SDL_GetRelativeMouseMode() == SDL_TRUE){
-        SDL_WarpMouseInWindow(this->_Window, this->GetWindowWidth()/2, this->GetWindowHeight()/2);
-    }
+
+	// Check if mouse look lock is enabled.
+	if(SDL_GetRelativeMouseMode() == SDL_TRUE){
+		// We must wrap the warp inside an ignoe/enable block to avoid sending a "reverse" motion event.
+		SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);
+		SDL_WarpMouseInWindow(this->_Window, width/2, height/2);
+		SDL_EventState(SDL_MOUSEMOTION, SDL_ENABLE);
+	}
 
 	return true;
 }
