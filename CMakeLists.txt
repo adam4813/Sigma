@@ -80,6 +80,7 @@ find_package(Bullet REQUIRED)
 if(NOT (BULLET_DYNAMICS_FOUND AND BULLET_COLLISION_FOUND AND BULLET_LINEARMATH_FOUND))
     message(FATAL_ERROR "Bullet Physics was not found. Aborting!")
 endif(NOT (BULLET_DYNAMICS_FOUND AND BULLET_COLLISION_FOUND AND BULLET_LINEARMATH_FOUND))
+include_directories("${CMAKE_SOURCE_DIR}/include/bullet")
 
 # Figure out what Operating System to compile against
 if(WIN32 AND NOT MINGW) # Windows

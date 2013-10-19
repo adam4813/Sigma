@@ -8,19 +8,32 @@
 #include "../../IOpSys.h"
 #include "SDL/SDL.h"
 
+#ifdef __linux__
+// used for putenv below
+#include <cstdlib>
+#endif // __linux__
+
 class SDLSys : public IOpSys {
 public:
-	SDLSys() { SDL_Init(SDL_INIT_EVERYTHING); this->Fullscreen = false; Sigma::event::KEY_ESCAPE = SDLK_ESCAPE; }
+	SDLSys() {
+#ifdef __linux__
+        // this magical environment variable makes fullscreen work on linux
+        putenv("SDL_VIDEO_X11_LEGACY_FULLSCREEN=0");
+#endif // __linux__
+	    SDL_Init(SDL_INIT_EVERYTHING);
+	    this->Fullscreen = false;
+	    Sigma::event::KEY_ESCAPE = SDLK_ESCAPE;
+    }
 	virtual ~SDLSys() { SDL_GL_DeleteContext(this->_Context); SDL_DestroyWindow(this->_Window); SDL_Quit(); }
 
 	virtual void* CreateGraphicsWindow(const unsigned int width = 800, const unsigned int height = 600);
 	virtual void ToggleFullscreen();
 
 	virtual bool MessageLoop();
-	
+
 	virtual bool SetupTimer();
 	virtual double GetDeltaTime();
-	
+
 	virtual bool KeyDown(int key, bool focused = false);
 	virtual bool KeyUp( int key, bool focused = false );
 
