@@ -304,3 +304,7 @@ unsigned int win32::GetWindowHeight() {
 		return this->windowedSize.bottom - this->windowedSize.top;
 	}
 }
+
+void IOpSys::Quit() {
+	PostQuitMessage(0);
+}

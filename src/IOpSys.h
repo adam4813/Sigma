@@ -102,6 +102,13 @@ public:
 	 */
 	static double GetCurrentDelta() { return curDelta; }
 
+	/**
+	 * \brief Notifies the IOpSys to quit during the next call to MessageLoop().
+	 *
+	 * \return    void
+	 */
+	static void Quit();
+
 	static Sigma::event::KeyboardInputSystem KeyboardEventSystem; // Handles keyboard events
 	static Sigma::event::MouseInputSystem MouseEventSystem; // Handles mouse events
 protected:

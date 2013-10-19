@@ -200,3 +200,9 @@ bool SDLSys::KeyReleased(int key, bool focused /*= false */) {
 void SDLSys::Present() {
 	SDL_GL_SwapWindow(this->_Window);
 }
+
+void IOpSys::Quit() {
+	static SDL_Event Q;
+	Q.type = SDL_QUIT;
+	SDL_PushEvent(&Q);
+}
