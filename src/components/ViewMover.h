@@ -28,6 +28,8 @@ public:
 	IGLView* View();
 
 	void AddNormalForce( glm::vec3 normal );
+	void RotateNow(float,float,float);
+
 protected:
 	IGLView* view;
 	std::list<glm::vec3> normalForces;

@@ -30,6 +30,11 @@ void ViewMover::ApplyForces(const double delta) {
 	}
 }
 
+// immediate mode rotation (for mouse motion)
+void ViewMover::RotateNow(float x, float y, float z) {
+	this->view->Transform.Rotate(x,y,z);
+}
+
 void ViewMover::View(IGLView* view) {
 	this->view = view;
 }

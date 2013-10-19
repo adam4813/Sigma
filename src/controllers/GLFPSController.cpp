@@ -46,17 +46,19 @@ namespace handler{
     } // function KeyStateChange
 
 	void GLFPSController::MouseMove(float dx, float dy) {
-		float pitch=0.0f, yaw=0.0f;
+		//float pitch=0.0f, yaw=0.0f;
 
 		// Motion from center to far left/right of screen should
 		// result in 90 degree turn
-		yaw = dx*90.0f;
-		pitch = dy*45.0f;
+		//yaw = dx*90.0f;
+		//pitch = dy*45.0f;
 
+		// immediate update rotation (SDL mode too laggy otherwise)
+		this->mover->RotateNow(dy,dx,0.0f);
 		// remove previous force and add new one
-        this->mover->RemoveRotationForce(this->_rotate);
-        this->_rotate = glm::vec3(pitch, yaw, 0.0f);
-        this->mover->AddRotationForce(this->_rotate);
+        //this->mover->RemoveRotationForce(this->_rotate);
+        //this->_rotate = glm::vec3(pitch, yaw, 0.0f);
+        //this->mover->AddRotationForce(this->_rotate);
 	}
 }
 }

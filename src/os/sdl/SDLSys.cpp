@@ -33,8 +33,13 @@ void* SDLSys::CreateGraphicsWindow(const unsigned int width, const unsigned int 
 	glDepthFunc(GL_LESS);
 
 	// Set the relative mouse state (hide mouse)
-	if(SDL_SetRelativeMouseMode(SDL_TRUE) < 0){
+	/*
+	if(SDL_SetRelativeMouseMode(SDL_FALSE) < 0){
         std::cerr << "ERROR: SDL could not grab mouse\n" << SDL_GetError() << std::endl;
+	} */
+	// relative mode was breaking things, just hide mouse.
+	if(SDL_ShowCursor(SDL_DISABLE) < 0) {
+        std::cerr << "ERROR: SDL could not hide mouse\n" << SDL_GetError() << std::endl;
 	}
 
 	return &this->_Context;
@@ -49,6 +54,7 @@ bool SDLSys::MessageLoop() {
 
 	// Mouse variables
 	float width, height, dx=0.0f, dy=0.0f;
+	int movx, movy; // test
 	float mouse_sensitivity = 100.0f;
 	float dampener = 2.0f;
 	bool mouse_moved = false; // if no mouse motion, we will explicitly clear it
@@ -61,6 +67,7 @@ bool SDLSys::MessageLoop() {
 	while(SDL_PollEvent(&event)) {
 		switch(event.type) {
 		case SDL_QUIT:
+			SDL_ShowCursor(SDL_ENABLE); // show mouse, since we are exiting
 			return false;
 		case SDL_KEYDOWN:
             // hack to do case insensitive lookup
@@ -85,24 +92,30 @@ bool SDLSys::MessageLoop() {
 		    mouse_moved = true;
             /*printf("Mouse moved by %d,%d to (%d,%d)\n",
                     event.motion.xrel, event.motion.yrel,
-                    event.motion.x, event.motion.y);*/
-
+                    event.motion.x, event.motion.y);// */
+			if(!(event.montion.xrel || event.motion.yrel)) {
+				return true; // Exit if no motion to avoid spamming mouse events
+			}
 			// Motion is in pixels, so normalize to -1.0 to 1.0 range
 			// Relative mouse motion is restricted, so scale the movement
 			// and dampen small movements
 			if(abs(event.motion.xrel) < dampener) {
 				dx = 0.0f;
 			} else {
-				dx = mouse_sensitivity * (event.motion.xrel) / width;
+				dx = mouse_sensitivity * (event.motion.xrel / width);
 			}
 
 			if(abs(event.motion.yrel) < dampener) {
 				dy = 0.0f;
 			} else {
-				dy = mouse_sensitivity * (event.motion.yrel) / height;
+				dy = mouse_sensitivity * (event.motion.yrel / height);
 			}
 
-			MouseEventSystem.MouseMove(dx, dy);
+			// Dispatch the event
+			MouseEventSystem.MouseMove(dx,dy);
+
+			// if mouse is hidden/grabbed and moved, recenter it so it doesn't appear offscreen
+		        SDL_WarpMouseInWindow(this->_Window, (width / 2.0f), (height / 2.0f));
             break;
         case SDL_MOUSEBUTTONDOWN:
             printf("Mouse button %d pressed at (%d,%d)\n",
@@ -114,13 +127,11 @@ bool SDLSys::MessageLoop() {
 	}
 
 	// explicitly clear mouse motion if no signal was received
+	// removed to allow immediate mode
+	/*
 	if(!mouse_moved){
         MouseEventSystem.MouseMove(0.f, 0.f);
-	}
-	// if mouse is hidden/grabbed, recenter it so it doesn't appear offscreen
-    if(SDL_GetRelativeMouseMode() == SDL_TRUE){
-        SDL_WarpMouseInWindow(this->_Window, this->GetWindowWidth()/2, this->GetWindowHeight()/2);
-    }
+	}*/
 
 	return true;
 }
