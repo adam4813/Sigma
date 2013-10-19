@@ -1,8 +1,9 @@
 #include "BulletPhysics.h"
 #include "../components/BulletShapeMesh.h"
+#include "../components/BulletShapeSphere.h"
 #include "../components/GLMesh.h"
 #include "GLFPSView.h"
-#include "../components/BulletShapeSphere.h"
+#include "../IOpSys.h"
 
 namespace Sigma {
 	BulletPhysics::~BulletPhysics() {
@@ -143,6 +144,44 @@ namespace Sigma {
 		dynamicsWorld->stepSimulation(delta, 10);
 
 		this->mover.UpdateView();
+
+		// Set the graivty to the planet's normal
+		btTransform sphereTransform;
+		getComponent(7,"BulletShapeSphere")->GetRigidBody()->getMotionState()->getWorldTransform(sphereTransform);
+		btVector3 sphereCenter = sphereTransform.getOrigin();
+
+		btTransform viewTransform;
+		this->mover.GetRigidBody()->getMotionState()->getWorldTransform(viewTransform);
+		btVector3 viewCenter = viewTransform.getOrigin();
+
+		viewCenter += sphereCenter;
+
+		viewCenter = viewCenter.normalize();
+
+		this->dynamicsWorld->setGravity(viewCenter * 10.0f);
+
+		// Check if we are in contact with the airlock
+		btCollisionObject* airlock = getComponent(30,"BulletShapeMesh")->GetRigidBody();
+
+		int numManifolds = this->dynamicsWorld->getDispatcher()->getNumManifolds();
+		for (int i=0;i<numManifolds;i++)
+		{
+			btPersistentManifold* contactManifold =  this->dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
+			btCollisionObject* obA = const_cast<btCollisionObject*>(contactManifold->getBody0());
+			btCollisionObject* obB = const_cast<btCollisionObject*>(contactManifold->getBody1());
+
+			if (((obA == airlock) || (obB == airlock)) && ((obA == this->mover.GetRigidBody()) || (obB == this->mover.GetRigidBody()))) {
+				int numContacts = contactManifold->getNumContacts();
+				for (int j=0;j<numContacts;j++)
+				{
+					btManifoldPoint& pt = contactManifold->getContactPoint(j);
+					if (pt.getDistance()<0.f)
+					{
+						IOpSys::Quit();
+					}
+				}
+			}
+		}
 
 		return true;
 	}
