@@ -33,7 +33,8 @@ namespace Sigma {
 		 */
 		bool Update(const double delta);
 
-		void createBulletShapeMesh(const unsigned int entityID, std::vector<Property> &properties) ;
+		void createBulletShapeMesh(const unsigned int entityID, std::vector<Property> &properties);
+		void createBulletShapeSphere(const unsigned int entityID, std::vector<Property> &properties);
 
 		std::map<std::string,FactoryFunction> getFactoryFunctions();
 		BulletMover* getViewMover() {

@@ -2,6 +2,7 @@
 #include "../components/BulletShapeMesh.h"
 #include "../components/GLMesh.h"
 #include "GLFPSView.h"
+#include "../components/BulletShapeSphere.h"
 
 namespace Sigma {
 	BulletPhysics::~BulletPhysics() {
@@ -42,6 +43,7 @@ namespace Sigma {
 		using namespace std::placeholders;
 		std::map<std::string,Sigma::IFactory::FactoryFunction> retval;
 		retval["BulletShapeMesh"] = std::bind(&BulletPhysics::createBulletShapeMesh,this,_1,_2);
+		retval["BulletShapeSphere"] = std::bind(&BulletPhysics::createBulletShapeSphere,this,_1,_2);
 		return retval;
 	}
 
@@ -89,6 +91,50 @@ namespace Sigma {
 		this->dynamicsWorld->addRigidBody(mesh->GetRigidBody());
 
 		this->addComponent(entityID, mesh);
+	}
+
+	void BulletPhysics::createBulletShapeSphere(const unsigned int entityID, std::vector<Property> &properties) {
+		BulletShapeSphere* sphere = new BulletShapeSphere(entityID);
+
+		float scale = 1.0f;
+		float x = 0.0f;
+		float y = 0.0f;
+		float z = 0.0f;
+		float rx = 0.0f;
+		float ry = 0.0f;
+		float rz = 0.0f;
+
+		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
+			Property*  p = &*propitr;
+
+			if (p->GetName() == "x") {
+				x = p->Get<float>();
+			}
+			else if (p->GetName() == "y") {
+				y = p->Get<float>();
+			}
+			else if (p->GetName() == "z") {
+				z = p->Get<float>();
+			}
+			else if (p->GetName() == "rx") {
+				rx = p->Get<float>();
+			}
+			else if (p->GetName() == "ry") {
+				ry = p->Get<float>();
+			}
+			else if (p->GetName() == "rz") {
+				rz = p->Get<float>();
+			}
+			else if (p->GetName() == "radius") {
+				sphere->SetRadius(p->Get<float>());
+			}
+		}
+
+		sphere->InitializeRigidBody(x, y, z, rx, ry, rz);
+
+		this->dynamicsWorld->addRigidBody(sphere->GetRigidBody());
+
+		this->addComponent(entityID, sphere);
 	}
 
 	bool BulletPhysics::Update(const double delta) {
