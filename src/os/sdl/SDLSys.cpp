@@ -95,6 +95,14 @@ bool SDLSys::MessageLoop() {
             if(!(event.motion.xrel || event.motion.yrel)) {
                 return true; // Exit if no motion to avoid spamming mouse events
             }
+            if(event.motion.xrel == -lastmouserx) {
+                event.motion.xrel = 0;
+            }
+            if(event.motion.yrel == -lastmousery) {
+                event.motion.yrel = 0;
+            }
+            lastmouserx = event.motion.xrel;
+            lastmousery = event.motion.yrel;
             // Motion is in pixels, so normalize to -1.0 to 1.0 range
             // Relative mouse motion is restricted, so scale the movement
             // and dampen small movements
@@ -114,7 +122,9 @@ bool SDLSys::MessageLoop() {
             MouseEventSystem.MouseMove(dx, dy);
 
             // if mouse is hidden/grabbed and moved, recenter it so it doesn't appear offscreen
-                SDL_WarpMouseInWindow(this->_Window, (width / 2.0f), (height / 2.0f));
+            SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);
+            SDL_WarpMouseInWindow(this->_Window, (width / 2.0f), (height / 2.0f));
+            SDL_EventState(SDL_MOUSEMOTION, SDL_ENABLE);
             break;
         case SDL_MOUSEBUTTONDOWN:
             printf("Mouse button %d pressed at (%d,%d)\n",

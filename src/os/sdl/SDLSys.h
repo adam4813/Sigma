@@ -51,6 +51,8 @@ private:
 	std::map<char, bool> _KeyStates;
 	std::map<char, bool> _KeyReleased;
 
+	int lastmouserx;
+	int lastmousery;
 	double _Frequency;
 	long long _LastTime;
 
