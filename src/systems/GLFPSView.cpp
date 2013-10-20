@@ -5,7 +5,7 @@ GLFPSView::GLFPSView() {}
 const glm::mat4 GLFPSView::GetViewMatrix() {
 	return glm::lookAt(this->Transform.GetPosition(),
 		  			   this->Transform.GetPosition() + -this->Transform.GetForward(),
-					   GLTransform::UP_VECTOR);
+					   this->Transform.GetUp());
 }
 
 void GLFPSView::Move(float right, float up, float forward) {
