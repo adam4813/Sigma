@@ -29,8 +29,10 @@ public:
 
 	void AddNormalForce( glm::vec3 normal );
 	void RotateNow(float,float,float);
+	void RotateTarget(float,float,float);
 
 protected:
 	IGLView* view;
 	std::list<glm::vec3> normalForces;
+	glm::vec3 _rotationtarget;
 };

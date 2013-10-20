@@ -15,6 +15,7 @@ namespace Sigma {
 	void BulletMover::ApplyForces(const double delta) {
 		glm::vec3 deltavec(delta);
 		glm::vec3 totalForce;
+		glm::vec3 targetrvel;
 
 		for (auto forceitr = this->forces.begin(); forceitr != this->forces.end(); ++forceitr) {
 			totalForce += *forceitr;
@@ -35,6 +36,12 @@ namespace Sigma {
 			this->view->Transform.Rotate((*rotitr) * deltavec);
 		}
 
+		// Inertial rotation
+		targetrvel = _rotationtarget * deltavec;
+		if(fabs(targetrvel.x) > 0.001f || fabs(targetrvel.y) > 0.001f || fabs(targetrvel.z) > 0.001f) {
+			this->view->Transform.Rotate(targetrvel);
+			_rotationtarget -= targetrvel;
+		}
 		this->rotationForces.clear();
 	}
 
