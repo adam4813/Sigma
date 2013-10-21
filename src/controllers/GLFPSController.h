@@ -39,3 +39,4 @@ namespace Sigma {
 }
 
 #endif // GLFPSCONTROLLER_H
+
