@@ -71,6 +71,12 @@ void* win32::CreateGraphicsWindow(const unsigned int width, const unsigned int h
 	ShowWindow(this->hwnd, SW_SHOW);
 	UpdateWindow(this->hwnd);
 
+
+	POINT midwindow = {512,384};
+	ClientToScreen(this->hwnd, &midwindow);
+	SetCursorPos(midwindow.x, midwindow.y);
+	ShowCursor(false);
+
 	StartOpengGL();
 
 	return this->hdc;

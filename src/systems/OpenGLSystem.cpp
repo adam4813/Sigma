@@ -151,21 +151,26 @@ namespace Sigma{
 			float x = 0.0f;
 			float y = 0.0f;
 			float z = 0.0f;
+			float rx = 0.0f;
+			float ry = 0.0f;
+			float rz = 0.0f;
 			int componentID = 0;
 			for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 				Property*  p = &(*propitr);
 				if (p->GetName() == "scale") {
 					scale = p->Get<float>();
-					continue;
 				} else if (p->GetName() == "x") {
 					x = p->Get<float>();
-					continue;
 				} else if (p->GetName() == "y") {
 					y = p->Get<float>();
-					continue;
 				} else if (p->GetName() == "z") {
 					z = p->Get<float>();
-					continue;
+				} else if (p->GetName() == "rx") {
+					rx = p->Get<float>();
+				} else if (p->GetName() == "ry") {
+					ry = p->Get<float>();
+				} else if (p->GetName() == "rz") {
+					rz = p->Get<float>();
 				} else if (p->GetName() == "subdivision_levels") {
 					subdivision_levels = p->Get<int>();
 				} else if (p->GetName() == "texture") {
@@ -185,6 +190,7 @@ namespace Sigma{
 			sphere->SetFixToCamera(fix_to_camera);
 			sphere->SetCullFace(cull_face);
 			sphere->Transform()->Scale(scale,scale,scale);
+			sphere->Transform()->Rotate(rx,ry,rz);
 			sphere->Transform()->Translate(x,y,z);
 			sphere->LoadShader(shader_name);
 			sphere->LoadTexture(texture_name);

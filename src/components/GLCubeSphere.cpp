@@ -71,8 +71,8 @@ namespace Sigma {
         // shader program was compiled and linked in GLMesh::InitializeBuffers.
         //  Now we can set relevant custom uniform values
         (*shader).Use();
-        glUniform1i(glGetUniformLocation((*shader).GetProgram(), "cubeMap"), GL_TEXTURE0);
-        glUniform1i(glGetUniformLocation((*shader).GetProgram(), "cubeNormalMap"), GL_TEXTURE1);
+        glUniform1i(glGetUniformLocation((*shader).GetProgram(), "cubeMap"), 0);
+        glUniform1i(glGetUniformLocation((*shader).GetProgram(), "cubeNormalMap"), 1);
         (*shader).UnUse();
     } // function InitializeBuffers
 
