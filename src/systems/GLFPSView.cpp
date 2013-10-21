@@ -8,6 +8,24 @@ const glm::mat4 GLFPSView::GetViewMatrix() {
 					   GLTransform::UP_VECTOR);
 }
 
+// Currently not working
+glm::vec3 GLFPSView::Restrict(glm::vec3 rotation) {
+	glm::vec3 rot = rotation;
+
+	float current_pitch = this->Transform.GetPitch();
+	float new_pitch = current_pitch + rotation.x;
+
+	if(new_pitch > 85.0f) {
+		std::cout << "Limiting pitch." << std::endl;
+		rot.x = 85.0f - current_pitch;
+	} else if(new_pitch < -85.0f) {
+		std::cout << "Limiting pitch." << std::endl;
+		rot.x = -85.0f - current_pitch;
+	}
+
+	return rot;
+}
+
 void GLFPSView::Move(float right, float up, float forward) {
 
 	// Figure out the movement directions along the xz plane, to allow for proper movement

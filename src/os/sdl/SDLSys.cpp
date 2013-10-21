@@ -114,9 +114,9 @@ bool SDLSys::MessageLoop() {
 	}
 
 	// explicitly clear mouse motion if no signal was received
-	if(!mouse_moved){
-        MouseEventSystem.MouseMove(0.f, 0.f);
-	}
+	//if(!mouse_moved){
+    //    MouseEventSystem.MouseMove(0.f, 0.f);
+	//}
 	// if mouse is hidden/grabbed, recenter it so it doesn't appear offscreen
     if(SDL_GetRelativeMouseMode() == SDL_TRUE){
         SDL_WarpMouseInWindow(this->_Window, this->GetWindowWidth()/2, this->GetWindowHeight()/2);
@@ -131,11 +131,16 @@ bool SDLSys::SetupTimer() {
 }
 
 void SDLSys::ToggleFullscreen() {
+	SDL_DisplayMode current;
+
 	if(!this->Fullscreen) {
+		SDL_GetDisplayMode(0, 0, &current);
+		SDL_SetWindowSize(this->_Window, current.w, current.h);
 		SDL_SetWindowFullscreen(this->_Window,SDL_WINDOW_FULLSCREEN);
 	}
 	else {
 		SDL_SetWindowFullscreen(this->_Window,0);
+		SDL_SetWindowSize(this->_Window, 1024, 768);
 	}
 	this->Fullscreen=!this->Fullscreen;
 }

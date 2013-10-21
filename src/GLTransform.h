@@ -85,6 +85,10 @@ public:
 		return forward_vector;
 	}
 
+	float GetPitch() {
+		return (glm::atan(this->rotateMatrix[0][1] / this->rotateMatrix[0][0]) / (3.14159f)) * 45.0f;
+	}
+
 	// Convenience overload
 	void Move(glm::vec3 vec) {
 		this->Move(vec.x, vec.y, vec.z);

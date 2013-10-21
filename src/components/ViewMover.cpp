@@ -24,9 +24,13 @@ void ViewMover::ApplyForces(const double delta) {
 
 	this->view->Move(outForce * deltavec);
 
-	// There are no forces here
 	for (auto rotitr = this->rotationForces.begin(); rotitr != this->rotationForces.end(); ++rotitr) {
-		this->view->Transform.Rotate((*rotitr) * deltavec);
+		glm::vec3 rotation_amount = (*rotitr) * deltavec;
+
+		// Restricts the total rotation allowed to a specified range
+		//rotation_amount = this->view->Restrict(rotation_amount);
+
+		this->view->Transform.Rotate(rotation_amount);
 	}
 }
 
