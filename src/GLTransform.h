@@ -10,7 +10,7 @@ public:
 	const static glm::vec3 UP_VECTOR;
 	const static glm::vec3 RIGHT_VECTOR;
 
-	GLTransform() : orientation(glm::quat(1,0,0,0)), position(glm::vec3(0,0,0)) {}
+	GLTransform() : orientation(glm::quat(1,0,0,0)), position(glm::vec3(0,0,0)), rotation(glm::vec3(0,0,0)), Euler(false) {}
 
 	void Translate(float x, float y, float z) {
 		this->position += glm::vec3(x, y, z);
@@ -34,12 +34,22 @@ public:
 	}
 
 	void Rotate(float x, float y, float z) {
-		glm::quat qX = glm::angleAxis(x, 1.0f,0.0f,0.0f);
-		glm::quat qY = glm::angleAxis(y, 0.0f,1.0f,0.0f);
-		glm::quat qZ = glm::angleAxis(z, 0.0f,0.0f,1.0f);
-		glm::quat change = qX * qY * qZ;
-		this->orientation = glm::normalize(change * this->orientation);
-		this->rotateMatrix = glm::mat4_cast(this->orientation);
+		this->rotation += glm::vec3(x, y, z);
+
+		if(this->Euler) {
+			this->rotateMatrix = glm::rotate(glm::mat4(1.0f), this->rotation.x, glm::vec3(1.0f, 0, 0));
+			this->rotateMatrix = glm::rotate(this->rotateMatrix, this->rotation.y, glm::vec3(0, 1.0f, 0));
+			this->rotateMatrix = glm::rotate(this->rotateMatrix, this->rotation.z, glm::vec3(0, 0, 1.0f));
+		}
+		else {
+			glm::quat qX = glm::angleAxis(x, 1.0f,0.0f,0.0f);
+			glm::quat qY = glm::angleAxis(y, 0.0f,1.0f,0.0f);
+			glm::quat qZ = glm::angleAxis(z, 0.0f,0.0f,1.0f);
+			glm::quat change = qX * qY * qZ;
+			this->orientation = glm::normalize(change * this->orientation);
+			this->rotateMatrix = glm::mat4_cast(this->orientation);
+		}
+		
 		this->MMhasChanged = true;
 	}
 
@@ -86,7 +96,17 @@ public:
 	}
 
 	float GetPitch() {
-		return (glm::atan(this->rotateMatrix[0][1] / this->rotateMatrix[0][0]) / (3.14159f)) * 45.0f;
+		//return (glm::atan(this->rotateMatrix[1][0] / this->rotateMatrix[0][0]) / (3.14159f)) * 45.0f;
+		//return (glm::acos((float)this->rotateMatrix[3][3]));
+		return this->rotation.x;
+	}
+
+	float GetYaw() {
+		return this->rotation.y;
+	}
+
+	float GetRoll() {
+		return this->rotation.z;
 	}
 
 	// Convenience overload
@@ -117,13 +137,20 @@ public:
 		return this->orientation;
 	}
 
+	void SetEuler(const bool euler) {
+		this->Euler = euler;
+	}
+
 private:
 	glm::quat orientation;
 	glm::vec3 position;
+	glm::vec3 rotation;
 
 	glm::mat4 transformMatrix;
 	glm::mat4 scaleMatrix;
 	glm::mat4 rotateMatrix;
 	glm::mat4 translateMatrix;
+
 	bool MMhasChanged; // Set to true if the modelMatrix has changed and needs to be updated
+	bool Euler; // Set to true to toggle rotation matrix construction between quaternions and euler angles
 };
