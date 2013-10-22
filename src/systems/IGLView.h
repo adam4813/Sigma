@@ -21,11 +21,19 @@ struct IGLView {
 	virtual void UpdateViewMatrix() = 0;*/
 
 	virtual void Move(float right, float up, float forward) = 0;
-
+	
 	// Helper function.
 	void Move(glm::vec3 trans) {
 		Move(trans.x, trans.y, trans.z);
 	}
+
+	/*
+	 * /brief Allows the view to restrict
+	 *        the rotation range
+	 *
+	 */
+	virtual glm::vec3 Restrict(glm::vec3) = 0;
+
 	/*
 	virtual void Rotate(float x, float y, float z) = 0;
 

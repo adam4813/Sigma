@@ -6,5 +6,6 @@ struct GLSixDOFView : public IGLView {
 	GLSixDOFView();
 
 	const glm::mat4 GetViewMatrix();
-	void Move(float right, float up, float forward);
+	virtual void Move(float right, float up, float forward);
+	virtual glm::vec3 Restrict(glm::vec3 rotation) { return rotation; }
 };

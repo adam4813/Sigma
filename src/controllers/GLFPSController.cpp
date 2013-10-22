@@ -10,6 +10,7 @@ namespace handler{
 
     GLFPSController::GLFPSController(IGLView* view, ViewMover* mover) : mover(mover) {
         // Set the view mover's view pointer.
+		view->Transform.SetEuler(true);
         this->mover->View(view);
 
         // Clear out the internal key state buffers.
@@ -50,13 +51,21 @@ namespace handler{
 
 		// Motion from center to far left/right of screen should
 		// result in 90 degree turn
-		yaw = dx*90.0f;
-		pitch = dy*45.0f;
+		yaw = dx*1.0f;
+		pitch = dy*1.0f;
+
+		// immediate update rotation
+		//this->mover->RotateNow(dy,dx,0.0f);
+
+		// Inertial motion
+		this->mover->RotateTarget(pitch,yaw,0.0f);
 
 		// remove previous force and add new one
+		/*
         this->mover->RemoveRotationForce(this->_rotate);
         this->_rotate = glm::vec3(pitch, yaw, 0.0f);
         this->mover->AddRotationForce(this->_rotate);
+	*/
 	}
 }
 }
