@@ -299,10 +299,15 @@ namespace Sigma{
                     v[j] = this->verts.size();
 
                     this->verts.push_back(temp_verts[temp_face_indices[i].v[j].vertex]);
-                    this->texCoords.push_back(temp_uvs[temp_face_indices[i].v[j].uv]);
-                    this->vertNorms.push_back(temp_normals[temp_face_indices[i].v[j].normal]);
-                    this->colors.push_back(temp_colors[temp_face_indices[i].v[j].color]);
-
+					if (temp_uvs.size() > 0) {
+						this->texCoords.push_back(temp_uvs[temp_face_indices[i].v[j].uv]);
+					}
+					if (temp_normals.size() > 0) {
+						this->vertNorms.push_back(temp_normals[temp_face_indices[i].v[j].normal]);
+					}
+					if (temp_colors.size() > 0) {
+						this->colors.push_back(temp_colors[temp_face_indices[i].v[j].color]);
+					}
                     unique_vertices.push_back(temp_face_indices[i].v[j]);
                 }
                 else {
