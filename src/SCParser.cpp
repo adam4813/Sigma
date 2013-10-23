@@ -77,7 +77,12 @@ namespace Sigma {
 							break;
 						}
 					}
-					currentEntity->components.push_back(c);
+					if(currentEntity != nullptr) {
+						currentEntity->components.push_back(c);
+					}
+					else {
+						std::cerr << "Attempted to add component to undefined entity." << std::endl;
+					}
 				}
 			}
 			if (currentEntity != nullptr) {
