@@ -1,7 +1,7 @@
 #include "SDLSys.h"
 
 #include "GL/glew.h"
-#include "SDL/SDL_opengl.h"
+#include "SDL2/SDL_opengl.h"
 
 Sigma::event::KeyboardInputSystem IOpSys::KeyboardEventSystem;
 Sigma::event::MouseInputSystem IOpSys::MouseEventSystem;
