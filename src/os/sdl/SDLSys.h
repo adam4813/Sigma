@@ -6,7 +6,7 @@
 #include <map>
 
 #include "../../IOpSys.h"
-#include "SDL/SDL.h"
+#include "SDL2/SDL.h"
 
 #ifdef __linux__
 // used for putenv below
