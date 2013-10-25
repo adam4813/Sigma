@@ -24,21 +24,29 @@ GUI Mode
 Command Mode
 ---
 
-* mkdir build/
-* cd build/
-* cmake ..
-* make
+```sh
+mkdir build/
+cd build/
+cmake ..
+make
+```
 
 
 Using the makefile-wrapper
 ---
 
-* make rebuild # make clean; make
+```sh
+make rebuild
+make clean
+make
+```
 
 Eclipse CDT (Unix/Linux)
 ---
 
-* make eclipse
+```sh
+make eclipse
+```
 
 After compiling
 ---
