@@ -103,7 +103,7 @@ int main(int argCount, char **argValues) {
 		props.push_back(p_y);
 		props.push_back(p_z);
 
-		glsys.createGLView(1, props, "GLFPSView");
+		glsys.createGLView(1, props, "FPSCamera");
 	}
 
 	// Still hard coded to use entity ID #1
@@ -113,7 +113,7 @@ int main(int argCount, char **argValues) {
 	// Create the controller
 	// Perhaps a little awkward currently, should create a generic
 	// controller class ancestor
-	if(glsys.GetViewMode() == "GLFPSView") {
+	if(glsys.GetViewMode() == "FPSCamera") {
 		Sigma::event::handler::FPSCamera cameraController(mover);
 		IOpSys::KeyboardEventSystem.Register(&cameraController);
 		IOpSys::MouseEventSystem.Register(&cameraController);
