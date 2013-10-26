@@ -41,6 +41,9 @@ namespace Sigma{
         std::string _msg;
     };
 
+    // forward definition of static-initialization struct
+    struct static_initializer;
+
     /**
      * The EntityManager class owns and manages all entities and components.
      *
@@ -50,7 +53,10 @@ namespace Sigma{
      *  example, there may be a sound context, graphics context, etc. This
      *  speeds up search because look-up is only within a given context.
      *
-     * Querying a context that does not exist results in a NoSuchContextException
+     * Note: you can use the default '0' context without having to create it manually
+     * (it is automatically created so you never *need* to worry about contexts)
+     *
+     * Attempting to use a context that does not exist results in a NoSuchContextException
      *
      * Adding/Removing/Getting components from an entity that does not exist
      * results in a NoSuchEntityException being thrown.
@@ -71,80 +77,76 @@ namespace Sigma{
              * this function because you will need the context-id for adding, removing,
              * and querying entities from this context.
              *
+             * Note that there is a default '0' context created automatically. The first
+             *  call to CreateContext() results in a *second* context being created.
+             *
              * \return the id of the new EntityManager, i.e. the context id
              */
             static unsigned int CreateContext();
 
             /** \brief Check if the entity exists in the given context
              *
-             * \param context const type_id the context/EntityManager to search
              * \param entity_id const type_id the entity being queried
              * \return bool true if and only if the entity exists in the given context
-             * \throw NoSuchContextException
              */
-            static bool EntityExists(const type_id context, const type_id entity_id);
+            static bool EntityExists(const type_id entity_id);
 
             /** \brief Create an empty entity in the given context. Replaces any
              *  existing entity with the same id
              *
-             * \param context const type_id the context/EntityManager to insert into
              * \param entity_id const type_id the entity id to insert
              * \return bool true if it overwrote a previous entity
-             * \throw NoSuchContextException if there is no matching context
              */
-            static bool CreateEntity(const type_id context, const type_id entity_id);
+            static bool CreateEntity(const type_id entity_id);
 
             /** \brief Delete the specified entity
              *
-             * \param context const type_id the context/EntityManager to use
              * \param entity_id const type_id the entity id to delete
              * \return bool true if it removed an entity (false if there is no such entity)
-             * \throw NoSuchContextException if there is no matching context
              */
-            static bool DeleteEntity(const type_id context, const type_id entity_id);
+            static bool DeleteEntity(const type_id entity_id);
 
             /** \brief Create the component specified by component_type and properties. Add it to
              * the given entity of the given context. Overwrites existing components of the same
              * type.
              *
-             * \param context const type_id the context/EntityManager to insert into
              * \param entity_id const type_id the entity id to give this component to
              * \return void
-             * \throw NoSuchContextException if there is no matching context
-             * \throw NoSuchEntityException if the context exists but the entity doesn't
+             * \throw NoSuchEntityException if the entity doesn't exist in this context
              */
-            static void AddComponent(const type_id context, const type_id entity_id, const std::string& component_type, const std::vector<Property>& properties);
+            static void AddComponent(const type_id entity_id, const std::string& component_type, const std::vector<Property>& properties);
 
              /** \brief Remove from the specified entity the component of type component_type, if it exists.
              *
-             * \param context const type_id the context/EntityManager to use
              * \param entity_id const type_id the entity id to remove this component from
              * \return bool true if a component was actually removed (false if it never existed)
-             * \throw NoSuchContextException if there is no matching context
-             * \throw NoSuchEntityException if the context exists but the entity doesn't
+             * \throw NoSuchEntityException if the entity doesn't exist in this context
              */
-            static bool RemoveComponent(const type_id context, const type_id entity_id, const std::string& component_type);
+            static bool RemoveComponent(const type_id entity_id, const std::string& component_type);
 
             /** \brief Get a pointer to the component of the requested type for the specified entity.
              *
-             * \param context const type_id the context/EntityManager to use
              * \param entity_id const type_id the entity id to search
              * \return a pointer to the requested component, or nullptr if none exists
-             * \throw NoSuchContextException if there is no matching context
-             * \throw NoSuchEntityException if the context exists but the entity doesn't
+             * \throw NoSuchEntityException if the entity doesn't exist in this context
              */
-            static IComponent* GetComponent(const type_id context, const type_id entity_id, const std::string& component_type);
+            static IComponent* GetComponent(const type_id entity_id, const std::string& component_type);
 
             /** \brief Get a vector of all components for the specified entity
              *
-             * \param context const type_id the context/EntityManager to use
              * \param entity_id const type_id the entity id to search
              * \return a vector of component pointers
-             * \throw NoSuchContextException if there is no matching context
-             * \throw NoSuchEntityException if the context exists but the entity doesn't
+             * \throw NoSuchEntityException if the entity doesn't exist in this context
              */
-            static std::vector<IComponent*> GetAllComponents(const type_id context, const type_id entity_id);
+            static std::vector<IComponent*> GetAllComponents(const type_id entity_id);
 
+            /** \brief Set the context for all subsequent actions
+             *
+             * \param context const type_id the context to switch into
+             * \return void
+             * \throw NoSuchContextException if the requested context does not exist
+             */
+            static void UseContext(const type_id context);
         private:
             // ctor only accessible through static CreateContext
             EntityManager(){ }
@@ -154,11 +156,23 @@ namespace Sigma{
             //  is shared by all entities in it. Here, we keep the list
             //  of already-created managers (i.e. contexts), statically
             static std::vector<std::unique_ptr<EntityManager>> existing_contexts;
-            // get context or throw NoSuchContextException
-            static EntityManager* getContext(const type_id context);
+            // keep track of current context
+            static EntityManager* current_context;
 
             // here's where we keep track of the entities and components
             std::map<type_id, std::vector<std::unique_ptr<IComponent>>> entities;
+
+            // static initialization
+            static static_initializer theInitializer;
+    };
+
+    // static initialization
+    struct static_initializer{
+        static_initializer(){
+            // this code is run once, statically
+            int default_context = EntityManager::CreateContext();
+            EntityManager::UseContext(default_context);
+        }
     };
 
 }
