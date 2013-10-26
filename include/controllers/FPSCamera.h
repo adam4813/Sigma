@@ -12,9 +12,13 @@ namespace Sigma {
 		namespace handler {
 			// A type of handler. This handler controls an OpenGL 6 DOF view.
 			class FPSCamera : public IKeyboardEventHandler, public IMouseEventHandler, public IGLView {
+			private:
 			public:
-				FPSCamera() { }
-				FPSCamera(ViewMover* mover);
+
+			    SET_COMPONENT_ID("FPS_CAMERA");
+
+				FPSCamera(int entityID) : IGLView(entityID) { }
+				FPSCamera(int entityID, ViewMover* mover);
 
 				/**
 				 * \brief Triggered whenever a key state change event happens

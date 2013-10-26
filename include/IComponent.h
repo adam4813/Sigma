@@ -1,4 +1,7 @@
 #pragma once
+#ifndef ICOMPONENT_H
+#define ICOMPONENT_H
+
 #include <string>
 
 #define SET_COMPONENT_ID(ID)                                \
@@ -15,3 +18,5 @@ public:
 private:
 	const int entityID; // The entity that owns this component.
 };
+
+#endif // ICOMPONENT_H

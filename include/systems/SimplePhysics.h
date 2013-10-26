@@ -39,9 +39,9 @@ public:
 
     std::map<std::string,FactoryFunction> getFactoryFunctions();
 
-	void createPhysicsMover(const unsigned int entityID, std::vector<Property> &properties) ;
-	void createViewMover(const unsigned int entityID, std::vector<Property> &properties) ;
-	void createAABBTree(const unsigned int entityID, std::vector<Property> &properties) ;
+	IComponent* createPhysicsMover(const unsigned int entityID, const std::vector<Property> &properties) ;
+	IComponent* createViewMover(const unsigned int entityID, const std::vector<Property> &properties) ;
+	IComponent* createAABBTree(const unsigned int entityID, const std::vector<Property> &properties) ;
 
 	Sigma::AABBTree* GetCollider(const unsigned int entityID) {
 		if (this->colliders.find(entityID) != this->colliders.end()) {

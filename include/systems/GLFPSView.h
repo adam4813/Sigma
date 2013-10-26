@@ -3,7 +3,10 @@
 #include "IGLView.h"
 
 struct GLFPSView : public IGLView {
-	GLFPSView();
+
+    SET_COMPONENT_ID("FPS_VIEW");
+
+	GLFPSView(int entityID);
 
 	const glm::mat4 GetViewMatrix();
 	virtual void Move(float right, float up, float forward);

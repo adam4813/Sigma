@@ -4,8 +4,12 @@
 //#include "glm/ext.hpp"
 
 #include "../GLTransform.h"
+#include "IComponent.h"
 
-struct IGLView {
+struct IGLView : public IComponent {
+
+    IGLView(int entityID) : IComponent(entityID) {}
+
 	GLTransform Transform;
 
 	virtual const glm::mat4 GetViewMatrix() = 0;
@@ -21,7 +25,7 @@ struct IGLView {
 	virtual void UpdateViewMatrix() = 0;*/
 
 	virtual void Move(float right, float up, float forward) = 0;
-	
+
 	// Helper function.
 	void Move(glm::vec3 trans) {
 		Move(trans.x, trans.y, trans.z);

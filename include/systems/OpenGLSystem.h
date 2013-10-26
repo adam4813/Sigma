@@ -84,13 +84,13 @@ namespace Sigma{
 
         std::map<std::string,FactoryFunction> getFactoryFunctions();
 
-        void createGLSprite(const unsigned int entityID, std::vector<Property> &properties) ;
-        void createGLIcoSphere(const unsigned int entityID, std::vector<Property> &properties) ;
-        void createGLCubeSphere(const unsigned int entityID, std::vector<Property> &properties) ;
-        void createGLMesh(const unsigned int entityID, std::vector<Property> &properties) ;
-		
+        IComponent* createGLSprite(const unsigned int entityID, std::vector<Property> &properties) ;
+        IComponent* createGLIcoSphere(const unsigned int entityID, std::vector<Property> &properties) ;
+        IComponent* createGLCubeSphere(const unsigned int entityID, std::vector<Property> &properties) ;
+        IComponent* createGLMesh(const unsigned int entityID, std::vector<Property> &properties) ;
+
 		// Views are not technically components, but perhaps they should be
-		void createGLView(const unsigned int entityID, std::vector<Property> &properties, std::string mode) ;
+		IComponent* createGLView(const unsigned int entityID, const std::vector<Property> &properties, std::string mode) ;
 
         IGLView* View() const { return this->view.get(); }
 

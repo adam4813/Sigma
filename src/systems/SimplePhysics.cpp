@@ -21,11 +21,11 @@ std::map<std::string,Sigma::IFactory::FactoryFunction>
     return retval;
 }
 
-void SimplePhysics::createPhysicsMover(const unsigned int entityID, std::vector<Property> &properties) {
+IComponent* SimplePhysics::createPhysicsMover(const unsigned int entityID, const std::vector<Property> &properties) {
 		PhysicsMover* mover = new PhysicsMover(entityID);
 
     for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
-        Property*  p = &(*propitr);
+        const Property*  p = &(*propitr);
         if (p->GetName() == "transform") {
             GLTransform* t = p->Get<GLTransform*>();
             mover->SetTransform(t);
@@ -44,14 +44,16 @@ void SimplePhysics::createPhysicsMover(const unsigned int entityID, std::vector<
 		}
 	}
 	this->addComponent(entityID,mover);
+	return mover;
 }
 
-void SimplePhysics::createViewMover(const unsigned int entityID, std::vector<Property> &properties) {
+IComponent* SimplePhysics::createViewMover(const unsigned int entityID, const std::vector<Property> &properties) {
 	ViewMover* mover = new ViewMover(entityID);
 	this->addComponent(entityID,mover);
+	return mover;
 }
 
-void SimplePhysics::createAABBTree(const unsigned int entityID, std::vector<Property> &properties) {
+IComponent* SimplePhysics::createAABBTree(const unsigned int entityID, const std::vector<Property> &properties) {
 	Sigma::AABBTree* tree = new Sigma::AABBTree(entityID);
 	float scale = 1.0f;
 	float x = 0.0f;
@@ -66,7 +68,7 @@ void SimplePhysics::createAABBTree(const unsigned int entityID, std::vector<Prop
 	std::string filename = "";
 
 	for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
-		Property*  p = &(*propitr);
+		const Property*  p = &(*propitr);
 		if (p->GetName() == "scale") {
 			scale = p->Get<float>();
 		} else if (p->GetName() == "x") {
@@ -98,6 +100,7 @@ void SimplePhysics::createAABBTree(const unsigned int entityID, std::vector<Prop
 		tree->Subdivivde(nullptr, i);
 	}
 	this->colliders[entityID] = tree;
+	return tree;
 }
 
 bool SimplePhysics::Update(const double delta) {
