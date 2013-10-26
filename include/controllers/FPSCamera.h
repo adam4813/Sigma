@@ -36,6 +36,7 @@ namespace Sigma {
 				const glm::mat4 GetViewMatrix();
 				virtual void Move(float right, float up, float forward);
 				virtual glm::vec3 Restrict(glm::vec3 rotation);
+				virtual void SetMover(ViewMover* m){ mover = m; }
 			private:
 				ViewMover* mover; // The view mover component that applies the rotations and forces set in the trigger method.
                 static const float SPEED_TRANSLATE, SPEED_ROTATE, BOOST_MULTIPLIER;
