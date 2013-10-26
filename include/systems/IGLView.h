@@ -1,4 +1,6 @@
 #pragma once
+#ifndef IGL_VIEW_H
+#define IGL_VIEW_H
 
 //#include "glm/glm.hpp"
 //#include "glm/ext.hpp"
@@ -6,43 +8,48 @@
 #include "../GLTransform.h"
 #include "IComponent.h"
 
-struct IGLView : public IComponent {
+namespace Sigma{
 
-    IGLView(int entityID) : IComponent(entityID) {}
+    struct IGLView : public Sigma::IComponent {
 
-	GLTransform Transform;
+        IGLView(int entityID) : IComponent(entityID) {}
 
-	virtual const glm::mat4 GetViewMatrix() = 0;
+        GLTransform Transform;
 
-	/*glm::mat4 ViewMatrix;
-	glm::vec3 position;
-	glm::quat orientation;
+        virtual const glm::mat4 GetViewMatrix() = 0;
 
-	IGLView() {
-		this->position = glm::vec3(0.0f,0.0f,0.0f);
-		this->orientation = glm::quat(0.0f,0.0f,1.0f,0.0f);
-	}
-	virtual void UpdateViewMatrix() = 0;*/
+        /*glm::mat4 ViewMatrix;
+        glm::vec3 position;
+        glm::quat orientation;
 
-	virtual void Move(float right, float up, float forward) = 0;
+        IGLView() {
+            this->position = glm::vec3(0.0f,0.0f,0.0f);
+            this->orientation = glm::quat(0.0f,0.0f,1.0f,0.0f);
+        }
+        virtual void UpdateViewMatrix() = 0;*/
 
-	// Helper function.
-	void Move(glm::vec3 trans) {
-		Move(trans.x, trans.y, trans.z);
-	}
+        virtual void Move(float right, float up, float forward) = 0;
 
-	/*
-	 * /brief Allows the view to restrict
-	 *        the rotation range
-	 *
-	 */
-	virtual glm::vec3 Restrict(glm::vec3) = 0;
+        // Helper function.
+        void Move(glm::vec3 trans) {
+            Move(trans.x, trans.y, trans.z);
+        }
 
-	/*
-	virtual void Rotate(float x, float y, float z) = 0;
+        /*
+         * /brief Allows the view to restrict
+         *        the rotation range
+         *
+         */
+        virtual glm::vec3 Restrict(glm::vec3) = 0;
 
-	// Helper function.
-	void Rotate(glm::vec3 rot) {
-		Rotate(rot.x, rot.y, rot.z);
-	}*/
-};
+        /*
+        virtual void Rotate(float x, float y, float z) = 0;
+
+        // Helper function.
+        void Rotate(glm::vec3 rot) {
+            Rotate(rot.x, rot.y, rot.z);
+        }*/
+    }; // stuct IGLView
+} // namespace Sigma
+
+#endif // IGL_VIEW_H

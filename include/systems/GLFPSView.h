@@ -2,7 +2,7 @@
 
 #include "IGLView.h"
 
-struct GLFPSView : public IGLView {
+struct GLFPSView : public Sigma::IGLView {
 
     SET_COMPONENT_ID("FPS_VIEW");
 

@@ -11,7 +11,7 @@ namespace Sigma {
 	namespace event {
 		namespace handler {
 			// A type of handler. This handler controls an OpenGL 6 DOF view.
-			class FPSCamera : public IKeyboardEventHandler, public IMouseEventHandler, public IGLView {
+			class FPSCamera : public IKeyboardEventHandler, public IMouseEventHandler, public Sigma::IGLView {
 			private:
 			public:
 

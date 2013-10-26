@@ -21,7 +21,7 @@ std::map<std::string,Sigma::IFactory::FactoryFunction>
     return retval;
 }
 
-IComponent* SimplePhysics::createPhysicsMover(const unsigned int entityID, const std::vector<Property> &properties) {
+Sigma::IComponent* SimplePhysics::createPhysicsMover(const unsigned int entityID, const std::vector<Property> &properties) {
 		PhysicsMover* mover = new PhysicsMover(entityID);
 
     for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
@@ -47,13 +47,13 @@ IComponent* SimplePhysics::createPhysicsMover(const unsigned int entityID, const
 	return mover;
 }
 
-IComponent* SimplePhysics::createViewMover(const unsigned int entityID, const std::vector<Property> &properties) {
+Sigma::IComponent* SimplePhysics::createViewMover(const unsigned int entityID, const std::vector<Property> &properties) {
 	ViewMover* mover = new ViewMover(entityID);
 	this->addComponent(entityID,mover);
 	return mover;
 }
 
-IComponent* SimplePhysics::createAABBTree(const unsigned int entityID, const std::vector<Property> &properties) {
+Sigma::IComponent* SimplePhysics::createAABBTree(const unsigned int entityID, const std::vector<Property> &properties) {
 	Sigma::AABBTree* tree = new Sigma::AABBTree(entityID);
 	float scale = 1.0f;
 	float x = 0.0f;

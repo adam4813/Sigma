@@ -2,7 +2,7 @@
 
 #include "IGLView.h"
 
-struct GLSixDOFView : public IGLView {
+struct GLSixDOFView : public Sigma::IGLView {
 
     SET_COMPONENT_ID("SIX_DOF_VIEW");
 
