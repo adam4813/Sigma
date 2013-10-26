@@ -1,8 +1,8 @@
-#include "SimplePhysics.h"
+#include "systems/SimplePhysics.h"
 #include "Property.h"
 #include "../components/PhysicsMover.h"
 #include "../components/ViewMover.h"
-#include "IGLView.h"
+#include "systems/IGLView.h"
 
 std::map<std::string,Sigma::IFactory::FactoryFunction>
     SimplePhysics::getFactoryFunctions()

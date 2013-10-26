@@ -4,7 +4,7 @@
 #include "systems/BulletPhysics.h"
 #include "systems/FactorySystem.h"
 #include "controllers/GLSixDOFViewController.h"
-#include "controllers/GLFPSController.h"
+#include "controllers/FPSCamera.h"
 #include "components/BulletMover.h"
 #include "SCParser.h"
 
@@ -114,7 +114,8 @@ int main(int argCount, char **argValues) {
 	// Perhaps a little awkward currently, should create a generic 
 	// controller class ancestor
 	if(glsys.GetViewMode() == "GLFPSView") {
-		Sigma::event::handler::GLFPSController cameraController(glsys.View(), mover);
+		Sigma::event::handler::FPSCamera cameraController;
+		cameraController.SetMover(*mover);
 		IOpSys::KeyboardEventSystem.Register(&cameraController);
 		IOpSys::MouseEventSystem.Register(&cameraController);
 	} else if (glsys.GetViewMode() == "GLSixDOFView") {

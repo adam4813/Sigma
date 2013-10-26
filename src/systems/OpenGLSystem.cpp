@@ -1,11 +1,12 @@
-#include "OpenGLSystem.h"
-#include "GLSLShader.h"
-#include "GLSixDOFView.h"
-#include "GLFPSView.h"
+#include "systems/OpenGLSystem.h"
+#include "systems/GLSLShader.h"
+#include "systems/GLSixDOFView.h"
+#include "systems/GLFPSView.h"
 #include "../components/GLSprite.h"
 #include "../components/GLIcoSphere.h"
 #include "../components/GLCubeSphere.h"
 #include "../components/GLMesh.h"
+#include "../controllers/FPSCamera.h"
 
 namespace Sigma{
     OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumulator(0.0),
@@ -29,8 +30,8 @@ namespace Sigma{
 	void OpenGLSystem::createGLView(const unsigned int entityID, std::vector<Property> &properties, std::string mode) {
 		viewMode = mode;
 
-		if(mode=="GLFPSView") {
-			this->view = std::unique_ptr<IGLView>(new GLFPSView());
+		if(mode=="FPSCamera") {
+			this->view = std::unique_ptr<IGLView>(new Sigma::event::handler::FPSCamera());
 		} else if(mode=="GLSixDOFView") {
 			this->view = std::unique_ptr<IGLView>(new GLSixDOFView());
 		} else {
