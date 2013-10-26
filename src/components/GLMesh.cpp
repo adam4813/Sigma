@@ -1,8 +1,8 @@
-#include "GLMesh.h"
+#include "components/GLMesh.h"
 
 #include "GL/glew.h"
 #include "SOIL.h"
-#include "../strutils.h"
+#include "strutils.h"
 
 #include <algorithm>
 #include <stdexcept>

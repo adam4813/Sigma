@@ -1,6 +1,6 @@
-#include "BulletMover.h"
+#include "components/BulletMover.h"
 
-#include "../systems/IGLView.h"
+#include "systems/IGLView.h"
 #include "bullet/btBulletCollisionCommon.h"
 #include "bullet/btBulletDynamicsCommon.h"
 

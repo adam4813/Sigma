@@ -1,4 +1,4 @@
-#include "GLFPSController.h"
+#include "controllers/GLFPSController.h"
 
 namespace Sigma{
 namespace event{

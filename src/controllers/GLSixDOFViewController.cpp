@@ -1,4 +1,4 @@
-#include "GLSixDOFViewController.h"
+#include "controllers/GLSixDOFViewController.h"
 
 namespace Sigma{
 namespace event{

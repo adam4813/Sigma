@@ -1,4 +1,4 @@
-#include "AABBCollider.h"
+#include "components/AABBCollider.h"
 #include <cmath>
 
 bool AABBCollider::CheckCollision(const AABBCollider& other) {

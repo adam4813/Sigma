@@ -2,11 +2,11 @@
 #include "systems/GLSLShader.h"
 #include "systems/GLSixDOFView.h"
 #include "systems/GLFPSView.h"
-#include "../components/GLSprite.h"
-#include "../components/GLIcoSphere.h"
-#include "../components/GLCubeSphere.h"
-#include "../components/GLMesh.h"
-#include "../controllers/FPSCamera.h"
+#include "components/GLSprite.h"
+#include "components/GLIcoSphere.h"
+#include "components/GLCubeSphere.h"
+#include "components/GLMesh.h"
+#include "controllers/FPSCamera.h"
 
 namespace Sigma{
     OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumulator(0.0),
@@ -37,7 +37,7 @@ namespace Sigma{
 		} else {
 			std::cerr << "Invalid view type!" << std::endl;
 		}
-	
+
 		float x=0.0f, y=0.0f, z=0.0f, rx=0.0f, ry=0.0f, rz=0.0f;
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {

@@ -5,7 +5,7 @@
 #include <cstring>
 #include <map>
 
-#include "../../IOpSys.h"
+#include "IOpSys.h"
 #include "SDL2/SDL.h"
 
 #ifdef __linux__
