@@ -4,8 +4,9 @@
 #include "systems/BulletPhysics.h"
 #include "systems/FactorySystem.h"
 #include "controllers/GLSixDOFViewController.h"
-#include "controllers/GLFPSController.h"
+#include "controllers/GLFPSViewController.h"
 #include "components/BulletMover.h"
+#include "components/GLScreenQuad.h"
 #include "SCParser.h"
 
 #if defined OS_Win32
@@ -92,7 +93,7 @@ int main(int argCount, char **argValues) {
 	// for this to work.
 
 	// No view provided, create a default FPS view
-	if(!glsys.View()) {
+	/*if(!glsys.View()) {
 		std::vector<Property> props;
 
 		Property p_x("x", 0.0f);
@@ -104,7 +105,7 @@ int main(int argCount, char **argValues) {
 		props.push_back(p_z);
 
 		glsys.createGLView(1, props, "GLFPSView");
-	}
+	}*/
 
 	// Still hard coded to use entity ID #1
 	// Link the graphics view to the physics system's view mover
@@ -114,7 +115,7 @@ int main(int argCount, char **argValues) {
 	// Perhaps a little awkward currently, should create a generic 
 	// controller class ancestor
 	if(glsys.GetViewMode() == "GLFPSView") {
-		Sigma::event::handler::GLFPSController cameraController(glsys.View(), mover);
+		Sigma::event::handler::GLFPSViewController cameraController(mover);
 		IOpSys::KeyboardEventSystem.Register(&cameraController);
 		IOpSys::MouseEventSystem.Register(&cameraController);
 	} else if (glsys.GetViewMode() == "GLSixDOFView") {
@@ -128,6 +129,9 @@ int main(int argCount, char **argValues) {
 	// Begin main loop
 	double delta;
 	bool isWireframe=false;
+
+	// Load a font
+	os->LoadFont("Akashi.ttf", 8);
 
 	while (os->MessageLoop()) {
 
@@ -159,9 +163,20 @@ int main(int argCount, char **argValues) {
 		// Pass in delta time in seconds
 		bphys.Update(deltaSec);
 
+		// Update stats display
+		Sigma::GLScreenQuad *statsDisplay = dynamic_cast<Sigma::GLScreenQuad*>(glsys.getComponent(31, "GLScreenQuad"));
+
+		if(statsDisplay) {
+			char message[100];
+			sprintf(message, "MS per frame: %.3f", delta);
+			os->RenderText(message, 2.0f, 2.0f, statsDisplay->GetTexture());
+			sprintf(message, "FPS: %.1f", 1000.0f/delta);
+			os->RenderText(message, 2.0f, 10.0f, statsDisplay->GetTexture());
+		}
+
 		// Update the renderer and present
 		if (glsys.Update(delta)) {
-			os->Present();
+			os->Present(glsys.getRender());
 		}
 	}
 

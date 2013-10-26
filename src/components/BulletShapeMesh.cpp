@@ -1,5 +1,5 @@
-#include "BulletShapeMesh.h"
-#include "GLMesh.h"
+#include "components/BulletShapeMesh.h"
+#include "components/GLMesh.h"
 
 namespace Sigma {
 	void Sigma::BulletShapeMesh::SetMesh(const GLMesh* mesh) {

@@ -1,4 +1,4 @@
-#include "GLMesh.h"
+#include "components/GLMesh.h"
 
 #include "GL/glew.h"
 #include "SOIL/SOIL.h"

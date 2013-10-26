@@ -1,4 +1,4 @@
-#include "PhysicsMover.h"
+#include "components/PhysicsMover.h"
 #include "../GLTransform.h"
 
 PhysicsMover::PhysicsMover(const int entityID) : IMoverComponent(entityID) {

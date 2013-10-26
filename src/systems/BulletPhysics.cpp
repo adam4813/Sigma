@@ -1,8 +1,8 @@
-#include "BulletPhysics.h"
-#include "../components/BulletShapeMesh.h"
-#include "../components/GLMesh.h"
-#include "GLFPSView.h"
-#include "../components/BulletShapeSphere.h"
+#include "systems/BulletPhysics.h"
+#include "components/BulletShapeMesh.h"
+#include "components/GLMesh.h"
+#include "systems/GLFPSView.h"
+#include "components/BulletShapeSphere.h"
 
 namespace Sigma {
 	BulletPhysics::~BulletPhysics() {

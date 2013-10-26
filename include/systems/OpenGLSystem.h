@@ -3,10 +3,10 @@
 #define OPENGLSYSTEM_H
 
 #include "Property.h"
-#include "IFactory.h"
-#include "ISystem.h"
-#include "IGLComponent.h"
-#include "systems/IGLView.h"
+#include "../IFactory.h"
+#include "../ISystem.h"
+#include "../IGLComponent.h"
+#include "../systems/IGLView.h"
 
 #include "GL/glew.h"
 #include "glm/glm.hpp"
@@ -18,8 +18,19 @@ struct IGLView;
 
 namespace Sigma{
 
+	struct RenderTarget {
+		GLuint texture_id;
+		GLuint fbo_id;
+		GLuint depth_id;
+
+		RenderTarget() : texture_id(0), fbo_id(0), depth_id(0) {}
+		virtual ~RenderTarget();
+
+		void Use(int slot);
+	};
+
     class OpenGLSystem
-        : public Sigma::IFactory, public ISystem<Sigma::IGLComponent> {
+        : public Sigma::IFactory, public ISystem<IComponent> {
     public:
 
         OpenGLSystem();
@@ -88,25 +99,51 @@ namespace Sigma{
         void createGLIcoSphere(const unsigned int entityID, std::vector<Property> &properties) ;
         void createGLCubeSphere(const unsigned int entityID, std::vector<Property> &properties) ;
         void createGLMesh(const unsigned int entityID, std::vector<Property> &properties) ;
-		
+		void createPointLight(const unsigned int entityID, std::vector<Property> &properties);
+		void createScreenQuad(const unsigned int entityID, std::vector<Property> &properties);
+
 		// Views are not technically components, but perhaps they should be
 		void createGLView(const unsigned int entityID, std::vector<Property> &properties, std::string mode) ;
+
+		// Managing rendering internals
+		/*
+		 * \brief creates a new render target of desired size
+		 */
+		int createRenderTarget(const unsigned int w, const unsigned int h, const unsigned int format);
+		
+		/*
+		 * \brief returns the fbo_id of primary render target (index 0)
+		 */
+		int getRender() { return this->renderTargets[0]->fbo_id; }
+		int getRenderTexture() { return this->renderTargets[0]->texture_id; }
 
         IGLView* View() const { return this->view.get(); }
 
 		GLTransform* GetTransformFor(const unsigned int entityID);
 		std::string GetViewMode() { return this->viewMode; }
+
+		// Rendering methods
+		void RenderTexture(GLuint texture_id);
+
     private:
         unsigned int windowWidth; // Store the width of our window
         unsigned int windowHeight; // Store the height of our window
 
         int OpenGLVersion[2];
 
+		// Scene matrices
         glm::mat4 ProjectionMatrix;
         std::unique_ptr<IGLView> view;
+
+		// Time tracking to fix render frame rate
         double deltaAccumulator; // milliseconds since last render
         double framerate; // default is 60fps
+		
+		// Type of view to create
 		std::string viewMode;
+
+		// Render targets to draw to
+		std::vector<std::unique_ptr<RenderTarget>> renderTargets;
     }; // class OpenGLSystem
 } // namespace Sigma
 #endif // OPENGLSYSTEM_H

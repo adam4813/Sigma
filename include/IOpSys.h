@@ -42,7 +42,7 @@ public:
 	 * \brief Flips the context buffers
 	 *
 	 */
-	virtual void Present() = 0;
+	virtual void Present(unsigned int texture_id) = 0;
 
 	/**
 	 * \brief Does the OS specific message looping.
@@ -95,6 +95,26 @@ public:
 	virtual double GetDeltaTime() = 0;
 
 	/**
+	 * \brief Draws text to the screen at pixel x, y
+	 *
+	 * \param std::string text - the text to draw
+	 * \param float x - x coord
+	 * \param float y - y coord
+	 *
+	 */
+	virtual void RenderText(std::string text, float x, float y, unsigned int texture_id)=0;
+
+	/**
+	 * \brief loads a font from the filesystem
+	 *
+	 * \param std::string file - the font file to load, supported formats
+	 * \                         depends on implementation
+	 * \param int resolution - the resolution of the font
+	 *
+	 */
+	virtual void LoadFont(std::string file, int resolution)=0;
+
+	/**
 	 * \brief Returns the current delta time.
 	 *
 	 * Returns the current delta time set in the last call to GetDeltaTime.
@@ -102,15 +122,9 @@ public:
 	 */
 	static double GetCurrentDelta() { return curDelta; }
 
-	/**
-	 * \brief Notifies the IOpSys to quit during the next call to MessageLoop().
-	 *
-	 * \return    void
-	 */
-	static void Quit();
-
 	static Sigma::event::KeyboardInputSystem KeyboardEventSystem; // Handles keyboard events
 	static Sigma::event::MouseInputSystem MouseEventSystem; // Handles mouse events
+
 protected:
 	static double curDelta; // Current delta time
 };

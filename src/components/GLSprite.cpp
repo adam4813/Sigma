@@ -1,4 +1,4 @@
-#include "GLSprite.h"
+#include "components/GLSprite.h"
 #include "GL/glew.h"
 #include "SOIL/SOIL.h"
 
