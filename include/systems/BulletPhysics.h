@@ -13,7 +13,7 @@ struct GLFPSView;
 
 namespace Sigma {
 	class BulletPhysics
-		: public Sigma::IFactory, public ISystem<IBulletShape> {
+		: public Sigma::IFactory, public Sigma::ISystem<IBulletShape> {
 	public:
 		BulletPhysics() : mover(1) { }
 		~BulletPhysics();

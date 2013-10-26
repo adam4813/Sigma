@@ -19,7 +19,7 @@ struct IGLView;
 namespace Sigma{
 
     class OpenGLSystem
-        : public Sigma::IFactory, public ISystem<Sigma::IGLComponent> {
+        : public Sigma::IFactory, public Sigma::ISystem<Sigma::IGLComponent> {
     public:
 
         OpenGLSystem();
