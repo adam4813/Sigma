@@ -6,6 +6,7 @@ namespace Sigma{
 
     std::vector<std::unique_ptr<EntityManager>> EntityManager::existing_contexts;
     EntityManager* EntityManager::current_context = nullptr;
+    EntityManager::type_id EntityManager::current_context_id = 0;
     static_initializer theInitializer; // runs initialization code
 
     EntityManager::type_id EntityManager::CreateContext(){
@@ -45,7 +46,7 @@ namespace Sigma{
             std::unique_ptr<IComponent> theComponent(FactorySystem::getInstance().create(component_type, entity_id, properties));
             (EntityManager::current_context->entities[entity_id]).push_back(std::move(theComponent));
         } else{
-            throw NoSuchEntityException(entity_id);
+            throw NoSuchEntityException(entity_id, EntityManager::CurrentContext());
         }
     }
 
@@ -64,7 +65,7 @@ namespace Sigma{
             // never found it
             return false;
         } else{
-            throw NoSuchEntityException(entity_id);
+            throw NoSuchEntityException(entity_id, EntityManager::CurrentContext());
         }
     }
 
@@ -82,7 +83,7 @@ namespace Sigma{
             // reached the end of the loop.. component not found
             return nullptr;
         } else{
-            throw NoSuchEntityException(entity_id);
+            throw NoSuchEntityException(entity_id, EntityManager::CurrentContext());
         }
     }
 
@@ -97,14 +98,16 @@ namespace Sigma{
             }
             return retval;
         } else{
-            throw NoSuchEntityException(entity_id);
+            throw NoSuchEntityException(entity_id, EntityManager::CurrentContext());
         }
     }
 
     void EntityManager::UseContext(const EntityManager::type_id context){
+        // TODO use logger here
         std::cout << "Using context " << context << std::endl;
         if(0 <= context && context <= EntityManager::existing_contexts.size()){
             EntityManager::current_context = existing_contexts[context].get();
+            EntityManager::current_context_id = context;
         } else{
             throw NoSuchContextException(context);
         }

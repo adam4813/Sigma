@@ -28,9 +28,9 @@ namespace Sigma{
 
     class NoSuchEntityException : public std::range_error {
     public:
-        NoSuchEntityException(unsigned int entity) : std::range_error(""){
+        NoSuchEntityException(unsigned int entity, unsigned int context) : std::range_error(""){
             char buffer[50];
-            sprintf(buffer, "Entity %d does not exist!", entity);
+            sprintf(buffer, "Entity %d does not exist in context %d!", entity, context);
             this->_msg = std::string(buffer);
         }
 
@@ -69,6 +69,8 @@ namespace Sigma{
             // note that the constructors are private
             virtual ~EntityManager() {}
             typedef unsigned int type_id;
+
+            friend struct static_initializer;
 
             /** \brief Create a new EntityManager
              *
@@ -147,6 +149,13 @@ namespace Sigma{
              * \throw NoSuchContextException if the requested context does not exist
              */
             static void UseContext(const type_id context);
+
+            /** \brief Gets the id of the currently active context
+             *
+             * \return type_id the id of the currently active context
+             *
+             */
+            static type_id CurrentContext(){ return EntityManager::current_context_id; }
         private:
             // ctor only accessible through static CreateContext
             EntityManager(){ }
@@ -158,6 +167,7 @@ namespace Sigma{
             static std::vector<std::unique_ptr<EntityManager>> existing_contexts;
             // keep track of current context
             static EntityManager* current_context;
+            static type_id current_context_id;
 
             // here's where we keep track of the entities and components
             std::map<type_id, std::vector<std::unique_ptr<IComponent>>> entities;
@@ -169,9 +179,10 @@ namespace Sigma{
     // static initialization
     struct static_initializer{
         static_initializer(){
-            // this code is run once, statically
-            int default_context = EntityManager::CreateContext();
-            EntityManager::UseContext(default_context);
+            // set up default context
+            // (this code is run once, statically)
+            EntityManager::current_context_id = EntityManager::CreateContext();
+            EntityManager::UseContext(EntityManager::current_context_id);
         }
     };
 
