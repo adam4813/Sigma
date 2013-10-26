@@ -103,11 +103,11 @@ namespace Sigma{
     }
 
     void EntityManager::UseContext(const EntityManager::type_id context){
-        // TODO use logger here
-        std::cout << "Using context " << context << std::endl;
-        if(0 <= context && context <= EntityManager::existing_contexts.size()){
+        if(0 <= context && context < EntityManager::existing_contexts.size()){
             EntityManager::current_context = existing_contexts[context].get();
             EntityManager::current_context_id = context;
+            // TODO use logger here
+            std::cout << "Using context " << context << std::endl;
         } else{
             throw NoSuchContextException(context);
         }

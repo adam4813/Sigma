@@ -29,4 +29,14 @@ namespace {
         ASSERT_TRUE(EntityManager::EntityExists(1)) << "Entity 1 should still exist but doesnt";
         EXPECT_FALSE(EntityManager::DeleteEntity(2));
 	}
+
+	// test switching between contexts
+	TEST(EntityManagerTest, EntityManagerContextSwitches){
+        auto newctx = EntityManager::CreateContext();
+        EntityManager::CreateEntity(0); // creates entity in context 0
+        EntityManager::UseContext(newctx);
+        EXPECT_FALSE(EntityManager::EntityExists(0)) << "Entity 0 should only exist in context 0";
+        EXPECT_THROW(EntityManager::AddComponent(0, "", std::vector<Property>()), Sigma::NoSuchEntityException);
+        EXPECT_THROW(EntityManager::UseContext(1000), Sigma::NoSuchContextException);
+	}
 }  // namespace
