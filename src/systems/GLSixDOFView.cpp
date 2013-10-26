@@ -1,4 +1,4 @@
-#include "GLSixDOFView.h"
+#include "systems/GLSixDOFView.h"
 
 GLSixDOFView::GLSixDOFView() {}
 
