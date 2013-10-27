@@ -47,7 +47,7 @@ namespace Sigma{
          * Moves the camera around by the specified amounts.
          * \param x, y, z direction relative to the camera, with x right, y up..
          */
-        void Move(float x, float y, float z);
+        //void Move(float x, float y, float z);
 
         /**
          * \brief Rotates the camera around the world.
@@ -56,7 +56,7 @@ namespace Sigma{
          * \param x, y, z rotation amount (in radians) relative to current viewing orientation
          * \return   void
          */
-        void Rotate(float x, float y, float z);
+        //void Rotate(float x, float y, float z);
 
         /**
          * \brief Sets the window width and height for glViewport

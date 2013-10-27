@@ -329,14 +329,6 @@ namespace Sigma{
         return OpenGLVersion;
     }
 
-	void OpenGLSystem::Move(float x, float y, float z) {
-		this->view->Transform.Move(x,y,z);
-	}
-
-	void OpenGLSystem::Rotate(float x, float y, float z) {
-		this->view->Transform.Rotate(x,y,z);
-	}
-
     void OpenGLSystem::SetViewportSize(const unsigned int width, const unsigned int height) {
         this->windowHeight = height;
         this->windowWidth = width;
