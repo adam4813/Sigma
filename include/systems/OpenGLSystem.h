@@ -9,8 +9,6 @@
 #include "systems/IGLView.h"
 #include <vector>
 
-//#include <memory>
-
 struct IGLView;
 
 namespace Sigma{
@@ -111,7 +109,14 @@ namespace Sigma{
 		}
 
 		GLTransform* GetTransformFor(const unsigned int entityID);
-		std::string GetViewMode() { return this->viewMode; }
+
+		/**
+		 * \brief Gets the current view mode.
+		 *
+		 * This method needs to be reworked because views are now stack based and as such this is for the primary view.
+		 * \return    const std::string& The current view mode.
+		 */
+		const std::string& GetViewMode() { return this->viewMode; }
     private:
         unsigned int windowWidth; // Store the width of our window
         unsigned int windowHeight; // Store the height of our window
@@ -119,7 +124,7 @@ namespace Sigma{
         int OpenGLVersion[2];
 
         glm::mat4 ProjectionMatrix;
-        std::vector<IGLView*> views;
+        std::vector<IGLView*> views; // A stack of the view. A vector is used to support random access.
         double deltaAccumulator; // milliseconds since last render
         double framerate; // default is 60fps
 		std::string viewMode;
