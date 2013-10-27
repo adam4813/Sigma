@@ -1,5 +1,5 @@
 #include "controllers/FPSCamera.h"
-#include "../components/ViewMover.h"
+#include "../components/CameraMover.h"
 
 namespace Sigma{
 	namespace event{
@@ -97,7 +97,7 @@ namespace Sigma{
 					(right * -right_direction)
 					);
 			}
-			void FPSCamera::SetMover(ViewMover* m){
+			void FPSCamera::SetMover(CameraMover* m){
 				this->mover = m;
 				if (this->mover) {
 					this->mover->View(this);

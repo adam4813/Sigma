@@ -1,7 +1,7 @@
 #include "systems/SimplePhysics.h"
 #include "systems/IGLView.h"
 #include "components/PhysicsMover.h"
-#include "components/ViewMover.h"
+#include "components/CameraMover.h"
 #include "Property.h"
 
 std::map<std::string,Sigma::IFactory::FactoryFunction>
@@ -10,13 +10,13 @@ std::map<std::string,Sigma::IFactory::FactoryFunction>
     using namespace std::placeholders;
     std::map<std::string,Sigma::IFactory::FactoryFunction> retval;
 	retval["PhysicsMover"] = std::bind(&SimplePhysics::createPhysicsMover,this,_1,_2);
-	retval["ViewMover"] = std::bind(&SimplePhysics::createViewMover,this,_1,_2);
+	retval["CameraMover"] = std::bind(&SimplePhysics::createViewMover,this,_1,_2);
 	retval["AABBTree"] = std::bind(&SimplePhysics::createAABBTree,this,_1,_2);
 
 	// Not supported in VS2012
     /*{
         {"PhysicsMover",std::bind(&SimplePhysics::createPhysicsMover,this,_1,_2,_3)},
-        {"ViewMover",std::bind(&SimplePhysics::createViewMover,this,_1,_2,_3)}
+        {"CameraMover",std::bind(&SimplePhysics::createViewMover,this,_1,_2,_3)}
     };*/
     return retval;
 }
@@ -48,7 +48,7 @@ Sigma::IComponent* SimplePhysics::createPhysicsMover(const unsigned int entityID
 }
 
 Sigma::IComponent* SimplePhysics::createViewMover(const unsigned int entityID, const std::vector<Property> &properties) {
-	ViewMover* mover = new ViewMover(entityID);
+	CameraMover* mover = new CameraMover(entityID);
 	this->addComponent(entityID,mover);
 	return mover;
 }
@@ -108,13 +108,13 @@ bool SimplePhysics::Update(const double delta) {
 	for (auto itr = this->colliders.begin(); itr != this->colliders.end(); ++itr) {
 		for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
 			for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
-				ViewMover* mover = static_cast<ViewMover*>(citr->second.get());
+				CameraMover* mover = static_cast<CameraMover*>(citr->second.get());
 
 				glm::vec3 cameraPos = mover->View()->Transform.GetPosition() - itr->second->Offset();
 
 				unsigned int collisions = itr->second->CollisionCheck(cameraPos, 0.10f);
 				for (unsigned int i = 0; i < collisions; ++i) {
-					mover->AddNormalForce(itr->second->GetCollisionPoint(i)->normal);
+					//mover->AddNormalForce(itr->second->GetCollisionPoint(i)->normal);
 				}
 			}
 		}

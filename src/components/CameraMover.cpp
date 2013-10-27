@@ -1,12 +1,12 @@
-#include "components/ViewMover.h"
+#include "components/CameraMover.h"
 
 #include "systems/IGLView.h"
 
-ViewMover::ViewMover(const int entityID) : Sigma::IMoverComponent(entityID) {
+CameraMover::CameraMover(const int entityID) : Sigma::IMoverComponent(entityID) {
 
 }
 
-void ViewMover::ApplyForces(const double delta) {
+void CameraMover::ApplyForces(const double delta) {
 	glm::vec3 deltavec(delta);
 	glm::vec3 totalForce;
 	glm::vec3 targetrvel;
@@ -15,15 +15,7 @@ void ViewMover::ApplyForces(const double delta) {
 		totalForce += *forceitr;
 	}
 
-	glm::vec3 outForce = totalForce;
-	for (auto forceitr = this->normalForces.begin(); forceitr != this->normalForces.end(); ++forceitr) {
-		float scalar = glm::dot(*forceitr, totalForce);
-		outForce -= (scalar + 1.0f) * *forceitr;
-	}
-
-	this->normalForces.clear();
-
-	this->view->Move(outForce * deltavec);
+	this->view->Move(totalForce * deltavec);
 
 	for (auto rotitr = this->rotationForces.begin(); rotitr != this->rotationForces.end(); ++rotitr) {
 		glm::vec3 rotation_amount = (*rotitr) * deltavec;
@@ -46,21 +38,17 @@ void ViewMover::ApplyForces(const double delta) {
 }
 
 // immediate mode rotation (for mouse motion)
-void ViewMover::RotateNow(float x, float y, float z) {
+void CameraMover::RotateNow(float x, float y, float z) {
 	this->view->Transform.Rotate(x,y,z);
 }
-void ViewMover::RotateTarget(float x, float y, float z) {
+void CameraMover::RotateTarget(float x, float y, float z) {
 	this->_rotationtarget += glm::vec3(x,y,z);
 }
 
-void ViewMover::View(Sigma::IGLView* view) {
+void CameraMover::View(Sigma::IGLView* view) {
 	this->view = view;
 }
 
-Sigma::IGLView* ViewMover::View() {
+Sigma::IGLView* CameraMover::View() {
 	return this->view;
-}
-
-void ViewMover::AddNormalForce(glm::vec3 normal) {
-	this->normalForces.push_back(normal);
 }

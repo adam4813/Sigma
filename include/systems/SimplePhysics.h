@@ -5,7 +5,7 @@
 
 #include "../IFactory.h"
 #include "../ISystem.h"
-#include "../components/ViewMover.h"
+#include "../components/CameraMover.h"
 
 #include <string>
 #include <vector>

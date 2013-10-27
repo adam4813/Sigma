@@ -6,7 +6,7 @@
 #include "../systems/MouseInputSystem.h"
 #include "../systems/IGLView.h"
 
-class ViewMover;
+class CameraMover;
 
 namespace Sigma {
 	namespace event {
@@ -42,9 +42,9 @@ namespace Sigma {
 				 * \param[in/out] ViewMover * m The view mover.
 				 * \return    void 
 				 */
-				virtual void SetMover(ViewMover* m);
+				virtual void SetMover(CameraMover* m);
 			private:
-				ViewMover* mover; // The view mover component that applies the rotations and forces set in the trigger method.
+				CameraMover* mover; // The view mover component that applies the rotations and forces set in the trigger method.
                 static const float SPEED_TRANSLATE, SPEED_ROTATE, BOOST_MULTIPLIER;
                 glm::vec3 _translate, _rotate;
 			};

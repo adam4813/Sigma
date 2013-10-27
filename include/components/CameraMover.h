@@ -9,11 +9,11 @@ namespace Sigma{
     struct IGLView;
 }
 
-class ViewMover : public Sigma::IMoverComponent {
+class CameraMover : public Sigma::IMoverComponent {
 public:
-    SET_COMPONENT_TYPENAME("ViewMover");
-	ViewMover() : Sigma::IMoverComponent(0) { }
-	ViewMover(const int entityID);
+    SET_COMPONENT_TYPENAME("CameraMover");
+	CameraMover() : Sigma::IMoverComponent(0) { }
+	CameraMover(const int entityID);
 
 	/**
 	 * \brief Apply all forces in this mover's list.
@@ -29,9 +29,9 @@ public:
 	 * \param[in] IGLView * view The view to apply the forces on.
 	 */
 	void View(Sigma::IGLView* view);
+
 	Sigma::IGLView* View();
 
-	void AddNormalForce( glm::vec3 normal );
 	void RotateNow(float,float,float);
 	void RotateTarget(float,float,float);
 
@@ -39,6 +39,6 @@ protected:
 	Sigma::IGLView* view;
 	std::list<glm::vec3> normalForces;
 	glm::vec3 _rotationtarget;
-}; // class ViewMover
+}; // class CameraMover
 
 #endif // VIEW_MOVER_H

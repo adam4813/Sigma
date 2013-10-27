@@ -2,11 +2,11 @@
 
 #include <list>
 #include "IBulletShape.h"
-#include "ViewMover.h"
+#include "CameraMover.h"
 
 struct IGLView;
 namespace Sigma {
-	class BulletMover : public IBulletShape, public ViewMover {
+	class BulletMover : public IBulletShape, public CameraMover {
 	public:
 		SET_COMPONENT_TYPENAME("BulletMover");
 		BulletMover() : IBulletShape(0) { }
