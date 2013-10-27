@@ -7,12 +7,9 @@
 #include "ISystem.h"
 #include "IGLComponent.h"
 #include "systems/IGLView.h"
+#include <vector>
 
-#include "GL/glew.h"
-#include "glm/glm.hpp"
-#include "glm/ext.hpp"
-
-#include <memory>
+//#include <memory>
 
 struct IGLView;
 
@@ -42,23 +39,6 @@ namespace Sigma{
         bool Update(const double delta);
 
         /**
-         * \brief Move the camera around the world.
-         *
-         * Moves the camera around by the specified amounts.
-         * \param x, y, z direction relative to the camera, with x right, y up..
-         */
-        //void Move(float x, float y, float z);
-
-        /**
-         * \brief Rotates the camera around the world.
-         *
-         * Rotates the camera around by the specified amounts.
-         * \param x, y, z rotation amount (in radians) relative to current viewing orientation
-         * \return   void
-         */
-        //void Rotate(float x, float y, float z);
-
-        /**
          * \brief Sets the window width and height for glViewport
          *
          * \param width new width for the window
@@ -80,10 +60,12 @@ namespace Sigma{
          *
          *  Note that the constructor sets a default of 60fps
          */
-        void SetFrameRate(double fr){ this->framerate = fr; }
+        void SetFrameRate(double fr) { this->framerate = fr; }
 
         std::map<std::string,FactoryFunction> getFactoryFunctions();
 
+
+		// TODO: Move these methods to the components themselves.
         IComponent* createGLSprite(const unsigned int entityID, const std::vector<Property> &properties) ;
         IComponent* createGLIcoSphere(const unsigned int entityID, const std::vector<Property> &properties) ;
         IComponent* createGLCubeSphere(const unsigned int entityID, const std::vector<Property> &properties) ;
@@ -92,7 +74,41 @@ namespace Sigma{
 		// Views are not technically components, but perhaps they should be
 		IComponent* createGLView(const unsigned int entityID, const std::vector<Property> &properties, std::string mode) ;
 
-        IGLView* View() const { return this->view.get(); }
+        /**
+         * \brief Gets the specified view.
+         *
+		 * \param unsigned int index The index of the view to retrieve.
+         * \return IGLView* The specified view.
+         */
+		IGLView* GetView(unsigned int index = 0) const {
+			if (index > this->views.size()) {
+				return this->views[this->views.size()];
+			}
+			return this->views[index];
+		}
+
+		/**
+		 * \brief Adds a view to the stack.
+		 *
+		 * \param[in/out] IGLView * view The view to add to the stack.
+		 * \return void 
+		 */
+		void PushView(IGLView* view) {
+			this->views.push_back(view);
+		}
+
+		/**
+		 * \brief Pops a view from the stack.
+		 *
+		 * Pops a view from the stack and deletes it.
+		 * \return void 
+		 */
+		void PopView() {
+			if (this->views.size() > 0) {
+				delete this->views[this->views.size()];
+				this->views.pop_back();
+			}
+		}
 
 		GLTransform* GetTransformFor(const unsigned int entityID);
 		std::string GetViewMode() { return this->viewMode; }
@@ -103,7 +119,7 @@ namespace Sigma{
         int OpenGLVersion[2];
 
         glm::mat4 ProjectionMatrix;
-        std::unique_ptr<IGLView> view;
+        std::vector<IGLView*> views;
         double deltaAccumulator; // milliseconds since last render
         double framerate; // default is 60fps
 		std::string viewMode;

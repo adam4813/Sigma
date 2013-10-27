@@ -8,9 +8,13 @@
 #include "components/GLMesh.h"
 #include "controllers/FPSCamera.h"
 
+#include "GL/glew.h"
+#include "glm/glm.hpp"
+#include "glm/ext.hpp"
+
 namespace Sigma{
     OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumulator(0.0),
-		framerate(60.0f), view(nullptr), viewMode("") {}
+		framerate(60.0f), viewMode("") {}
 
 	std::map<std::string, Sigma::IFactory::FactoryFunction>
         OpenGLSystem::getFactoryFunctions() {
@@ -31,9 +35,9 @@ namespace Sigma{
 		viewMode = mode;
 
 		if(mode=="FPSCamera") {
-			this->view = std::unique_ptr<IGLView>(new Sigma::event::handler::FPSCamera(entityID));
+			this->views.push_back(new Sigma::event::handler::FPSCamera(entityID));
 		} else if(mode=="GLSixDOFView") {
-			this->view = std::unique_ptr<IGLView>(new GLSixDOFView(entityID));
+			this->views.push_back(new GLSixDOFView(entityID));
 		} else {
 			std::cerr << "Invalid view type!" << std::endl;
 		}
@@ -64,10 +68,10 @@ namespace Sigma{
 			}
 		}
 
-		this->view->Transform.Move(x,y,z);
-		this->view->Transform.Rotate(rx,ry,rz);
+		this->views[this->views.size()]->Transform.Move(x,y,z);
+		this->views[this->views.size()]->Transform.Rotate(rx,ry,rz);
 
-		return this->view.get();
+		return this->views[this->views.size()];
 	}
 
 	IComponent* OpenGLSystem::createGLSprite(const unsigned int entityID, const std::vector<Property> &properties) {
@@ -275,7 +279,7 @@ namespace Sigma{
             glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
-			glm::mat4 viewMatrix = this->view->GetViewMatrix();
+			glm::mat4 viewMatrix = (*this->views.end())->GetViewMatrix();
 
             // Loop through and draw each component.
             for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
