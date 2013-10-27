@@ -25,7 +25,7 @@ namespace Sigma{
 		retval["GLIcoSphere"] = std::bind(&OpenGLSystem::createGLIcoSphere,this,_1,_2);
 		retval["GLCubeSphere"] = std::bind(&OpenGLSystem::createGLCubeSphere,this,_1,_2);
 		retval["GLMesh"] = std::bind(&OpenGLSystem::createGLMesh,this,_1,_2);
-		retval["GLFPSView"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2, "FPSCamera");
+		retval["FPSCamera"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2, "FPSCamera");
 		retval["GLSixDOFView"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2, "GLSixDOFView");
 
         return retval;
@@ -76,10 +76,10 @@ namespace Sigma{
 			}
 		}
 
-		this->views[this->views.size()]->Transform.Move(x,y,z);
-		this->views[this->views.size()]->Transform.Rotate(rx,ry,rz);
+		this->views[this->views.size() - 1]->Transform.Move(x,y,z);
+		this->views[this->views.size() - 1]->Transform.Rotate(rx,ry,rz);
 
-		return this->views[this->views.size()];
+		return this->views[this->views.size() - 1];
 	}
 
 	IComponent* OpenGLSystem::createGLSprite(const unsigned int entityID, const std::vector<Property> &properties) {
@@ -324,7 +324,10 @@ namespace Sigma{
             glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
-			glm::mat4 viewMatrix = (*this->views.end())->GetViewMatrix();
+			glm::mat4 viewMatrix;
+			if (this->views.size() > 0) {
+				viewMatrix = this->views[this->views.size() - 1]->GetViewMatrix();
+			}
 
             // Loop through and draw each component.
             for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
@@ -362,7 +365,7 @@ namespace Sigma{
 		assert((OpenGLVersion[0] > 1) && (OpenGLVersion[0] < 5));
 
 		// Determine the aspect ratio and sanity check it to a safe ratio
-		float aspectRatio = static_cast<float>(this->windowWidth / this->windowHeight);
+		float aspectRatio = static_cast<float>(this->windowWidth) / static_cast<float>(this->windowHeight);
 		if (aspectRatio < 1.0f) {
 			aspectRatio = 4.0f / 3.0f;
 		}
@@ -394,7 +397,7 @@ namespace Sigma{
 		this->windowWidth = width;
 
 		// Determine the aspect ratio and sanity check it to a safe ratio
-		float aspectRatio = static_cast<float>(this->windowWidth / this->windowHeight);
+		float aspectRatio = static_cast<float>(this->windowWidth) / static_cast<float>(this->windowHeight);
 		if (aspectRatio < 1.0f) {
 			aspectRatio = 4.0f / 3.0f;
 		}

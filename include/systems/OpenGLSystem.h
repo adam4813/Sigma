@@ -80,7 +80,7 @@ namespace Sigma{
          */
 		IGLView* GetView(unsigned int index = 0) const {
 			if (index > this->views.size()) {
-				return this->views[this->views.size()];
+				return this->views[this->views.size() - 1];
 			}
 			return this->views[index];
 		}
@@ -103,7 +103,7 @@ namespace Sigma{
 		 */
 		void PopView() {
 			if (this->views.size() > 0) {
-				delete this->views[this->views.size()];
+				delete this->views[this->views.size() - 1];
 				this->views.pop_back();
 			}
 		}

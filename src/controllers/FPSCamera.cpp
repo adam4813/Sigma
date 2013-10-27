@@ -46,8 +46,7 @@ namespace Sigma{
 			} // function KeyStateChange
 
 			void FPSCamera::MouseMove(float dx, float dy) {
-				// Inertial motion
-				this->mover->RotateTarget(dx,dy,0.0f);
+				this->mover->RotateTarget(dy,dx,0.0f);
 			}
 
 			const glm::mat4 FPSCamera::GetViewMatrix() {
