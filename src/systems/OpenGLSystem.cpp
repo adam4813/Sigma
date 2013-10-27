@@ -1,7 +1,6 @@
 #include "systems/OpenGLSystem.h"
 #include "systems/GLSLShader.h"
 #include "systems/GLSixDOFView.h"
-#include "systems/GLFPSView.h"
 #include "components/GLSprite.h"
 #include "components/GLIcoSphere.h"
 #include "components/GLCubeSphere.h"

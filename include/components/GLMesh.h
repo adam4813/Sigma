@@ -71,7 +71,7 @@ namespace Sigma{
             }
         }
 
-        void LoadMesh(std::string fname);
+        bool LoadMesh(std::string fname);
 
         void ParseMTL(std::string fname);
 
@@ -184,7 +184,7 @@ namespace Sigma{
         }
 
 		/** \brief load the default shader "shaders/mesh" */
-        void LoadShader();
+        bool LoadShader();
 
         static const std::string DEFAULT_SHADER;
 
