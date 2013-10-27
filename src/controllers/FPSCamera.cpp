@@ -1,4 +1,5 @@
 #include "controllers/FPSCamera.h"
+#include "../components/ViewMover.h"
 
 namespace Sigma{
 	namespace event{
@@ -7,10 +8,9 @@ namespace Sigma{
 			const float FPSCamera::SPEED_ROTATE      = 20.0f * 3.14159f;
 			const float FPSCamera::BOOST_MULTIPLIER  = 2.0f;
 
-			FPSCamera::FPSCamera(int entityID, ViewMover* mover) : IGLView(entityID), mover(mover) {
+			FPSCamera::FPSCamera(int entityID) : IGLView(entityID) {
 				// Set the view mover's view pointer.
 				this->Transform.SetEuler(true);
-				this->mover->View(this);
 
 				// Clear out the internal key state buffers.
 				memset(this->keys, 0, sizeof(this->keys));
@@ -29,24 +29,32 @@ namespace Sigma{
 
 				// Translation keys
 				float fwd = 0.0f, strafe = 0.0f, rise = 0.0f;
-				if (this->keyState['W'] == KS_DOWN) // Move forward
+				if (this->keyState['W'] == KS_DOWN) { // Move forward
 					fwd += speed;
-				if (this->keyState['S'] == KS_DOWN) // Move backward
+				}
+				if (this->keyState['S'] == KS_DOWN) { // Move backward
 					fwd -= speed;
-				if (this->keyState['A'] == KS_DOWN) // Strafe left
+				}
+				if (this->keyState['A'] == KS_DOWN) { // Strafe left
 					strafe -= speed;
-				if (this->keyState['D'] == KS_DOWN) // Strafe right
+				}
+				if (this->keyState['D'] == KS_DOWN) { // Strafe right
 					strafe += speed;
+				}
 
 				// remove previous force and add new one
-				this->mover->RemoveForce(this->_translate);
-				this->_translate = glm::vec3(strafe, rise, fwd);
-				this->mover->AddForce(this->_translate);
+				if (this->mover) {
+					this->mover->RemoveForce(this->_translate);
+					this->_translate = glm::vec3(strafe, rise, fwd);
+					this->mover->AddForce(this->_translate);
+				}
 
 			} // function KeyStateChange
 
 			void FPSCamera::MouseMove(float dx, float dy) {
-				this->mover->RotateTarget(dy,dx,0.0f);
+				if (this->mover) {
+					this->mover->RotateTarget(dy,dx,0.0f);
+				}
 			}
 
 			const glm::mat4 FPSCamera::GetViewMatrix() {
@@ -69,7 +77,8 @@ namespace Sigma{
 
 				if(new_pitch > 45.0f) {
 					rot.x = 45.0f - current_pitch;
-				} else if(new_pitch < -45.0f) {
+				}
+				else if(new_pitch < -45.0f) {
 					rot.x = -45.0f - current_pitch;
 				}
 
@@ -87,6 +96,12 @@ namespace Sigma{
 					(up * GLTransform::UP_VECTOR) +
 					(right * -right_direction)
 					);
+			}
+			void FPSCamera::SetMover(ViewMover* m){
+				this->mover = m;
+				if (this->mover) {
+					this->mover->View(this);
+				}
 			}
 		}
 	}
