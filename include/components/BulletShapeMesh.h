@@ -5,7 +5,7 @@ namespace Sigma{
 	class GLMesh;
 	class BulletShapeMesh : public IBulletShape {
 	public:
-		SET_COMPONENT_ID("BulletShapeMesh");
+		SET_COMPONENT_TYPENAME("BulletShapeMesh");
 		BulletShapeMesh(const int entityID = 0) : IBulletShape(entityID) { }
 		~BulletShapeMesh() {
 			if (this->btmesh != nullptr) {

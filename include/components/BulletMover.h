@@ -8,7 +8,7 @@ struct IGLView;
 namespace Sigma {
 	class BulletMover : public IBulletShape, public ViewMover {
 	public:
-		SET_COMPONENT_ID("BulletMover");
+		SET_COMPONENT_TYPENAME("BulletMover");
 		BulletMover() : IBulletShape(0) { }
 		BulletMover(const int entityID);
 		~BulletMover();

@@ -7,7 +7,7 @@ class GLTransform;
 
 class PhysicsMover : public Sigma::IMoverComponent {
 public:
-    SET_COMPONENT_ID("PhysicsMover");
+    SET_COMPONENT_TYPENAME("PhysicsMover");
 	PhysicsMover() : Sigma::IMoverComponent(0) { }
 	PhysicsMover(const int entityID);
 

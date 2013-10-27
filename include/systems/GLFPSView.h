@@ -4,7 +4,7 @@
 
 struct GLFPSView : public Sigma::IGLView {
 
-    SET_COMPONENT_ID("FPS_VIEW");
+    SET_COMPONENT_TYPENAME("FPS_VIEW");
 
 	GLFPSView(int entityID);
 

@@ -4,7 +4,7 @@
 
 struct GLSixDOFView : public Sigma::IGLView {
 
-    SET_COMPONENT_ID("SIX_DOF_VIEW");
+    SET_COMPONENT_TYPENAME("SIX_DOF_VIEW");
 
 	GLSixDOFView(int entityID);
 

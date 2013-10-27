@@ -92,7 +92,7 @@ int main(int argCount, char **argValues) {
 	// for this to work.
 
 	// No view provided, create a default FPS view
-	if(!glsys.View()) {
+	if(!glsys.GetView()) {
 		std::vector<Property> props;
 
 		Property p_x("x", 0.0f);
@@ -116,13 +116,13 @@ int main(int argCount, char **argValues) {
 	// controller class ancestor
 	if(glsys.GetViewMode() == "FPSCamera") {
 	    using Sigma::event::handler::FPSCamera;
-        FPSCamera* theCamera = static_cast<FPSCamera*>(glsys.View());
+        FPSCamera* theCamera = static_cast<FPSCamera*>(glsys.GetView());
 		IOpSys::KeyboardEventSystem.Register(theCamera);
 		IOpSys::MouseEventSystem.Register(theCamera);
 		theCamera->SetMover(mover);
 		mover->View(theCamera);
 	} else if (glsys.GetViewMode() == "GLSixDOFView") {
-		Sigma::event::handler::GLSixDOFViewController cameraController(glsys.View(), mover);
+		Sigma::event::handler::GLSixDOFViewController cameraController(glsys.GetView(), mover);
 		IOpSys::KeyboardEventSystem.Register(&cameraController);
 	}
 

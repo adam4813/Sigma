@@ -11,7 +11,7 @@ namespace Sigma{
 
 class ViewMover : public Sigma::IMoverComponent {
 public:
-    SET_COMPONENT_ID("ViewMover");
+    SET_COMPONENT_TYPENAME("ViewMover");
 	ViewMover() : Sigma::IMoverComponent(0) { }
 	ViewMover(const int entityID);
 

@@ -10,7 +10,7 @@ namespace Sigma {
 
     class GLCubeSphere : public GLMesh {
     public:
-        SET_COMPONENT_ID("GLCubeSphere");
+        SET_COMPONENT_TYPENAME("GLCubeSphere");
         // We have a private ctor so the factory method must be used.
         GLCubeSphere(const int entityID = 0);
         ~GLCubeSphere();

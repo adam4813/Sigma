@@ -11,7 +11,7 @@ namespace Sigma{
 
     class GLIcoSphere : public GLMesh {
     public:
-        SET_COMPONENT_ID("GLIcoSphere");
+        SET_COMPONENT_TYPENAME("GLIcoSphere");
         // We have a private ctor so the factory method must be used.
         GLIcoSphere(const int entityID = 0);
         ~GLIcoSphere(){}
