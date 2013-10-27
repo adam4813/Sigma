@@ -53,7 +53,7 @@ namespace Sigma{
                 {
                     _Components.insert(std::pair<std::size_t,ComponentMap>(EntityID,ComponentMap()));
                 }
-                _Components[EntityID][Component->getComponentID()]=std::unique_ptr<T>(Component);
+                _Components[EntityID][Component->getComponentTypeName()]=std::unique_ptr<T>(Component);
             }
         protected:
             EntityComponentMap _Components;

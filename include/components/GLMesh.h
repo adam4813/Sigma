@@ -29,7 +29,7 @@ namespace Sigma{
     public:
         using IGLComponent::LoadShader;
 
-        SET_COMPONENT_ID("GLMesh");
+        SET_COMPONENT_TYPENAME("GLMesh");
         GLMesh(const int entityID);
         virtual ~GLMesh(){}
 

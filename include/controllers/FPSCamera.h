@@ -15,7 +15,7 @@ namespace Sigma {
 			private:
 			public:
 
-			    SET_COMPONENT_ID("FPS_CAMERA");
+			    SET_COMPONENT_TYPENAME("FPS_CAMERA");
 
 				FPSCamera(int entityID) : IGLView(entityID) { }
 				FPSCamera(int entityID, ViewMover* mover);

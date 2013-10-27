@@ -36,7 +36,7 @@ namespace Sigma {
 	class AABBTree : public Sigma::IComponent {
 	public:
 		AABBTree(const int entityID);
-		SET_COMPONENT_ID("AABBTree");
+		SET_COMPONENT_TYPENAME("AABBTree");
 		~AABBTree() { }
 
 		/**
