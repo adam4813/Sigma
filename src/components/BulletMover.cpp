@@ -48,8 +48,8 @@ namespace Sigma {
 
 	void BulletMover::UpdateView() {
 		btTransform trans;
-		//this->body->getMotionState()->getWorldTransform(trans);
-		//this->view->Transform.TranslateTo(trans.getOrigin().x(),trans.getOrigin().y(), trans.getOrigin().z());
+		this->body->getMotionState()->getWorldTransform(trans);
+		this->view->Transform.TranslateTo(trans.getOrigin().x(),trans.getOrigin().y(), trans.getOrigin().z());
 	}
 
 	void BulletMover::InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz) {

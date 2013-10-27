@@ -7,7 +7,7 @@
   *
   * This class is used to pass around generic properties.
   * Properties have a name and a value. The value is stored in
-  * vholder and is accessed by calling Get() with the 
+  * vholder and is accessed by calling Get() with the
   * appropriate type.
   */
 class Property {
@@ -48,14 +48,14 @@ public:
 	 * \returns   t The value with the given template type.
 	 */
 	template <typename t>
-	t Get() { return static_cast<ValueHolder<t>*>(this->vholder)->Get(); }
+	t Get() const { return static_cast<ValueHolder<t>*>(this->vholder)->Get(); }
 
 	/**
 	 * \brief Gets the name of this property.
 	 *
 	 * \returns   std::string The name of this property.
 	 */
-	std::string GetName() { return this->name; }
+	std::string GetName() const { return this->name; }
 private:
 	/**
 	  * \brief ValueHolderBase is a common base type that can be used to holder a pointer to a specialized templated version of ValueHolder.
@@ -72,7 +72,7 @@ private:
 		virtual ValueHolderBase* Clone() const = 0;
 	};
 
-	
+
 	/**
 	  * \brief A generic value holder type.
 	  *

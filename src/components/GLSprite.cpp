@@ -78,10 +78,8 @@ namespace Sigma{
         glGenTextures(1, &this->texture_);
     }
 
-    void GLSprite::LoadShader() {
-        (*shader).LoadFromFile(GL_VERTEX_SHADER, "shaders/sprite.vert");
-        (*shader).LoadFromFile(GL_FRAGMENT_SHADER, "shaders/frag.shade");
-        (*shader).CreateAndLinkProgram();
+	void GLSprite::LoadShader() {
+		IGLComponent::LoadShader(GLSprite::DEFAULT_SHADER);
     }
 
     void GLSprite::Render(glm::mediump_float *view, glm::mediump_float *proj) {

@@ -1,14 +1,18 @@
 #pragma once
+#ifndef VIEW_MOVER_H
+#define VIEW_MOVER_H
 
 #include "../IMoverComponent.h"
 #include <list>
 
-struct IGLView;
+namespace Sigma{
+    struct IGLView;
+}
 
-class ViewMover : public IMoverComponent {
+class ViewMover : public Sigma::IMoverComponent {
 public:
     SET_COMPONENT_ID("ViewMover");
-	ViewMover() : IMoverComponent(0) { }
+	ViewMover() : Sigma::IMoverComponent(0) { }
 	ViewMover(const int entityID);
 
 	/**
@@ -24,15 +28,17 @@ public:
 	 *
 	 * \param[in] IGLView * view The view to apply the forces on.
 	 */
-	void View(IGLView* view);
-	IGLView* View();
+	void View(Sigma::IGLView* view);
+	Sigma::IGLView* View();
 
 	void AddNormalForce( glm::vec3 normal );
 	void RotateNow(float,float,float);
 	void RotateTarget(float,float,float);
 
 protected:
-	IGLView* view;
+	Sigma::IGLView* view;
 	std::list<glm::vec3> normalForces;
 	glm::vec3 _rotationtarget;
-};
+}; // class ViewMover
+
+#endif // VIEW_MOVER_H

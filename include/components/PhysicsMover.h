@@ -1,12 +1,14 @@
 #pragma once
+#ifndef PHSYICS_MOVER_H
+#define PHSYICS_MOVER_H
 
 #include "../IMoverComponent.h"
 class GLTransform;
 
-class PhysicsMover : public IMoverComponent {
+class PhysicsMover : public Sigma::IMoverComponent {
 public:
     SET_COMPONENT_ID("PhysicsMover");
-	PhysicsMover() : IMoverComponent(0) { }
+	PhysicsMover() : Sigma::IMoverComponent(0) { }
 	PhysicsMover(const int entityID);
 
 	/**
@@ -35,4 +37,6 @@ public:
 	GLTransform* Transform() const { return this->transform; }
 protected:
 	GLTransform* transform; // The transform that forces are applied to.
-};
+}; // class PhysicsMover
+
+#endif // PHSYICS_MOVER_H

@@ -58,7 +58,7 @@ namespace Sigma {
         GLuint specularMap;
     };
 
-	class IGLComponent : public IComponent {
+	class IGLComponent : public Sigma::IComponent {
 	public:
 		IGLComponent() : IComponent(0) { } // Default ctor setting entity ID to 0.
 		IGLComponent(const int entityID) : lightingEnabled(true), IComponent(entityID) { } // Ctor that sets the entity ID.

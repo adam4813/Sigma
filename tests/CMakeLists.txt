@@ -2,7 +2,8 @@ project (SigmaTests)
 
 cmake_minimum_required(VERSION 2.8)
 
-IF(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
+IF(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    # gtest requires pthread on *nix
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 ENDIF(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
@@ -12,6 +13,11 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
 set(SigmaTests_SRC "${CMAKE_SOURCE_DIR}")
 
 file(GLOB SigmaTests_SRC "tests/*.h" "main.cpp")
+file(GLOB SigmaTests_SRC_CPP
+    "${CMAKE_SOURCE_DIR}/src/EntityManager.cpp" "${CMAKE_SOURCE_DIR}/src/systems/FactorySystem.cpp"
+    # add other cpp dependencies here
+    )
+source_group("Source Files" FILES ${Sigma_SRC_COMPONENT_CPP})
 
 find_package(GTEST REQUIRED)
 IF(NOT GTEST_FOUND)
@@ -26,6 +32,8 @@ foreach(flag_var
    endif(${flag_var} MATCHES "/MD")
 endforeach(flag_var)
 
-add_executable(SigmaTests ${SigmaTests_SRC})
+add_executable(SigmaTests ${SigmaTests_SRC} ${SigmaTests_SRC_CPP})
 
 target_link_libraries (SigmaTests ${GTEST_LIBRARIES})
+
+message("Tests' Cmake configured.")

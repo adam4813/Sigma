@@ -2,8 +2,11 @@
 
 #include "IGLView.h"
 
-struct GLSixDOFView : public IGLView {
-	GLSixDOFView();
+struct GLSixDOFView : public Sigma::IGLView {
+
+    SET_COMPONENT_ID("SIX_DOF_VIEW");
+
+	GLSixDOFView(int entityID);
 
 	const glm::mat4 GetViewMatrix();
 	virtual void Move(float right, float up, float forward);

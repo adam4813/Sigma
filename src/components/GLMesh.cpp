@@ -365,7 +365,7 @@ namespace Sigma{
         }
     } // function LoadMesh
 
-    void GLMesh::LoadShader(){
+    void GLMesh::LoadShader() {
         IGLComponent::LoadShader(GLMesh::DEFAULT_SHADER);
     }
 

@@ -1,6 +1,6 @@
 #include "systems/GLSixDOFView.h"
 
-GLSixDOFView::GLSixDOFView() {}
+GLSixDOFView::GLSixDOFView(int entity_id) : IGLView(entity_id) {}
 
 const glm::mat4 GLSixDOFView::GetViewMatrix() {
 	return glm::lookAt(this->Transform.GetPosition(),

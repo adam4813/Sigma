@@ -93,7 +93,7 @@ int main(int argCount, char **argValues) {
 	// for this to work.
 
 	// No view provided, create a default FPS view
-	/*if(!glsys.View()) {
+	if(!glsys.GetView()) {
 		std::vector<Property> props;
 
 		Property p_x("x", 0.0f);
@@ -104,22 +104,26 @@ int main(int argCount, char **argValues) {
 		props.push_back(p_y);
 		props.push_back(p_z);
 
-		glsys.createGLView(1, props, "GLFPSView");
-	}*/
+		glsys.createGLView(1, props, "FPSCamera");
+	}
 
 	// Still hard coded to use entity ID #1
 	// Link the graphics view to the physics system's view mover
 	Sigma::BulletMover* mover = bphys.getViewMover();
 
+
 	// Create the controller
 	// Perhaps a little awkward currently, should create a generic
 	// controller class ancestor
-	if(glsys.GetViewMode() == "GLFPSView") {
-		Sigma::event::handler::FPSCamera cameraController(mover);
-		IOpSys::KeyboardEventSystem.Register(&cameraController);
-		IOpSys::MouseEventSystem.Register(&cameraController);
+	if(glsys.GetViewMode() == "FPSCamera") {
+	    using Sigma::event::handler::FPSCamera;
+        FPSCamera* theCamera = static_cast<FPSCamera*>(glsys.GetView());
+		IOpSys::KeyboardEventSystem.Register(theCamera);
+		IOpSys::MouseEventSystem.Register(theCamera);
+		theCamera->SetMover(mover);
+		mover->View(theCamera);
 	} else if (glsys.GetViewMode() == "GLSixDOFView") {
-		Sigma::event::handler::GLSixDOFViewController cameraController(glsys.View(), mover);
+		Sigma::event::handler::GLSixDOFViewController cameraController(glsys.GetView(), mover);
 		IOpSys::KeyboardEventSystem.Register(&cameraController);
 	}
 
@@ -164,7 +168,7 @@ int main(int argCount, char **argValues) {
 		bphys.Update(deltaSec);
 
 		// Update stats display
-		Sigma::GLScreenQuad *statsDisplay = dynamic_cast<Sigma::GLScreenQuad*>(glsys.getComponent(31, "GLScreenQuad"));
+/*		Sigma::GLScreenQuad *statsDisplay = dynamic_cast<Sigma::GLScreenQuad*>(glsys.getComponent(31, "GLScreenQuad"));
 
 		if(statsDisplay) {
 			char message[100];
@@ -172,7 +176,7 @@ int main(int argCount, char **argValues) {
 			os->RenderText(message, 2.0f, 2.0f, statsDisplay->GetTexture());
 			sprintf(message, "FPS: %.1f", 1000.0f/delta);
 			os->RenderText(message, 2.0f, 10.0f, statsDisplay->GetTexture());
-		}
+		}*/
 
 		// Update the renderer and present
 		if (glsys.Update(delta)) {

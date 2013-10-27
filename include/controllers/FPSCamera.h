@@ -11,10 +11,14 @@ namespace Sigma {
 	namespace event {
 		namespace handler {
 			// A type of handler. This handler controls an OpenGL 6 DOF view.
-			class FPSCamera : public IKeyboardEventHandler, public IMouseEventHandler, public IGLView {
+			class FPSCamera : public IKeyboardEventHandler, public IMouseEventHandler, public Sigma::IGLView {
+			private:
 			public:
-				FPSCamera() { }
-				FPSCamera(ViewMover* mover);
+
+			    SET_COMPONENT_ID("FPS_CAMERA");
+
+				FPSCamera(int entityID) : IGLView(entityID) { }
+				FPSCamera(int entityID, ViewMover* mover);
 
 				/**
 				 * \brief Triggered whenever a key state change event happens
@@ -32,6 +36,7 @@ namespace Sigma {
 				const glm::mat4 GetViewMatrix();
 				virtual void Move(float right, float up, float forward);
 				virtual glm::vec3 Restrict(glm::vec3 rotation);
+				virtual void SetMover(ViewMover* m){ mover = m; }
 			private:
 				ViewMover* mover; // The view mover component that applies the rotations and forces set in the trigger method.
                 static const float SPEED_TRANSLATE, SPEED_ROTATE, BOOST_MULTIPLIER;
