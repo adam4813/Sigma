@@ -1,5 +1,5 @@
 #include "controllers/FPSCamera.h"
-#include "../components/CameraMover.h"
+#include "components/BulletMover.h"
 
 namespace Sigma{
 	namespace event{
@@ -10,7 +10,8 @@ namespace Sigma{
 
 			FPSCamera::FPSCamera(int entityID) : IGLView(entityID) {
 				// Set the view mover's view pointer.
-				this->Transform.SetEuler(true);
+				this->transform.SetEuler(true);
+				this->transform.SetMaxRotation(glm::vec3(45.0f,0,0));
 
 				// Clear out the internal key state buffers.
 				memset(this->keys, 0, sizeof(this->keys));
@@ -44,9 +45,9 @@ namespace Sigma{
 
 				// remove previous force and add new one
 				if (this->mover) {
-					this->mover->RemoveForce(this->_translate);
-					this->_translate = glm::vec3(strafe, rise, fwd);
-					this->mover->AddForce(this->_translate);
+					this->mover->RemoveForce(this->translation);
+					this->translation = glm::vec3(strafe, rise, fwd);
+					this->mover->AddForce(this->translation);
 				}
 
 			} // function KeyStateChange
@@ -60,47 +61,18 @@ namespace Sigma{
 			const glm::mat4 FPSCamera::GetViewMatrix() {
 				// Limit rotation to pitch and yaw, apply pitch first to ensure
 				// yaw rotation happens correctly
-				glm::mat4 viewMatrix = glm::rotate(glm::mat4(1.0f), this->Transform.GetPitch(), glm::vec3(1.0f, 0, 0));
-				viewMatrix = glm::rotate(viewMatrix, this->Transform.GetYaw(), glm::vec3(0, 1.0f, 0));
+				glm::mat4 viewMatrix = glm::rotate(glm::mat4(1.0f), this->transform.GetPitch(), glm::vec3(1.0f, 0, 0));
+				viewMatrix = glm::rotate(viewMatrix, this->transform.GetYaw(), glm::vec3(0, 1.0f, 0));
 
-				viewMatrix = glm::translate(viewMatrix, -1.0f * this->Transform.GetPosition());
+				viewMatrix = glm::translate(viewMatrix, -1.0f * this->transform.GetPosition());
 
 				return viewMatrix;
 			}
 
-			// Currently not working
-			glm::vec3 FPSCamera::Restrict(glm::vec3 rotation) {
-				glm::vec3 rot = rotation;
-
-				float current_pitch = this->Transform.GetPitch();
-				float new_pitch = current_pitch + rotation.x;
-
-				if(new_pitch > 45.0f) {
-					rot.x = 45.0f - current_pitch;
-				}
-				else if(new_pitch < -45.0f) {
-					rot.x = -45.0f - current_pitch;
-				}
-
-				return rot;
-			}
-
-			void FPSCamera::Move(float right, float up, float forward) {
-
-				// Figure out the movement directions along the xz plane, to allow for proper movement.
-				glm::vec3 right_direction = glm::normalize(glm::cross(this->Transform.GetForward(), GLTransform::UP_VECTOR));
-				glm::vec3 forward_direction = glm::normalize(glm::cross(GLTransform::UP_VECTOR, right_direction));
-
-				this->Transform.Translate(
-					(forward * -forward_direction) +
-					(up * GLTransform::UP_VECTOR) +
-					(right * -right_direction)
-					);
-			}
-			void FPSCamera::SetMover(CameraMover* m){
-				this->mover = m;
+			void FPSCamera::SetMover(BulletMover* m){
 				if (this->mover) {
-					this->mover->View(this);
+					m->SetTransform(this->transform);
+					this->mover = m;
 				}
 			}
 		}

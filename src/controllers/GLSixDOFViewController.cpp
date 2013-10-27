@@ -8,9 +8,9 @@ namespace handler{
     const float GLSixDOFViewController::SPEED_ROTATE      = 20.0f * 3.14159f;
     const float GLSixDOFViewController::BOOST_MULTIPLIER  = 2.0f;
 
-    GLSixDOFViewController::GLSixDOFViewController(IGLView* view, CameraMover* mover) : mover(mover) {
+    GLSixDOFViewController::GLSixDOFViewController(IGLView* view, BulletMover* mover) : mover(mover) {
         // Set the view mover's view pointer.
-        this->mover->View(view);
+        this->mover->SetTransform(view->transform);
 
         // Clear out the internal key state buffers.
         memset(this->keys, 0, sizeof(this->keys));
