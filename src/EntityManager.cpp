@@ -56,7 +56,7 @@ namespace Sigma{
             std::vector<std::unique_ptr<IComponent>>& theComponents = EntityManager::current_context->entities[entity_id];
             // search for the specified component
             for(auto itr = theComponents.begin(); itr != theComponents.end(); ++itr){
-                if((*itr)->getComponentID() == component_type){
+                if((*itr)->getComponentTypeName() == component_type){
                     // remove it and break out since we know there is only one.
                     theComponents.erase(itr);
                     return true;
@@ -75,7 +75,7 @@ namespace Sigma{
             std::vector<std::unique_ptr<IComponent>>& theComponents = EntityManager::current_context->entities[entity_id];
             // search for the specified component
             for(auto itr = theComponents.begin(); itr != theComponents.end(); ++itr){
-                if((*itr)->getComponentID() == component_type){
+                if((*itr)->getComponentTypeName() == component_type){
                     // found! return it.
                     return (*itr).get();
                 }
