@@ -6,6 +6,7 @@
 #include <map>
 
 #include "IOpSys.h"
+
 #include "SDL/SDL.h"
 #include "SDL/SDL_ttf.h"
 

@@ -132,3 +132,6 @@ add_definitions(-D${IOPSYS})
 
 # Link the executable to the Hello library.
 target_link_libraries (Sigma ${Sigma_LIB} ${OPENGL_LIBRARIES} ${GLEW_LIBRARY} ${SOIL_LIBRARY} ${BULLET_LINEARMATH_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES})
+
+# build the Tests subproject
+#ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/tests")

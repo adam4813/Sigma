@@ -86,7 +86,7 @@ namespace Sigma {
 			sprintf(filename, "%s.dds", texture_name.c_str());
 
 			this->_cubeMap = SOIL_load_OGL_single_cubemap(filename, SOIL_DDS_CUBEMAP_FACE_ORDER, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
-	
+
 			// if that didn't work, load individual files
 			if(this->_cubeMap == 0) {
 				// There are always six files
@@ -113,7 +113,7 @@ namespace Sigma {
 			sprintf(filename, "%s_nm.dds", texture_name.c_str());
 
 			this->_cubeNormalMap = SOIL_load_OGL_single_cubemap(filename, SOIL_DDS_CUBEMAP_FACE_ORDER, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
-	
+
 			if(this->_cubeNormalMap==0) {
 				// LOAD CUBE NORMAL TEXTURES
 				for(int i=0; i < 6; i++) {

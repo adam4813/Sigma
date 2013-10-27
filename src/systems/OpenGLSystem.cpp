@@ -52,7 +52,7 @@ namespace Sigma{
 		} else {
 			std::cerr << "Invalid view type!" << std::endl;
 		}
-	
+
 		float x=0.0f, y=0.0f, z=0.0f, rx=0.0f, ry=0.0f, rz=0.0f;
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {

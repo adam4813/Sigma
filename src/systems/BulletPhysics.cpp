@@ -1,7 +1,7 @@
 #include "systems/BulletPhysics.h"
+#include "systems/GLFPSView.h"
 #include "components/BulletShapeMesh.h"
 #include "components/GLMesh.h"
-#include "systems/GLFPSView.h"
 #include "components/BulletShapeSphere.h"
 
 namespace Sigma {

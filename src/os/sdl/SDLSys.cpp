@@ -3,8 +3,6 @@
 #include "GL/glew.h"
 #include "SDL/sdl_opengl.h"
 
-#include <iostream>
-#include <fstream>
 
 Sigma::event::KeyboardInputSystem IOpSys::KeyboardEventSystem;
 Sigma::event::MouseInputSystem IOpSys::MouseEventSystem;

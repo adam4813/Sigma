@@ -2,9 +2,9 @@
 #ifndef GLSIXDOFVIEWCONTROLLER_H
 #define GLSIXDOFVIEWCONTROLLER_H
 
-#include "../systems/KeyboardInputSystem.h"
-#include "../components/ViewMover.h"
-#include "../systems/IGLView.h"
+#include "systems/KeyboardInputSystem.h"
+#include "systems/IGLView.h"
+#include "components/ViewMover.h"
 
 namespace Sigma {
 	namespace event {

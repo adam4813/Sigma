@@ -4,7 +4,7 @@
 #include "systems/BulletPhysics.h"
 #include "systems/FactorySystem.h"
 #include "controllers/GLSixDOFViewController.h"
-#include "controllers/GLFPSViewController.h"
+#include "controllers/FPSCamera.h"
 #include "components/BulletMover.h"
 #include "components/GLScreenQuad.h"
 #include "SCParser.h"
@@ -71,7 +71,7 @@ int main(int argCount, char **argValues) {
 
 			// Currently, physicsmover components must come after gl* components
 			if((*itr).type == "PhysicsMover") {
-				GLTransform *transform = glsys.GetTransformFor(e->id); 
+				GLTransform *transform = glsys.GetTransformFor(e->id);
 				if(transform) {
 					Property p("transform", transform);
 					itr->properties.push_back(p);
@@ -88,7 +88,7 @@ int main(int argCount, char **argValues) {
 	}
 
 	// View and ViewMover creation has been moved to test.sc, but for
-	// now provide sensible defaults.  Final engine should require 
+	// now provide sensible defaults.  Final engine should require
 	// definition in scene file.  Currently entity ID for view must be 1
 	// for this to work.
 
@@ -112,10 +112,10 @@ int main(int argCount, char **argValues) {
 	Sigma::BulletMover* mover = bphys.getViewMover();
 
 	// Create the controller
-	// Perhaps a little awkward currently, should create a generic 
+	// Perhaps a little awkward currently, should create a generic
 	// controller class ancestor
 	if(glsys.GetViewMode() == "GLFPSView") {
-		Sigma::event::handler::GLFPSViewController cameraController(mover);
+		Sigma::event::handler::FPSCamera cameraController(mover);
 		IOpSys::KeyboardEventSystem.Register(&cameraController);
 		IOpSys::MouseEventSystem.Register(&cameraController);
 	} else if (glsys.GetViewMode() == "GLSixDOFView") {

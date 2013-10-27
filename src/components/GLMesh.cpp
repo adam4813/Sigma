@@ -2,7 +2,7 @@
 
 #include "GL/glew.h"
 #include "SOIL/SOIL.h"
-#include "../strutils.h"
+#include "strutils.h"
 
 #include <algorithm>
 #include <stdexcept>

@@ -125,6 +125,8 @@ public:
 	static Sigma::event::KeyboardInputSystem KeyboardEventSystem; // Handles keyboard events
 	static Sigma::event::MouseInputSystem MouseEventSystem; // Handles mouse events
 
+	void IOpSys::Quit();
+
 protected:
 	static double curDelta; // Current delta time
 };
