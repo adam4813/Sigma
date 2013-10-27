@@ -7,7 +7,7 @@ namespace Sigma{
 			const float FPSCamera::SPEED_ROTATE      = 20.0f * 3.14159f;
 			const float FPSCamera::BOOST_MULTIPLIER  = 2.0f;
 
-			FPSCamera::FPSCamera(ViewMover* mover) : mover(mover) {
+			FPSCamera::FPSCamera(int entityID, ViewMover* mover) : IGLView(entityID), mover(mover) {
 				// Set the view mover's view pointer.
 				this->Transform.SetEuler(true);
 				this->mover->View(this);

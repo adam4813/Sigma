@@ -47,7 +47,7 @@ namespace Sigma {
 		return retval;
 	}
 
-	void BulletPhysics::createBulletShapeMesh(const unsigned int entityID, std::vector<Property> &properties) {
+	IComponent* BulletPhysics::createBulletShapeMesh(const unsigned int entityID, const std::vector<Property> &properties) {
 		BulletShapeMesh* mesh = new BulletShapeMesh(entityID);
 
 		float scale = 1.0f;
@@ -59,7 +59,7 @@ namespace Sigma {
 		float rz = 0.0f;
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
-			Property*  p = &*propitr;
+			const Property*  p = &*propitr;
 
 			if (p->GetName() == "x") {
 				x = p->Get<float>();
@@ -91,9 +91,11 @@ namespace Sigma {
 		this->dynamicsWorld->addRigidBody(mesh->GetRigidBody());
 
 		this->addComponent(entityID, mesh);
+
+		return mesh;
 	}
 
-	void BulletPhysics::createBulletShapeSphere(const unsigned int entityID, std::vector<Property> &properties) {
+	IComponent* BulletPhysics::createBulletShapeSphere(const unsigned int entityID, const std::vector<Property> &properties) {
 		BulletShapeSphere* sphere = new BulletShapeSphere(entityID);
 
 		float scale = 1.0f;
@@ -105,7 +107,7 @@ namespace Sigma {
 		float rz = 0.0f;
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
-			Property*  p = &*propitr;
+			const Property*  p = &*propitr;
 
 			if (p->GetName() == "x") {
 				x = p->Get<float>();
@@ -135,6 +137,8 @@ namespace Sigma {
 		this->dynamicsWorld->addRigidBody(sphere->GetRigidBody());
 
 		this->addComponent(entityID, sphere);
+
+		return sphere;
 	}
 
 	bool BulletPhysics::Update(const double delta) {

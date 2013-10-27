@@ -27,13 +27,13 @@ namespace Sigma{
         return retval;
     }
 
-	void OpenGLSystem::createGLView(const unsigned int entityID, std::vector<Property> &properties, std::string mode) {
+	IComponent* OpenGLSystem::createGLView(const unsigned int entityID, const std::vector<Property> &properties, std::string mode) {
 		viewMode = mode;
 
 		if(mode=="FPSCamera") {
-			this->view = std::unique_ptr<IGLView>(new Sigma::event::handler::FPSCamera());
+			this->view = std::unique_ptr<IGLView>(new Sigma::event::handler::FPSCamera(entityID));
 		} else if(mode=="GLSixDOFView") {
-			this->view = std::unique_ptr<IGLView>(new GLSixDOFView());
+			this->view = std::unique_ptr<IGLView>(new GLSixDOFView(entityID));
 		} else {
 			std::cerr << "Invalid view type!" << std::endl;
 		}
@@ -41,7 +41,7 @@ namespace Sigma{
 		float x=0.0f, y=0.0f, z=0.0f, rx=0.0f, ry=0.0f, rz=0.0f;
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
-			Property*  p = &(*propitr);
+			const Property*  p = &(*propitr);
 
 			if (p->GetName() == "x") {
 				x = p->Get<float>();
@@ -66,9 +66,11 @@ namespace Sigma{
 
 		this->view->Transform.Move(x,y,z);
 		this->view->Transform.Rotate(rx,ry,rz);
+
+		return this->view.get();
 	}
 
-	void OpenGLSystem::createGLSprite(const unsigned int entityID, std::vector<Property> &properties) {
+	IComponent* OpenGLSystem::createGLSprite(const unsigned int entityID, const std::vector<Property> &properties) {
 		GLSprite* spr = new GLSprite(entityID);
 		float scale = 1.0f;
 		float x = 0.0f;
@@ -78,7 +80,7 @@ namespace Sigma{
 		std::string textureFilename;
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
-			Property*  p = &(*propitr);
+			const Property*  p = &(*propitr);
 			if (p->GetName() == "scale") {
 				scale = p->Get<float>();
 			} else if (p->GetName() == "x") {
@@ -98,9 +100,10 @@ namespace Sigma{
 		spr->Transform()->Translate(x,y,z);
 		spr->InitializeBuffers();
 		this->addComponent(entityID,spr);
+		return spr;
 	}
 
-	void OpenGLSystem::createGLIcoSphere(const unsigned int entityID, std::vector<Property> &properties) {
+	IComponent* OpenGLSystem::createGLIcoSphere(const unsigned int entityID, const std::vector<Property> &properties) {
 			Sigma::GLIcoSphere* sphere = new Sigma::GLIcoSphere(entityID);
 			float scale = 1.0f;
 			float x = 0.0f;
@@ -111,7 +114,7 @@ namespace Sigma{
 			std::string shader_name = "shaders/icosphere";
 
 			for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
-				Property*  p = &(*propitr);
+				const Property*  p = &(*propitr);
 				if (p->GetName() == "scale") {
 					scale = p->Get<float>();
 					continue;
@@ -136,9 +139,10 @@ namespace Sigma{
 			sphere->InitializeBuffers();
 			sphere->SetCullFace("back");
 			this->addComponent(entityID,sphere);
+			return sphere;
 	}
 
-		void OpenGLSystem::createGLCubeSphere(const unsigned int entityID, std::vector<Property> &properties) {
+		IComponent* OpenGLSystem::createGLCubeSphere(const unsigned int entityID, const std::vector<Property> &properties) {
 			Sigma::GLCubeSphere* sphere = new Sigma::GLCubeSphere(entityID);
 
 			std::string texture_name = "";
@@ -157,7 +161,7 @@ namespace Sigma{
 			float rz = 0.0f;
 			int componentID = 0;
 			for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
-				Property*  p = &(*propitr);
+				const Property*  p = &(*propitr);
 				if (p->GetName() == "scale") {
 					scale = p->Get<float>();
 				} else if (p->GetName() == "x") {
@@ -197,9 +201,10 @@ namespace Sigma{
 			sphere->LoadTexture(texture_name);
 			sphere->InitializeBuffers();
 			this->addComponent(entityID,sphere);
+			return sphere;
 	}
 
-	void OpenGLSystem::createGLMesh(const unsigned int entityID, std::vector<Property> &properties) {
+	IComponent* OpenGLSystem::createGLMesh(const unsigned int entityID, const std::vector<Property> &properties) {
 		Sigma::GLMesh* mesh = new Sigma::GLMesh(entityID);
 
 		float scale = 1.0f;
@@ -214,7 +219,7 @@ namespace Sigma{
 		std::string shaderfile = "";
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
-			Property*  p = &*propitr;
+			const Property*  p = &*propitr;
 			if (p->GetName() == "scale") {
 				scale = p->Get<float>();
 				continue;
@@ -256,6 +261,7 @@ namespace Sigma{
 		else mesh->LoadShader(); // load default
         mesh->InitializeBuffers();
         this->addComponent(entityID,mesh);
+        return mesh;
     }
 
     bool OpenGLSystem::Update(const double delta) {

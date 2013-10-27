@@ -13,7 +13,7 @@ struct GLFPSView;
 
 namespace Sigma {
 	class BulletPhysics
-		: public Sigma::IFactory, public ISystem<IBulletShape> {
+		: public Sigma::IFactory, public Sigma::ISystem<IBulletShape> {
 	public:
 		BulletPhysics() : mover(1) { }
 		~BulletPhysics();
@@ -33,8 +33,8 @@ namespace Sigma {
 		 */
 		bool Update(const double delta);
 
-		void createBulletShapeMesh(const unsigned int entityID, std::vector<Property> &properties);
-		void createBulletShapeSphere(const unsigned int entityID, std::vector<Property> &properties);
+		IComponent* createBulletShapeMesh(const unsigned int entityID, const std::vector<Property> &properties);
+		IComponent* createBulletShapeSphere(const unsigned int entityID, const std::vector<Property> &properties);
 
 		std::map<std::string,FactoryFunction> getFactoryFunctions();
 		BulletMover* getViewMover() {

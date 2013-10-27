@@ -20,10 +20,11 @@ namespace Sigma {
              * \param[in] const std::string type The type of componenet to create
              * \param[in] const int entityID The ID of the entity this component belongs to.
              * \param[in] std::vector<Property> &properties A vector containing the properties to apply to the created component.
+             * \return a pointer to the newly created component
              */
-            void create(const std::string& type,
+            IComponent* create(const std::string& type,
                         const unsigned int entityID,
-                        std::vector<Property> &properties);
+                        const std::vector<Property> &properties);
 
             /**
              * \brief add the given Factory to the central list

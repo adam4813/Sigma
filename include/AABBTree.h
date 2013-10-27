@@ -33,7 +33,7 @@ namespace Sigma {
 		glm::vec3 normal;
 	};
 
-	class AABBTree : public IComponent {
+	class AABBTree : public Sigma::IComponent {
 	public:
 		AABBTree(const int entityID);
 		SET_COMPONENT_ID("AABBTree");
@@ -41,7 +41,7 @@ namespace Sigma {
 
 		/**
 		 * \brief Subdivides the AABB Tree to depth.
-		 * 
+		 *
 		 * \param[in] AABBTreeNode * node The node to subdivide (nullptr for root down)
 		 * \param[in] int depth The current depth of the subdivision.
 		 * \returns   void
@@ -50,15 +50,15 @@ namespace Sigma {
 
 		/**
 		 * \brief Populate the internal lists from a GLMesh.
-		 * 
+		 *
 		 * \param[in/] std::string fname The name of the mesh file to load.
-		 * \returns   void 
+		 * \returns   void
 		 */
 		void Populate(std::string fname);
 
 		/**
 		 * \brief Performs a SAT test on a node and a face.
-		 * 
+		 *
 		 * \param[in] AABBTreeNode * n2b The node to check.
 		 * \param[in] const Sigma::Face * face The face to check
 		 * \return   bool True if the overlap or intersect.

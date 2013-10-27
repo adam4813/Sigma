@@ -2,7 +2,7 @@
 
 #include "systems/IGLView.h"
 
-ViewMover::ViewMover(const int entityID) : IMoverComponent(entityID) {
+ViewMover::ViewMover(const int entityID) : Sigma::IMoverComponent(entityID) {
 
 }
 
@@ -53,11 +53,11 @@ void ViewMover::RotateTarget(float x, float y, float z) {
 	this->_rotationtarget += glm::vec3(x,y,z);
 }
 
-void ViewMover::View(IGLView* view) {
+void ViewMover::View(Sigma::IGLView* view) {
 	this->view = view;
 }
 
-IGLView* ViewMover::View() {
+Sigma::IGLView* ViewMover::View() {
 	return this->view;
 }
 

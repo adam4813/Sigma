@@ -1,4 +1,7 @@
-#pragma  once
+#pragma once
+#ifndef SIMPLE_PHYSICS_H
+#define SIMPLE_PHYSICS_H
+
 
 #include "../IFactory.h"
 #include "../ISystem.h"
@@ -13,7 +16,7 @@ class Property;
 class IMoverComponent;
 
 class SimplePhysics
-    : public Sigma::IFactory, public ISystem<IMoverComponent> {
+    : public Sigma::IFactory, public Sigma::ISystem<Sigma::IMoverComponent> {
 public:
 	SimplePhysics() { }
 	~SimplePhysics() {
@@ -39,9 +42,9 @@ public:
 
     std::map<std::string,FactoryFunction> getFactoryFunctions();
 
-	void createPhysicsMover(const unsigned int entityID, std::vector<Property> &properties) ;
-	void createViewMover(const unsigned int entityID, std::vector<Property> &properties) ;
-	void createAABBTree(const unsigned int entityID, std::vector<Property> &properties) ;
+	Sigma::IComponent* createPhysicsMover(const unsigned int entityID, const std::vector<Property> &properties) ;
+	Sigma::IComponent* createViewMover(const unsigned int entityID, const std::vector<Property> &properties) ;
+	Sigma::IComponent* createAABBTree(const unsigned int entityID, const std::vector<Property> &properties) ;
 
 	Sigma::AABBTree* GetCollider(const unsigned int entityID) {
 		if (this->colliders.find(entityID) != this->colliders.end()) {
@@ -52,4 +55,6 @@ public:
 
 private:
 	std::map<unsigned int, Sigma::AABBTree*> colliders;
-};
+}; // class SimplePhysics
+
+#endif // SIMPLE_PHYSICS_H

@@ -1,6 +1,6 @@
 #include "systems/GLFPSView.h"
 
-GLFPSView::GLFPSView() {}
+GLFPSView::GLFPSView(int entity_id) : IGLView(entity_id) {}
 
 const glm::mat4 GLFPSView::GetViewMatrix() {
 	//return glm::lookAt(this->Transform.GetPosition(),
