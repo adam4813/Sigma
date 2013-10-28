@@ -5,7 +5,7 @@
 //#include "glm/glm.hpp"
 //#include "glm/ext.hpp"
 
-#include "../GLTransform.h"
+#include "GLTransform.h"
 #include "IComponent.h"
 
 namespace Sigma{
@@ -14,41 +14,9 @@ namespace Sigma{
 
         IGLView(int entityID) : IComponent(entityID) {}
 
-        GLTransform Transform;
+        GLTransform transform;
 
         virtual const glm::mat4 GetViewMatrix() = 0;
-
-        /*glm::mat4 ViewMatrix;
-        glm::vec3 position;
-        glm::quat orientation;
-
-        IGLView() {
-            this->position = glm::vec3(0.0f,0.0f,0.0f);
-            this->orientation = glm::quat(0.0f,0.0f,1.0f,0.0f);
-        }
-        virtual void UpdateViewMatrix() = 0;*/
-
-        virtual void Move(float right, float up, float forward) = 0;
-
-        // Helper function.
-        void Move(glm::vec3 trans) {
-            Move(trans.x, trans.y, trans.z);
-        }
-
-        /*
-         * /brief Allows the view to restrict
-         *        the rotation range
-         *
-         */
-        virtual glm::vec3 Restrict(glm::vec3) = 0;
-
-        /*
-        virtual void Rotate(float x, float y, float z) = 0;
-
-        // Helper function.
-        void Rotate(glm::vec3 rot) {
-            Rotate(rot.x, rot.y, rot.z);
-        }*/
     }; // stuct IGLView
 } // namespace Sigma
 

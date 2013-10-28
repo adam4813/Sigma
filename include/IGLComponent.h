@@ -58,7 +58,7 @@ namespace Sigma {
         GLuint specularMap;
     };
 
-	class IGLComponent : public Sigma::IComponent {
+	class IGLComponent : public IComponent {
 	public:
 		IGLComponent() : IComponent(0) { } // Default ctor setting entity ID to 0.
 		IGLComponent(const int entityID) : IComponent(entityID) { } // Ctor that sets the entity ID.
@@ -141,7 +141,7 @@ namespace Sigma {
          *  filename should be a relative path, like "shaders/mesh"
          * \return void
          */
-        void LoadShader(const std::string& filename);
+        bool LoadShader(const std::string& filename);
 
 		// The index in buffers for each type of buffer.
 		int ElemBufIndex;

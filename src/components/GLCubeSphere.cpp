@@ -66,17 +66,17 @@ namespace Sigma {
         //  Cubesphere normals are computed in the shader 'shaders/cubesphere.vert'.
         //  TODO get GLIcoSphere's normal calculations into a shader too
 
-        GLMesh::InitializeBuffers();
-
         // shader program was compiled and linked in GLMesh::InitializeBuffers.
         //  Now we can set relevant custom uniform values
         (*shader).Use();
         glUniform1i(glGetUniformLocation((*shader).GetProgram(), "cubeMap"), 0);
         glUniform1i(glGetUniformLocation((*shader).GetProgram(), "cubeNormalMap"), 1);
-        (*shader).UnUse();
+		(*shader).UnUse();
+
+		GLMesh::InitializeBuffers();
     } // function InitializeBuffers
 
-    void GLCubeSphere::LoadTexture(std::string texture_name) {
+    bool GLCubeSphere::LoadTexture(std::string texture_name) {
         // SOIL makes this straightforward..
 		char filename[100];
 		std::string filenames[6];
@@ -130,7 +130,12 @@ namespace Sigma {
 				}
 			}
         }
-    } // function LoadTexture
+
+		if ((this->_cubeMap == 0) && (this->_cubeNormalMap == 0)) {
+			return false;
+		}
+		return true;
+	} // function LoadTexture
 
 	Vertex GLCubeSphere::GetMidPoint(const Vertex& v1, const Vertex& v2){
         return Vertex((v1.x + v2.x)/2.0f, (v1.y + v2.y)/2.0f, (v1.z + v2.z)/2.0f);

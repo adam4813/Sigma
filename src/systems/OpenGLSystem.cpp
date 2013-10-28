@@ -1,7 +1,6 @@
 #include "systems/OpenGLSystem.h"
 #include "systems/GLSLShader.h"
 #include "systems/GLSixDOFView.h"
-#include "systems/GLFPSView.h"
 #include "components/GLSprite.h"
 #include "components/GLIcoSphere.h"
 #include "components/GLCubeSphere.h"
@@ -76,8 +75,8 @@ namespace Sigma{
 			}
 		}
 
-		this->views[this->views.size() - 1]->Transform.Move(x,y,z);
-		this->views[this->views.size() - 1]->Transform.Rotate(rx,ry,rz);
+		this->views[this->views.size() - 1]->transform.Move(x,y,z);
+		this->views[this->views.size() - 1]->transform.Rotate(rx,ry,rz);
 
 		return this->views[this->views.size() - 1];
 	}

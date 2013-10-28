@@ -1,5 +1,4 @@
 #include "systems/BulletPhysics.h"
-#include "systems/GLFPSView.h"
 #include "components/BulletShapeMesh.h"
 #include "components/GLMesh.h"
 #include "components/BulletShapeSphere.h"
@@ -146,7 +145,7 @@ namespace Sigma {
 
 		dynamicsWorld->stepSimulation(delta, 10);
 
-		this->mover.UpdateView();
+		this->mover.UpdateTransform();
 
 		return true;
 	}

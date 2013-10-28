@@ -141,6 +141,60 @@ public:
 		this->Euler = euler;
 	}
 
+	void SetMaxRotation(glm::vec3 maxrot) {
+		this->maxRotation = maxrot;
+	}
+	
+
+	/**
+	 * \brief Restricts the rotation to a defined value.
+	 *
+	  * If the rotation value passed in is greater than the restriction the restricted value is returned.
+	 * \param[in/out] glm::vec3 rotation The attempted rotation.
+	 * \return    glm::vec3 The new restricted rotation.
+	 */
+	glm::vec3 Restrict(glm::vec3 rotation) {
+		glm::vec3 rot = rotation;
+
+		if (this->maxRotation.x >= 0) {
+			float current_pitch = this->rotation.x;
+			float new_pitch = current_pitch + rotation.x;
+
+			if(new_pitch > this->maxRotation.x) {
+				rot.x = this->maxRotation.x - current_pitch;
+			}
+			else if(new_pitch < -this->maxRotation.x) {
+				rot.x = -this->maxRotation.x - current_pitch;
+			}
+		}
+
+		if (this->maxRotation.y > 0) {
+			float current_yaw = this->rotation.y;
+			float new_yaw = current_yaw + rotation.y;
+
+			if(new_yaw > this->maxRotation.y) {
+				rot.y = this->maxRotation.y - current_yaw;
+			}
+			else if(new_yaw < -this->maxRotation.y) {
+				rot.x = -this->maxRotation.y - current_yaw;
+			}
+		}
+
+		if (this->maxRotation.z > 0) {
+			float current_roll = this->rotation.z;
+			float new_roll = current_roll + rotation.z;
+
+			if(new_roll > this->maxRotation.z) {
+				rot.z = this->maxRotation.z - current_roll;
+			}
+			else if(new_roll < -this->maxRotation.z) {
+				rot.z = -this->maxRotation.z - current_roll;
+			}
+		}
+
+		return rot;
+	}
+
 private:
 	glm::quat orientation;
 	glm::vec3 position;
@@ -150,6 +204,8 @@ private:
 	glm::mat4 scaleMatrix;
 	glm::mat4 rotateMatrix;
 	glm::mat4 translateMatrix;
+
+	glm::vec3 maxRotation;
 
 	bool MMhasChanged; // Set to true if the modelMatrix has changed and needs to be updated
 	bool Euler; // Set to true to toggle rotation matrix construction between quaternions and euler angles

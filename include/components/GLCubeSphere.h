@@ -62,7 +62,7 @@ namespace Sigma {
          * \param texture_name the base name of the jpg images to be loaded
          * \return void
          */
-        void LoadTexture(std::string texture_name);
+        bool LoadTexture(std::string texture_name);
 
         // helper methods for constructing a GLCubeSphere object from parameters,
         //  like in SCParser

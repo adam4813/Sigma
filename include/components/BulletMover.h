@@ -1,12 +1,13 @@
 #pragma once
 
-#include <list>
 #include "IBulletShape.h"
-#include "ViewMover.h"
+#include "IMoverComponent.h"
+#include "GLTransform.h"
 
-struct IGLView;
 namespace Sigma {
-	class BulletMover : public IBulletShape, public ViewMover {
+	struct IGLView;
+
+	class BulletMover : public IBulletShape, public IMoverComponent {
 	public:
 		SET_COMPONENT_TYPENAME("BulletMover");
 		BulletMover() : IBulletShape(0) { }
@@ -16,6 +17,7 @@ namespace Sigma {
 		/**
 		 * \brief Apply all forces in this mover's list.
 		 *
+		 * Calculates the total forcve and sets the rigid body's linear foce.
 		 * Physics movers apply forces on a transform object.
 		 * \param[in] const double delta Change in time since the last call.
 		 */
@@ -31,11 +33,34 @@ namespace Sigma {
 		void InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz);
 
 		/**
-		 * \brief Updates the internal view's transform to match its collision rigid body.
+		 * \brief Updates the transform to match its collision rigid body.
 		 *
-		 * \return    void 
+		 * \return void 
 		 */
-		void UpdateView();
+		void UpdateTransform();
+
+		/**
+		 * \brief Rotates the transform now.
+		 *
+		 * Rotates the transform immediately instead of adding it to the list.
+		 * \param[in/out] float x, y, z The amount to rotate.
+		 * \return void
+		 */
+		void RotateNow(float x, float y, float z);
+		/**
+		 * \brief Sets the target rotation amount.
+		 *
+		 * 
+		 * \param[in/out] float x, y, z The amount to rotate to.
+		 * \return void
+		 */
+		void RotateTarget(float x, float y, float z);
+
+		void SetTransform(GLTransform& transform) {
+			this->transform = &transform;
+		}
 	private:
+		GLTransform* transform;
+		glm::vec3 _rotationtarget;
 	};
 }
