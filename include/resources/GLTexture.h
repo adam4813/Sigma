@@ -1,7 +1,11 @@
 #pragma once
 #include "GL/glew.h"
 #include <string>
+<<<<<<< HEAD
 #include "SOIL/SOIL.h"
+=======
+#include "SOIL.h"
+>>>>>>> Added the GLTexture resource
 
 namespace Sigma {
 	namespace resource {
@@ -27,6 +31,7 @@ namespace Sigma {
 				glBindTexture(GL_TEXTURE_2D, 0);
 			}
 			void LoadDataFromFile(const std::string& filename) {
+<<<<<<< HEAD
 				int width, height, channels;
 				unsigned char* data = SOIL_load_image(filename.c_str(), &width, &height, &channels, false);
 
@@ -47,6 +52,11 @@ namespace Sigma {
 						}
 					}
 
+=======
+				int width, height;
+				unsigned char* data = SOIL_load_image(filename.c_str(), &width, &height, nullptr, false);
+				if (data) {
+>>>>>>> Added the GLTexture resource
 					if (width >= 0) {
 						this->width = width;
 					}

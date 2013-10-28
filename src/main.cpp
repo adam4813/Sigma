@@ -4,6 +4,7 @@
 #include "systems/BulletPhysics.h"
 #include "systems/FactorySystem.h"
 #include "controllers/GLSixDOFViewController.h"
+#include "controllers/GUIController.h"
 #include "controllers/FPSCamera.h"
 #include "components/BulletMover.h"
 #include "SCParser.h"
@@ -13,6 +14,15 @@
 #elif defined OS_SDL
 #include "os/sdl/SDLSys.h"
 #endif
+<<<<<<< HEAD
+=======
+#include "components/GLSprite.h"
+
+//GUI url and some random things to test javascript bindings
+#define URL     "http://0x10co.de/btc1h"
+#define NAME    "Sigma"
+#define VERSION 1
+>>>>>>> Added the GLTexture resource
 
 int main(int argCount, char **argValues) {
 	Sigma::OpenGLSystem glsys;
@@ -54,6 +64,20 @@ int main(int argCount, char **argValues) {
 
 	bphys.Start();
 
+<<<<<<< HEAD
+=======
+	//For web gui
+	std::vector<Property> props;
+	webguisys.Start();
+	webguisys.createWebView("WebGUIComponent", 21, props, URL);
+	props.push_back(Property("textureFilename", std::string("gui")));
+	glsys.createGLSprite(0, props);
+	Sigma::event::handler::GUIController guicon;
+	guicon.SetGUI(webguisys.getComponent(21, WebGUIComponent::getStaticComponentTypeName()));
+	IOpSys::KeyboardEventSystem.Register(&guicon);
+	IOpSys::MouseEventSystem.Register(&guicon);
+
+>>>>>>> Added the GLTexture resource
 	// Parse the scene file to retrieve entities
 	Sigma::parser::SCParser parser;
 
@@ -166,6 +190,7 @@ int main(int argCount, char **argValues) {
 
 		// Pass in delta time in seconds
 		bphys.Update(deltaSec);
+		webguisys.Update(deltaSec);
 
 		// Update the renderer and present
 		if (glsys.Update(delta)) {
