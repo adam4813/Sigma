@@ -42,7 +42,7 @@ public:
 	 * \brief Flips the context buffers
 	 *
 	 */
-	virtual void Present(unsigned int texture_id) = 0;
+	virtual void Present(int fbo_id) = 0;
 
 	/**
 	 * \brief Does the OS specific message looping.
@@ -112,7 +112,7 @@ public:
 	 * \param int resolution - the resolution of the font
 	 *
 	 */
-	virtual void LoadFont(std::string file, int resolution)=0;
+	virtual void LoadFont(std::string file, unsigned int ptSize)=0;
 
 	/**
 	 * \brief Returns the current delta time.

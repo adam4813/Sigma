@@ -5,11 +5,6 @@ namespace Sigma {
 	GLScreenQuad::~GLScreenQuad() {}
 
 	void GLScreenQuad::InitializeBuffers() {
-		//this->AddVertex(Vertex(-1.0f, -1.0f, 0.0f));
-		//this->AddVertex(Vertex(1.0f, -1.0f, 0.0f));
-		//this->AddVertex(Vertex(-1.0f,  1.0f, 0.0f));
-		//this->AddVertex(Vertex(1.0f,  1.0f, 0.0f));
-
 		this->AddVertex(Vertex(this->x, this->y, 0.0f));
 		this->AddVertex(Vertex(this->w, this->y, 0.0f));
 		this->AddVertex(Vertex(this->x, this->h, 0.0f));
@@ -25,7 +20,7 @@ namespace Sigma {
 		pixelHeight = abs(this->y - this->h) * 384.0f;
 
 		// Calculate nearest power of two texture size, for speed
-		int textureSize = this->nearestPowerOf2(pixelWidth, pixelHeight);
+		this->texture_size = this->NearestPowerOf2(pixelWidth, pixelHeight);
 		float offset;
 
 		// Figure out corrected texture coordinates
@@ -52,8 +47,8 @@ namespace Sigma {
 		glActiveTexture(GL_TEXTURE0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		std::vector<GLbyte> texData(textureSize*textureSize*4, 0);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, textureSize, textureSize, 0, GL_BGRA, GL_UNSIGNED_BYTE, &texData[0]);
+		std::vector<GLbyte> texData(this->texture_size*this->texture_size*4, 0);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, this->texture_size, this->texture_size, 0, GL_BGRA, GL_UNSIGNED_BYTE, &texData[0]);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		GLMesh::InitializeBuffers();
@@ -79,6 +74,11 @@ namespace Sigma {
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
         glBindVertexArray(0);
+
+		// Clear the texture for next frame
+		std::vector<GLbyte> texData(this->texture_size*this->texture_size*4, 0);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, this->texture_size, this->texture_size, 0, GL_BGRA, GL_UNSIGNED_BYTE, &texData[0]);
+
         glBindTexture(GL_TEXTURE_2D, 0);
 
 		glEnable(GL_DEPTH_TEST);

@@ -255,7 +255,7 @@ const int* win32::StartOpengGL() {
 	return OpenGLVersion;
 }
 
-void win32::Present() {
+void win32::Present(int fbo_id) {
 	SwapBuffers(this->hdc); // Swap buffers so we can see our rendering.
 }
 

@@ -100,10 +100,8 @@ namespace Sigma{
 		/*
 		 * \brief returns the fbo_id of primary render target (index 0)
 		 */
-		int getRender() { return this->renderTargets[0]->fbo_id; }
-		int getRenderTexture() { return this->renderTargets[0]->texture_id; }
-
-//        IGLView* View() const { return this->view.get(); }
+		int getRender() { return (this->renderTargets.size() > 0) ? this->renderTargets[0]->fbo_id : -1; }
+		int getRenderTexture() { return (this->renderTargets.size() > 0) ? this->renderTargets[0]->texture_id : -1; }
 
 		// Rendering methods
 		void RenderTexture(GLuint texture_id);

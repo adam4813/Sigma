@@ -168,7 +168,7 @@ int main(int argCount, char **argValues) {
 		bphys.Update(deltaSec);
 
 		// Update stats display
-/*		Sigma::GLScreenQuad *statsDisplay = dynamic_cast<Sigma::GLScreenQuad*>(glsys.getComponent(31, "GLScreenQuad"));
+		Sigma::GLScreenQuad *statsDisplay = dynamic_cast<Sigma::GLScreenQuad*>(glsys.getComponent(31, "GLScreenQuad"));
 
 		if(statsDisplay) {
 			char message[100];
@@ -176,7 +176,7 @@ int main(int argCount, char **argValues) {
 			os->RenderText(message, 2.0f, 2.0f, statsDisplay->GetTexture());
 			sprintf(message, "FPS: %.1f", 1000.0f/delta);
 			os->RenderText(message, 2.0f, 10.0f, statsDisplay->GetTexture());
-		}*/
+		}
 
 		// Update the renderer and present
 		if (glsys.Update(delta)) {

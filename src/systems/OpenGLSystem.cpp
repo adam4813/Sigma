@@ -416,7 +416,7 @@ namespace Sigma{
 		if(qAtten != 0.0f) {
 			light->qAttenuation = qAtten;
 		} else {
-			light->qAttenuation = 1.0f / (light->radius*light->radius);
+			light->qAttenuation = 1.0f / light->radius*light->radius;
 		}
 
 
@@ -476,8 +476,15 @@ namespace Sigma{
         // Check if the deltaAccumulator is greater than 1/<framerate>th of a second.
         //  ..if so, it's time to render a new frame
         if (this->deltaAccumulator > 1000.0 / this->framerate) {
-            // Bind the primary render target
-			glBindFramebuffer(GL_FRAMEBUFFER, this->renderTargets[0]->fbo_id);
+            
+			// Hacky for now, but if we created at least one render target
+			// then the 0th one is the draw buffer, 1+ could be for post-processing
+			if(this->renderTargets.size() > 0) {
+				// Bind the primary render target
+				glBindFramebuffer(GL_FRAMEBUFFER, this->renderTargets[0]->fbo_id);
+			}
+
+			glm::vec3 viewPosition;
 
             // Set up the scene to a "clean" state.
             glClearColor(0.0f,0.0f,0.0f,0.0f);
@@ -487,6 +494,7 @@ namespace Sigma{
 			glm::mat4 viewMatrix;
 			if (this->views.size() > 0) {
 				viewMatrix = this->views[this->views.size() - 1]->GetViewMatrix();
+				viewPosition = this->views[this->views.size() - 1]->Transform.GetPosition();
 			}
 
 			// Loop through each light, rendering all components
@@ -509,9 +517,14 @@ namespace Sigma{
 
 					if(glComp) {
 						glComp->GetShader()->Use();
+
+						// Set view position
+						glUniform3f(glGetUniformBlockIndex(glComp->GetShader()->GetProgram(), "viewPosW"), viewPosition.x, viewPosition.y, viewPosition.z);
+
 						// For now, turn on ambient intensity and turn off lighting
-						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "ambientLightIntensity"), 0.15f);
-						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "lightIntensity"), 0.0f);
+						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "ambLightIntensity"), 0.05f);
+						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "diffuseLightIntensity"), 0.0f);
+						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "specularLightIntensity"), 0.0f);
 						glComp->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 					}
 				}
@@ -541,7 +554,10 @@ namespace Sigma{
 									glComp->GetShader()->Use();
 
 									// Turn off ambient light for additive blending
-									glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "ambientLightIntensity"), 0.0f);
+									glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "ambLightIntensity"), 0.0f);
+
+									// Set view position
+									glUniform3f(glGetUniformBlockIndex(glComp->GetShader()->GetProgram(), "viewPosW"), viewPosition.x, viewPosition.y, viewPosition.z);
 
 									// Activate the current point light for this shader
 									light->Activate(glComp->GetShader().get());
@@ -621,7 +637,7 @@ namespace Sigma{
         glCullFace(GL_BACK);
 
 		// Create main framebuffer (index 0)
-		this->createRenderTarget(1024, 768, GL_RGBA8);
+		//this->createRenderTarget(1024, 768, GL_RGBA8);
 
         return OpenGLVersion;
     }

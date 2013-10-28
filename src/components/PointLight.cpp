@@ -22,8 +22,8 @@ void PointLight::Activate(GLSLShader *shader) {
 	
 		// Set Light position and color
 		glUniform3f(glGetUniformLocation((*shader).GetProgram(), "lightPositionW"), this->position.x, this->position.y, this->position.z);
-		glUniform4f(glGetUniformLocation((*shader).GetProgram(), "lightColor"), this->color.r, this->color.g, this->color.b, this->color.a);
-		glUniform1f(glGetUniformLocation((*shader).GetProgram(), "lightIntensity"), this->intensity);
+		glUniform4f(glGetUniformLocation((*shader).GetProgram(), "diffuseLightColor"), this->color.r, this->color.g, this->color.b, this->color.a);
+		glUniform1f(glGetUniformLocation((*shader).GetProgram(), "diffuseLightIntensity"), this->intensity);
 	}
 }
 }

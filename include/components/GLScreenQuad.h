@@ -20,7 +20,7 @@ public:
 
 	unsigned int GetTexture() { return this->texture_id; }
 
-	int nearestPowerOf2(const float width, const float height) const {
+	int NearestPowerOf2(const float width, const float height) const {
 		unsigned int power = 0;
 		unsigned int dim = 1;
 
@@ -35,6 +35,7 @@ public:
 protected:
 	unsigned int texture_id;
 	float x, y, w, h;
+	unsigned int texture_size;
 };
 };
 

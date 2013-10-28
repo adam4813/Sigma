@@ -220,12 +220,14 @@ bool SDLSys::KeyReleased(int key, bool focused /*= false */) {
     }
 }
 
-void SDLSys::LoadFont(std::string file, int resolution) {
-	font = TTF_OpenFont(file.c_str(), resolution);
+void SDLSys::LoadFont(std::string file, unsigned int ptSize) {
+	this->font = TTF_OpenFont(file.c_str(), ptSize);
 
-	if(!font) {
+	if(!this->font) {
 		std::cerr << "Error loading font: " << TTF_GetError() << std::endl;
 	}
+
+	TTF_SetFontKerning(this->font, 0);
 }
 
 void SDLSys::RenderText(std::string text, float x, float y, unsigned int texture_id) {
@@ -240,6 +242,7 @@ void SDLSys::RenderText(std::string text, float x, float y, unsigned int texture
 	if(font) {
 		// Render text
 		textSurface = TTF_RenderText_Blended(this->font, text.c_str(), color);
+
 		if(!textSurface) {
 			std::cerr << "TTF Error: " << TTF_GetError();
 			return;
@@ -256,26 +259,36 @@ void SDLSys::RenderText(std::string text, float x, float y, unsigned int texture
 
 			// Convert text surface to RGBA8 format
 			SDL_Surface *convertSurface = SDL_CreateRGBSurface(0, textSurface->w, textSurface->h, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
-			//SDL_SetSurfaceAlphaMod(textSurface, 0xFF);
-			//SDL_SetSurfaceBlendMode(textSurface, SDL_BLENDMODE_NONE);
-			SDL_BlitSurface(textSurface, 0, convertSurface, 0);
 
-			// Copy it over
-			glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, convertSurface->w, convertSurface->h, GL_BGRA, GL_UNSIGNED_BYTE, convertSurface->pixels);
+			if(convertSurface) {
+				//SDL_SetSurfaceAlphaMod(textSurface, 0xFF);
+				//SDL_SetSurfaceBlendMode(textSurface, SDL_BLENDMODE_NONE);
+				SDL_BlitSurface(textSurface, 0, convertSurface, 0);
+
+				// Copy it over
+				glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, convertSurface->w, convertSurface->h, GL_BGRA, GL_UNSIGNED_BYTE, convertSurface->pixels);
+			} else {
+				std::cerr << SDL_GetError() << std::endl;
+			}
+
 		
 			// Free resources/cleanup
 			glBindTexture(GL_TEXTURE_2D, 0);
-			//SDL_FreeSurface(convertSurface);
-			//SDL_FreeSurface(textSurface);
+			SDL_FreeSurface(convertSurface);
+			SDL_FreeSurface(textSurface);
 		}
 	}
 }
 
-void SDLSys::Present(unsigned int fbo_id) {
+void SDLSys::Present(int fbo_id) {
 	// For now, use glBlitFramebuffer, but rendering using a screen space quad
 	// will be faster
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo_id);
-	glBlitFramebuffer(0, 0, this->GetWindowWidth(), this->GetWindowHeight(), 0, 0, this->GetWindowWidth(), this->GetWindowHeight(), GL_COLOR_BUFFER_BIT, GL_LINEAR);
-    SDL_GL_SwapWindow(this->_Window);
+	if(fbo_id > 0) {
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo_id);
+		glBlitFramebuffer(0, 0, this->GetWindowWidth(), this->GetWindowHeight(), 0, 0, this->GetWindowWidth(), this->GetWindowHeight(), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	}
+    
+	SDL_GL_SwapWindow(this->_Window);
+	
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 }
