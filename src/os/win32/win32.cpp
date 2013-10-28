@@ -130,6 +130,9 @@ LRESULT CALLBACK win32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 	case WM_LBUTTONDOWN:
 		MouseEventSystem.MouseDown(Sigma::event::BUTTON::LEFT, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		break;
+	case WM_LBUTTONUP:
+		MouseEventSystem.MouseUp(Sigma::event::BUTTON::LEFT, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		break;
 	case WM_RBUTTONDOWN:
 		ShowCursor(false);
 		mouselook = true;
