@@ -79,7 +79,9 @@ namespace Sigma{
          * \return IGLView* The specified view.
          */
 		IGLView* GetView(unsigned int index = 0) const {
-			if (index > this->views.size()) {
+		    if (this->views.size() == 0){
+                    return nullptr;
+			} else if (index > this->views.size()) {
 				return this->views[this->views.size() - 1];
 			}
 			return this->views[index];
@@ -89,7 +91,7 @@ namespace Sigma{
 		 * \brief Adds a view to the stack.
 		 *
 		 * \param[in/out] IGLView * view The view to add to the stack.
-		 * \return void 
+		 * \return void
 		 */
 		void PushView(IGLView* view) {
 			this->views.push_back(view);
@@ -99,7 +101,7 @@ namespace Sigma{
 		 * \brief Pops a view from the stack.
 		 *
 		 * Pops a view from the stack and deletes it.
-		 * \return void 
+		 * \return void
 		 */
 		void PopView() {
 			if (this->views.size() > 0) {

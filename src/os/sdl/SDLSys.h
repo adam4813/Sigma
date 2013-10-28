@@ -18,7 +18,9 @@ public:
 	SDLSys() {
 #ifdef __linux__
         // this magical environment variable makes fullscreen work on linux
-        putenv("SDL_VIDEO_X11_LEGACY_FULLSCREEN=0");
+        char buffer[50];
+        strcpy(buffer, "SDL_VIDEO_X11_LEGACY_FULLSCREEN=0");
+        putenv(buffer);
 #endif // __linux__
 	    SDL_Init(SDL_INIT_EVERYTHING);
 	    this->Fullscreen = false;
