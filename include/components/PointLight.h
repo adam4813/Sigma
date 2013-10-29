@@ -29,10 +29,7 @@ public:
 	float intensity;
 
 	float radius;
-
-	float cAttenuation;
-	float lAttenuation;
-	float qAttenuation;
+	float falloff;
 };
 }
 #endif

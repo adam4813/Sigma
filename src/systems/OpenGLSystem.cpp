@@ -368,8 +368,6 @@ namespace Sigma{
 	IComponent* OpenGLSystem::createPointLight(const unsigned int entityID, const std::vector<Property> &properties) {
 		Sigma::PointLight *light = new Sigma::PointLight(entityID);
 
-		float cAtten=0.0f, lAtten=0.0f, qAtten=0.0f;
-
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			const Property*  p = &*propitr;
 			if (p->GetName() == "x") {
@@ -388,37 +386,12 @@ namespace Sigma{
 				light->color.b = p->Get<float>();
 			} else if (p->GetName() == "ca") {
 				light->color.a = p->Get<float>();
-			} else if (p->GetName() == "catten") {
-				cAtten = p->Get<float>();
-			} else if (p->GetName() == "latten") {
-				lAtten = p->Get<float>();
-			} else if (p->GetName() == "qatten") {
-				qAtten = p->Get<float>();
 			} else if (p->GetName() == "radius") {
 				light->radius = p->Get<float>();
+			} else if (p->GetName() == "falloff") {
+				light->falloff = p->Get<float>();
 			}
 		}
-
-		// If attenuation values are provided, use them
-		// otherwise compute attenuation value from radius
-		if(cAtten != 0.0f) {
-			light->cAttenuation = cAtten;
-		} else {
-			light->cAttenuation = 1.0f;
-		}
-
-		if(lAtten != 0.0f) {
-			light->lAttenuation = lAtten;
-		} else {
-			light->lAttenuation = 2.0f / light->radius;
-		}
-
-		if(qAtten != 0.0f) {
-			light->qAttenuation = qAtten;
-		} else {
-			light->qAttenuation = 1.0f / light->radius*light->radius;
-		}
-
 
 		this->addComponent(entityID, light);
 		return light;
@@ -502,11 +475,15 @@ namespace Sigma{
 			// TODO: Implement scissors test
 			// Potentially move to deferred shading depending on
 			// visual style needs
-
-			// TODO: Render a ambient pass first, then turn on additive blending for multiple lights
 			
 			// Ambient Pass
 			// Loop through and draw each component.
+
+			glm::mat4 viewProj = viewMatrix;
+			viewProj *= this->ProjectionMatrix;
+
+			// Calculate frustum for culling
+			this->GetView(0)->CalculateFrustum(viewProj);
 
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -536,7 +513,8 @@ namespace Sigma{
 					// Check if this component is a light
 					PointLight *light = dynamic_cast<PointLight*>(citr->second.get());
 
-					if(light) {
+					// If it is a light, and it intersects the frustum, then render
+					if(light && this->GetView(0)->CameraFrustum.isectSphere(light->position, light->radius)) {
 						// Modify depth test to allow for overlaying
 						// lights
 						glDepthFunc(GL_EQUAL);

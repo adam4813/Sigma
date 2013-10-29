@@ -14,7 +14,6 @@ namespace Sigma{
         this->UVBufIndex = 3;
     }
 
-
     void GLSprite::InitializeBuffers() {
         static const GLfloat vert[] = {
             1.0f, 1.0f, 0.0f,
