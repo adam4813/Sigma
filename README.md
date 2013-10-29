@@ -6,6 +6,12 @@ The Sigma game engine for creating games on multiple platforms. The name Sigma w
 Requires CMake and a compiler that supports C++11.
 
 
+Contributing
+===
+The easiest way to contribute is to fork and experiement. To better understand the orgranization please refer to https://docs.google.com/drawings/d/1HFFiz1oJc3A8gyO-fMADAfW8PTWjCqhe5silYDXM1lo/edit. 
+
+Coding standards and practices can be found here https://docs.google.com/document/d/1dN3cNUdn0HKb7lZXcBCIL2Tm216hQAQxbZnEuCpiYtc/edit
+
 Installing
 ===
 
