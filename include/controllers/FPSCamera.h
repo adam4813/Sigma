@@ -1,11 +1,10 @@
 #pragma once
-#ifndef GLFPSCONTROLLER_H
-#define GLFPSCONTROLLER_H
+#ifndef FPSVIEW_H
+#define FPSVIEW_H
 
 #include "systems/KeyboardInputSystem.h"
 #include "systems/MouseInputSystem.h"
 #include "systems/IGLView.h"
-
 
 namespace Sigma {
 	class BulletMover;
@@ -65,5 +64,5 @@ namespace Sigma {
 	}
 }
 
-#endif // GLFPSCONTROLLER_H
+#endif // FPSVIEW_H
 

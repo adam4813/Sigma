@@ -25,7 +25,10 @@ public:
 
 	bool KeyReleased( int key, bool focused = false );
 
-	void Present();
+	virtual void Present(int fbo_id=-1);
+
+	virtual void LoadFont(std::string filename, unsigned int ptSize) {};
+	virtual void RenderText(std::string text, float x, float y, unsigned int texture_id) {};
 
 	virtual unsigned int GetWindowWidth();
 	virtual unsigned int GetWindowHeight();

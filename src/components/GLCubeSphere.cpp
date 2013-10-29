@@ -1,6 +1,6 @@
 #include "components/GLCubeSphere.h"
 
-#include "SOIL.h"
+#include "SOIL/SOIL.h"
 
 #include <vector>
 #include <sstream>

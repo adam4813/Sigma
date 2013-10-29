@@ -1,6 +1,6 @@
 #include "components/GLSprite.h"
 #include "GL/glew.h"
-#include "SOIL.h"
+#include "SOIL/SOIL.h"
 
 namespace Sigma{
 
@@ -13,7 +13,6 @@ namespace Sigma{
         this->VertBufIndex = 0;
         this->UVBufIndex = 3;
     }
-
 
     void GLSprite::InitializeBuffers() {
         static const GLfloat vert[] = {

@@ -6,7 +6,9 @@
 #include <map>
 
 #include "IOpSys.h"
-#include "SDL2/SDL.h"
+
+#include "SDL/SDL.h"
+#include "SDL/SDL_ttf.h"
 
 #ifdef __linux__
 // used for putenv below
@@ -15,16 +17,22 @@
 
 class SDLSys : public IOpSys {
 public:
-	SDLSys() {
+	SDLSys() : font(0), Fullscreen(false) {
 #ifdef __linux__
         // this magical environment variable makes fullscreen work on linux
         putenv("SDL_VIDEO_X11_LEGACY_FULLSCREEN=0");
 #endif // __linux__
-	    SDL_Init(SDL_INIT_EVERYTHING);
-	    this->Fullscreen = false;
+	    if(SDL_Init(SDL_INIT_EVERYTHING)==-1) {
+			std::cerr << "SDL Init Error: " << SDL_GetError() << std::endl;
+		}
+
+		if(!TTF_WasInit() && TTF_Init()==-1) {
+			std::cerr << "TTF_Init Error: " << TTF_GetError() << std::endl;
+		}
+
 	    Sigma::event::KEY_ESCAPE = SDLK_ESCAPE;
     }
-	virtual ~SDLSys() { SDL_GL_DeleteContext(this->_Context); SDL_DestroyWindow(this->_Window); SDL_Quit(); }
+	virtual ~SDLSys() { SDL_GL_DeleteContext(this->_Context); SDL_DestroyWindow(this->_Window); TTF_CloseFont(font), TTF_Quit(); SDL_Quit(); }
 
 	virtual void* CreateGraphicsWindow(const unsigned int width = 800, const unsigned int height = 600);
 	virtual void ToggleFullscreen();
@@ -39,13 +47,19 @@ public:
 
 	virtual bool KeyReleased( int key, bool focused = false );
 
-	virtual void Present();
+	virtual void RenderText(std::string text, float x, float y, unsigned int texture_id);
+	virtual void LoadFont(std::string file, unsigned int ptSize);
+
+	virtual void Present(int fbo_id);
 	virtual unsigned int GetWindowWidth();
 	virtual unsigned int GetWindowHeight();
 
 private:
 	SDL_Window *_Window;
 	SDL_GLContext _Context;
+
+	// Fonts
+	TTF_Font *font;
 
 	// Keyboard state
 	std::map<char, bool> _KeyStates;

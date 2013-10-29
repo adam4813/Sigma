@@ -6,6 +6,7 @@
 #include "controllers/GLSixDOFViewController.h"
 #include "controllers/FPSCamera.h"
 #include "components/BulletMover.h"
+#include "components/GLScreenQuad.h"
 #include "SCParser.h"
 
 #if defined OS_Win32
@@ -132,6 +133,9 @@ int main(int argCount, char **argValues) {
 	double delta;
 	bool isWireframe=false;
 
+	// Load a font
+	os->LoadFont("Akashi.ttf", 8);
+
 	while (os->MessageLoop()) {
 
 		// Get time in ms, store it in seconds too
@@ -162,9 +166,20 @@ int main(int argCount, char **argValues) {
 		// Pass in delta time in seconds
 		bphys.Update(deltaSec);
 
+		// Update stats display
+		Sigma::GLScreenQuad *statsDisplay = dynamic_cast<Sigma::GLScreenQuad*>(glsys.getComponent(31, "GLScreenQuad"));
+
+		if(statsDisplay) {
+			char message[100];
+			sprintf(message, "MS per frame: %.3f", delta);
+			os->RenderText(message, 2.0f, 2.0f, statsDisplay->GetTexture());
+			sprintf(message, "FPS: %.1f", 1000.0f/delta);
+			os->RenderText(message, 2.0f, 10.0f, statsDisplay->GetTexture());
+		}
+
 		// Update the renderer and present
 		if (glsys.Update(delta)) {
-			os->Present();
+			os->Present(glsys.getRender());
 		}
 	}
 

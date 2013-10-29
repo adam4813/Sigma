@@ -1,5 +1,4 @@
 #include "components/CameraMover.h"
-
 #include "systems/IGLView.h"
 
 namespace Sigma {

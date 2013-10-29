@@ -1,4 +1,4 @@
-#include "win32.h"
+#include "os/win32/win32.h"
 #include <windowsx.h>
 #include <assert.h>
 
@@ -257,7 +257,7 @@ const int* win32::StartOpengGL() {
 	return OpenGLVersion;
 }
 
-void win32::Present() {
+void win32::Present(int fbo_id) {
 	SwapBuffers(this->hdc); // Swap buffers so we can see our rendering.
 }
 

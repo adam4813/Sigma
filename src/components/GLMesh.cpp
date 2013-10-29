@@ -1,7 +1,7 @@
 #include "components/GLMesh.h"
 
 #include "GL/glew.h"
-#include "SOIL.h"
+#include "SOIL/SOIL.h"
 #include "strutils.h"
 
 #include <algorithm>
@@ -103,22 +103,35 @@ namespace Sigma{
             glCullFace(this->cull_face);
         }
 
-        if (this->faceGroups.size() == 0) {
-            glUniform1i(glGetUniformLocation((*shader).GetProgram(), "texEnabled"), 0);
-        }
-        else {
-            glUniform1i(glGetUniformLocation((*shader).GetProgram(), "texEnabled"), 1);
-            glUniform1i(glGetUniformLocation((*shader).GetProgram(), "texDiff"), 0);
-            glUniform1i(glGetUniformLocation((*shader).GetProgram(), "texAmb"), 1);
-        }
         for (int i = 0, cur = this->MeshGroup_ElementCount(0), prev = 0; cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
             if (this->faceGroups.size() > 0) {
                 Material& mat = this->mats[this->faceGroups[prev]];
-                glBindTexture(GL_TEXTURE_2D, mat.diffuseMap);
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, mat.ambientMap);
-                glActiveTexture(GL_TEXTURE1);
+
+				if (mat.ambientMap) {
+					glUniform1i(glGetUniformLocation((*shader).GetProgram(), "texEnabled"), 1);
+					glUniform1i(glGetUniformLocation((*shader).GetProgram(), "ambientTexEnabled"), 1);
+					glUniform1i(glGetUniformLocation((*shader).GetProgram(), "texAmb"), 1);
+					glBindTexture(GL_TEXTURE_2D, mat.ambientMap);
+					glActiveTexture(GL_TEXTURE1);
+				} else {
+					glUniform1i(glGetUniformLocation((*shader).GetProgram(), "ambientTexEnabled"), 0);
+				}
+
+				if (mat.diffuseMap) {
+					glUniform1i(glGetUniformLocation((*shader).GetProgram(), "texEnabled"), 1);
+					glUniform1i(glGetUniformLocation((*shader).GetProgram(), "diffuseTexEnabled"), 1);
+					glUniform1i(glGetUniformLocation((*shader).GetProgram(), "texDiff"), 0);
+					glBindTexture(GL_TEXTURE_2D, mat.diffuseMap);
+					glActiveTexture(GL_TEXTURE0);
+				} else {
+					glUniform1i(glGetUniformLocation((*shader).GetProgram(), "diffuseTexEnabled"), 0);
+				}
             }
+			else {
+				glUniform1i(glGetUniformLocation((*shader).GetProgram(), "texEnabled"), 0);
+				glUniform1i(glGetUniformLocation((*shader).GetProgram(), "diffuseTexEnabled"), 0);
+				glUniform1i(glGetUniformLocation((*shader).GetProgram(), "ambientTexEnabled"), 0);
+			}
             glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_INT, (void*)prev);
         }
 
@@ -366,8 +379,8 @@ namespace Sigma{
 		return true;
     } // function LoadMesh
 
-    bool GLMesh::LoadShader() {
-       return IGLComponent::LoadShader(GLMesh::DEFAULT_SHADER);
+    void GLMesh::LoadShader() {
+       IGLComponent::LoadShader(GLMesh::DEFAULT_SHADER);
     }
 
     void GLMesh::ParseMTL(std::string fname) {

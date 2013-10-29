@@ -184,7 +184,7 @@ namespace Sigma{
         }
 
 		/** \brief load the default shader "shaders/mesh" */
-        bool LoadShader();
+        void LoadShader();
 
         static const std::string DEFAULT_SHADER;
 
