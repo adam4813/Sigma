@@ -11,10 +11,10 @@
 
 namespace Sigma{
 
-    class IMoverComponent: public Sigma::IComponent {
+    class IMoverComponent: public IComponent {
     public:
-        IMoverComponent() : Sigma::IComponent(0) { } // Default ctor setting entity ID to 0.
-        IMoverComponent(const int entityID) : Sigma::IComponent(entityID) { } // Ctor that sets the entity ID.
+        IMoverComponent() : IComponent(0) { } // Default ctor setting entity ID to 0.
+        IMoverComponent(const int entityID) : IComponent(entityID) { } // Ctor that sets the entity ID.
 
         /**
          * \brief Add a force to the list.

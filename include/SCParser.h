@@ -90,9 +90,9 @@ namespace Sigma {
 			 * \return   const Entity* The entity from the list or nullptr if the index is OOB.
 			 * \exception
 			 */
-			Sigma::parser::Entity* GetEntity(const unsigned int index);
+			Entity* GetEntity(const unsigned int index);
 		private:
-			std::vector<Sigma::parser::Entity> entities;
+			std::vector<Entity> entities;
 			std::string fname;
 		};
 	}

@@ -68,6 +68,8 @@ void* win32::CreateGraphicsWindow(const unsigned int width, const unsigned int h
 	}
 	this->hwnd = CreateWindowEx(dwExStyle, windowClass.lpszClassName, windowClass.lpszClassName, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, this->windowedSize.left, this->windowedSize.top, this->windowedSize.right, this->windowedSize.bottom, NULL, NULL, hInstance, NULL);
 
+	assert(this->hwnd != 0);
+
 	ShowWindow(this->hwnd, SW_SHOW);
 	UpdateWindow(this->hwnd);
 

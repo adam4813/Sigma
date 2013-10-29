@@ -1,7 +1,6 @@
 #include "systems/OpenGLSystem.h"
 #include "systems/GLSLShader.h"
 #include "systems/GLSixDOFView.h"
-#include "systems/GLFPSView.h"
 #include "controllers/FPSCamera.h"
 #include "components/GLSprite.h"
 #include "components/GLIcoSphere.h"
@@ -514,7 +513,7 @@ namespace Sigma{
 					PointLight *light = dynamic_cast<PointLight*>(citr->second.get());
 
 					// If it is a light, and it intersects the frustum, then render
-					if(light && this->GetView(0)->CameraFrustum.isectSphere(light->position, light->radius)) {
+					if(light/* && this->GetView(0)->CameraFrustum.isectSphere(light->position, light->radius)*/) {
 						// Modify depth test to allow for overlaying
 						// lights
 						glDepthFunc(GL_EQUAL);

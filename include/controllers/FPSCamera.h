@@ -4,21 +4,19 @@
 
 #include "systems/KeyboardInputSystem.h"
 #include "systems/MouseInputSystem.h"
-#include "components/ViewMover.h"
 #include "systems/IGLView.h"
 
 namespace Sigma {
+	class BulletMover;
+
 	namespace event {
 		namespace handler {
 			// A type of handler. This handler controls an OpenGL 6 DOF view.
-			class FPSCamera : public IKeyboardEventHandler, public IMouseEventHandler, public Sigma::IGLView {
-			private:
+			class FPSCamera : public IKeyboardEventHandler, public IMouseEventHandler, public IGLView {
 			public:
+			    SET_COMPONENT_TYPENAME("FPS_CAMERA");
 
-			    SET_COMPONENT_ID("FPS_CAMERA");
-
-				FPSCamera(int entityID) : IGLView(entityID) { }
-				FPSCamera(int entityID, ViewMover* mover);
+				FPSCamera(int entityID);
 
 				/**
 				 * \brief Triggered whenever a key state change event happens
@@ -29,18 +27,38 @@ namespace Sigma {
 				 * \return void
 				 */
 				void KeyStateChange(const unsigned int key, const KEY_STATE state);
+
+				/**
+				 * \brief Handles a change in mouse position.
+				 *
+				 * \param[in/out] float dx, dy The change in mouse position.
+				 * \param[in/out] float dy
+				 */
 				virtual void MouseMove(float dx, float dy);
+
+				// Not used but required to implement.
 				virtual void MouseDown(Sigma::event::BUTTON btn) {}
 				virtual void MouseUp(Sigma::event::BUTTON btn) {}
 
+				/**
+				 * \brief Updates and returns the view matrix.
+				 *
+				 * \return const glm::mat4 The current view matrix.
+				 */
 				const glm::mat4 GetViewMatrix();
-				virtual void Move(float right, float up, float forward);
-				virtual glm::vec3 Restrict(glm::vec3 rotation);
-				virtual void SetMover(ViewMover* m){ mover = m; }
+
+				/**
+				 * \brief Sets the view mover for this event handler.
+				 *
+				 * The view mover does the moving.
+				 * \param[in/out] ViewMover * m The view mover.
+				 * \return    void 
+				 */
+				virtual void SetMover(BulletMover* m);
 			private:
-				ViewMover* mover; // The view mover component that applies the rotations and forces set in the trigger method.
-                static const float SPEED_TRANSLATE, SPEED_ROTATE, BOOST_MULTIPLIER;
-                glm::vec3 _translate, _rotate;
+				BulletMover* mover; // The view mover component that applies the rotations and forces set in the trigger method.
+                static const float SPEED_TRANSLATE, SPEED_ROTATE, BOOST_MULTIPLIER; // Speed variables
+                glm::vec3 translation; // Current translation.
 			};
 		}
 	}

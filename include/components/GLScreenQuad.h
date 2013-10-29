@@ -8,7 +8,7 @@
 namespace Sigma {
 class GLScreenQuad : public GLMesh {
 public:
-	SET_COMPONENT_ID("GLScreenQuad");
+	SET_COMPONENT_TYPENAME("GLScreenQuad");
 	GLScreenQuad(int entityID);
 	virtual ~GLScreenQuad();
 

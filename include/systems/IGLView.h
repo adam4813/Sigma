@@ -2,7 +2,7 @@
 #ifndef IGL_VIEW_H
 #define IGL_VIEW_H
 
-#include "../GLTransform.h"
+#include "GLTransform.h"
 #include "IComponent.h"
 
 namespace Sigma{
@@ -55,20 +55,6 @@ namespace Sigma{
 		Frustum CameraFrustum;
 
         virtual const glm::mat4 GetViewMatrix() = 0;
-
-        virtual void Move(float right, float up, float forward) = 0;
-
-        // Helper function.
-        void Move(glm::vec3 trans) {
-            Move(trans.x, trans.y, trans.z);
-        }
-
-        /*
-         * /brief Allows the view to restrict
-         *        the rotation range
-         *
-         */
-        virtual glm::vec3 Restrict(glm::vec3) = 0;
 
 		/*
 		 * /brief Extracts frustum planes from a matrix

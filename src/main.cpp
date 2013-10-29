@@ -121,7 +121,6 @@ int main(int argCount, char **argValues) {
 		IOpSys::KeyboardEventSystem.Register(theCamera);
 		IOpSys::MouseEventSystem.Register(theCamera);
 		theCamera->SetMover(mover);
-		mover->View(theCamera);
 	} else if (glsys.GetViewMode() == "GLSixDOFView") {
 		Sigma::event::handler::GLSixDOFViewController cameraController(glsys.GetView(), mover);
 		IOpSys::KeyboardEventSystem.Register(&cameraController);

@@ -151,7 +151,7 @@ namespace Sigma{
                 lhs.color==rhs.color);
     }
 
-    void GLMesh::LoadMesh(std::string fname) {
+    bool GLMesh::LoadMesh(std::string fname) {
 		// Extract the path from the filename.
 		std::string path;
 		if (fname.find("/") != std::string::npos) {
@@ -179,7 +179,7 @@ namespace Sigma{
 
         if (!in) {
             std::cerr << "Cannot open mesh " << fname << std::endl;
-            return;
+            return false;
         }
 
         // Default color if no material is provided is white
@@ -374,12 +374,13 @@ namespace Sigma{
                 }
             }
 
-            surfaceNorms.clear();
-        }
+			surfaceNorms.clear();
+		}
+		return true;
     } // function LoadMesh
 
     void GLMesh::LoadShader() {
-        IGLComponent::LoadShader(GLMesh::DEFAULT_SHADER);
+       IGLComponent::LoadShader(GLMesh::DEFAULT_SHADER);
     }
 
     void GLMesh::ParseMTL(std::string fname) {

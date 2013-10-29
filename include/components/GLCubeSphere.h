@@ -10,7 +10,7 @@ namespace Sigma {
 
     class GLCubeSphere : public GLMesh {
     public:
-        SET_COMPONENT_ID("GLCubeSphere");
+        SET_COMPONENT_TYPENAME("GLCubeSphere");
         // We have a private ctor so the factory method must be used.
         GLCubeSphere(const int entityID = 0);
         ~GLCubeSphere();
@@ -62,7 +62,7 @@ namespace Sigma {
          * \param texture_name the base name of the jpg images to be loaded
          * \return void
          */
-        void LoadTexture(std::string texture_name);
+        bool LoadTexture(std::string texture_name);
 
         // helper methods for constructing a GLCubeSphere object from parameters,
         //  like in SCParser

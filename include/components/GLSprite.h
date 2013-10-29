@@ -11,7 +11,7 @@ namespace Sigma{
     public:
         using IGLComponent::LoadShader;
 
-        SET_COMPONENT_ID("GLSprite");
+        SET_COMPONENT_TYPENAME("GLSprite");
         // We have a private ctor so the factory method must be used.
         GLSprite(const int entityID = 0);
 

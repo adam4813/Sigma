@@ -13,7 +13,7 @@ public:
 	PointLight(const unsigned int entityID);
 	virtual ~PointLight() {}
 
-	SET_COMPONENT_ID("PointLight");
+	SET_COMPONENT_TYPENAME("PointLight");
 
 	/*
 	 * /brief Sets this point light as the
