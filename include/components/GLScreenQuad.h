@@ -26,7 +26,7 @@ public:
 
 		while(dim < width && dim < height) {
 			power += 1;
-			dim = (int)pow(2, power);
+			dim = (int)pow(2.0, (int)power);
 		}
 
 		return dim;
