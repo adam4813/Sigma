@@ -3,7 +3,6 @@
 #include <vector>
 
 namespace Sigma{
-
     GLIcoSphere::GLIcoSphere( const int entityID ) : GLMesh(entityID) {
         // all initialization handled by GLMesh
     }
@@ -141,9 +140,10 @@ namespace Sigma{
         float green, blue;
         // look up midpoint based on key hash
         auto found = cache.find(key);
-        if(found != cache.end()){
+        if (found != cache.end()) {
             return found->second;
-        } else{
+        }
+		else {
             // create and save vertex
             int next_index = cache[key] = this->verts.size();
             AddVertex(GetUnitSphereMidPoint(this->verts[v1], this->verts[v2]));

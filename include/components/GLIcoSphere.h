@@ -8,7 +8,6 @@
 #include <stdint.h>
 
 namespace Sigma{
-
     class GLIcoSphere : public GLMesh {
     public:
         SET_COMPONENT_TYPENAME("GLIcoSphere");
@@ -45,7 +44,6 @@ namespace Sigma{
         int CreateOrGetMidpoint(std::map<int64_t,int> &cache, const int v1, const int v2);
         /// given two vertices on the unit sphere, return their midpoint on the sphere
         Vertex GetUnitSphereMidPoint(const Vertex& v1, const Vertex& v2) const;
-
     }; // class GLIcoSphere
 
 } // namespace Sigma
