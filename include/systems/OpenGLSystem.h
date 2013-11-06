@@ -15,6 +15,7 @@
 #include "IGLComponent.h"
 #include "systems/IGLView.h"
 #include <vector>
+#include "resources/GLTexture.h"
 
 struct IGLView;
 
@@ -152,6 +153,8 @@ namespace Sigma{
 		 * \return    const std::string& The current view mode.
 		 */
 		const std::string& GetViewMode() { return this->viewMode; }
+
+		static std::map<std::string, Sigma::resource::GLTexture> textures;
     private:
         unsigned int windowWidth; // Store the width of our window
         unsigned int windowHeight; // Store the height of our window

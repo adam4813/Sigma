@@ -25,8 +25,9 @@ namespace Sigma{
 	void RenderTarget::Use(int slot) {
 		glBindFramebuffer(GL_FRAMEBUFFER, this->fbo_id);
 	}
-
-    OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumulator(0.0),
+	
+	std::map<std::string, Sigma::resource::GLTexture> OpenGLSystem::textures;
+    OpenGLSystem::OpenGLSystem() : windowWidth(1024), windowHeight(768), deltaAccumulator(0.0),
 		framerate(60.0f), viewMode("") {}
 
 	std::map<std::string, Sigma::IFactory::FactoryFunction>
@@ -127,7 +128,20 @@ namespace Sigma{
 				textureFilename = p->Get<std::string>();
 			}
 		}
-		spr->LoadTexture(textureFilename);
+
+		// Check if the texture is loaded and load it if not.
+		if (textures.find(textureFilename) == textures.end()) {
+			Sigma::resource::GLTexture texture;
+			texture.LoadDataFromFile(textureFilename);
+			if (texture.GetID() != 0) {
+				Sigma::OpenGLSystem::textures[textureFilename] = texture;
+			}
+		}
+
+		// It should be loaded, but in case an error occurred double check for it.
+		if (textures.find(textureFilename) != textures.end()) {
+			spr->SetTexture(&Sigma::OpenGLSystem::textures[textureFilename]);
+		}
 		spr->LoadShader();
 		spr->Transform()->Scale(glm::vec3(scale));
 		spr->Transform()->Translate(x,y,z);
