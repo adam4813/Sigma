@@ -54,6 +54,9 @@ namespace Sigma{
          * \return unsigned int The number of elements to draw. Always 6 for a GLSprite.
          */
         unsigned int MeshGroup_ElementCount(const unsigned int group = 0) const {
+			if (group > 0) {
+				return 0;
+			}
             return 6;
         }
     private:

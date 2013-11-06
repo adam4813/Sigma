@@ -74,29 +74,35 @@ namespace Sigma{
         glVertexAttribPointer(uvlocation, 2, GL_FLOAT, GL_FALSE, 0, NULL);
         glEnableVertexAttribArray(uvlocation);
 
-        glBindVertexArray(0);
+		glBindVertexArray(0);
+		this->shader->Use();
+		this->shader->AddUniform("in_Model");
+		this->shader->AddUniform("in_View");
+		this->shader->AddUniform("in_Proj");
+		this->shader->AddUniform("tex");
+		this->shader->UnUse();
     }
 
 	void GLSprite::LoadShader() {
-		// Just laod the default shader
+		// Just load the default shader
 		IGLComponent::LoadShader(GLSprite::DEFAULT_SHADER);
     }
 
     void GLSprite::Render(glm::mediump_float *view, glm::mediump_float *proj) {
-        shader->Use();
+        this->shader->Use();
 
 		glm::mat4 modelMatrix = this->Transform()->GetMatrix();
 
-        glUniformMatrix4fv(glGetUniformLocation((*shader).GetProgram(), "in_Model"), 1, GL_FALSE, &modelMatrix[0][0]);
-        glUniformMatrix4fv(glGetUniformLocation((*shader).GetProgram(), "in_View"), 1, GL_FALSE, view);
-        glUniformMatrix4fv(glGetUniformLocation((*shader).GetProgram(), "in_Proj"), 1, GL_FALSE, proj);
+        glUniformMatrix4fv((*this->shader)("in_Model"), 1, GL_FALSE, &modelMatrix[0][0]);
+        glUniformMatrix4fv((*this->shader)("in_View"), 1, GL_FALSE, view);
+        glUniformMatrix4fv((*this->shader)("in_Proj"), 1, GL_FALSE, proj);
 
         glBindVertexArray(this->Vao());
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->GetBuffer(this->ElemBufIndex));
 
 		// Check to make sure we have a valid texture
 		if (this->texture) {
-			glUniform1i(glGetUniformLocation((*shader).GetProgram(), "tex"), 0);
+			glUniform1i((*this->shader)("tex"), 0);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, this->texture->GetID());
 		}
@@ -106,7 +112,7 @@ namespace Sigma{
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
-        shader->UnUse();
+        this->shader->UnUse();
     }
 
 	void GLSprite::SetTexture(Sigma::resource::GLTexture* texture) {
