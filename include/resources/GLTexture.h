@@ -27,9 +27,26 @@ namespace Sigma {
 				glBindTexture(GL_TEXTURE_2D, 0);
 			}
 			void LoadDataFromFile(const std::string& filename) {
-				int width, height;
-				unsigned char* data = SOIL_load_image(filename.c_str(), &width, &height, nullptr, false);
+				int width, height, channels;
+				unsigned char* data = SOIL_load_image(filename.c_str(), &width, &height, &channels, false);
+
 				if (data) {
+					// Invert Y
+					int i, j;
+					for( j = 0; j*2 < height; ++j )
+					{
+						int index1 = j * width * channels;
+						int index2 = (height - 1 - j) * width * channels;
+						for( i = width * channels; i > 0; --i )
+						{
+							unsigned char temp = data[index1];
+							data[index1] = data[index2];
+							data[index2] = temp;
+							++index1;
+							++index2;
+						}
+					}
+
 					if (width >= 0) {
 						this->width = width;
 					}
