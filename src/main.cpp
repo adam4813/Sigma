@@ -6,7 +6,6 @@
 #include "controllers/GLSixDOFViewController.h"
 #include "controllers/FPSCamera.h"
 #include "components/BulletMover.h"
-#include "components/GLScreenQuad.h"
 #include "SCParser.h"
 
 #if defined OS_Win32
@@ -48,7 +47,8 @@ int main(int argCount, char **argValues) {
 		std::cerr << "Error starting OpenGL!" << std::endl;
 		delete os;
 		return -1;
-	} else {
+	}
+	else {
 		std::cout << "OpenGL version: " << version[0] << "." << version[1] << std::endl;
 	}
 
@@ -115,13 +115,14 @@ int main(int argCount, char **argValues) {
 	// Create the controller
 	// Perhaps a little awkward currently, should create a generic
 	// controller class ancestor
-	if(glsys.GetViewMode() == "FPSCamera") {
+	if (glsys.GetViewMode() == "FPSCamera") {
 	    using Sigma::event::handler::FPSCamera;
         FPSCamera* theCamera = static_cast<FPSCamera*>(glsys.GetView());
 		IOpSys::KeyboardEventSystem.Register(theCamera);
 		IOpSys::MouseEventSystem.Register(theCamera);
 		theCamera->SetMover(mover);
-	} else if (glsys.GetViewMode() == "GLSixDOFView") {
+	}
+	else if (glsys.GetViewMode() == "GLSixDOFView") {
 		Sigma::event::handler::GLSixDOFViewController cameraController(glsys.GetView(), mover);
 		IOpSys::KeyboardEventSystem.Register(&cameraController);
 	}
@@ -134,7 +135,6 @@ int main(int argCount, char **argValues) {
 	bool isWireframe=false;
 
 	// Load a font
-	os->LoadFont("Akashi.ttf", 8);
 
 	while (os->MessageLoop()) {
 
@@ -147,7 +147,8 @@ int main(int argCount, char **argValues) {
 			if (!isWireframe) {
 				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 				isWireframe = true;
-			} else {
+			}
+			else {
 				glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 				isWireframe = false;
 			}
@@ -165,17 +166,6 @@ int main(int argCount, char **argValues) {
 
 		// Pass in delta time in seconds
 		bphys.Update(deltaSec);
-
-		// Update stats display
-		Sigma::GLScreenQuad *statsDisplay = dynamic_cast<Sigma::GLScreenQuad*>(glsys.getComponent(31, "GLScreenQuad"));
-
-		if(statsDisplay) {
-			char message[100];
-			sprintf(message, "MS per frame: %.3f", delta);
-			os->RenderText(message, 2.0f, 2.0f, statsDisplay->GetTexture());
-			sprintf(message, "FPS: %.1f", 1000.0f/delta);
-			os->RenderText(message, 2.0f, 10.0f, statsDisplay->GetTexture());
-		}
 
 		// Update the renderer and present
 		if (glsys.Update(delta)) {

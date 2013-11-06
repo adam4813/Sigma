@@ -5,7 +5,6 @@
 #include "GLTransform.h"
 
 namespace Sigma {
-	struct IGLView;
 
 	class BulletMover : public IBulletShape, public IMoverComponent {
 	public:
@@ -17,7 +16,7 @@ namespace Sigma {
 		/**
 		 * \brief Apply all forces in this mover's list.
 		 *
-		 * Calculates the total forcve and sets the rigid body's linear foce.
+		 * Calculates the total force and sets the rigid body's linear force.
 		 * Physics movers apply forces on a transform object.
 		 * \param[in] const double delta Change in time since the last call.
 		 */

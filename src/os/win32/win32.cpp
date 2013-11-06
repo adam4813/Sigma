@@ -22,7 +22,8 @@ void win32::ToggleFullscreen() {
 	if (this->fullscreen) {
 		SetWindowLongPtr(this->hwnd, GWL_STYLE, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_VISIBLE);
 		MoveWindow(this->hwnd, this->windowedSize.left, this->windowedSize.top, this->windowedSize.right - this->windowedSize.left, this->windowedSize.bottom - this->windowedSize.top, TRUE);
-	} else {
+	}
+	else {
 		// Save the current windowed position
 		GetWindowRect(this->hwnd, &this->windowedSize);
 
@@ -132,7 +133,8 @@ bool win32::MessageLoop() {
 	if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) { // If we have a message to process, process it
 		if (msg.message == WM_QUIT) {
 			return false;
-		} else {
+		}
+		else {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
@@ -224,17 +226,19 @@ const int* win32::StartOpengGL() {
 		assert(0 && "Unable to create GL 3.x context.");
 		//It's not possible to make a GL 3.x context. Use the old style context (GL 2.1 and before)
 		this->hrc = tempContext;
-	} else {
+	}
+	else {
 		this->hrc = wglCreateContextAttribsARB(this->hdc, 0, attribs);
 	}
 
-	if(!this->hrc) {
+	if (!this->hrc) {
 		assert(0 && "Failed to make context!");
 	}
 	
-	if(!wglMakeCurrent(this->hdc, this->hrc)) {
+	if (!wglMakeCurrent(this->hdc, this->hrc)) {
 		assert(0 && "Invalid context, cannot make current!");
-	} else {
+	}
+	else {
 		wglDeleteContext(tempContext);
 	}
 
@@ -289,7 +293,8 @@ unsigned int win32::GetWindowWidth() {
 		monInfo.cbSize = sizeof(MONITORINFO);
 		GetMonitorInfo(hmon, &monInfo);
 		return monInfo.rcMonitor.right - monInfo.rcMonitor.left;
-	} else {
+	}
+	else {
 		return this->windowedSize.right - this->windowedSize.left;
 	}
 }
@@ -302,7 +307,8 @@ unsigned int win32::GetWindowHeight() {
 		monInfo.cbSize = sizeof(MONITORINFO);
 		GetMonitorInfo(hmon, &monInfo);
 		return monInfo.rcMonitor.bottom - monInfo.rcMonitor.top;
-	} else {
+	}
+	else {
 		return this->windowedSize.bottom - this->windowedSize.top;
 	}
 }

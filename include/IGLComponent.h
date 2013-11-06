@@ -126,11 +126,14 @@ namespace Sigma {
 		virtual void SetCullFace(std::string cull_face) {
 			if(cull_face == "back") {
 				this->cull_face = GL_BACK;
-			} else if (cull_face == "front") {
+			}
+			else if (cull_face == "front") {
 				this->cull_face = GL_FRONT;
-			} else if (cull_face == "none") {
+			}
+			else if (cull_face == "none") {
 				this->cull_face = 0;
-			} else {
+			}
+			else {
 				assert(0 && "Invalid cull_face parameter");
 			}
 		};

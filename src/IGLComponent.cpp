@@ -7,11 +7,11 @@ namespace Sigma{
     void IGLComponent::LoadShader(const std::string& filename) {
         // look up shader that is already loaded
         ShaderMap::iterator existingShader = IGLComponent::loadedShaders.find(filename.c_str());
-        if(existingShader != IGLComponent::loadedShaders.end()){
+        if(existingShader != IGLComponent::loadedShaders.end()) {
             // shader already exists!
 			this->shader = existingShader->second;
         }
-        else{
+        else {
             // need to create and save the shader
             std::string vertFilename = filename + ".vert";
             std::string fragFilename = filename + ".frag";

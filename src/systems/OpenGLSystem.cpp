@@ -183,7 +183,8 @@ namespace Sigma{
 				}
 				else if (p->GetName() == "shader"){
 					shader_name = p->Get<std::string>();
-				} else if (p->GetName() == "lightEnabled") {
+				}
+				else if (p->GetName() == "lightEnabled") {
 					sphere->SetLightingEnabled(p->Get<bool>());
 				}
 			}
@@ -254,7 +255,8 @@ namespace Sigma{
 			}
 			else if (p->GetName() == "fix_to_camera") {
 				fix_to_camera = p->Get<bool>();
-			} else if (p->GetName() == "lightEnabled") {
+			}
+			else if (p->GetName() == "lightEnabled") {
 				sphere->SetLightingEnabled(p->Get<bool>());
 			}
 		}
@@ -328,7 +330,8 @@ namespace Sigma{
 			}
 			else if (p->GetName() == "cullface") {
 				cull_face = p->Get<std::string>();
-			} else if (p->GetName() == "lightEnabled") {
+			}
+			else if (p->GetName() == "lightEnabled") {
 				mesh->SetLightingEnabled(p->Get<bool>());
 			}
 		}
@@ -361,11 +364,14 @@ namespace Sigma{
 			const Property*  p = &(*propitr);
 			if (p->GetName() == "left") {
 				x = p->Get<float>();
-			} else if (p->GetName() == "top") {
+			}
+			else if (p->GetName() == "top") {
 				y = p->Get<float>();
-			} else if (p->GetName() == "right") {
+			}
+			else if (p->GetName() == "right") {
 				w = p->Get<float>();
-			} else if (p->GetName() == "bottom") {
+			}
+			else if (p->GetName() == "bottom") {
 				h = p->Get<float>();
 			}
 		}
@@ -385,23 +391,32 @@ namespace Sigma{
 			const Property*  p = &*propitr;
 			if (p->GetName() == "x") {
 				light->position.x = p->Get<float>();
-			} else if (p->GetName() == "y") {
+			}
+			else if (p->GetName() == "y") {
 				light->position.y = p->Get<float>();
-			} else if (p->GetName() == "z") {
+			}
+			else if (p->GetName() == "z") {
 				light->position.z = p->Get<float>();
-			} else if (p->GetName() == "intensity") {
+			}
+			else if (p->GetName() == "intensity") {
 				light->intensity = p->Get<float>();
-			} else if (p->GetName() == "cr") {
+			}
+			else if (p->GetName() == "cr") {
 				light->color.r = p->Get<float>();
-			} else if (p->GetName() == "cg") {
+			}
+			else if (p->GetName() == "cg") {
 				light->color.g = p->Get<float>();
-			} else if (p->GetName() == "cb") {
+			}
+			else if (p->GetName() == "cb") {
 				light->color.b = p->Get<float>();
-			} else if (p->GetName() == "ca") {
+			}
+			else if (p->GetName() == "ca") {
 				light->color.a = p->Get<float>();
-			} else if (p->GetName() == "radius") {
+			}
+			else if (p->GetName() == "radius") {
 				light->radius = p->Get<float>();
-			} else if (p->GetName() == "falloff") {
+			}
+			else if (p->GetName() == "falloff") {
 				light->falloff = p->Get<float>();
 			}
 		}
@@ -443,6 +458,7 @@ namespace Sigma{
 		switch(status) {
 			case GL_FRAMEBUFFER_COMPLETE:
 				std::cout << "Successfully created render target.";
+				break;
 			default:
 				std::cerr << "Error: Framebuffer format is not compatible." << std::endl;
 		}
