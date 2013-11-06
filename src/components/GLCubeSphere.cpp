@@ -19,8 +19,9 @@ namespace Sigma {
 
     GLCubeSphere::~GLCubeSphere() {
         glDeleteTextures(1, &this->_cubeMap);
-        if(this->_cubeNormalMap != 0)
+        if(this->_cubeNormalMap != 0) {
             glDeleteTextures(1, &this->_cubeNormalMap);
+		}
     }
 
     void GLCubeSphere::InitializeBuffers() {
@@ -66,14 +67,17 @@ namespace Sigma {
         //  Cubesphere normals are computed in the shader 'shaders/cubesphere.vert'.
         //  TODO get GLIcoSphere's normal calculations into a shader too
 
-        // shader program was compiled and linked in GLMesh::InitializeBuffers.
-        //  Now we can set relevant custom uniform values
-        (*shader).Use();
-        glUniform1i(glGetUniformLocation((*shader).GetProgram(), "cubeMap"), 0);
-        glUniform1i(glGetUniformLocation((*shader).GetProgram(), "cubeNormalMap"), 1);
-		(*shader).UnUse();
-
 		GLMesh::InitializeBuffers();
+
+		// shader program was compiled and linked in GLMesh::InitializeBuffers.
+		//  Now we can set relevant custom uniform values
+		this->shader->Use();
+		this->shader->AddUniform("cubeMap");
+		glUniform1i((*this->shader)("cubeMap"), 0);
+		this->shader->AddUniform("cubeNormalMap");
+		glUniform1i((*this->shader)("cubeNormalMap"), 1);
+		this->shader->UnUse();
+
     } // function InitializeBuffers
 
     bool GLCubeSphere::LoadTexture(std::string texture_name) {
@@ -148,9 +152,10 @@ namespace Sigma {
                 : (static_cast<int64_t>(v2) << 32 | static_cast<int64_t>(v1));
         // look up midpoint based on key hash
         auto found = cache.find(key);
-        if(found != cache.end()){
+        if (found != cache.end()) {
             return found->second;
-        } else{
+        }
+		else {
             // create and save vertex
             int next_index = cache[key] = this->verts.size();
             //Vertex midpt();

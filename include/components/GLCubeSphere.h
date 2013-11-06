@@ -7,7 +7,6 @@
 #include <stdint.h>
 
 namespace Sigma {
-
     class GLCubeSphere : public GLMesh {
     public:
         SET_COMPONENT_TYPENAME("GLCubeSphere");
@@ -39,13 +38,14 @@ namespace Sigma {
          * \return unsigned int The number of elements to draw.
          */
         virtual unsigned int MeshGroup_ElementCount(const unsigned int group = 0) const {
-            if (group > 0)
+            if (group > 0) {
                 return 0;
+			}
             return this->faces.size() * 3;
         }
 
         /**
-         * \brief Helper method to subdivde the cube recursively
+         * \brief Helper method to subdivide the cube recursively
          *
          *  Each level of subdivision divides a triangle into 4 parts, so the number
          *  of triangles for this cubesphere will be 12 * 4^levels. Note that with

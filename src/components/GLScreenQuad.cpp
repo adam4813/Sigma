@@ -2,12 +2,6 @@
 
 namespace Sigma {
 	GLScreenQuad::GLScreenQuad(int entityID) : GLMesh(entityID), texture_id(0), x(0), y(0), w(0), h(0) {
-		this->shader->Use();
-		// Set up the uniform location in the shader.
-		this->shader->AddUniform("in_Texture");
-		// Set the uniform value now to avoid setting it each frame.
-		glUniform1i((*this->shader)("in_Texture"), 0);
-		this->shader->UnUse();
 	}
 	GLScreenQuad::~GLScreenQuad() {}
 
@@ -60,6 +54,13 @@ namespace Sigma {
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		GLMesh::InitializeBuffers();
+
+		this->shader->Use();
+		// Set up the uniform location in the shader.
+		this->shader->AddUniform("in_Texture");
+		// Set the uniform value now to avoid setting it each frame.
+		glUniform1i((*this->shader)("in_Texture"), 0);
+		this->shader->UnUse();
 	}
 
 	void GLScreenQuad::Render(glm::mediump_float *view, glm::mediump_float *proj) {
