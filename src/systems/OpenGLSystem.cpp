@@ -384,7 +384,7 @@ namespace Sigma{
 		quad->SetSize(w, h);
 		quad->LoadShader("shaders/quad");
 		quad->InitializeBuffers();
-		this->addComponent(entityID,quad);
+		this->screensSpaceComp.push_back(std::unique_ptr<IGLComponent>(quad));
 		return quad;
 	}
 
@@ -586,6 +586,19 @@ namespace Sigma{
 						glDepthFunc(GL_LESS);
 					}
 				}
+			}
+
+			for (auto citr = this->screensSpaceComp.begin(); citr != this->screensSpaceComp.end(); ++citr) {
+					citr->get()->GetShader()->Use();
+
+					// Set view position
+					glUniform3f(glGetUniformBlockIndex(citr->get()->GetShader()->GetProgram(), "viewPosW"), viewPosition.x, viewPosition.y, viewPosition.z);
+
+					// For now, turn on ambient intensity and turn off lighting
+					glUniform1f(glGetUniformLocation(citr->get()->GetShader()->GetProgram(), "ambLightIntensity"), 0.05f);
+					glUniform1f(glGetUniformLocation(citr->get()->GetShader()->GetProgram(), "diffuseLightIntensity"), 0.0f);
+					glUniform1f(glGetUniformLocation(citr->get()->GetShader()->GetProgram(), "specularLightIntensity"), 0.0f);
+					citr->get()->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 			}
 
 			// Unbind frame buffer
