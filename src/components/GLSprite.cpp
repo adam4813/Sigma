@@ -1,6 +1,5 @@
 #include "components/GLSprite.h"
 #include "GL/glew.h"
-#include "SOIL/SOIL.h"
 #include "resources/GLTexture.h"
 
 namespace Sigma{

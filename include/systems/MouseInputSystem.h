@@ -15,8 +15,8 @@ namespace Sigma{
             float mouse_x, mouse_y; // current pixel locations
             BUTTON_STATE buttons[3]; // left, middle, right
             virtual void MouseMove(float dx, float dy) = 0; // given displacement since last call
-            virtual void MouseDown(BUTTON btn) = 0; // called on button press.
-            virtual void MouseUp(BUTTON btn) = 0;
+			virtual void MouseDown(BUTTON btn, float x, float y) = 0; // called on button press.
+            virtual void MouseUp(BUTTON btn, float x, float y) = 0;
         };
 
         class MouseInputSystem
@@ -42,6 +42,18 @@ namespace Sigma{
 				void MouseMove(float dx, float dy) {
 					for (auto itr = this->eventHandlers.begin(); itr != this->eventHandlers.end(); ++itr) {
 						(*itr)->MouseMove(dx, dy);
+					}
+				}
+
+				void MouseDown(BUTTON btn, float x, float y) {
+					for (auto itr = this->eventHandlers.begin(); itr != this->eventHandlers.end(); ++itr) {
+						(*itr)->MouseDown(btn, x, y);
+					}
+				}
+
+				void MouseUp(BUTTON btn, float x, float y) {
+					for (auto itr = this->eventHandlers.begin(); itr != this->eventHandlers.end(); ++itr) {
+						(*itr)->MouseUp(btn, x, y);
 					}
 				}
             private:

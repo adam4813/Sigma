@@ -59,35 +59,43 @@ void* win32::CreateGraphicsWindow(const unsigned int width, const unsigned int h
 	windowClass.lpszMenuName = NULL;
 	windowClass.lpszClassName = "GL Test Window";
 
-	this->windowedSize.left = 0;
-	this->windowedSize.top = 0;
-	this->windowedSize.right = width;
-	this->windowedSize.bottom = height;
+	this->windowedSize.left = 50;
+	this->windowedSize.top = 50;
+	this->windowedSize.right = width+50;
+	this->windowedSize.bottom = height+50;
+
+	AdjustWindowRectEx(&this->windowedSize, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, false, dwExStyle);
 
 	if (!RegisterClass(&windowClass)) {
 		return false;
 	}
-	this->hwnd = CreateWindowEx(dwExStyle, windowClass.lpszClassName, windowClass.lpszClassName, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, this->windowedSize.left, this->windowedSize.top, this->windowedSize.right, this->windowedSize.bottom, NULL, NULL, hInstance, NULL);
+	this->hwnd = CreateWindowEx(dwExStyle, windowClass.lpszClassName, windowClass.lpszClassName, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, this->windowedSize.left, this->windowedSize.top, this->windowedSize.right - this->windowedSize.left, this->windowedSize.bottom - this->windowedSize.top, NULL, NULL, hInstance, NULL);
 
-	assert(this->hwnd != 0);
+	assert(this->hwnd != 0);	
+
+	// Now that we have created the window to the size we want, we must get the correct client size and store that.
+	GetClientRect(this->hwnd, &this->windowedSize);
 
 	ShowWindow(this->hwnd, SW_SHOW);
 	UpdateWindow(this->hwnd);
-
-
-	POINT midwindow = {512,384};
-	ClientToScreen(this->hwnd, &midwindow);
-	SetCursorPos(midwindow.x, midwindow.y);
-	ShowCursor(false);
 
 	StartOpengGL();
 
 	return this->hdc;
 }
 
-LRESULT CALLBACK win32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+bool win32::mouselook = false;
+
+LRESULT CALLBACK win32::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	bool mouseMoved = false;
-	POINT midwindow = {512,384};
+
+	RECT windowSize;
+	GetClientRect(hwnd, &windowSize);
+	unsigned int windowWidth = windowSize.right - windowSize.left;
+	unsigned int windowHeight = windowSize.bottom - windowSize.top;
+
+	POINT midwindow = {windowWidth / 2, windowHeight / 2};
+
 	switch (message) {
 	case WM_KEYUP:
 		KeyboardEventSystem.KeyUp(wParam);
@@ -98,22 +106,44 @@ LRESULT CALLBACK win32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		KeyboardEventSystem.KeyDown(wParam);
 		return 0;
 		break;
+	case WM_CHAR: 
+		KeyboardEventSystem.CharDown(wParam);
+		return 0;
+		break;
 	case WM_MOUSEMOVE:
-		mouseMoved = true;
-		if ((abs(GET_X_LPARAM(lParam) - midwindow.x) > 2) && (abs(GET_Y_LPARAM(lParam) - midwindow.y) > 2)) {
-			MouseEventSystem.MouseMove((GET_X_LPARAM(lParam) - midwindow.x) / 1024.0f * 500.0f, (GET_Y_LPARAM(lParam) - midwindow.y) / 768.0f * 500.0f);
+		if (mouselook) {
+			mouseMoved = true;
+			if ((abs(GET_X_LPARAM(lParam) - midwindow.x) > 2) && (abs(GET_Y_LPARAM(lParam) - midwindow.y) > 2)) {
+				MouseEventSystem.MouseMove((GET_X_LPARAM(lParam) - midwindow.x) / static_cast<float>(windowHeight) * 500.0f, (GET_Y_LPARAM(lParam) - midwindow.y) / static_cast<float>(windowWidth) * 500.0f);
+			}
+			else if (abs(GET_X_LPARAM(lParam) - midwindow.x) > 2) {
+				MouseEventSystem.MouseMove((GET_X_LPARAM(lParam) - midwindow.x) / static_cast<float>(windowHeight) * 500.0f, 0.0f);
+			}
+			else if (abs(GET_Y_LPARAM(lParam) - midwindow.y) > 2) {
+				MouseEventSystem.MouseMove(0.0f, (GET_Y_LPARAM(lParam) - midwindow.y) / static_cast<float>(windowWidth) * 500.0f);
+			}
+			else {
+				mouseMoved = false;
+			}
+			ClientToScreen(hwnd, &midwindow);
+			SetCursorPos(midwindow.x, midwindow.y);
 		}
-		else if (abs(GET_X_LPARAM(lParam) - midwindow.x) > 2) {
-			MouseEventSystem.MouseMove((GET_X_LPARAM(lParam) - midwindow.x) / 1024.0f * 500.0f, 0.0f);
-		}
-		else if (abs(GET_Y_LPARAM(lParam) - midwindow.y) > 2) {
-			MouseEventSystem.MouseMove(0.0f, (GET_Y_LPARAM(lParam) - midwindow.y) / 768.0f * 500.0f);
-		}
-		else {
-			mouseMoved = false;
-		}
-		ClientToScreen(hWnd, &midwindow);
+		break;
+	case WM_LBUTTONDOWN:
+		MouseEventSystem.MouseDown(Sigma::event::BUTTON::LEFT, static_cast<float>(GET_X_LPARAM(lParam)) / static_cast<float>(windowWidth), static_cast<float>(GET_Y_LPARAM(lParam)) / static_cast<float>(windowHeight));
+		break;
+	case WM_LBUTTONUP:
+		MouseEventSystem.MouseUp(Sigma::event::BUTTON::LEFT,static_cast<float>( GET_X_LPARAM(lParam)) / static_cast<float>(windowWidth), static_cast<float>(GET_Y_LPARAM(lParam)) / static_cast<float>(windowHeight));
+		break;
+	case WM_RBUTTONDOWN:
+		ShowCursor(false);
+		mouselook = true;
+		ClientToScreen(hwnd, &midwindow);
 		SetCursorPos(midwindow.x, midwindow.y);
+		break;
+	case WM_RBUTTONUP:
+		ShowCursor(true);
+		mouselook = false;
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
@@ -124,11 +154,12 @@ LRESULT CALLBACK win32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		MouseEventSystem.MouseMove(0.f, 0.f);
 	}
 
-	return DefWindowProc(hWnd, message, wParam, lParam);
+	return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
 bool win32::MessageLoop() {
 	MSG msg;
+	
 	ZeroMemory(keyUp, sizeof(keyUp));
 	if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) { // If we have a message to process, process it
 		if (msg.message == WM_QUIT) {

@@ -12,6 +12,7 @@ namespace Sigma {
 		// A keyboard event handler interface. Handlers can be controllers, loggers, etc.
 		struct IKeyboardEventHandler {
 			unsigned int keys[256]; // The keys this handler triggers off.
+			unsigned int chars[256]; // The keys this handler triggers off.
 			KEY_STATE keyState[256]; // State of the keys.
 			/**
 			 * \brief Called when on the keys reported during register has a state change.
@@ -20,6 +21,7 @@ namespace Sigma {
 			 * \param[in] KEY_STATE state The new state the key is in
 			 */
 			virtual void KeyStateChange(const unsigned int key, const KEY_STATE state) = 0;
+			virtual void CharDown(const unsigned int c) { }
 		};
 
 		class KeyboardInputSystem {
@@ -38,6 +40,11 @@ namespace Sigma {
 						this->eventHandlers[i].push_back(e);
 					}
 				}
+				for (unsigned int i = 0; i < 256; i++) {
+					if (e->chars[i] > 0) {
+						this->charHandlers[i].push_back(e);
+					}
+				}
 			}
 
 			/**
@@ -50,6 +57,14 @@ namespace Sigma {
 				if (this->eventHandlers.find(key) != this->eventHandlers.end()) {
 					for (auto itr = this->eventHandlers[key].begin(); itr != this->eventHandlers[key].end(); ++ itr) {
 						(*itr)->KeyStateChange(key, KS_UP);
+					}
+				}
+			}
+
+			void CharDown(const unsigned int c) {
+				if (this->charHandlers.find(c) != this->charHandlers.end()) {
+					for (auto itr = this->charHandlers[c].begin(); itr != this->charHandlers[c].end(); ++ itr) {
+						(*itr)->CharDown(c);
 					}
 				}
 			}
@@ -69,6 +84,7 @@ namespace Sigma {
 			}
 		private:
 			std::map<unsigned int, std::vector<Sigma::event::IKeyboardEventHandler*> > eventHandlers;
+			std::map<unsigned int, std::vector<Sigma::event::IKeyboardEventHandler*> > charHandlers;
 		};
 	}
 }

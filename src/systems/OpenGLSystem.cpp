@@ -359,6 +359,8 @@ namespace Sigma{
 		float w = 0.0f;
 		float h = 0.0f;
 		int componentID = 0;
+		std::string textrueName;
+		bool textureInMemory = false;
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			const Property*  p = &(*propitr);
@@ -368,19 +370,45 @@ namespace Sigma{
 			else if (p->GetName() == "top") {
 				y = p->Get<float>();
 			}
-			else if (p->GetName() == "right") {
+			else if (p->GetName() == "width") {
 				w = p->Get<float>();
 			}
-			else if (p->GetName() == "bottom") {
+			else if (p->GetName() == "height") {
 				h = p->Get<float>();
 			}
+			else if (p->GetName() == "textureName") {
+				textrueName = p->Get<std::string>();
+				textureInMemory = true;
+			}
+			else if (p->GetName() == "textureFileName") {
+				textrueName = p->Get<std::string>();
+			}
+		}
+
+		// Check if the texture is loaded and load it if not.
+		if (textures.find(textrueName) == textures.end()) {
+			Sigma::resource::GLTexture texture;
+			if (textureInMemory) { // We are using an in memory texture. It will be populated somewhere else
+				Sigma::OpenGLSystem::textures[textrueName] = texture;
+			}
+			else { // The texture in on disk so load it.
+				texture.LoadDataFromFile(textrueName);
+				if (texture.GetID() != 0) {
+					Sigma::OpenGLSystem::textures[textrueName] = texture;
+				}
+			}
+		}
+
+		// It should be loaded, but in case an error occurred double check for it.
+		if (textures.find(textrueName) != textures.end()) {
+			quad->SetTexture(&Sigma::OpenGLSystem::textures[textrueName]);
 		}
 
 		quad->SetPosition(x, y);
 		quad->SetSize(w, h);
 		quad->LoadShader("shaders/quad");
 		quad->InitializeBuffers();
-		this->addComponent(entityID,quad);
+		this->screensSpaceComp.push_back(std::unique_ptr<IGLComponent>(quad));
 		return quad;
 	}
 
@@ -582,6 +610,19 @@ namespace Sigma{
 						glDepthFunc(GL_LESS);
 					}
 				}
+			}
+
+			for (auto citr = this->screensSpaceComp.begin(); citr != this->screensSpaceComp.end(); ++citr) {
+					citr->get()->GetShader()->Use();
+
+					// Set view position
+					glUniform3f(glGetUniformBlockIndex(citr->get()->GetShader()->GetProgram(), "viewPosW"), viewPosition.x, viewPosition.y, viewPosition.z);
+
+					// For now, turn on ambient intensity and turn off lighting
+					glUniform1f(glGetUniformLocation(citr->get()->GetShader()->GetProgram(), "ambLightIntensity"), 0.05f);
+					glUniform1f(glGetUniformLocation(citr->get()->GetShader()->GetProgram(), "diffuseLightIntensity"), 0.0f);
+					glUniform1f(glGetUniformLocation(citr->get()->GetShader()->GetProgram(), "specularLightIntensity"), 0.0f);
+					citr->get()->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 			}
 
 			// Unbind frame buffer
