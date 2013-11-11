@@ -79,11 +79,6 @@ void* win32::CreateGraphicsWindow(const unsigned int width, const unsigned int h
 	ShowWindow(this->hwnd, SW_SHOW);
 	UpdateWindow(this->hwnd);
 
-
-	POINT midwindow = {512,384};
-	ClientToScreen(this->hwnd, &midwindow);
-	SetCursorPos(midwindow.x, midwindow.y);
-
 	StartOpengGL();
 
 	return this->hdc;
@@ -91,9 +86,16 @@ void* win32::CreateGraphicsWindow(const unsigned int width, const unsigned int h
 
 bool win32::mouselook = false;
 
-LRESULT CALLBACK win32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK win32::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	bool mouseMoved = false;
-	POINT midwindow = {512,384};
+
+	RECT windowSize;
+	GetClientRect(hwnd, &windowSize);
+	unsigned int windowWidth = windowSize.right - windowSize.left;
+	unsigned int windowHeight = windowSize.bottom - windowSize.top;
+
+	POINT midwindow = {windowWidth / 2, windowHeight / 2};
+
 	switch (message) {
 	case WM_KEYUP:
 		KeyboardEventSystem.KeyUp(wParam);
@@ -112,30 +114,31 @@ LRESULT CALLBACK win32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		if (mouselook) {
 			mouseMoved = true;
 			if ((abs(GET_X_LPARAM(lParam) - midwindow.x) > 2) && (abs(GET_Y_LPARAM(lParam) - midwindow.y) > 2)) {
-				MouseEventSystem.MouseMove((GET_X_LPARAM(lParam) - midwindow.x) / 1024.0f * 500.0f, (GET_Y_LPARAM(lParam) - midwindow.y) / 768.0f * 500.0f);
+				MouseEventSystem.MouseMove((GET_X_LPARAM(lParam) - midwindow.x) / static_cast<float>(windowHeight) * 500.0f, (GET_Y_LPARAM(lParam) - midwindow.y) / static_cast<float>(windowWidth) * 500.0f);
 			}
 			else if (abs(GET_X_LPARAM(lParam) - midwindow.x) > 2) {
-				MouseEventSystem.MouseMove((GET_X_LPARAM(lParam) - midwindow.x) / 1024.0f * 500.0f, 0.0f);
+				MouseEventSystem.MouseMove((GET_X_LPARAM(lParam) - midwindow.x) / static_cast<float>(windowHeight) * 500.0f, 0.0f);
 			}
 			else if (abs(GET_Y_LPARAM(lParam) - midwindow.y) > 2) {
-				MouseEventSystem.MouseMove(0.0f, (GET_Y_LPARAM(lParam) - midwindow.y) / 768.0f * 500.0f);
+				MouseEventSystem.MouseMove(0.0f, (GET_Y_LPARAM(lParam) - midwindow.y) / static_cast<float>(windowWidth) * 500.0f);
 			}
 			else {
 				mouseMoved = false;
 			}
-			ClientToScreen(hWnd, &midwindow);
+			ClientToScreen(hwnd, &midwindow);
 			SetCursorPos(midwindow.x, midwindow.y);
 		}
 		break;
 	case WM_LBUTTONDOWN:
-		MouseEventSystem.MouseDown(Sigma::event::BUTTON::LEFT, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		MouseEventSystem.MouseDown(Sigma::event::BUTTON::LEFT, static_cast<float>(GET_X_LPARAM(lParam)) / static_cast<float>(windowWidth), static_cast<float>(GET_Y_LPARAM(lParam)) / static_cast<float>(windowHeight));
 		break;
 	case WM_LBUTTONUP:
-		MouseEventSystem.MouseUp(Sigma::event::BUTTON::LEFT, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		MouseEventSystem.MouseUp(Sigma::event::BUTTON::LEFT,static_cast<float>( GET_X_LPARAM(lParam)) / static_cast<float>(windowWidth), static_cast<float>(GET_Y_LPARAM(lParam)) / static_cast<float>(windowHeight));
 		break;
 	case WM_RBUTTONDOWN:
 		ShowCursor(false);
 		mouselook = true;
+		ClientToScreen(hwnd, &midwindow);
 		SetCursorPos(midwindow.x, midwindow.y);
 		break;
 	case WM_RBUTTONUP:
@@ -151,7 +154,7 @@ LRESULT CALLBACK win32::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		MouseEventSystem.MouseMove(0.f, 0.f);
 	}
 
-	return DefWindowProc(hWnd, message, wParam, lParam);
+	return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
 bool win32::MessageLoop() {
