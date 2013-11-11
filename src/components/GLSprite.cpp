@@ -1,9 +1,5 @@
 #include "components/GLSprite.h"
 #include "GL/glew.h"
-<<<<<<< HEAD
-#include "SOIL/SOIL.h"
-=======
->>>>>>> Added the GLTexture resource
 #include "resources/GLTexture.h"
 
 namespace Sigma{
@@ -77,7 +73,6 @@ namespace Sigma{
         glVertexAttribPointer(uvlocation, 2, GL_FLOAT, GL_FALSE, 0, NULL);
         glEnableVertexAttribArray(uvlocation);
 
-<<<<<<< HEAD
 		glBindVertexArray(0);
 		this->shader->Use();
 		this->shader->AddUniform("in_Model");
@@ -89,18 +84,10 @@ namespace Sigma{
 
 	void GLSprite::LoadShader() {
 		// Just load the default shader
-=======
-        glBindVertexArray(0);
-    }
-
-	void GLSprite::LoadShader() {
-		// Just laod the default shader
->>>>>>> Added the GLTexture resource
 		IGLComponent::LoadShader(GLSprite::DEFAULT_SHADER);
     }
 
     void GLSprite::Render(glm::mediump_float *view, glm::mediump_float *proj) {
-<<<<<<< HEAD
         this->shader->Use();
 
 		glm::mat4 modelMatrix = this->Transform()->GetMatrix();
@@ -108,26 +95,13 @@ namespace Sigma{
         glUniformMatrix4fv((*this->shader)("in_Model"), 1, GL_FALSE, &modelMatrix[0][0]);
         glUniformMatrix4fv((*this->shader)("in_View"), 1, GL_FALSE, view);
         glUniformMatrix4fv((*this->shader)("in_Proj"), 1, GL_FALSE, proj);
-=======
-        shader->Use();
-
-		glm::mat4 modelMatrix = this->Transform()->GetMatrix();
-
-        glUniformMatrix4fv(glGetUniformLocation((*shader).GetProgram(), "in_Model"), 1, GL_FALSE, &modelMatrix[0][0]);
-        glUniformMatrix4fv(glGetUniformLocation((*shader).GetProgram(), "in_View"), 1, GL_FALSE, view);
-        glUniformMatrix4fv(glGetUniformLocation((*shader).GetProgram(), "in_Proj"), 1, GL_FALSE, proj);
->>>>>>> Added the GLTexture resource
 
         glBindVertexArray(this->Vao());
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->GetBuffer(this->ElemBufIndex));
 
 		// Check to make sure we have a valid texture
 		if (this->texture) {
-<<<<<<< HEAD
 			glUniform1i((*this->shader)("tex"), 0);
-=======
-			glUniform1i(glGetUniformLocation((*shader).GetProgram(), "tex"), 0);
->>>>>>> Added the GLTexture resource
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, this->texture->GetID());
 		}
@@ -137,19 +111,10 @@ namespace Sigma{
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
-<<<<<<< HEAD
         this->shader->UnUse();
     }
 
 	void GLSprite::SetTexture(Sigma::resource::GLTexture* texture) {
 		this->texture = texture;
     }
-=======
-        shader->UnUse();
-    }
-
-	void GLSprite::SetTexture(Sigma::resource::GLTexture* texture) {
-		this->texture = texture;
-    }
->>>>>>> Added the GLTexture resource
 } // namespace Sigma

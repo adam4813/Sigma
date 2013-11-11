@@ -14,7 +14,6 @@
 #include "glm/ext.hpp"
 
 namespace Sigma{
-<<<<<<< HEAD
 	// RenderTarget methods
 	RenderTarget::~RenderTarget() {
 		glDeleteTextures(1, &this->texture_id); // Perhaps should check if texture was created for this RT or is used elsewhere
@@ -27,9 +26,6 @@ namespace Sigma{
 		glBindFramebuffer(GL_FRAMEBUFFER, this->fbo_id);
 	}
 	
-=======
-
->>>>>>> Added the GLTexture resource
 	std::map<std::string, Sigma::resource::GLTexture> OpenGLSystem::textures;
     OpenGLSystem::OpenGLSystem() : windowWidth(1024), windowHeight(768), deltaAccumulator(0.0),
 		framerate(60.0f), viewMode("") {}
