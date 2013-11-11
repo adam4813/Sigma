@@ -18,7 +18,10 @@ public:
 	virtual void InitializeBuffers();
 	virtual void Render(glm::mediump_float *view, glm::mediump_float *proj);
 
+	// Screen space 0.0 - 1.0
 	void SetPosition(float x, float y) { this->x=x; this->y=y; }
+
+	// Screen space 0.0 - 1.0
 	void SetSize(float w, float h) { this->w=w; this->h=h; }
 
 	unsigned int GetTexture();

@@ -373,10 +373,10 @@ namespace Sigma{
 			else if (p->GetName() == "top") {
 				y = p->Get<float>();
 			}
-			else if (p->GetName() == "right") {
+			else if (p->GetName() == "width") {
 				w = p->Get<float>();
 			}
-			else if (p->GetName() == "bottom") {
+			else if (p->GetName() == "height") {
 				h = p->Get<float>();
 			}
 			else if (p->GetName() == "textureName") {
