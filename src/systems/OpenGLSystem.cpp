@@ -364,6 +364,7 @@ namespace Sigma{
 		float h = 0.0f;
 		int componentID = 0;
 		std::string textrueName;
+		bool textureInMemory = false;
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			const Property*  p = &(*propitr);
@@ -381,15 +382,24 @@ namespace Sigma{
 			}
 			else if (p->GetName() == "textureName") {
 				textrueName = p->Get<std::string>();
+				textureInMemory = true;
+			}
+			else if (p->GetName() == "textureFileName") {
+				textrueName = p->Get<std::string>();
 			}
 		}
 
 		// Check if the texture is loaded and load it if not.
 		if (textures.find(textrueName) == textures.end()) {
 			Sigma::resource::GLTexture texture;
-			texture.LoadDataFromFile(textrueName);
-			if (texture.GetID() != 0) {
+			if (textureInMemory) { // We are using an in memory texture. It will be populated somewhere else
 				Sigma::OpenGLSystem::textures[textrueName] = texture;
+			}
+			else { // The texture in on disk so load it.
+				texture.LoadDataFromFile(textrueName);
+				if (texture.GetID() != 0) {
+					Sigma::OpenGLSystem::textures[textrueName] = texture;
+				}
 			}
 		}
 
