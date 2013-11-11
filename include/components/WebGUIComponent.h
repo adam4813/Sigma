@@ -42,6 +42,18 @@ public:
 		return this->surface;
 	}
 
+	void SetCaputeArea(float x, float y, float width, float height) {
+		this->x = x;
+		this->y = y;
+		this->width = width;
+		this->height = height;
+	}
+
+	void SetWindowSize(unsigned int width, unsigned int heigit) {
+		this->windowWidth = width;
+		this->windowHeight = heigit;
+	}
+
 	void InjectKeyboardEvent(const unsigned int key, const Sigma::event::KEY_STATE state);
 
 	void InjectCharDown(const unsigned int c);
@@ -51,4 +63,8 @@ private:
 	WebView* view;
 	BitmapSurface* surface;
 	Sigma::resource::GLTexture* texture;
+
+	float x, y, width, height; // The region in which to capture mouse inputs.
+	unsigned int windowWidth; // The width of the window
+	unsigned int windowHeight; // The height of the window
 };
