@@ -5,16 +5,15 @@
 #include "systems/KeyboardInputSystem.h"
 #include "systems/MouseInputSystem.h"
 
-class WebGUIComponent;
-
 namespace Sigma {
+	class WebGUIView;
 	namespace event {
 		namespace handler {
 			// A type of handler. This handler controls an OpenGL 6 DOF view.
 			class GUIController : public IKeyboardEventHandler, public IMouseEventHandler{
 			public:
 				GUIController();
-				void SetGUI(WebGUIComponent* gui) {
+				void SetGUI(WebGUIView* gui) {
 					this->gui = gui;
 				}
 
@@ -42,7 +41,7 @@ namespace Sigma {
 				virtual void MouseDown(Sigma::event::BUTTON btn, float x, float y);
 				virtual void MouseUp(Sigma::event::BUTTON btn, float x, float y) { }
 			private:
-				WebGUIComponent* gui;
+				WebGUIView* gui;
 				bool hasFocus;
 			};
 		}

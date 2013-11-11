@@ -16,32 +16,37 @@ class Property;
 
 using namespace Awesomium;
 
-class WebGUISystem
-    : public Sigma::IFactory, public Sigma::ISystem<WebGUIComponent> {
-public:
-	WebGUISystem() { }
-	~WebGUISystem() { };
-	/**
-	 * \brief Starts the Awesomium WebGUI system.
-	 *
-	 * \return bool Returns false on startup failure.
-	 */
-	bool Start();
+namespace Sigma {
+	class WebGUISystem : public IFactory, public ISystem<WebGUIView> {
+	public:
+		WebGUISystem() { }
+		~WebGUISystem() { };
+		/**
+		 * \brief Starts the Awesomium WebGUI system.
+		 *
+		 * \return bool Returns false on startup failure.
+		 */
+		bool Start();
 
-	/**
-	 * \brief Causes an update in the system based on the change in time.
-	 *
-	 * Updates the state of the system based off how much time has elapsed since the last update.
-	 * \param[in] const float delta The change in time since the last update
-	 * \return bool Returns true if we had an update interval passed.
-	 */
-	bool Update(const double delta);
+		void SetWindowSize(unsigned int width, unsigned int height) {
+			this->windowWidth = width;
+			this->windowHeight = height;
+		}
 
-    std::map<std::string,FactoryFunction> getFactoryFunctions();
+		/**
+		 * \brief Causes an update in the system based on the change in time.
+		 *
+		 * Updates the state of the system based off how much time has elapsed since the last update.
+		 * \param[in] const float delta The change in time since the last update
+		 * \return bool Returns true if we had an update interval passed.
+		 */
+		bool Update(const double delta);
 
-	void createWebView(const std::string type, const unsigned int entityID, std::vector<Property> &properties);
-	void createWebView(const std::string type, const unsigned int entityID, std::vector<Property> &properties, const char* targeturl);
-	void setWebView(const unsigned int entityID, const std::string url);
-private:
-	WebCore* web_core;
-};
+		std::map<std::string,FactoryFunction> getFactoryFunctions();
+
+		IComponent* createWebGUIView(const unsigned int entityID, const std::vector<Property> &properties);
+	private:
+		WebCore* web_core;
+		unsigned int windowWidth, windowHeight; // The width of the overall window for converting mouse coordinate normals.
+	};
+}

@@ -10,61 +10,65 @@
 
 using namespace Awesomium;
 
-class WebGUIComponent : public Sigma::IComponent {
-public:
-    SET_COMPONENT_TYPENAME("WebGUIComponent");
-    WebGUIComponent() : IComponent(0), texture(nullptr) { }
-    WebGUIComponent(const int entityID) : IComponent(entityID), texture(nullptr) { };
+namespace Sigma {
+	class WebGUIView : public Sigma::IComponent {
+	public:
+		SET_COMPONENT_TYPENAME("WebGUIView");
+		WebGUIView() : IComponent(0), texture(nullptr) { }
+		WebGUIView(const int entityID) : IComponent(entityID), texture(nullptr) { };
 
-	void SetTexture(Sigma::resource::GLTexture* texture) {
-		this->texture = texture;
-	}
-
-	void UpdateTexture() {
-		if (this->texture) {
-			this->texture->LoadDataFromMemory(this->surface->buffer(), this->surface->width(), this->surface->height());
+		void SetTexture(Sigma::resource::GLTexture* texture) {
+			this->texture = texture;
 		}
-	}
 
-	void SetWebView(WebView* view) {
-		this->view = view;
-	}
+		void UpdateTexture() {
+			if (this->texture) {
+				this->texture->LoadDataFromMemory(this->surface->buffer(), this->surface->width(), this->surface->height());
+			}
+		}
 
-	void SetSurface(BitmapSurface* surface) {
-		this->surface = surface;
-	}
+		void SetWebView(WebView* view) {
+			this->view = view;
+		}
 
-	WebView* GetWebView() {
-		return this->view;
-	}
+		void SetSurface(BitmapSurface* surface) {
+			this->surface = surface;
+		}
 
-	BitmapSurface* GetSurface() {
-		return this->surface;
-	}
+		WebView* GetWebView() {
+			return this->view;
+		}
 
-	void SetCaputeArea(float x, float y, float width, float height) {
-		this->x = x;
-		this->y = y;
-		this->width = width;
-		this->height = height;
-	}
+		BitmapSurface* GetSurface() {
+			return this->surface;
+		}
 
-	void SetWindowSize(unsigned int width, unsigned int heigit) {
-		this->windowWidth = width;
-		this->windowHeight = heigit;
-	}
+		void SetCaputeArea(float x, float y, float width, float height) {
+			this->x = x;
+			this->y = y;
+			this->width = width;
+			this->height = height;
+		}
 
-	void InjectKeyboardEvent(const unsigned int key, const Sigma::event::KEY_STATE state);
+		void SetWindowSize(unsigned int width, unsigned int heigit) {
+			this->windowWidth = width;
+			this->windowHeight = heigit;
+		}
 
-	void InjectCharDown(const unsigned int c);
+		void InjectKeyboardEvent(const unsigned int key, const Sigma::event::KEY_STATE state);
 
-	void InjectMouseDown(const Sigma::event::BUTTON btn, float x, float y);
-private:
-	WebView* view;
-	BitmapSurface* surface;
-	Sigma::resource::GLTexture* texture;
+		void InjectCharDown(const unsigned int c);
 
-	float x, y, width, height; // The region in which to capture mouse inputs.
-	unsigned int windowWidth; // The width of the window
-	unsigned int windowHeight; // The height of the window
-};
+		void InjectMouseDown(const Sigma::event::BUTTON btn, float x, float y);
+	private:
+		WebView* view;
+		BitmapSurface* surface;
+		Sigma::resource::GLTexture* texture;
+
+		bool hasFocus;
+
+		float x, y, width, height; // The region in which to capture mouse inputs.
+		unsigned int windowWidth; // The width of the window
+		unsigned int windowHeight; // The height of the window
+	};
+}
