@@ -363,6 +363,7 @@ namespace Sigma{
 		float w = 0.0f;
 		float h = 0.0f;
 		int componentID = 0;
+		std::string textrueName;
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			const Property*  p = &(*propitr);
@@ -378,6 +379,23 @@ namespace Sigma{
 			else if (p->GetName() == "bottom") {
 				h = p->Get<float>();
 			}
+			else if (p->GetName() == "textureName") {
+				textrueName = p->Get<std::string>();
+			}
+		}
+
+		// Check if the texture is loaded and load it if not.
+		if (textures.find(textrueName) == textures.end()) {
+			Sigma::resource::GLTexture texture;
+			texture.LoadDataFromFile(textrueName);
+			if (texture.GetID() != 0) {
+				Sigma::OpenGLSystem::textures[textrueName] = texture;
+			}
+		}
+
+		// It should be loaded, but in case an error occurred double check for it.
+		if (textures.find(textrueName) != textures.end()) {
+			quad->SetTexture(&Sigma::OpenGLSystem::textures[textrueName]);
 		}
 
 		quad->SetPosition(x, y);

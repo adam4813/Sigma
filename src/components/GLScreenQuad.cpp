@@ -1,8 +1,8 @@
 #include "components/GLScreenQuad.h"
+#include "resources/GLTexture.h"
 
 namespace Sigma {
-	GLScreenQuad::GLScreenQuad(int entityID) : GLMesh(entityID), texture_id(0), x(0), y(0), w(0), h(0) {
-	}
+	GLScreenQuad::GLScreenQuad(int entityID) : GLMesh(entityID), texture(nullptr), x(0), y(0), w(0), h(0) {}
 	GLScreenQuad::~GLScreenQuad() {}
 
 	void GLScreenQuad::InitializeBuffers() {
@@ -16,7 +16,7 @@ namespace Sigma {
 
 		float pixelWidth, pixelHeight;
 
-		// NOTE: This is currently depends on a fixed screen size
+		// NOTE: This is currently dependend on a fixed screen size
 		pixelWidth = abs(this->x - this->w) * 512.0f;
 		pixelHeight = abs(this->y - this->h) * 384.0f;
 
@@ -25,14 +25,13 @@ namespace Sigma {
 		float offset;
 
 		// Figure out corrected texture coordinates
-		if (pixelWidth > pixelHeight) {
+		if(pixelWidth > pixelHeight) {
 			offset = (pixelHeight / pixelWidth);
 			this->texCoords.push_back(TexCoord(0.0f, 0.0f));
 			this->texCoords.push_back(TexCoord(1.0f, 0.0f));
 			this->texCoords.push_back(TexCoord(0.0f, offset));
 			this->texCoords.push_back(TexCoord(1.0f, offset));
-		}
-		else {
+		} else {
 			offset = (pixelWidth / pixelHeight);
 			this->texCoords.push_back(TexCoord(0.0f, 0.0f));
 			this->texCoords.push_back(TexCoord(offset, 0.0f));
@@ -43,24 +42,7 @@ namespace Sigma {
 		// Add the mesh group
 		this->AddMeshGroupIndex(0);
 
-		// Create texture with black background
-		glGenTextures(1, &this->texture_id);
-		glBindTexture(GL_TEXTURE_2D, this->texture_id);
-		glActiveTexture(GL_TEXTURE0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		texData.assign(this->texture_size*this->texture_size*4, 0);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, this->texture_size, this->texture_size, 0, GL_BGRA, GL_UNSIGNED_BYTE, &this->texData[0]);
-		glBindTexture(GL_TEXTURE_2D, 0);
-
 		GLMesh::InitializeBuffers();
-
-		this->shader->Use();
-		// Set up the uniform location in the shader.
-		this->shader->AddUniform("in_Texture");
-		// Set the uniform value now to avoid setting it each frame.
-		glUniform1i((*this->shader)("in_Texture"), 0);
-		this->shader->UnUse();
 	}
 
 	void GLScreenQuad::Render(glm::mediump_float *view, glm::mediump_float *proj) {
@@ -72,7 +54,9 @@ namespace Sigma {
 
 		glBindVertexArray(this->vao);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->GetBuffer(this->ElemBufIndex));
-		glBindTexture(GL_TEXTURE_2D, this->texture_id);
+
+		glUniform1i(glGetUniformLocation((*this->shader).GetProgram(), "in_Texture"), 0);
+		glBindTexture(GL_TEXTURE_2D, this->texture->GetID());
 		glActiveTexture(GL_TEXTURE0);
 
 		for (int i = 0, cur = this->MeshGroup_ElementCount(0), prev = 0; cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
@@ -83,7 +67,6 @@ namespace Sigma {
         glBindVertexArray(0);
 
 		// Clear the texture for next frame
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, this->texture_size, this->texture_size, 0, GL_BGRA, GL_UNSIGNED_BYTE, &this->texData[0]);
 
         glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -93,4 +76,16 @@ namespace Sigma {
 
 		this->shader->UnUse();
 	}
+
+	unsigned int GLScreenQuad::GetTexture() {
+		if (this->texture) {
+			return this->texture->GetID();
+		}
+		return 0;
+	}
+
+	void GLScreenQuad::SetTexture(resource::GLTexture* texture) {
+		this->texture = texture;
+	}
+
 };
