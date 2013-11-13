@@ -114,19 +114,26 @@ LRESULT CALLBACK win32::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 		if (mouselook) {
 			mouseMoved = true;
 			if ((abs(GET_X_LPARAM(lParam) - midwindow.x) > 2) && (abs(GET_Y_LPARAM(lParam) - midwindow.y) > 2)) {
-				MouseEventSystem.MouseMove((GET_X_LPARAM(lParam) - midwindow.x) / static_cast<float>(windowHeight) * 500.0f, (GET_Y_LPARAM(lParam) - midwindow.y) / static_cast<float>(windowWidth) * 500.0f);
+				MouseEventSystem.MouseMove(static_cast<float>(GET_X_LPARAM(lParam)) / static_cast<float>(windowWidth), static_cast<float>(GET_Y_LPARAM(lParam)) / static_cast<float>(windowHeight), (GET_X_LPARAM(lParam) - midwindow.x) / static_cast<float>(windowHeight) * 500.0f, (GET_Y_LPARAM(lParam) - midwindow.y) / static_cast<float>(windowWidth) * 500.0f);
 			}
 			else if (abs(GET_X_LPARAM(lParam) - midwindow.x) > 2) {
-				MouseEventSystem.MouseMove((GET_X_LPARAM(lParam) - midwindow.x) / static_cast<float>(windowHeight) * 500.0f, 0.0f);
+				MouseEventSystem.MouseMove(static_cast<float>(GET_X_LPARAM(lParam)) / static_cast<float>(windowWidth), static_cast<float>(GET_Y_LPARAM(lParam)) / static_cast<float>(windowHeight), (GET_X_LPARAM(lParam) - midwindow.x) / static_cast<float>(windowHeight) * 500.0f, 0.0f);
 			}
 			else if (abs(GET_Y_LPARAM(lParam) - midwindow.y) > 2) {
-				MouseEventSystem.MouseMove(0.0f, (GET_Y_LPARAM(lParam) - midwindow.y) / static_cast<float>(windowWidth) * 500.0f);
+				MouseEventSystem.MouseMove(static_cast<float>(GET_X_LPARAM(lParam)) / static_cast<float>(windowWidth), static_cast<float>(GET_Y_LPARAM(lParam)) / static_cast<float>(windowHeight), 0.0f, (GET_Y_LPARAM(lParam) - midwindow.y) / static_cast<float>(windowWidth) * 500.0f);
 			}
 			else {
 				mouseMoved = false;
 			}
 			ClientToScreen(hwnd, &midwindow);
 			SetCursorPos(midwindow.x, midwindow.y);
+		}
+		else {
+			mouseMoved = true;
+			MouseEventSystem.MouseMove(static_cast<float>(GET_X_LPARAM(lParam)) / static_cast<float>(windowWidth), static_cast<float>(GET_Y_LPARAM(lParam)) / static_cast<float>(windowHeight), 0.0f, 0.0f);
+		}
+		if (!mouseMoved) {
+			MouseEventSystem.MouseMove(0.f, 0.f, 0.f, 0.f);
 		}
 		break;
 	case WM_LBUTTONDOWN:
@@ -148,10 +155,6 @@ LRESULT CALLBACK win32::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
-	}
-
-	if (!mouseMoved) {
-		MouseEventSystem.MouseMove(0.f, 0.f);
 	}
 
 	return DefWindowProc(hwnd, message, wParam, lParam);

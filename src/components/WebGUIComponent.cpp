@@ -27,19 +27,54 @@ namespace Sigma {
 		}
 	}
 
-	void WebGUIView::InjectMouseDown(const Sigma::event::BUTTON btn, float x, float y) {
+	bool WebGUIView::InjectMouseMove(float x, float y) {
+		if(this->mouseDown == 0) {
+			if ((x > this->x) && (x < (this->x + this->width))) {
+				if ((y > this->y) && (y < (this->y + this->height))) {
+					this->view->Focus();
+					this->hasFocus = true;
+					this->view->InjectMouseMove((x - this->x) * this->windowWidth, (y - this->y) * this->windowHeight);
+					return true;
+				}
+			}
+			this->view->Unfocus();
+			this->hasFocus = false;
+		}
+		else {
+			this->view->InjectMouseMove((x - this->x) * this->windowWidth, (y - this->y) * this->windowHeight);
+			return true;
+		}
+		return false;
+	}
+
+	bool WebGUIView::InjectMouseDown(const Sigma::event::BUTTON btn, float x, float y) {
+		if (btn != Sigma::event::BUTTON::LEFT) { return false; }
 		if ((x > this->x) && (x < (this->x + this->width))) {
 			if ((y > this->y) && (y < (this->y + this->height))) {
 				this->view->Focus();
 				this->hasFocus = true;
 				this->view->InjectMouseMove((x - this->x) * this->windowWidth, (y - this->y) * this->windowHeight);
 				this->view->InjectMouseDown(kMouseButton_Left);
-				this->view->InjectMouseUp(kMouseButton_Left);
-				return; // Early return to prevent foxus loss.
+				this->mouseDown = 1;
+				//this->view->InjectMouseUp(kMouseButton_Left);
+				return true; // Early return to prevent focus loss.
 			}
 		}
 		this->view->Unfocus();
 		this->hasFocus = false;
+		return false;
+	}
+
+	bool WebGUIView::InjectMouseUp(const Sigma::event::BUTTON btn, float x, float y) {
+		if (this->hasFocus) {
+			this->view->InjectMouseMove((x - this->x) * this->windowWidth, (y - this->y) * this->windowHeight);
+			this->view->InjectMouseUp(kMouseButton_Left);
+			this->mouseDown = 0;
+			return true;
+		}
+		this->view->Unfocus();
+		this->hasFocus = false;
+		return false;
 	}
 
 	void WebGUIView::InjectCharDown(const unsigned int c) {

@@ -19,7 +19,7 @@ using namespace Awesomium;
 namespace Sigma {
 	class WebGUISystem : public IFactory, public ISystem<WebGUIView> {
 	public:
-		WebGUISystem() { }
+		WebGUISystem() : web_core(nullptr) { }
 		~WebGUISystem() { };
 		/**
 		 * \brief Starts the Awesomium WebGUI system.
