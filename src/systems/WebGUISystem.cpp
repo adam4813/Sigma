@@ -39,6 +39,7 @@ namespace Sigma {
 
 	IComponent* WebGUISystem::createWebGUIView(const unsigned int entityID, const std::vector<Property> &properties) {
 		float x, y, width, height;
+		bool transparent = false;
 		std::string textureName = "";
 		WebURL url;
 
@@ -60,17 +61,21 @@ namespace Sigma {
 			else if (p->GetName() == "textureName") {
 				textureName = p->Get<std::string>();
 			}
+			else if (p->GetName() == "transparent") {
+				transparent = p->Get<bool>();
+			}
 			else if (p->GetName() == "URL") {
 				url = WebURL(WSLit(p->Get<std::string>().c_str()));
 			}
 		}
 		WebGUIView* webview = new WebGUIView(entityID);
 		WebView* view = web_core->CreateWebView(width * this->windowWidth, height * this->windowHeight);
-
+		
 		if (!url.IsValid()) {
 			std::cerr << "Invalid URL" << std::endl;
 		}
 		view->LoadURL(url);
+		view->SetTransparent(transparent);
 
 		while (view->IsLoading()) {
 			this->web_core->Update();

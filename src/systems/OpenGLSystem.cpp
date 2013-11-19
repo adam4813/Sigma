@@ -612,6 +612,9 @@ namespace Sigma{
 				}
 			}
 
+			// Enable transparent rendering
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			for (auto citr = this->screensSpaceComp.begin(); citr != this->screensSpaceComp.end(); ++citr) {
 					citr->get()->GetShader()->Use();
 
@@ -624,6 +627,8 @@ namespace Sigma{
 					glUniform1f(glGetUniformLocation(citr->get()->GetShader()->GetProgram(), "specularLightIntensity"), 0.0f);
 					citr->get()->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 			}
+			// Remove blending
+			glDisable(GL_BLEND);
 
 			// Unbind frame buffer
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);

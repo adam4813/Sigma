@@ -122,7 +122,10 @@ bool SDLSys::MessageLoop() {
             }
 
             // Dispatch the event
-            MouseEventSystem.MouseMove(dx, dy);
+            MouseEventSystem.MouseMove(
+				static_cast<float>(event.motion.x) / static_cast<float>(this->GetWindowWidth()),
+				static_cast<float>(event.motion.y) / static_cast<float>(this->GetWindowHeight()),
+				dx, dy);
 
             // if mouse is hidden/grabbed and moved, recenter it so it doesn't appear offscreen
             SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);

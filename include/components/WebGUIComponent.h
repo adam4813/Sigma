@@ -14,8 +14,8 @@ namespace Sigma {
 	class WebGUIView : public Sigma::IComponent {
 	public:
 		SET_COMPONENT_TYPENAME("WebGUIView");
-		WebGUIView() : IComponent(0), texture(nullptr) { }
-		WebGUIView(const int entityID) : IComponent(entityID), texture(nullptr) { };
+		WebGUIView() : IComponent(0), texture(nullptr), mouseDown(0) { }
+		WebGUIView(const int entityID) : IComponent(entityID), texture(nullptr), mouseDown(0) { };
 
 		void SetTexture(Sigma::resource::GLTexture* texture) {
 			this->texture = texture;
@@ -59,13 +59,16 @@ namespace Sigma {
 
 		void InjectCharDown(const unsigned int c);
 
-		void InjectMouseDown(const Sigma::event::BUTTON btn, float x, float y);
+		bool InjectMouseMove(float x, float y);
+		bool InjectMouseDown(const Sigma::event::BUTTON btn, float x, float y);
+		bool InjectMouseUp(const Sigma::event::BUTTON btn, float x, float y);
 	private:
 		WebView* view;
 		BitmapSurface* surface;
 		Sigma::resource::GLTexture* texture;
 
 		bool hasFocus;
+		unsigned int mouseDown;
 
 		float x, y, width, height; // The region in which to capture mouse inputs.
 		unsigned int windowWidth; // The width of the window

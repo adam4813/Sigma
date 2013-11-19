@@ -52,7 +52,7 @@ namespace Sigma{
 
 			} // function KeyStateChange
 
-			void FPSCamera::MouseMove(float dx, float dy) {
+			void FPSCamera::MouseMove(float x, float y, float dx, float dy) {
 				if (this->mover) {
 					this->mover->RotateTarget(dy,dx,0.0f);
 				}

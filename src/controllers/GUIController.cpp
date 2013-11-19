@@ -31,6 +31,20 @@ namespace Sigma {
 					this->gui->InjectMouseDown(btn, x, y);
 				}
 			}
+
+			void GUIController::MouseUp(Sigma::event::BUTTON btn, float x, float y) {
+				// Store the new key state
+				if (this->gui) {
+					this->gui->InjectMouseUp(btn, x, y);
+				}
+			}
+
+			void GUIController::MouseMove(float x, float y, float dx, float dy) {
+				// Store the new key state
+				if (this->gui) {
+					this->gui->InjectMouseMove(x, y);
+				}
+			}
 		}
 	}
 }
