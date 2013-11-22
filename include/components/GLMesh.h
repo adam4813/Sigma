@@ -10,7 +10,6 @@
 #include <memory>
 
 namespace Sigma{
-
     // Helper structs for OBJ loading
     // Stores unique combinations of indices
     struct VertexIndices {
@@ -62,11 +61,14 @@ namespace Sigma{
             if (this->groupIndex.size() == 0) {
                 return 0;
             }
+
             if ((group + 1) < (this->groupIndex.size())) {
                 return (this->groupIndex[group+1] - this->groupIndex[group]) * 3;
-            } else if (group > (this->groupIndex.size() - 1)) {
+            }
+			else if (group > (this->groupIndex.size() - 1)) {
                 return 0;
-            } else {
+            }
+			else {
                 return (this->faces.size() - this->groupIndex[group]) * 3;
             }
         }
@@ -92,8 +94,9 @@ namespace Sigma{
          * \return   const Vertex* The vertex at the index or nullptr if the index was invalid.
          */
         const Vertex* GetVertex(const unsigned int index) const {
-            if(0 <= index && index < this->verts.size())
+            if(index < this->verts.size()) {
                 return &this->verts[index];
+			}
             return nullptr;
         }
 
@@ -118,13 +121,14 @@ namespace Sigma{
          * \return   const Face* The face at the index or nullptr if the index was invalid.
          */
         const Face* GetFace(const unsigned int index) const {
-            if(0 <= index && index < this->faces.size())
+            if(index < this->faces.size()) {
                 return &this->faces[index];
+			}
             return nullptr;
         }
 
         bool RemoveFace(const unsigned int index) {
-            if(0 <= index && index < this->faces.size()){
+            if(index < this->faces.size()) {
                 this->faces.erase(this->faces.begin() + index);
                 return true;
             }
@@ -178,13 +182,14 @@ namespace Sigma{
          * \return   const Color* The color at the index or nullptr if the index was invalid.
          */
         const Color* GetVertexColor(const unsigned int index) const {
-            if(0 <= index && index < this->colors.size())
+            if (index < this->colors.size()) {
                 return &this->colors[index];
+			}
             return nullptr;
         }
 
 		/** \brief load the default shader "shaders/mesh" */
-        bool LoadShader();
+        void LoadShader();
 
         static const std::string DEFAULT_SHADER;
 

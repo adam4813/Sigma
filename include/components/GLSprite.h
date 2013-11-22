@@ -6,11 +6,12 @@
 #include "../IGLComponent.h"
 
 namespace Sigma{
+	namespace resource {
+		class GLTexture;
+	}
 
     class GLSprite : public IGLComponent {
     public:
-        using IGLComponent::LoadShader;
-
         SET_COMPONENT_TYPENAME("GLSprite");
         // We have a private ctor so the factory method must be used.
         GLSprite(const int entityID = 0);
@@ -22,12 +23,23 @@ namespace Sigma{
 		 */
         void InitializeBuffers();
 
+        /**
+         * \brief Renders a GLSprite.
+         *
+         * 
+         * \param[in/out] glm::mediump_float * view The current view matrix.
+         * \param[in/out] glm::mediump_float * proj The current projection matrix.
+         * \exception  
+         */
         virtual void Render(glm::mediump_float *view, glm::mediump_float *proj);
 
-        unsigned int LoadTexture();
-        unsigned int LoadTexture(const std::string& filename);
-        GLuint GetTexture() const { return texture_; }
-        void SetTextureData(const unsigned char* data, unsigned int width, unsigned int height);
+		/**
+		 * \brief Set the GLTexture resource
+		 *
+		 * \param[in/out] Sigma::resource::GLTexture * texture
+		 * \return    void 
+		 */
+		void SetTexture(Sigma::resource::GLTexture* texture);
 
 
         // Load the default shader, "shaders/vert"
@@ -39,14 +51,16 @@ namespace Sigma{
          *
          *  Because this is a component with only one part, only the 0th group has any elements
          * \param Group the index of the mesh group to count
-         * \return unsigned int The number of elements to draw.
+         * \return unsigned int The number of elements to draw. Always 6 for a GLSprite.
          */
         unsigned int MeshGroup_ElementCount(const unsigned int group = 0) const {
-            if (group > 0) return 0;
+			if (group > 0) {
+				return 0;
+			}
             return 6;
         }
     private:
-        GLuint texture_;
+		Sigma::resource::GLTexture* texture;
     }; // class GLSprite
 
 } // namespace Sigma

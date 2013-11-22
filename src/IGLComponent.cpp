@@ -4,15 +4,14 @@ namespace Sigma{
 	// static member initialization
     IGLComponent::ShaderMap IGLComponent::loadedShaders;
 
-    bool IGLComponent::LoadShader(const std::string& filename) {
+    void IGLComponent::LoadShader(const std::string& filename) {
         // look up shader that is already loaded
         ShaderMap::iterator existingShader = IGLComponent::loadedShaders.find(filename.c_str());
-        if(existingShader != IGLComponent::loadedShaders.end()){
+        if(existingShader != IGLComponent::loadedShaders.end()) {
             // shader already exists!
 			this->shader = existingShader->second;
-			return true;
         }
-        else{
+        else {
             // need to create and save the shader
             std::string vertFilename = filename + ".vert";
             std::string fragFilename = filename + ".frag";
@@ -27,10 +26,8 @@ namespace Sigma{
 				this->shader = std::shared_ptr<GLSLShader>(theShader);
 				// save it in the static map
 				IGLComponent::loadedShaders[filename] = this->shader;
-				return true;
 			}
         }
-		return false;
     }
 
 } // namespace Sigma

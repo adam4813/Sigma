@@ -61,7 +61,7 @@ namespace Sigma {
 	class IGLComponent : public IComponent {
 	public:
 		IGLComponent() : IComponent(0) { } // Default ctor setting entity ID to 0.
-		IGLComponent(const int entityID) : IComponent(entityID) { } // Ctor that sets the entity ID.
+		IGLComponent(const int entityID) : lightingEnabled(true), IComponent(entityID) { } // Ctor that sets the entity ID.
 
         typedef std::unordered_map<std::string, std::shared_ptr<GLSLShader>> ShaderMap;
 
@@ -126,11 +126,14 @@ namespace Sigma {
 		virtual void SetCullFace(std::string cull_face) {
 			if(cull_face == "back") {
 				this->cull_face = GL_BACK;
-			} else if (cull_face == "front") {
+			}
+			else if (cull_face == "front") {
 				this->cull_face = GL_FRONT;
-			} else if (cull_face == "none") {
+			}
+			else if (cull_face == "none") {
 				this->cull_face = 0;
-			} else {
+			}
+			else {
 				assert(0 && "Invalid cull_face parameter");
 			}
 		};
@@ -141,7 +144,11 @@ namespace Sigma {
          *  filename should be a relative path, like "shaders/mesh"
          * \return void
          */
-        bool LoadShader(const std::string& filename);
+        void LoadShader(const std::string& filename);
+		std::shared_ptr<GLSLShader> GetShader() { return this->shader; }
+
+		void SetLightingEnabled(bool enabled) { this->lightingEnabled = enabled; }
+		bool IsLightingEnabled() { return this->lightingEnabled; }
 
 		// The index in buffers for each type of buffer.
 		int ElemBufIndex;
@@ -160,6 +167,8 @@ namespace Sigma {
         std::shared_ptr<GLSLShader> shader; // shaders are shared among components
         // name-->shader map to look up already-loaded shaders (so each can be loaded only once)
         static ShaderMap loadedShaders;
+
+		bool lightingEnabled;
 	}; // class IGLComponent
 } // namespace Sigma
 

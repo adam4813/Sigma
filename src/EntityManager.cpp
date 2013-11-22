@@ -31,6 +31,7 @@ namespace Sigma{
         // if entity_id is already a key, it will delete the previous value
         // and replace it with this one
         EntityManager::current_context->entities[entity_id] = std::vector<std::unique_ptr<IComponent>>();
+		return true;
     }
 
     bool EntityManager::DeleteEntity(const type_id entity_id){

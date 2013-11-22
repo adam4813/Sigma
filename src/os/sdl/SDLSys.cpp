@@ -1,7 +1,8 @@
-#include "SDLSys.h"
+#include "os/sdl/SDLSys.h"
 
 #include "GL/glew.h"
 #include "SDL2/SDL_opengl.h"
+
 
 Sigma::event::KeyboardInputSystem IOpSys::KeyboardEventSystem;
 Sigma::event::MouseInputSystem IOpSys::MouseEventSystem;
@@ -18,6 +19,8 @@ void* SDLSys::CreateGraphicsWindow(const unsigned int width, const unsigned int 
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+
+	SDL_GL_SetSwapInterval(0);
 
     this->_Window = SDL_CreateWindow("Sigma Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
     this->_Context = SDL_GL_CreateContext(this->_Window);
@@ -119,13 +122,16 @@ bool SDLSys::MessageLoop() {
             }
 
             // Dispatch the event
-            MouseEventSystem.MouseMove(dx, dy);
+            MouseEventSystem.MouseMove(
+				static_cast<float>(event.motion.x) / static_cast<float>(this->GetWindowWidth()),
+				static_cast<float>(event.motion.y) / static_cast<float>(this->GetWindowHeight()),
+				dx, dy);
 
             // if mouse is hidden/grabbed and moved, recenter it so it doesn't appear offscreen
             SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);
             SDL_WarpMouseInWindow(this->_Window, (width / 2.0f), (height / 2.0f));
             SDL_EventState(SDL_MOUSEMOTION, SDL_ENABLE);
-			break;
+            break;
         case SDL_MOUSEBUTTONDOWN:
             printf("Mouse button %d pressed at (%d,%d)\n",
                     event.button.button, event.button.x, event.button.y);
@@ -180,8 +186,8 @@ unsigned int SDLSys::GetWindowWidth() {
 }
 
 double SDLSys::GetDeltaTime() {
-    int currentTime = SDL_GetTicks();
-    double delta = static_cast<double>(currentTime - this->_LastTime);
+    double currentTime = static_cast<double>(SDL_GetTicks());
+    double delta = currentTime - this->_LastTime;
     this->_LastTime = currentTime;
     return delta;
 }
@@ -217,7 +223,75 @@ bool SDLSys::KeyReleased(int key, bool focused /*= false */) {
     }
 }
 
+void SDLSys::LoadFont(std::string file, unsigned int ptSize) {
+	this->font = TTF_OpenFont(file.c_str(), ptSize);
 
-void SDLSys::Present() {
-    SDL_GL_SwapWindow(this->_Window);
+	if(!this->font) {
+		std::cerr << "Error loading font: " << TTF_GetError() << std::endl;
+	}
+
+	TTF_SetFontKerning(this->font, 0);
+}
+
+void SDLSys::RenderText(std::string text, float x, float y, unsigned int texture_id) {
+	SDL_Color color, bgColor;
+	SDL_Surface *textSurface;
+
+	color.a = color.g = 255;
+	color.r = color.b = 0;
+
+	bgColor.a = bgColor.r = bgColor.g = bgColor.b = 0;
+
+	if(font) {
+		// Render text
+		textSurface = TTF_RenderText_Blended(this->font, text.c_str(), color);
+
+		if(!textSurface) {
+			std::cerr << "TTF Error: " << TTF_GetError();
+			return;
+		} else {
+			// Note: width should not exceed the texture's size,
+			// but there's no way to compare just yet without
+			// a full fledged Texture class
+			int w, h;
+			TTF_SizeText(this->font, text.c_str(), &w, &h);
+
+			// Bind the texture for writing
+			glBindTexture(GL_TEXTURE_2D, texture_id);
+			glActiveTexture(GL_TEXTURE0);
+
+			// Convert text surface to RGBA8 format
+			SDL_Surface *convertSurface = SDL_CreateRGBSurface(0, textSurface->w, textSurface->h, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+
+			if(convertSurface) {
+				//SDL_SetSurfaceAlphaMod(textSurface, 0xFF);
+				//SDL_SetSurfaceBlendMode(textSurface, SDL_BLENDMODE_NONE);
+				SDL_BlitSurface(textSurface, 0, convertSurface, 0);
+
+				// Copy it over
+				glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, convertSurface->w, convertSurface->h, GL_BGRA, GL_UNSIGNED_BYTE, convertSurface->pixels);
+			} else {
+				std::cerr << SDL_GetError() << std::endl;
+			}
+
+		
+			// Free resources/cleanup
+			glBindTexture(GL_TEXTURE_2D, 0);
+			SDL_FreeSurface(convertSurface);
+			SDL_FreeSurface(textSurface);
+		}
+	}
+}
+
+void SDLSys::Present(int fbo_id) {
+	// For now, use glBlitFramebuffer, but rendering using a screen space quad
+	// will be faster
+	if(fbo_id > 0) {
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo_id);
+		glBlitFramebuffer(0, 0, this->GetWindowWidth(), this->GetWindowHeight(), 0, 0, this->GetWindowWidth(), this->GetWindowHeight(), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	}
+    
+	SDL_GL_SwapWindow(this->_Window);
+	
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 }

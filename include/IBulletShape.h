@@ -1,11 +1,11 @@
 #pragma once
-#include "bullet/btBulletCollisionCommon.h"
-#include "bullet/btBulletDynamicsCommon.h"
+#include <bullet/btBulletCollisionCommon.h>
+#include <bullet/btBulletDynamicsCommon.h>
 #include "IComponent.h"
 
 
 namespace Sigma{
-	class IBulletShape : public Sigma::IComponent {
+	class IBulletShape : public IComponent {
 	public:
 		IBulletShape(const int entityID = 0) : IComponent(entityID) { }
 		virtual ~IBulletShape() {

@@ -3,18 +3,37 @@
 #define OPENGLSYSTEM_H
 
 #include "Property.h"
+
+#include "GL/glew.h"
+#include "glm/glm.hpp"
+#include "glm/ext.hpp"
+
+#include <memory>
+
 #include "IFactory.h"
 #include "ISystem.h"
 #include "IGLComponent.h"
 #include "systems/IGLView.h"
 #include <vector>
+#include "resources/GLTexture.h"
 
 struct IGLView;
 
 namespace Sigma{
 
+	struct RenderTarget {
+		GLuint texture_id;
+		GLuint fbo_id;
+		GLuint depth_id;
+
+		RenderTarget() : texture_id(0), fbo_id(0), depth_id(0) {}
+		virtual ~RenderTarget();
+
+		void Use(int slot);
+	};
+
     class OpenGLSystem
-        : public Sigma::IFactory, public Sigma::ISystem<Sigma::IGLComponent> {
+        : public Sigma::IFactory, public ISystem<IComponent> {
     public:
 
         OpenGLSystem();
@@ -62,15 +81,31 @@ namespace Sigma{
 
         std::map<std::string,FactoryFunction> getFactoryFunctions();
 
+		IComponent* createPointLight(const unsigned int entityID, const std::vector<Property> &properties);
+		IComponent* createScreenQuad(const unsigned int entityID, const std::vector<Property> &properties);
 
 		// TODO: Move these methods to the components themselves.
         IComponent* createGLSprite(const unsigned int entityID, const std::vector<Property> &properties) ;
         IComponent* createGLIcoSphere(const unsigned int entityID, const std::vector<Property> &properties) ;
         IComponent* createGLCubeSphere(const unsigned int entityID, const std::vector<Property> &properties) ;
         IComponent* createGLMesh(const unsigned int entityID, const std::vector<Property> &properties) ;
-
 		// Views are not technically components, but perhaps they should be
 		IComponent* createGLView(const unsigned int entityID, const std::vector<Property> &properties, std::string mode) ;
+
+		// Managing rendering internals
+		/*
+		 * \brief creates a new render target of desired size
+		 */
+		int createRenderTarget(const unsigned int w, const unsigned int h, const unsigned int format);
+		
+		/*
+		 * \brief returns the fbo_id of primary render target (index 0)
+		 */
+		int getRender() { return (this->renderTargets.size() > 0) ? this->renderTargets[0]->fbo_id : -1; }
+		int getRenderTexture() { return (this->renderTargets.size() > 0) ? this->renderTargets[0]->texture_id : -1; }
+
+		// Rendering methods
+		void RenderTexture(GLuint texture_id);
 
         /**
          * \brief Gets the specified view.
@@ -79,10 +114,9 @@ namespace Sigma{
          * \return IGLView* The specified view.
          */
 		IGLView* GetView(unsigned int index = 0) const {
-		    if (this->views.size() == 0){
-                    return nullptr;
-			} else if (index > this->views.size()) {
-				return this->views[this->views.size() - 1];
+			if (index >= this->views.size()) {
+				//return this->views[this->views.size() - 1];
+				return 0;
 			}
 			return this->views[index];
 		}
@@ -119,17 +153,28 @@ namespace Sigma{
 		 * \return    const std::string& The current view mode.
 		 */
 		const std::string& GetViewMode() { return this->viewMode; }
+
+		static std::map<std::string, Sigma::resource::GLTexture> textures;
     private:
         unsigned int windowWidth; // Store the width of our window
         unsigned int windowHeight; // Store the height of our window
 
         int OpenGLVersion[2];
 
+		// Scene matrices
         glm::mat4 ProjectionMatrix;
         std::vector<IGLView*> views; // A stack of the view. A vector is used to support random access.
+
         double deltaAccumulator; // milliseconds since last render
         double framerate; // default is 60fps
+		
+		// Type of view to create
 		std::string viewMode;
+
+		// Render targets to draw to
+		std::vector<std::unique_ptr<RenderTarget>> renderTargets;
+
+		std::vector<std::unique_ptr<IGLComponent>> screensSpaceComp; // A vector that holds only screen space components. These are rendered separately.
     }; // class OpenGLSystem
 } // namespace Sigma
 #endif // OPENGLSYSTEM_H

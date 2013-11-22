@@ -10,8 +10,8 @@ namespace Sigma{
 
 			FPSCamera::FPSCamera(int entityID) : IGLView(entityID) {
 				// Set the view mover's view pointer.
-				this->transform.SetEuler(true);
-				this->transform.SetMaxRotation(glm::vec3(45.0f,0,0));
+				this->Transform.SetEuler(true);
+				this->Transform.SetMaxRotation(glm::vec3(45.0f,0,0));
 
 				// Clear out the internal key state buffers.
 				memset(this->keys, 0, sizeof(this->keys));
@@ -52,7 +52,7 @@ namespace Sigma{
 
 			} // function KeyStateChange
 
-			void FPSCamera::MouseMove(float dx, float dy) {
+			void FPSCamera::MouseMove(float x, float y, float dx, float dy) {
 				if (this->mover) {
 					this->mover->RotateTarget(dy,dx,0.0f);
 				}
@@ -61,17 +61,17 @@ namespace Sigma{
 			const glm::mat4 FPSCamera::GetViewMatrix() {
 				// Limit rotation to pitch and yaw, apply pitch first to ensure
 				// yaw rotation happens correctly
-				glm::mat4 viewMatrix = glm::rotate(glm::mat4(1.0f), this->transform.GetPitch(), glm::vec3(1.0f, 0, 0));
-				viewMatrix = glm::rotate(viewMatrix, this->transform.GetYaw(), glm::vec3(0, 1.0f, 0));
+				glm::mat4 viewMatrix = glm::rotate(glm::mat4(1.0f), this->Transform.GetPitch(), glm::vec3(1.0f, 0, 0));
+				viewMatrix = glm::rotate(viewMatrix, this->Transform.GetYaw(), glm::vec3(0, 1.0f, 0));
 
-				viewMatrix = glm::translate(viewMatrix, -1.0f * this->transform.GetPosition());
+				viewMatrix = glm::translate(viewMatrix, -1.0f * this->Transform.GetPosition());
 
 				return viewMatrix;
 			}
 
 			void FPSCamera::SetMover(BulletMover* m){
 				if (this->mover) {
-					m->SetTransform(this->transform);
+					m->SetTransform(this->Transform);
 					this->mover = m;
 				}
 			}

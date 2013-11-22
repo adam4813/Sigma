@@ -1,7 +1,6 @@
 #include "components/GLMesh.h"
 
 #include "GL/glew.h"
-#include "SOIL.h"
 #include "strutils.h"
 
 #include <algorithm>
@@ -10,6 +9,8 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include "resources/GLTexture.h"
+#include "systems/OpenGLSystem.h"
 
 namespace Sigma{
 
@@ -83,15 +84,26 @@ namespace Sigma{
         }
 
         glBindVertexArray(0); // Reset the buffer binding because we are good programmers.
+
+		this->shader->Use();
+		this->shader->AddUniform("in_Model");
+		this->shader->AddUniform("in_View");
+		this->shader->AddUniform("in_Proj");
+		this->shader->AddUniform("texEnabled");
+		this->shader->AddUniform("ambientTexEnabled");
+		this->shader->AddUniform("diffuseTexEnabled");
+		this->shader->AddUniform("texAmb");
+		this->shader->AddUniform("texDiff");
+		this->shader->UnUse();
     }
 
     void GLMesh::Render(glm::mediump_float *view, glm::mediump_float *proj) {
         glm::mat4 modelMatrix = this->Transform()->GetMatrix();
 
-        (*shader).Use();
-        glUniformMatrix4fv(glGetUniformLocation((*shader).GetProgram(), "in_Model"), 1, GL_FALSE, &modelMatrix[0][0]);
-        glUniformMatrix4fv(glGetUniformLocation((*shader).GetProgram(), "in_View"), 1, GL_FALSE, view);
-        glUniformMatrix4fv(glGetUniformLocation((*shader).GetProgram(), "in_Proj"), 1, GL_FALSE, proj);
+        this->shader->Use();
+        glUniformMatrix4fv((*this->shader)("in_Model"), 1, GL_FALSE, &modelMatrix[0][0]);
+        glUniformMatrix4fv((*this->shader)("in_View"), 1, GL_FALSE, view);
+        glUniformMatrix4fv((*this->shader)("in_Proj"), 1, GL_FALSE, proj);
 
         glBindVertexArray(this->Vao());
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->GetBuffer(this->ElemBufIndex));
@@ -103,22 +115,35 @@ namespace Sigma{
             glCullFace(this->cull_face);
         }
 
-        if (this->faceGroups.size() == 0) {
-            glUniform1i(glGetUniformLocation((*shader).GetProgram(), "texEnabled"), 0);
-        }
-        else {
-            glUniform1i(glGetUniformLocation((*shader).GetProgram(), "texEnabled"), 1);
-            glUniform1i(glGetUniformLocation((*shader).GetProgram(), "texDiff"), 0);
-            glUniform1i(glGetUniformLocation((*shader).GetProgram(), "texAmb"), 1);
-        }
         for (int i = 0, cur = this->MeshGroup_ElementCount(0), prev = 0; cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
             if (this->faceGroups.size() > 0) {
                 Material& mat = this->mats[this->faceGroups[prev]];
-                glBindTexture(GL_TEXTURE_2D, mat.diffuseMap);
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, mat.ambientMap);
-                glActiveTexture(GL_TEXTURE1);
+
+				if (mat.ambientMap) {
+					glUniform1i((*this->shader)("texEnabled"), 1);
+					glUniform1i((*this->shader)("ambientTexEnabled"), 1);
+					glUniform1i((*this->shader)("texAmb"), 1);
+					glBindTexture(GL_TEXTURE_2D, mat.ambientMap);
+					glActiveTexture(GL_TEXTURE1);
+				} else {
+					glUniform1i((*this->shader)("ambientTexEnabled"), 0);
+				}
+
+				if (mat.diffuseMap) {
+					glUniform1i((*this->shader)("texEnabled"), 1);
+					glUniform1i((*this->shader)("diffuseTexEnabled"), 1);
+					glUniform1i((*this->shader)("texDiff"), 0);
+					glBindTexture(GL_TEXTURE_2D, mat.diffuseMap);
+					glActiveTexture(GL_TEXTURE0);
+				} else {
+					glUniform1i((*this->shader)("diffuseTexEnabled"), 0);
+				}
             }
+			else {
+				glUniform1i((*this->shader)("texEnabled"), 0);
+				glUniform1i((*this->shader)("diffuseTexEnabled"), 0);
+				glUniform1i((*this->shader)("ambientTexEnabled"), 0);
+			}
             glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_INT, (void*)prev);
         }
 
@@ -128,7 +153,7 @@ namespace Sigma{
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
-        (*shader).UnUse();
+        this->shader->UnUse();
     } // function Render
 
     bool operator ==(const VertexIndices &lhs, const VertexIndices &rhs) {
@@ -143,7 +168,8 @@ namespace Sigma{
 		std::string path;
 		if (fname.find("/") != std::string::npos) {
 			path = fname.substr(0, fname.find_last_of("/") + 1); // Keep the separator.
-		} else {
+		}
+		else {
 			path = fname.substr(0, fname.find_last_of("\\") + 1); // Keep the separator.
 		}
 
@@ -181,12 +207,14 @@ namespace Sigma{
                 std::istringstream s(line.substr(2));
                 s >> x; s >> y; s >> z;
                 temp_verts.push_back(Vertex(x, y, z));
-            }  else if (line.substr(0,2) == "vt") { //  Vertex tex coord
+            }
+			else if (line.substr(0,2) == "vt") { //  Vertex tex coord
                 float u, v = 0.0f;
                 std::istringstream s(line.substr(2));
                 s >> u; s >> v;
                 temp_uvs.push_back(TexCoord(u,v));
-            }  else if (line.substr(0,2) == "vn") { // Vertex normal
+            }
+			else if (line.substr(0,2) == "vn") { // Vertex normal
                 float x, y, z;
                 std::istringstream s(line.substr(2));
                 s >> x; s >> y; s >> z;
@@ -204,20 +232,25 @@ namespace Sigma{
                     std::string first = cur.substr(0, cur.find('/')); // Substring for the v portion
                     indicies[i][0] = atoi(first.c_str());
                     has_vert_indices=true;
+
                     if ((cur.find('/') + 1) != cur.find('/', cur.find('/') + 1)) { // Check if we have a t portion
                         std::string second = cur.substr(cur.find('/') + 1, cur.find('/', cur.find('/') + 1)); // Substring for the t portion
                         indicies[i][1] = atoi(second.c_str());
                         has_uv_indices=true;
-                    } else {
+                    }
+					else {
                         indicies[i][1] = 0;
                     }
+
                     if (cur.find('/', cur.find('/')) != cur.find_last_of('/')) { // Check if we have an n portion
                         std::string third = cur.substr(cur.find_last_of('/') + 1); // Substring for the n portion
                         indicies[i][2] = atoi(third.c_str());
                         has_normal_indices=true;
-                    } else {
+                    }
+					else {
                         indicies[i][2] = 0;
                     }
+
                     cur = left.substr(0, left.find(' '));
                     left = left.substr(left.find(' ') + 1);
                 }
@@ -250,12 +283,15 @@ namespace Sigma{
 
                 // Store the face
                 temp_face_indices.push_back(current_face);
-            } else if (line.substr(0,1) == "g") { // Face group
+            }
+			else if (line.substr(0,1) == "g") { // Face group
                 this->groupIndex.push_back(temp_face_indices.size());
-            } else if (line.substr(0, line.find(' ')) == "mtllib") { // Material library
+            }
+			else if (line.substr(0, line.find(' ')) == "mtllib") { // Material library
 				// Add the path to the filename to load it relative to the obj file.
                 ParseMTL(path + line.substr(line.find(' ') + 1));
-            } else if (line.substr(0, line.find(' ')) == "usemtl") { // Use material
+            }
+			else if (line.substr(0, line.find(' ')) == "usemtl") { // Use material
                 std::string mtlname = line.substr(line.find(' ') + 1);
 
                 // Set as current material group
@@ -271,9 +307,11 @@ namespace Sigma{
                 temp_colors.push_back(Color(color.r, color.g, color.b));
                 this->faceGroups[temp_face_indices.size()] = currentMtlGroup;
                 current_color++;
-            } else if ((line.substr(0,1) == "#") || (line.size() == 0)) { // Comment or blank line
+            }
+			else if ((line.substr(0,1) == "#") || (line.size() == 0)) { // Comment or blank line
                 /* ignoring this line comment or blank*/
-            } else { // Unknown
+            }
+			else { // Unknown
                 /* ignoring this line */
                 std::string test = line.substr(0, line.find(' '));
                 std::cerr << "Unrecognized line " << line << std::endl;
@@ -366,8 +404,8 @@ namespace Sigma{
 		return true;
     } // function LoadMesh
 
-    bool GLMesh::LoadShader() {
-       return IGLComponent::LoadShader(GLMesh::DEFAULT_SHADER);
+    void GLMesh::LoadShader() {
+       IGLComponent::LoadShader(GLMesh::DEFAULT_SHADER);
     }
 
     void GLMesh::ParseMTL(std::string fname) {
@@ -375,7 +413,8 @@ namespace Sigma{
 		std::string path;
 		if (fname.find("/") != std::string::npos) {
 			path = fname.substr(0, fname.find_last_of("/") + 1); // Keep the separator.
-		} else {
+		}
+		else {
 			path = fname.substr(0, fname.find_last_of("\\") + 1); // Keep the separator.
 		}
 
@@ -406,49 +445,81 @@ namespace Sigma{
                         float r,g,b;
                         s >> r; s >> g; s >> b;
                         m.ka[0] = r; m.ka[1] = g; m.ka[2] = b;
-                    } else if (label == "Kd") {
+                    }
+					else if (label == "Kd") {
                         float r,g,b;
                         s >> r; s >> g; s >> b;
                         m.kd[0] = r; m.kd[1] = g; m.kd[2] = b;
-                    } else if (label == "Ks") {
+                    }
+					else if (label == "Ks") {
                         float r,g,b;
                         s >> r; s >> g; s >> b;
                         m.ks[0] = r; m.ks[1] = g; m.ks[2] = b;
-                    } else if ((label == "Tr") || (label == "d")) {
+                    }
+					else if ((label == "Tr") || (label == "d")) {
                         float tr;
                         s >> tr;
                         m.tr = tr;
-                    } else if (label == "Ns") {
+                    }
+					else if (label == "Ns") {
                         float ns;
                         s >> ns;
                         m.tr = ns;
-                    } else if (label == "illum") {
+                    }
+					else if (label == "illum") {
                         int i;
                         s >> i;
                         m.illum = i;
-                    } else if (label == "map_Kd") {
+                    }
+					else if (label == "map_Kd") {
                         std::string filename;
 						s >> filename;
 						filename = trim(filename);
 						filename = convert_path(filename);
 						std::cerr << "Loading diffuse texture: " << path + filename << std::endl;
+						resource::GLTexture texture;
+						if (OpenGLSystem::textures.find(filename) == OpenGLSystem::textures.end()) {
+							texture.LoadDataFromFile(path + filename);
+							if (texture.GetID() != 0) {
+								OpenGLSystem::textures[filename] = texture;
+							}
+						}
+
 						// Add the path to the filename to load it relative to the mtl file
-						m.diffuseMap = SOIL_load_OGL_texture((path + filename).c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+						if (OpenGLSystem::textures.find(filename) != OpenGLSystem::textures.end()) {
+							m.diffuseMap = Sigma::OpenGLSystem::textures[filename].GetID();
+						}
+
 						if (m.diffuseMap == 0) {
 							std::cerr << "Error loading diffuse texture: " << path + filename << std::endl;
 						}
-                    } else if (label == "map_Ka") {
+                    }
+					else if (label == "map_Ka") {
                         std::string filename;
 						s >> filename;
 						filename = trim(filename);
 						filename = convert_path(filename);
 						std::cerr << "Loading ambient texture: " << path + filename << std::endl;
 						// Add the path to the filename to load it relative to the mtl file
-						m.ambientMap = SOIL_load_OGL_texture((path + filename).c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+						resource::GLTexture texture;
+						if (OpenGLSystem::textures.find(filename) == OpenGLSystem::textures.end()) {
+							texture.LoadDataFromFile(path + filename);
+							if (texture.GetID() != 0) {
+								OpenGLSystem::textures[filename] = texture;
+							}
+						}
+
+						// It should be loaded, but in case an error occurred double check for it.
+						if (OpenGLSystem::textures.find(filename) != OpenGLSystem::textures.end()) {
+							m.ambientMap = Sigma::OpenGLSystem::textures[filename].GetID();
+						}
+
+						// Add the path to the filename to load it relative to the mtl file
 						if (m.ambientMap == 0) {
 							std::cerr << "Error loading ambient texture: " << path + filename << std::endl;
 						}
-                    } else {
+                    }
+					else {
                         // Blank line
                     }
                     std::streamoff pre = in.tellg();

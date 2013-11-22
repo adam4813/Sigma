@@ -1,18 +1,33 @@
 #include "systems/OpenGLSystem.h"
 #include "systems/GLSLShader.h"
 #include "systems/GLSixDOFView.h"
+#include "controllers/FPSCamera.h"
 #include "components/GLSprite.h"
 #include "components/GLIcoSphere.h"
 #include "components/GLCubeSphere.h"
 #include "components/GLMesh.h"
-#include "controllers/FPSCamera.h"
+#include "components/GLScreenQuad.h"
+#include "components/PointLight.h"
 
 #include "GL/glew.h"
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 
 namespace Sigma{
-    OpenGLSystem::OpenGLSystem() : windowWidth(800), windowHeight(600), deltaAccumulator(0.0),
+	// RenderTarget methods
+	RenderTarget::~RenderTarget() {
+		glDeleteTextures(1, &this->texture_id); // Perhaps should check if texture was created for this RT or is used elsewhere
+		glDeleteRenderbuffers(1, &this->depth_id);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glDeleteFramebuffers(1, &this->fbo_id);
+	}
+
+	void RenderTarget::Use(int slot) {
+		glBindFramebuffer(GL_FRAMEBUFFER, this->fbo_id);
+	}
+	
+	std::map<std::string, Sigma::resource::GLTexture> OpenGLSystem::textures;
+    OpenGLSystem::OpenGLSystem() : windowWidth(1024), windowHeight(768), deltaAccumulator(0.0),
 		framerate(60.0f), viewMode("") {}
 
 	std::map<std::string, Sigma::IFactory::FactoryFunction>
@@ -26,6 +41,8 @@ namespace Sigma{
 		retval["GLMesh"] = std::bind(&OpenGLSystem::createGLMesh,this,_1,_2);
 		retval["FPSCamera"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2, "FPSCamera");
 		retval["GLSixDOFView"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2, "GLSixDOFView");
+		retval["PointLight"] = std::bind(&OpenGLSystem::createPointLight,this,_1,_2);
+		retval["GLScreenQuad"] = std::bind(&OpenGLSystem::createScreenQuad,this,_1,_2);
 
         return retval;
     }
@@ -75,8 +92,8 @@ namespace Sigma{
 			}
 		}
 
-		this->views[this->views.size() - 1]->transform.Move(x,y,z);
-		this->views[this->views.size() - 1]->transform.Rotate(rx,ry,rz);
+		this->views[this->views.size() - 1]->Transform.Move(x,y,z);
+		this->views[this->views.size() - 1]->Transform.Rotate(rx,ry,rz);
 
 		return this->views[this->views.size() - 1];
 	}
@@ -111,7 +128,20 @@ namespace Sigma{
 				textureFilename = p->Get<std::string>();
 			}
 		}
-		spr->LoadTexture(textureFilename);
+
+		// Check if the texture is loaded and load it if not.
+		if (textures.find(textureFilename) == textures.end()) {
+			Sigma::resource::GLTexture texture;
+			texture.LoadDataFromFile(textureFilename);
+			if (texture.GetID() != 0) {
+				Sigma::OpenGLSystem::textures[textureFilename] = texture;
+			}
+		}
+
+		// It should be loaded, but in case an error occurred double check for it.
+		if (textures.find(textureFilename) != textures.end()) {
+			spr->SetTexture(&Sigma::OpenGLSystem::textures[textureFilename]);
+		}
 		spr->LoadShader();
 		spr->Transform()->Scale(glm::vec3(scale));
 		spr->Transform()->Translate(x,y,z);
@@ -153,6 +183,9 @@ namespace Sigma{
 				}
 				else if (p->GetName() == "shader"){
 					shader_name = p->Get<std::string>();
+				}
+				else if (p->GetName() == "lightEnabled") {
+					sphere->SetLightingEnabled(p->Get<bool>());
 				}
 			}
 			sphere->Transform()->Scale(scale,scale,scale);
@@ -222,6 +255,9 @@ namespace Sigma{
 			}
 			else if (p->GetName() == "fix_to_camera") {
 				fix_to_camera = p->Get<bool>();
+			}
+			else if (p->GetName() == "lightEnabled") {
+				sphere->SetLightingEnabled(p->Get<bool>());
 			}
 		}
 
@@ -295,6 +331,9 @@ namespace Sigma{
 			else if (p->GetName() == "cullface") {
 				cull_face = p->Get<std::string>();
 			}
+			else if (p->GetName() == "lightEnabled") {
+				mesh->SetLightingEnabled(p->Get<bool>());
+			}
 		}
 
 		mesh->SetCullFace(cull_face);
@@ -312,12 +351,171 @@ namespace Sigma{
         return mesh;
     }
 
+	IComponent* OpenGLSystem::createScreenQuad(const unsigned int entityID, const std::vector<Property> &properties) {
+		Sigma::GLScreenQuad* quad = new Sigma::GLScreenQuad(entityID);
+
+		float x = 0.0f;
+		float y = 0.0f;
+		float w = 0.0f;
+		float h = 0.0f;
+		int componentID = 0;
+		std::string textrueName;
+		bool textureInMemory = false;
+
+		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
+			const Property*  p = &(*propitr);
+			if (p->GetName() == "left") {
+				x = p->Get<float>();
+			}
+			else if (p->GetName() == "top") {
+				y = p->Get<float>();
+			}
+			else if (p->GetName() == "width") {
+				w = p->Get<float>();
+			}
+			else if (p->GetName() == "height") {
+				h = p->Get<float>();
+			}
+			else if (p->GetName() == "textureName") {
+				textrueName = p->Get<std::string>();
+				textureInMemory = true;
+			}
+			else if (p->GetName() == "textureFileName") {
+				textrueName = p->Get<std::string>();
+			}
+		}
+
+		// Check if the texture is loaded and load it if not.
+		if (textures.find(textrueName) == textures.end()) {
+			Sigma::resource::GLTexture texture;
+			if (textureInMemory) { // We are using an in memory texture. It will be populated somewhere else
+				Sigma::OpenGLSystem::textures[textrueName] = texture;
+			}
+			else { // The texture in on disk so load it.
+				texture.LoadDataFromFile(textrueName);
+				if (texture.GetID() != 0) {
+					Sigma::OpenGLSystem::textures[textrueName] = texture;
+				}
+			}
+		}
+
+		// It should be loaded, but in case an error occurred double check for it.
+		if (textures.find(textrueName) != textures.end()) {
+			quad->SetTexture(&Sigma::OpenGLSystem::textures[textrueName]);
+		}
+
+		quad->SetPosition(x, y);
+		quad->SetSize(w, h);
+		quad->LoadShader("shaders/quad");
+		quad->InitializeBuffers();
+		this->screensSpaceComp.push_back(std::unique_ptr<IGLComponent>(quad));
+		return quad;
+	}
+
+	IComponent* OpenGLSystem::createPointLight(const unsigned int entityID, const std::vector<Property> &properties) {
+		Sigma::PointLight *light = new Sigma::PointLight(entityID);
+
+		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
+			const Property*  p = &*propitr;
+			if (p->GetName() == "x") {
+				light->position.x = p->Get<float>();
+			}
+			else if (p->GetName() == "y") {
+				light->position.y = p->Get<float>();
+			}
+			else if (p->GetName() == "z") {
+				light->position.z = p->Get<float>();
+			}
+			else if (p->GetName() == "intensity") {
+				light->intensity = p->Get<float>();
+			}
+			else if (p->GetName() == "cr") {
+				light->color.r = p->Get<float>();
+			}
+			else if (p->GetName() == "cg") {
+				light->color.g = p->Get<float>();
+			}
+			else if (p->GetName() == "cb") {
+				light->color.b = p->Get<float>();
+			}
+			else if (p->GetName() == "ca") {
+				light->color.a = p->Get<float>();
+			}
+			else if (p->GetName() == "radius") {
+				light->radius = p->Get<float>();
+			}
+			else if (p->GetName() == "falloff") {
+				light->falloff = p->Get<float>();
+			}
+		}
+
+		this->addComponent(entityID, light);
+		return light;
+	}
+
+	int OpenGLSystem::createRenderTarget(const unsigned int w, const unsigned int h, const unsigned int format) {
+		std::unique_ptr<RenderTarget> newRT(new RenderTarget());
+
+		glGenTextures(1, &newRT->texture_id);
+		glBindTexture(GL_TEXTURE_2D, newRT->texture_id);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		//NULL means reserve texture memory, but texels are undefined
+		glTexImage2D(GL_TEXTURE_2D, 0, (GLint)format, (GLsizei)w, (GLsizei)h, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+
+		glGenFramebuffers(1, &newRT->fbo_id);
+		glBindFramebuffer(GL_FRAMEBUFFER, newRT->fbo_id);
+		
+		//Attach 2D texture to this FBO
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, newRT->texture_id, 0);
+		
+		glGenRenderbuffers(1, &newRT->depth_id);
+		glBindRenderbuffer(GL_RENDERBUFFER, newRT->depth_id);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, w, h);
+		
+		//Attach depth buffer to FBO
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, newRT->depth_id);
+		
+		//Does the GPU support current FBO configuration?
+		GLenum status;
+		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+		switch(status) {
+			case GL_FRAMEBUFFER_COMPLETE:
+				std::cout << "Successfully created render target.";
+				break;
+			default:
+				std::cerr << "Error: Framebuffer format is not compatible." << std::endl;
+		}
+
+		// Unbind objects
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		this->renderTargets.push_back(std::move(newRT));
+		return (this->renderTargets.size() - 1);
+	}
+
     bool OpenGLSystem::Update(const double delta) {
         this->deltaAccumulator += delta;
 
         // Check if the deltaAccumulator is greater than 1/<framerate>th of a second.
         //  ..if so, it's time to render a new frame
-        if (this->deltaAccumulator > (1000.0 / this->framerate)) {
+        if (this->deltaAccumulator > 1000.0 / this->framerate) {
+            
+			// Hacky for now, but if we created at least one render target
+			// then the 0th one is the draw buffer, 1+ could be for post-processing
+			if(this->renderTargets.size() > 0) {
+				// Bind the primary render target
+				glBindFramebuffer(GL_FRAMEBUFFER, this->renderTargets[0]->fbo_id);
+			}
+
+			glm::vec3 viewPosition;
+
             // Set up the scene to a "clean" state.
             glClearColor(0.0f,0.0f,0.0f,0.0f);
             glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window
@@ -326,14 +524,114 @@ namespace Sigma{
 			glm::mat4 viewMatrix;
 			if (this->views.size() > 0) {
 				viewMatrix = this->views[this->views.size() - 1]->GetViewMatrix();
+				viewPosition = this->views[this->views.size() - 1]->Transform.GetPosition();
 			}
 
-            // Loop through and draw each component.
-            for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
-                for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
-                    citr->second->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
-                }
-            }
+			// Loop through each light, rendering all components
+			// TODO: Cull components based on light
+			// TODO: Implement scissors test
+			// Potentially move to deferred shading depending on
+			// visual style needs
+			
+			// Ambient Pass
+			// Loop through and draw each component.
+
+			glm::mat4 viewProj = viewMatrix;
+			viewProj *= this->ProjectionMatrix;
+
+			// Calculate frustum for culling
+			this->GetView(0)->CalculateFrustum(viewProj);
+
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+			for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
+				for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
+					IGLComponent *glComp = dynamic_cast<IGLComponent *>(citr->second.get());
+
+					if(glComp) {
+						glComp->GetShader()->Use();
+
+						// Set view position
+						glUniform3f(glGetUniformBlockIndex(glComp->GetShader()->GetProgram(), "viewPosW"), viewPosition.x, viewPosition.y, viewPosition.z);
+
+						// For now, turn on ambient intensity and turn off lighting
+						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "ambLightIntensity"), 0.05f);
+						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "diffuseLightIntensity"), 0.0f);
+						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "specularLightIntensity"), 0.0f);
+						glComp->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
+					}
+				}
+			}
+
+			// Light passes
+			for(auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
+				for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
+					// Check if this component is a light
+					PointLight *light = dynamic_cast<PointLight*>(citr->second.get());
+
+					// If it is a light, and it intersects the frustum, then render
+					if(light/* && this->GetView(0)->CameraFrustum.isectSphere(light->position, light->radius)*/) {
+						// Modify depth test to allow for overlaying
+						// lights
+						glDepthFunc(GL_EQUAL);
+
+						// Make sure additive blending is enabled
+						glEnable(GL_BLEND);
+						glBlendFunc(GL_ONE, GL_ONE);
+
+						// Loop through and draw each component.
+						for (auto child_eitr = this->_Components.begin(); child_eitr != this->_Components.end(); ++child_eitr) {
+							for (auto child_citr = child_eitr->second.begin(); child_citr != child_eitr->second.end(); ++child_citr) {
+								IGLComponent *glComp = dynamic_cast<IGLComponent *>(child_citr->second.get());
+
+								if(glComp && glComp->IsLightingEnabled()) {
+									glComp->GetShader()->Use();
+
+									// Turn off ambient light for additive blending
+									glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "ambLightIntensity"), 0.0f);
+
+									// Set view position
+									glUniform3f(glGetUniformBlockIndex(glComp->GetShader()->GetProgram(), "viewPosW"), viewPosition.x, viewPosition.y, viewPosition.z);
+
+									// Activate the current point light for this shader
+									light->Activate(glComp->GetShader().get());
+
+									// Render
+									glComp->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
+								}
+							}
+						}
+
+						// Remove blending
+						glDisable(GL_BLEND);
+
+						// Re-enabled depth test
+						glDepthFunc(GL_LESS);
+					}
+				}
+			}
+
+			// Enable transparent rendering
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			for (auto citr = this->screensSpaceComp.begin(); citr != this->screensSpaceComp.end(); ++citr) {
+					citr->get()->GetShader()->Use();
+
+					// Set view position
+					glUniform3f(glGetUniformBlockIndex(citr->get()->GetShader()->GetProgram(), "viewPosW"), viewPosition.x, viewPosition.y, viewPosition.z);
+
+					// For now, turn on ambient intensity and turn off lighting
+					glUniform1f(glGetUniformLocation(citr->get()->GetShader()->GetProgram(), "ambLightIntensity"), 0.05f);
+					glUniform1f(glGetUniformLocation(citr->get()->GetShader()->GetProgram(), "diffuseLightIntensity"), 0.0f);
+					glUniform1f(glGetUniformLocation(citr->get()->GetShader()->GetProgram(), "specularLightIntensity"), 0.0f);
+					citr->get()->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
+			}
+			// Remove blending
+			glDisable(GL_BLEND);
+
+			// Unbind frame buffer
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
             this->deltaAccumulator = 0.0;
             return true;
@@ -347,11 +645,14 @@ namespace Sigma{
 		// for now, just returns the first component's transform
 		// bigger question: should entities be able to have multiple GLComponents?
 		for(auto compItr = entity->begin(); compItr != entity->end(); compItr++) {
-			GLTransform *transform = ((*compItr).second)->Transform();
-			return transform;
+			IGLComponent *glComp = dynamic_cast<IGLComponent *>((*compItr).second.get());
+			if(glComp) {
+				GLTransform *transform = glComp->Transform();
+				return transform;
+			}
 		}
 
-		// no components
+		// no GL components
 		return 0;
 	}
 
@@ -387,6 +688,9 @@ namespace Sigma{
 		}
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
+
+		// Create main framebuffer (index 0)
+		//this->createRenderTarget(1024, 768, GL_RGBA8);
 
         return OpenGLVersion;
     }

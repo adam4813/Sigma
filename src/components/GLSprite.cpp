@@ -1,28 +1,28 @@
 #include "components/GLSprite.h"
 #include "GL/glew.h"
-#include "SOIL.h"
+#include "resources/GLTexture.h"
 
 namespace Sigma{
 
     const std::string GLSprite::DEFAULT_SHADER = "shaders/sprite";
 
-        GLSprite::GLSprite( const int entityID /*= 0*/ ) : Sigma::IGLComponent(entityID)  {
+    GLSprite::GLSprite( const int entityID /*= 0*/ ) : Sigma::IGLComponent(entityID), texture(nullptr)  {
         this->drawMode = GL_TRIANGLES;
         this->ElemBufIndex = 2;
         this->ColorBufIndex = 1;
         this->VertBufIndex = 0;
-        this->UVBufIndex = 3;
+		this->UVBufIndex = 3;
+		IGLComponent::LoadShader(GLSprite::DEFAULT_SHADER); // Load the default shader
     }
-
 
     void GLSprite::InitializeBuffers() {
         static const GLfloat vert[] = {
             1.0f, 1.0f, 0.0f,
-            0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f,
-            1.0f, 0.0f, 0.0f,
+            -1.0f, 1.0f, 0.0f,
+            -1.0f, -1.0f, 0.0f,
+            1.0f, -1.0f, 0.0f,
             1.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f
+            -1.0f, -1.0f, 0.0f
         };
 
         static const GLfloat col[] = {
@@ -73,52 +73,48 @@ namespace Sigma{
         glVertexAttribPointer(uvlocation, 2, GL_FLOAT, GL_FALSE, 0, NULL);
         glEnableVertexAttribArray(uvlocation);
 
-        glBindVertexArray(0);
-
-        glGenTextures(1, &this->texture_);
+		glBindVertexArray(0);
+		this->shader->Use();
+		this->shader->AddUniform("in_Model");
+		this->shader->AddUniform("in_View");
+		this->shader->AddUniform("in_Proj");
+		this->shader->AddUniform("tex");
+		this->shader->UnUse();
     }
 
 	void GLSprite::LoadShader() {
+		// Just load the default shader
 		IGLComponent::LoadShader(GLSprite::DEFAULT_SHADER);
     }
 
     void GLSprite::Render(glm::mediump_float *view, glm::mediump_float *proj) {
-        (*shader).Use();
+        this->shader->Use();
 
 		glm::mat4 modelMatrix = this->Transform()->GetMatrix();
 
-        glUniform1i(glGetUniformLocation((*shader).GetProgram(), "tex"), 0);
-        glUniformMatrix4fv(glGetUniformLocation((*shader).GetProgram(), "in_Model"), 1, GL_FALSE, &modelMatrix[0][0]);
-        glUniformMatrix4fv(glGetUniformLocation((*shader).GetProgram(), "in_View"), 1, GL_FALSE, view);
-        glUniformMatrix4fv(glGetUniformLocation((*shader).GetProgram(), "in_Proj"), 1, GL_FALSE, proj);
+        glUniformMatrix4fv((*this->shader)("in_Model"), 1, GL_FALSE, &modelMatrix[0][0]);
+        glUniformMatrix4fv((*this->shader)("in_View"), 1, GL_FALSE, view);
+        glUniformMatrix4fv((*this->shader)("in_Proj"), 1, GL_FALSE, proj);
 
         glBindVertexArray(this->Vao());
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->GetBuffer(this->ElemBufIndex));
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, this->GetTexture());
+		// Check to make sure we have a valid texture
+		if (this->texture) {
+			glUniform1i((*this->shader)("tex"), 0);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, this->texture->GetID());
+		}
 
         glDrawElements(this->DrawMode(), this->MeshGroup_ElementCount(), GL_UNSIGNED_SHORT, (void*)0);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
-        (*shader).UnUse();
+        this->shader->UnUse();
     }
 
-    unsigned int GLSprite::LoadTexture(const std::string& filename) {
-        GLuint textureID;
-        textureID = SOIL_load_OGL_texture(filename.c_str(), SOIL_LOAD_AUTO, this->texture_, 0);
-        return textureID;
+	void GLSprite::SetTexture(Sigma::resource::GLTexture* texture) {
+		this->texture = texture;
     }
-
-    void GLSprite::SetTextureData(const unsigned char* data, unsigned int width, unsigned int height) {
-        glBindTexture(GL_TEXTURE_2D, this->texture_);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, data);
-        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
-
-
 } // namespace Sigma
