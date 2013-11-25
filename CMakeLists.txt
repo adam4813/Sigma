@@ -80,18 +80,20 @@ if(WIN32 AND NOT MINGW) # Windows
 	set(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x86)
 	link_directories("${CMAKE_SOURCE_DIR}/lib/x86")
 	
+	SET(GLFW3_LIBRARY glfw3)
 	set(GLEW_LIBRARY glew32s glew32)
 	set(BULLET_LINEARMATH_LIBRARIES LinearMath)
 	set(BULLET_COLLISION_LIBRARIES BulletCollision)
 	set(BULLET_DYNAMICS_LIBRARIES BulletDynamics)
 	SET(SOIL_LIBRARY SOIL)
 	SET(AWSOMEIUM_LIBRARY Awesomium)
-	set(IOPSYS "OS_Win32" CACHE STRING "Select the Op Sys you want to use")
 endif(WIN32 AND NOT MINGW)
 
 if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
-	find_package(SDL2 REQUIRED)
-	find_package(SDL2TTF REQUIRED)	
+	find_package(GLFW3 REQUIRED)
+	if(NOT GLFW3_FOUND)
+		message(FATAL_ERROR "GLFW3 not found! Aborting!")
+	endif(NOT GLFW3_FOUND)
 
 	find_package(GLEW REQUIRED)
 	if(NOT GLEW_FOUND)
@@ -108,23 +110,11 @@ if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
 		message(FATAL_ERROR "SOIL wasn't found!")
 		message(ERROR "Please install SOIL, or if you have it installed, make sure that modules/FindSOIL.cmake looks for it")
 	endif(NOT ${SOIL_FOUND})
-
-	# Link the libraries
-	set(Sigma_LIB ${Sigma_LIB} ${SDL2_LIBRARY} ${SDL2TTF_LIBRARY} ${BULLET_LINEARMATH_LIBRARY} ${BULLET_COLLISION_LIBRARY} ${BULLET_DYNAMICS_LIBRARY})
-
-	set(IOPSYS "OS_SDL" CACHE STRING "Select the Op Sys you want to use")
 endif(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 if(APPLE) # Mac OSX
   #TODO: Add stuff here if needed
 endif(APPLE)
-
-# Add a cache line to allow choosing between IOpSys
-set_property(CACHE IOPSYS PROPERTY STRINGS "OS_SDL" "OS_Win32")
-
-#Add in our IOpSys
-message("Using ${IOPSYS}...")
-add_subdirectory("src/os")
 
 # add the executable
 add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP} ${Sigma_SRC_CONTROLLERS_H} ${Sigma_SRC_CONTROLLERS_CPP})
@@ -133,7 +123,7 @@ add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT
 add_definitions(-D${IOPSYS})
 
 # Link the executable to the Hello library.
-target_link_libraries (Sigma ${Sigma_LIB} ${OPENGL_LIBRARIES} ${GLEW_LIBRARY} ${SOIL_LIBRARY} ${BULLET_LINEARMATH_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${AWSOMEIUM_LIBRARY})
+target_link_libraries (Sigma ${Sigma_LIB} ${OPENGL_LIBRARIES} ${GLFW3_LIBRARY} ${GLEW_LIBRARY} ${SOIL_LIBRARY} ${BULLET_LINEARMATH_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${AWSOMEIUM_LIBRARY})
 
 # build the Tests subproject
 #ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/tests")

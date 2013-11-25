@@ -505,7 +505,7 @@ namespace Sigma{
 
         // Check if the deltaAccumulator is greater than 1/<framerate>th of a second.
         //  ..if so, it's time to render a new frame
-        if (this->deltaAccumulator > 1000.0 / this->framerate) {
+        if (this->deltaAccumulator > 1.0f / this->framerate) {
             
 			// Hacky for now, but if we created at least one render target
 			// then the 0th one is the draw buffer, 1+ could be for post-processing
