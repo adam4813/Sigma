@@ -10,11 +10,10 @@ uniform float ambLightIntensity = 0.15f;
 
 uniform vec4 diffuseLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 uniform float diffuseLightIntensity = 1.0f;
-//uniform float cAttenuation = 1.0f;
-//uniform float lAttenuation = 0.08f;
-//uniform float qAttenuation = 0.01f;
+uniform float cAttenuation = 1.0f;
+uniform float lAttenuation = 0.08f;
+uniform float qAttenuation = 0.01f;
 uniform float radius = 1.0f;
-uniform float falloff = 2.0f;
 
 uniform float specularHardness = 32.0f;
 uniform vec4 specularLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -48,11 +47,9 @@ void main(void)
 
 	ambientLight = vec4(ambLightIntensity*ambLightColor.xyz, ambLightColor.w);
 
-	// old equation, hard to tie to radius
+	// Radius based attenuation is better for now
 	//float attenuation = 1.0f / (cAttenuation + lAttenuation*distance + qAttenuation*distance*distance);
-
-	// radius based attenuation
-	float attenuation = pow(max(0.0f, 1.0f - (distance/radius)), falloff+1.0f);
+	float attenuation = 1.0f - dot(ex_LightDirW, ex_LightDirW) / (radius*radius);
 
 	float NdL = clamp(dot(normal, lightDirW), 0.0f, 1.0f);
 	diffuseLight = vec4(diffuseLightIntensity*diffuseLightColor.xyz*NdL*attenuation, diffuseLightColor.w);
