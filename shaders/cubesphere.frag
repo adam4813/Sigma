@@ -4,7 +4,7 @@
  
 precision highp float; // needed only for version 1.30
 
-uniform vec3 light = normalize(vec3(-1.0, 0.0, -1.0));
+uniform vec3 light = normalize(vec3(0.0, 1.0, 0.0));
 uniform samplerCube cubeMap;
 uniform samplerCube cubeNormMap;
 
