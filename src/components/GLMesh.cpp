@@ -15,7 +15,7 @@
 namespace Sigma{
 
     // static member initialization
-    const std::string GLMesh::DEFAULT_SHADER = "shaders/mesh";
+    const std::string GLMesh::DEFAULT_SHADER = "shaders/mesh_deferred";
 
     GLMesh::GLMesh(const int entityID) : IGLComponent(entityID) {
         memset(&this->buffers, 0, sizeof(this->buffers));

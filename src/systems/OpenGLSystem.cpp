@@ -16,20 +16,40 @@
 namespace Sigma{
 	// RenderTarget methods
 	RenderTarget::~RenderTarget() {
-		glDeleteTextures(1, &this->texture_id); // Perhaps should check if texture was created for this RT or is used elsewhere
+		glDeleteTextures(this->texture_ids.size(), &this->texture_ids[0]); // Perhaps should check if texture was created for this RT or is used elsewhere
 		glDeleteRenderbuffers(1, &this->depth_id);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glDeleteFramebuffers(1, &this->fbo_id);
 	}
 
-	void RenderTarget::Use(int slot) {
-		glBindFramebuffer(GL_FRAMEBUFFER, this->fbo_id);
+	void RenderTarget::Bind() {
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo_id);
+
+		std::vector<GLenum> buffers;
+
+		for(unsigned int i=0; i < this->texture_ids.size(); i++) {
+			buffers.push_back(GL_COLOR_ATTACHMENT0 + i);
+		}
+
+		glDrawBuffers(this->texture_ids.size(), &buffers[0]);
+	}
+
+	void RenderTarget::BindRead() {
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, this->fbo_id);
+	}
+
+	void RenderTarget::Unbind() {
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	}
+
+	void RenderTarget::UnbindRead() {
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 	}
 	
 	std::map<std::string, Sigma::resource::GLTexture> OpenGLSystem::textures;
     OpenGLSystem::OpenGLSystem() : windowWidth(1024), windowHeight(768), deltaAccumulator(0.0),
 		framerate(60.0f), viewMode("") {}
-
+		
 	std::map<std::string, Sigma::IFactory::FactoryFunction>
         OpenGLSystem::getFactoryFunctions() {
 		using namespace std::placeholders;
@@ -453,25 +473,16 @@ namespace Sigma{
 		return light;
 	}
 
-	int OpenGLSystem::createRenderTarget(const unsigned int w, const unsigned int h, const unsigned int format) {
+	int OpenGLSystem::createRenderTarget(const unsigned int w, const unsigned int h) {
 		std::unique_ptr<RenderTarget> newRT(new RenderTarget());
 
-		glGenTextures(1, &newRT->texture_id);
-		glBindTexture(GL_TEXTURE_2D, newRT->texture_id);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-		//NULL means reserve texture memory, but texels are undefined
-		glTexImage2D(GL_TEXTURE_2D, 0, (GLint)format, (GLsizei)w, (GLsizei)h, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
-
+		// Create the frame buffer object
 		glGenFramebuffers(1, &newRT->fbo_id);
-		glBindFramebuffer(GL_FRAMEBUFFER, newRT->fbo_id);
-		
-		//Attach 2D texture to this FBO
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, newRT->texture_id, 0);
-		
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, newRT->fbo_id);
+
+		newRT->width = w;
+		newRT->height = h;
+
 		glGenRenderbuffers(1, &newRT->depth_id);
 		glBindRenderbuffer(GL_RENDERBUFFER, newRT->depth_id);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, w, h);
@@ -481,23 +492,66 @@ namespace Sigma{
 		
 		//Does the GPU support current FBO configuration?
 		GLenum status;
-		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
 
 		switch(status) {
 			case GL_FRAMEBUFFER_COMPLETE:
 				std::cout << "Successfully created render target.";
 				break;
 			default:
-				std::cerr << "Error: Framebuffer format is not compatible." << std::endl;
+				assert(0 && "Error: Framebuffer format is not compatible.");
 		}
 
 		// Unbind objects
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
 		this->renderTargets.push_back(std::move(newRT));
 		return (this->renderTargets.size() - 1);
+	}
+
+	void OpenGLSystem::createRTBuffer(unsigned int rtID, GLint format, GLenum internalFormat, GLenum type) {
+		RenderTarget *rt = this->renderTargets[rtID].get();
+
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, rt->fbo_id);
+
+		// Create a texture for each requested target
+		GLuint texture_id;
+
+		glGenTextures(1, &texture_id);
+		glBindTexture(GL_TEXTURE_2D, texture_id);
+
+		// Texture params for full screen quad
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		//NULL means reserve texture memory, but texels are undefined
+		glTexImage2D(GL_TEXTURE_2D, 0, format,
+					 (GLsizei)rt->width,
+					 (GLsizei)rt->height,
+					 0, internalFormat, type, NULL);
+		
+		//Attach 2D texture to this FBO
+		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+rt->texture_ids.size(), GL_TEXTURE_2D, texture_id, 0);
+
+		this->renderTargets[rtID]->texture_ids.push_back(texture_id);
+
+		//Does the GPU support current FBO configuration?
+		GLenum status;
+		status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+
+		switch(status) {
+			case GL_FRAMEBUFFER_COMPLETE:
+				std::cout << "Successfully created render target.";
+				break;
+			default:
+				assert(0 && "Error: Framebuffer format is not compatible.");
+		}
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	}
 
     bool OpenGLSystem::Update(const double delta) {
@@ -507,43 +561,43 @@ namespace Sigma{
         //  ..if so, it's time to render a new frame
         if (this->deltaAccumulator > 1000.0 / this->framerate) {
             
-			// Hacky for now, but if we created at least one render target
-			// then the 0th one is the draw buffer, 1+ could be for post-processing
-			if(this->renderTargets.size() > 0) {
-				// Bind the primary render target
-				glBindFramebuffer(GL_FRAMEBUFFER, this->renderTargets[0]->fbo_id);
-			}
+			/////////////////////
+			// Rendering Setup //
+			/////////////////////
 
 			glm::vec3 viewPosition;
 
-            // Set up the scene to a "clean" state.
-            glClearColor(0.0f,0.0f,0.0f,0.0f);
-            glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
-
+			// Setup the view matrix and position variables
 			glm::mat4 viewMatrix;
 			if (this->views.size() > 0) {
 				viewMatrix = this->views[this->views.size() - 1]->GetViewMatrix();
 				viewPosition = this->views[this->views.size() - 1]->Transform.GetPosition();
 			}
 
-			// Loop through each light, rendering all components
-			// TODO: Cull components based on light
-			// TODO: Implement scissors test
-			// Potentially move to deferred shading depending on
-			// visual style needs
-			
-			// Ambient Pass
-			// Loop through and draw each component.
-
+			// Setup the projection matrix
 			glm::mat4 viewProj = viewMatrix;
 			viewProj *= this->ProjectionMatrix;
 
 			// Calculate frustum for culling
 			this->GetView(0)->CalculateFrustum(viewProj);
+			
+			//////////////////
+			// GBuffer Pass //
+			//////////////////
 
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			// Bind the first buffer, which is the Geometry Buffer
+			if(this->renderTargets.size() > 0) {
+				// Bind the primary render target
+				this->renderTargets[0]->Bind();
+			}
+
+			// Clear the GBuffer
+            glClearColor(0.0f,0.0f,0.0f,1.0f);
+            glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
+
+			// Loop through and draw each GL Component component.
+			glDisable(GL_BLEND);
 
 			for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
 				for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
@@ -564,6 +618,34 @@ namespace Sigma{
 				}
 			}
 
+			///////////////////
+			// Lighting Pass //
+			///////////////////
+
+			// Turn on additive blending
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_ONE, GL_ONE);
+
+			// Bind the Geometry buffer for reading
+			if(this->renderTargets.size() > 0) {
+				this->renderTargets[0]->BindRead();
+			}
+
+			// Bind the second buffer, which is the Light Accumulation Buffer
+			if(this->renderTargets.size() > 1) {
+				this->renderTargets[1]->Bind();
+			}
+
+			// Clear it
+			glClearColor(0.0f,0.0f,0.0f,1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
+
+			// Loop through each light, rendering all components
+			// TODO: Cull components based on light
+			// TODO: Implement scissors test
+			// Potentially move to deferred shading depending on
+			// visual style needs
+
 			// Light passes
 			for(auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
 				for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
@@ -571,7 +653,7 @@ namespace Sigma{
 					PointLight *light = dynamic_cast<PointLight*>(citr->second.get());
 
 					// If it is a light, and it intersects the frustum, then render
-					if(light/* && this->GetView(0)->CameraFrustum.isectSphere(light->position, light->radius)*/) {
+					if(light && this->GetView(0)->CameraFrustum.isectSphere(light->position, light->radius)) {
 						// Modify depth test to allow for overlaying
 						// lights
 						glDepthFunc(GL_EQUAL);
@@ -612,9 +694,20 @@ namespace Sigma{
 				}
 			}
 
+			// Unbind the Geometry buffer for reading
+			if(this->renderTargets.size() > 0) {
+				this->renderTargets[0]->UnbindRead();
+			}
+
+			// Unbind the second buffer, which is the Light Accumulation Buffer
+			if(this->renderTargets.size() > 1) {
+				this->renderTargets[1]->Unbind();
+			}
+
 			// Enable transparent rendering
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			
 			for (auto citr = this->screensSpaceComp.begin(); citr != this->screensSpaceComp.end(); ++citr) {
 					citr->get()->GetShader()->Use();
 
@@ -627,6 +720,7 @@ namespace Sigma{
 					glUniform1f(glGetUniformLocation(citr->get()->GetShader()->GetProgram(), "specularLightIntensity"), 0.0f);
 					citr->get()->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 			}
+
 			// Remove blending
 			glDisable(GL_BLEND);
 
@@ -688,9 +782,6 @@ namespace Sigma{
 		}
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
-
-		// Create main framebuffer (index 0)
-		//this->createRenderTarget(1024, 768, GL_RGBA8);
 
         return OpenGLVersion;
     }

@@ -22,14 +22,19 @@ struct IGLView;
 namespace Sigma{
 
 	struct RenderTarget {
-		GLuint texture_id;
+		std::vector<GLuint> texture_ids;
 		GLuint fbo_id;
 		GLuint depth_id;
+		unsigned int width;
+		unsigned int height;
 
-		RenderTarget() : texture_id(0), fbo_id(0), depth_id(0) {}
+		RenderTarget() : fbo_id(0), depth_id(0) {}
 		virtual ~RenderTarget();
 
-		void Use(int slot);
+		void Bind();
+		void BindRead();
+		void Unbind();
+		void UnbindRead();
 	};
 
     class OpenGLSystem
@@ -96,13 +101,14 @@ namespace Sigma{
 		/*
 		 * \brief creates a new render target of desired size
 		 */
-		int createRenderTarget(const unsigned int w, const unsigned int h, const unsigned int format);
+		int createRenderTarget(const unsigned int w, const unsigned int h);
 		
 		/*
 		 * \brief returns the fbo_id of primary render target (index 0)
 		 */
-		int getRender() { return (this->renderTargets.size() > 0) ? this->renderTargets[0]->fbo_id : -1; }
-		int getRenderTexture() { return (this->renderTargets.size() > 0) ? this->renderTargets[0]->texture_id : -1; }
+		int getRenderTarget(unsigned int rtID) { return (this->renderTargets.size() > rtID) ? this->renderTargets[rtID]->fbo_id : -1; }
+		int getRenderTexture(const unsigned int target=0) { return (this->renderTargets.size() > 0) ? this->renderTargets[0]->texture_ids[target] : -1; }
+		void createRTBuffer(unsigned int rtID, GLint format, GLenum internalFormat, GLenum type);
 
 		// Rendering methods
 		void RenderTexture(GLuint texture_id);

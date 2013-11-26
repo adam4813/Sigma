@@ -35,7 +35,10 @@ int main(int argCount, char **argValues) {
 	os = new SDLSys();
 #endif
 
-	// Create the window
+	///////////////////////
+	// Create the window //
+	///////////////////////
+
 	std::cout << "Creating graphics window." << std::endl;
 	if(os->CreateGraphicsWindow(1024,768) == 0) {
 		std::cerr << "Error creating window!" << std::endl;
@@ -43,11 +46,14 @@ int main(int argCount, char **argValues) {
 		return -1;
 	}
 
-	// Start the openGL system
+	/////////////////////////////
+	// Start the openGL system //
+	/////////////////////////////
+
 	std::cout << "Initializing OpenGL system." << std::endl;
 	const int* version = glsys.Start();
 	glsys.SetViewportSize(os->GetWindowWidth(), os->GetWindowHeight());
-
+	
 	if (version[0] == -1) {
 		std::cerr << "Error starting OpenGL!" << std::endl;
 		delete os;
@@ -56,10 +62,35 @@ int main(int argCount, char **argValues) {
 		std::cout << "OpenGL version: " << version[0] << "." << version[1] << std::endl;
 	}
 
+	//////////////////////////////
+	// Setup deferred rendering //
+	//////////////////////////////
+
+	// Create render target for the GBuffer, Light Accumulation buffer, and final composite buffer
+	unsigned int geoBuffer = glsys.createRenderTarget(os->GetWindowWidth(), os->GetWindowHeight());
+	glsys.createRTBuffer(geoBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE); // Diffuse buffer
+	glsys.createRTBuffer(geoBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE); // Normal buffer
+	glsys.createRTBuffer(geoBuffer, GL_R32F, GL_RED, GL_FLOAT);			  // Depth buffer
+
+	unsigned int lightBuffer = glsys.createRenderTarget(os->GetWindowWidth(), os->GetWindowHeight());
+	glsys.createRTBuffer(lightBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE); // Light accumulation buffer
+
+	///////////////////
+	// Setup physics //
+	///////////////////
+
 	bphys.Start();
+
+	///////////////
+	// Setup GUI //
+	///////////////
 
 	webguisys.Start();
 	webguisys.SetWindowSize(os->GetWindowWidth(), os->GetWindowHeight());
+
+	////////////////
+	// Load scene //
+	////////////////
 
 	// Parse the scene file to retrieve entities
 	Sigma::parser::SCParser parser;
@@ -90,6 +121,10 @@ int main(int argCount, char **argValues) {
             factory.create(itr->type,e->id, const_cast<std::vector<Property>&>(itr->properties));
 		}
 	}
+
+	//////////////////////
+	// Setup user input //
+	//////////////////////
 
 	// View and ViewMover creation has been moved to test.sc, but for
 	// now provide sensible defaults.  Final engine should require
@@ -129,6 +164,10 @@ int main(int argCount, char **argValues) {
 		IOpSys::KeyboardEventSystem.Register(&cameraController);
 	}
 
+	///////////////////
+	// Configure GUI //
+	///////////////////
+
 	Sigma::event::handler::GUIController guicon;
 	guicon.SetGUI(webguisys.getComponent(100, Sigma::WebGUIView::getStaticComponentTypeName()));
 	IOpSys::KeyboardEventSystem.Register(&guicon);
@@ -144,6 +183,10 @@ int main(int argCount, char **argValues) {
 	IOpSys::KeyboardEventSystem.Register(&guicon3);
 	IOpSys::MouseEventSystem.Register(&guicon3);
 
+	///////////////
+	// MAIN LOOP //
+	///////////////
+
 	// Setup the timer
 	os->SetupTimer();
 
@@ -151,12 +194,19 @@ int main(int argCount, char **argValues) {
 	double delta;
 	bool isWireframe=false;
 
-	// Load a font
 	while (os->MessageLoop()) {
+
+		////////////////////////
+		// Advance Simulation //
+		////////////////////////
 
 		// Get time in ms, store it in seconds too
 		delta = os->GetDeltaTime();
 		double deltaSec = (double)delta/1000.0f;
+
+		///////////////////
+		// Process Input //
+		///////////////////
 
 		// Debug keys
 		if (os->KeyReleased('P', true)) { // Wireframe mode
@@ -179,13 +229,17 @@ int main(int argCount, char **argValues) {
 			break;
 		}
 
+		///////////////////////
+		// Update subsystems //
+		///////////////////////
+
 		// Pass in delta time in seconds
 		bphys.Update(deltaSec);
 		webguisys.Update(deltaSec);
 
 		// Update the renderer and present
 		if (glsys.Update(delta)) {
-			os->Present(glsys.getRender());
+			os->Present(glsys.getRenderTarget(geoBuffer));
 		}
 	}
 
