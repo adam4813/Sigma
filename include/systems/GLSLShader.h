@@ -20,9 +20,12 @@ public:
 	void AddAttribute(const std::string attribute);
 	void AddUniform(const std::string uniform);
 	GLuint GetProgram() const;
+	
+	// ISSUE: This is a bit questionable as it violates the principle of least surprise
 	//An indexer that returns the location of the attribute/uniform
 	GLuint operator[](const std::string attribute);
 	GLuint operator()(const std::string uniform);
+	
 	//Program deletion
 	void DeleteProgram() {glDeleteProgram(_program);_program=-1;}
 	bool isLoaded() { return _program != 0; }

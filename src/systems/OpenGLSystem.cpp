@@ -22,7 +22,7 @@ namespace Sigma{
 		glDeleteFramebuffers(1, &this->fbo_id);
 	}
 
-	void RenderTarget::Bind() {
+	void RenderTarget::BindWrite() {
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->fbo_id);
 
 		std::vector<GLenum> buffers;
@@ -38,15 +38,14 @@ namespace Sigma{
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, this->fbo_id);
 	}
 
-	void RenderTarget::Unbind() {
+	void RenderTarget::UnbindWrite() {
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	}
 
 	void RenderTarget::UnbindRead() {
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 	}
-	
-	std::map<std::string, Sigma::resource::GLTexture> OpenGLSystem::textures;
+
     OpenGLSystem::OpenGLSystem() : windowWidth(1024), windowHeight(768), deltaAccumulator(0.0),
 		framerate(60.0f), viewMode("") {}
 		
@@ -235,6 +234,7 @@ namespace Sigma{
 		float ry = 0.0f;
 		float rz = 0.0f;
 		int componentID = 0;
+
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			const Property*  p = &(*propitr);
 			if (p->GetName() == "scale") {
@@ -290,6 +290,7 @@ namespace Sigma{
 		sphere->LoadShader(shader_name);
 		sphere->LoadTexture(texture_name);
 		sphere->InitializeBuffers();
+
 		this->addComponent(entityID,sphere);
 		return sphere;
 	}
@@ -378,8 +379,9 @@ namespace Sigma{
 		float y = 0.0f;
 		float w = 0.0f;
 		float h = 0.0f;
+		
 		int componentID = 0;
-		std::string textrueName;
+		std::string textureName;
 		bool textureInMemory = false;
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
@@ -397,31 +399,31 @@ namespace Sigma{
 				h = p->Get<float>();
 			}
 			else if (p->GetName() == "textureName") {
-				textrueName = p->Get<std::string>();
+				textureName = p->Get<std::string>();
 				textureInMemory = true;
 			}
 			else if (p->GetName() == "textureFileName") {
-				textrueName = p->Get<std::string>();
+				textureName = p->Get<std::string>();
 			}
 		}
 
 		// Check if the texture is loaded and load it if not.
-		if (textures.find(textrueName) == textures.end()) {
+		if (textures.find(textureName) == textures.end()) {
 			Sigma::resource::GLTexture texture;
 			if (textureInMemory) { // We are using an in memory texture. It will be populated somewhere else
-				Sigma::OpenGLSystem::textures[textrueName] = texture;
+				Sigma::OpenGLSystem::textures[textureName] = texture;
 			}
 			else { // The texture in on disk so load it.
-				texture.LoadDataFromFile(textrueName);
+				texture.LoadDataFromFile(textureName);
 				if (texture.GetID() != 0) {
-					Sigma::OpenGLSystem::textures[textrueName] = texture;
+					Sigma::OpenGLSystem::textures[textureName] = texture;
 				}
 			}
 		}
 
 		// It should be loaded, but in case an error occurred double check for it.
-		if (textures.find(textrueName) != textures.end()) {
-			quad->SetTexture(&Sigma::OpenGLSystem::textures[textrueName]);
+		if (textures.find(textureName) != textures.end()) {
+			quad->SetTexture(&Sigma::OpenGLSystem::textures[textureName]);
 		}
 
 		quad->SetPosition(x, y);
@@ -429,6 +431,7 @@ namespace Sigma{
 		quad->LoadShader("shaders/quad");
 		quad->InitializeBuffers();
 		this->screensSpaceComp.push_back(std::unique_ptr<IGLComponent>(quad));
+		
 		return quad;
 	}
 
@@ -566,6 +569,7 @@ namespace Sigma{
 			/////////////////////
 
 			glm::vec3 viewPosition;
+			glm::mat4 viewProjInv;
 
 			// Setup the view matrix and position variables
 			glm::mat4 viewMatrix;
@@ -578,6 +582,8 @@ namespace Sigma{
 			glm::mat4 viewProj = viewMatrix;
 			viewProj *= this->ProjectionMatrix;
 
+			viewProjInv = glm::inverse(viewProj);
+
 			// Calculate frustum for culling
 			this->GetView(0)->CalculateFrustum(viewProj);
 			
@@ -587,13 +593,12 @@ namespace Sigma{
 
 			// Bind the first buffer, which is the Geometry Buffer
 			if(this->renderTargets.size() > 0) {
-				// Bind the primary render target
-				this->renderTargets[0]->Bind();
+				this->renderTargets[0]->BindWrite();
 			}
 
 			// Clear the GBuffer
             glClearColor(0.0f,0.0f,0.0f,1.0f);
-            glViewport(0, 0, windowWidth, windowHeight); // Set the viewport size to fill the window
+            glViewport(0, 0, this->windowWidth, this->windowHeight); // Set the viewport size to fill the window
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
 			// Loop through and draw each GL Component component.
@@ -618,6 +623,11 @@ namespace Sigma{
 				}
 			}
 
+			// Unbind the first buffer, which is the Geometry Buffer
+			if(this->renderTargets.size() > 0) {
+				this->renderTargets[0]->UnbindWrite();
+			}
+
 			///////////////////
 			// Lighting Pass //
 			///////////////////
@@ -626,6 +636,9 @@ namespace Sigma{
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ONE, GL_ONE);
 
+			// Disable depth testing
+			glDepthFunc(GL_NONE);
+
 			// Bind the Geometry buffer for reading
 			if(this->renderTargets.size() > 0) {
 				this->renderTargets[0]->BindRead();
@@ -633,18 +646,35 @@ namespace Sigma{
 
 			// Bind the second buffer, which is the Light Accumulation Buffer
 			if(this->renderTargets.size() > 1) {
-				this->renderTargets[1]->Bind();
+				this->renderTargets[1]->BindWrite();
 			}
 
 			// Clear it
 			glClearColor(0.0f,0.0f,0.0f,1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 			// Loop through each light, rendering all components
 			// TODO: Cull components based on light
-			// TODO: Implement scissors test
-			// Potentially move to deferred shading depending on
-			// visual style needs
+			// TODO: Implement scissors test or sphere based rendering
+
+			// Screen space quad for rendering
+			GLScreenQuad renderQuad(999);
+			renderQuad.SetSize(this->windowWidth, this->windowHeight);
+			renderQuad.SetPosition(0, 0);
+			renderQuad.InitializeBuffers();
+			renderQuad.LoadShader("shaders/pointlight");
+			renderQuad.SetCullFace("none");
+			renderQuad.GetShader()->AddUniform("viewProjInverse");
+			renderQuad.GetShader()->AddUniform("lightPosW");
+			renderQuad.GetShader()->AddUniform("lightRadius");
+			renderQuad.GetShader()->AddUniform("lightColor");
+			renderQuad.GetShader()->AddUniform("normalBuffer");
+			renderQuad.GetShader()->AddUniform("depthBuffer");
+
+			// Enable point light shader
+			renderQuad.GetShader()->Use();
+
+			// Setup textures
 
 			// Light passes
 			for(auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
@@ -653,43 +683,20 @@ namespace Sigma{
 					PointLight *light = dynamic_cast<PointLight*>(citr->second.get());
 
 					// If it is a light, and it intersects the frustum, then render
-					if(light && this->GetView(0)->CameraFrustum.isectSphere(light->position, light->radius)) {
-						// Modify depth test to allow for overlaying
-						// lights
-						glDepthFunc(GL_EQUAL);
+					if(light /* && this->GetView(0)->CameraFrustum.isectSphere(light->position, light->radius) */) {
+						GLSLShader &shader = (*renderQuad.GetShader().get());
 
-						// Make sure additive blending is enabled
-						glEnable(GL_BLEND);
-						glBlendFunc(GL_ONE, GL_ONE);
+						// Load variables
+						glUniformMatrix4fv(shader("viewProjInverse"), 1, false, &viewProjInv[0][0]);
+						glUniform3fv(shader("lightPosW"), 1, &light->position[0]);
+						glUniform1f(shader("lightRadius"), light->radius);
+						glUniform4fv(shader("lightColor"), 1, &light->color[0]);
 
-						// Loop through and draw each component.
-						for (auto child_eitr = this->_Components.begin(); child_eitr != this->_Components.end(); ++child_eitr) {
-							for (auto child_citr = child_eitr->second.begin(); child_citr != child_eitr->second.end(); ++child_citr) {
-								IGLComponent *glComp = dynamic_cast<IGLComponent *>(child_citr->second.get());
+						glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[0]);
+						glActiveTexture(GL_TEXTURE0);
 
-								if(glComp && glComp->IsLightingEnabled()) {
-									glComp->GetShader()->Use();
-
-									// Turn off ambient light for additive blending
-									glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "ambLightIntensity"), 0.0f);
-
-									// Set view position
-									glUniform3f(glGetUniformBlockIndex(glComp->GetShader()->GetProgram(), "viewPosW"), viewPosition.x, viewPosition.y, viewPosition.z);
-
-									// Activate the current point light for this shader
-									light->Activate(glComp->GetShader().get());
-
-									// Render
-									glComp->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
-								}
-							}
-						}
-
-						// Remove blending
-						glDisable(GL_BLEND);
-
-						// Re-enabled depth test
-						glDepthFunc(GL_LESS);
+						glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[1]);
+						glActiveTexture(GL_TEXTURE1);
 					}
 				}
 			}
@@ -701,8 +708,26 @@ namespace Sigma{
 
 			// Unbind the second buffer, which is the Light Accumulation Buffer
 			if(this->renderTargets.size() > 1) {
-				this->renderTargets[1]->Unbind();
+				this->renderTargets[1]->UnbindWrite();
 			}
+
+			// Disable point lighting shader
+			renderQuad.GetShader()->UnUse();
+
+			// Remove blending
+			glDisable(GL_BLEND);
+			
+			// Re-enabled depth test
+			glDepthFunc(GL_LESS);
+
+			////////////////////
+			// Composite Pass //
+			////////////////////
+
+
+			//////////////////
+			// Overlay Pass //
+			//////////////////
 
 			// Enable transparent rendering
 			glEnable(GL_BLEND);

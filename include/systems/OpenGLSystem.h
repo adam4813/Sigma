@@ -31,9 +31,9 @@ namespace Sigma{
 		RenderTarget() : fbo_id(0), depth_id(0) {}
 		virtual ~RenderTarget();
 
-		void Bind();
+		void BindWrite();
 		void BindRead();
-		void Unbind();
+		void UnbindWrite();
 		void UnbindRead();
 	};
 
@@ -181,6 +181,8 @@ namespace Sigma{
 		std::vector<std::unique_ptr<RenderTarget>> renderTargets;
 
 		std::vector<std::unique_ptr<IGLComponent>> screensSpaceComp; // A vector that holds only screen space components. These are rendered separately.
+
+		std::map<std::string, Sigma::resource::GLTexture> textures;
     }; // class OpenGLSystem
 } // namespace Sigma
 #endif // OPENGLSYSTEM_H

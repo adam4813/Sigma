@@ -4,11 +4,10 @@
 #define GL_SCREEN_QUAD
 
 #include "GLMesh.h"
+#include "resources/GLTexture.h"
 
 namespace Sigma {
-	namespace resource {
-		class GLTexture;
-	}
+
 class GLScreenQuad : public GLMesh {
 public:
 	SET_COMPONENT_TYPENAME("GLScreenQuad");

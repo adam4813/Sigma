@@ -73,5 +73,4 @@ namespace Sigma {
 	void GLScreenQuad::SetTexture(resource::GLTexture* texture) {
 		this->texture = texture;
 	}
-
 };
