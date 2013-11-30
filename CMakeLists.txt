@@ -73,6 +73,8 @@ if(NOT OPENGL_FOUND)
 	message(FATAL_ERROR "OpenGL not found! Aborting!")
 endif(NOT OPENGL_FOUND)
 
+SET(ADDITIONAL_LIBS "")
+
 # Figure out what Operating System to compile against
 if(WIN32 AND NOT MINGW) # Windows
 	set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${CMAKE_SOURCE_DIR}/include/libraries)
@@ -86,7 +88,7 @@ if(WIN32 AND NOT MINGW) # Windows
 	set(BULLET_COLLISION_LIBRARIES BulletCollision)
 	set(BULLET_DYNAMICS_LIBRARIES BulletDynamics)
 	SET(SOIL_LIBRARY SOIL)
-	SET(AWSOMEIUM_LIBRARY Awesomium)
+	SET(AWESOMIUM_LIBRARY Awesomium)
 endif(WIN32 AND NOT MINGW)
 
 if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
@@ -94,6 +96,13 @@ if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
 	if(NOT GLFW3_FOUND)
 		message(FATAL_ERROR "GLFW3 not found! Aborting!")
 	endif(NOT GLFW3_FOUND)
+	SET(ADDITIONAL_LIBS
+		-lX11
+		-lXxf86vm
+		-lpthread
+		-lXi
+		-lXrandr
+	)
 
 	find_package(GLEW REQUIRED)
 	if(NOT GLEW_FOUND)
@@ -110,6 +119,11 @@ if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
 		message(FATAL_ERROR "SOIL wasn't found!")
 		message(ERROR "Please install SOIL, or if you have it installed, make sure that modules/FindSOIL.cmake looks for it")
 	endif(NOT ${SOIL_FOUND})
+	
+	find_package(Awesomium REQUIRED)
+	if(NOT ${AWESOMIUM_FOUND})
+		message(FATAL_ERROR "Awesomium wasn't found!")
+	endif(NOT ${AWESOMIUM_FOUND})
 endif(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 if(APPLE) # Mac OSX
@@ -119,11 +133,10 @@ endif(APPLE)
 # add the executable
 add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP} ${Sigma_SRC_CONTROLLERS_H} ${Sigma_SRC_CONTROLLERS_CPP})
 
-# Set the preprocessor define for the IOpSys to use.
-add_definitions(-D${IOPSYS})
+message("linking libraries ${Sigma_LIB} ${OPENGL_LIBRARIES} ${GLFW3_LIBRARY} ${ADDITIONAL_LIBS} ${GLEW_LIBRARY} ${SOIL_LIBRARY} ${BULLET_LINEARMATH_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${AWESOMIUM_LIBRARY}")
 
 # Link the executable to the Hello library.
-target_link_libraries (Sigma ${Sigma_LIB} ${OPENGL_LIBRARIES} ${GLFW3_LIBRARY} ${GLEW_LIBRARY} ${SOIL_LIBRARY} ${BULLET_LINEARMATH_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${AWSOMEIUM_LIBRARY})
+target_link_libraries (Sigma ${Sigma_LIB} ${OPENGL_LIBRARIES} ${GLFW3_LIBRARY} ${ADDITIONAL_LIBS} ${GLEW_LIBRARY} ${SOIL_LIBRARY} ${BULLET_LINEARMATH_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${AWESOMIUM_LIBRARY})
 
 # build the Tests subproject
 #ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/tests")
