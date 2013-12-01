@@ -48,19 +48,19 @@ message("Compiler ID: " ${CMAKE_CXX_COMPILER_ID})
 # check for gcc version to set c++11 or c++0x
 # thanks to http://stackoverflow.com/questions/10984442/how-to-detect-c11-support-of-a-compiler-with-cmake
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
-    execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-    if (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
-        # c++11 std only appears in gcc 4.7 or higher. c++0x will work for lesser versions.
-        message("gcc ${GCC_VERSION} does not support c++11, only c++0x. This may cause some problems in the future. We recommend upgrading to gcc-4.7 or greater.")
+	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+	if (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
+		# c++11 std only appears in gcc 4.7 or higher. c++0x will work for lesser versions.
+		message("gcc ${GCC_VERSION} does not support c++11, only c++0x. This may cause some problems in the future. We recommend upgrading to gcc-4.7 or greater.")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-    else(NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
-        # compiler is gcc 4.7 or higher. Force c++11.
+	else(NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
+		# compiler is gcc 4.7 or higher. Force c++11.
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    endif (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
+	endif (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
 elseif (MSVC AND (MSVC10 OR MSVC11))
-    message("Support Visual Studio!")
+	message("Support Visual Studio!")
 else ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
-    message(FATAL_ERROR "Your C++ compiler does not support C++11.")
+	message(FATAL_ERROR "Your C++ compiler does not support C++11.")
 endif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
 
 add_definitions(
@@ -102,18 +102,18 @@ if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
 		message(FATAL_ERROR "GLFW3 not found! Aborting!")
 	endif(NOT GLFW3_FOUND)
 
-    # GLFW's linux dependencies are not straightforward.
-    # Thanks to http://ubuntuforums.org/showthread.php?t=2168824 for this solution
-    find_package(X11)
-    set( ADDITIONAL_GLFW_LIBS
-         -lGLU
-         -pthread
-         -lrt
-         -lXinerama
-         -lXrandr
-         -lXxf86vm
-         -lXi
-    )
+	# GLFW's linux dependencies are not straightforward.
+	# Thanks to http://ubuntuforums.org/showthread.php?t=2168824 for this solution
+	find_package(X11)
+	set( ADDITIONAL_GLFW_LIBS
+		 -lGLU
+		 -pthread
+		 -lrt
+		 -lXinerama
+		 -lXrandr
+		 -lXxf86vm
+		 -lXi
+	)
 
 	find_package(GLEW REQUIRED)
 	if(NOT GLEW_FOUND)
