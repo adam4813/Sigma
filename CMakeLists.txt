@@ -5,16 +5,16 @@ project (Sigma)
 include_directories("${CMAKE_SOURCE_DIR}/include")
 
 # Set the cmake search paths
-set(CMAKE_INCLUDE_PATH ${CMAKE_SOURCE_DIR}/include)
+SET(CMAKE_INCLUDE_PATH ${CMAKE_SOURCE_DIR}/include)
 
 # change output directory of executable so that relative paths in the code are correct
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 
 #Setup the core variables
-set(Sigma_SRC "")
+SET(Sigma_SRC "")
 
-# Set the directory where to find FindSLD2.cmake
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
+# Set the directory of Find<Library>.cmake modules
+SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
 
 # find all source files in the src directory
 file(GLOB Sigma_SRC "include/*.h" "src/*.cpp")
@@ -37,6 +37,10 @@ file(GLOB Sigma_SRC_CONTROLLERS_H "include/controllers/*.h")
 source_group("Header Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_H})
 file(GLOB Sigma_SRC_CONTROLLERS_CPP "src/controllers/*.cpp")
 source_group("Source Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_CPP})
+
+# Put all Resource files into a filter
+file(GLOB Sigma_SRC_RESOURCES_H "include/resources/*.h")
+source_group("Header Files\\resources" FILES ${Sigma_SRC_RESOURCES_H})
 
 # Outpit the compiler ID.
 message("Compiler ID: " ${CMAKE_CXX_COMPILER_ID})
@@ -72,36 +76,44 @@ if(NOT OPENGL_FOUND)
 	message(FATAL_ERROR "OpenGL not found! Aborting!")
 endif(NOT OPENGL_FOUND)
 
-SET(ADDITIONAL_GLFW_LIBS "")
-
 # Figure out what Operating System to compile against
 if(WIN32 AND NOT MINGW) # Windows
 	set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${CMAKE_SOURCE_DIR}/include/libraries)
 	include_directories("${CMAKE_SOURCE_DIR}/include/libraries")
 	set(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x86)
 	link_directories("${CMAKE_SOURCE_DIR}/lib/x86")
-	
+
 	SET(GLFW3_LIBRARY glfw3)
 	set(GLEW_LIBRARY glew32s glew32)
 	set(BULLET_LINEARMATH_LIBRARIES LinearMath)
 	set(BULLET_COLLISION_LIBRARIES BulletCollision)
 	set(BULLET_DYNAMICS_LIBRARIES BulletDynamics)
 	SET(SOIL_LIBRARY SOIL)
-	SET(AWESOMIUM_LIBRARY Awesomium)
+	SET(AWSOMEIUM_LIBRARY Awesomium)
 endif(WIN32 AND NOT MINGW)
 
+SET(X11_LIBRARIES "")
+SET(ADDITIONAL_GLFW_LIBS "")
+
 if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
+
 	find_package(GLFW3 REQUIRED)
 	if(NOT GLFW3_FOUND)
 		message(FATAL_ERROR "GLFW3 not found! Aborting!")
 	endif(NOT GLFW3_FOUND)
-	SET(ADDITIONAL_GLFW_LIBS
-		-lX11
-		-lXxf86vm
-		-lpthread
-		-lXi
-		-lXrandr
-	)
+
+    # GLFW's linux dependencies are not straightforward.
+    # Thanks to http://ubuntuforums.org/showthread.php?t=2168824 for this solution
+    find_package(X11)
+    set( ADDITIONAL_GLFW_LIBS
+         -lGLU
+         -pthread
+         -lrt
+         -lXinerama
+         -lXrandr
+         -lXxf86vm
+         -lXi
+    )
 
 	find_package(GLEW REQUIRED)
 	if(NOT GLEW_FOUND)
@@ -112,13 +124,13 @@ if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
 	if(NOT (BULLET_DYNAMICS_FOUND AND BULLET_COLLISION_FOUND AND BULLET_LINEARMATH_FOUND))
 		message(FATAL_ERROR "Bullet Physics was not found. Aborting!")
 	endif(NOT (BULLET_DYNAMICS_FOUND AND BULLET_COLLISION_FOUND AND BULLET_LINEARMATH_FOUND))
-	
+
 	find_package(SOIL REQUIRED)
 	if(NOT ${SOIL_FOUND})
 		message(FATAL_ERROR "SOIL wasn't found!")
 		message(ERROR "Please install SOIL, or if you have it installed, make sure that modules/FindSOIL.cmake looks for it")
 	endif(NOT ${SOIL_FOUND})
-	
+
 	find_package(Awesomium REQUIRED)
 	if(NOT ${AWESOMIUM_FOUND})
 		message(FATAL_ERROR "Awesomium wasn't found!")
@@ -130,10 +142,10 @@ if(APPLE) # Mac OSX
 endif(APPLE)
 
 # add the executable
-add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP} ${Sigma_SRC_CONTROLLERS_H} ${Sigma_SRC_CONTROLLERS_CPP})
+add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP} ${Sigma_SRC_CONTROLLERS_H} ${Sigma_SRC_CONTROLLERS_CPP} ${Sigma_SRC_RESOURCES_H})
 
-# Link the executable to the Hello library.
-target_link_libraries (Sigma ${OPENGL_LIBRARIES} ${GLFW3_LIBRARY} ${ADDITIONAL_GLFW_LIBS} ${GLEW_LIBRARY} ${SOIL_LIBRARY} ${BULLET_LINEARMATH_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${AWESOMIUM_LIBRARY})
+# Link the executable to all required libraries
+target_link_libraries (Sigma ${OPENGL_LIBRARIES} ${GLFW3_LIBRARY} ${X11_LIBRARIES} ${ADDITIONAL_GLFW_LIBS} ${GLEW_LIBRARY} ${SOIL_LIBRARY} ${BULLET_LINEARMATH_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${AWESOMIUM_LIBRARY})
 
 # build the Tests subproject
 #ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/tests")

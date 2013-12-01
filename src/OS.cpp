@@ -25,7 +25,11 @@ namespace Sigma {
 
 		// Make the window's context current.
 		glfwMakeContextCurrent(this->window);
-
+		
+		// setting glewExperimental fixes a glfw context problem
+		// (tested on Ubuntu 13.04)
+		glewExperimental = GL_TRUE;
+		
 		// Init GLEW.
 		GLuint error = glewInit();
 		if (error != GLEW_OK) {
