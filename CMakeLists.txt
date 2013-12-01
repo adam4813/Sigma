@@ -89,31 +89,18 @@ if(WIN32 AND NOT MINGW) # Windows
 	set(BULLET_COLLISION_LIBRARIES BulletCollision)
 	set(BULLET_DYNAMICS_LIBRARIES BulletDynamics)
 	SET(SOIL_LIBRARY SOIL)
-	SET(AWSOMEIUM_LIBRARY Awesomium)
+	SET(AWESOMIUM_LIBRARY Awesomium)
 endif(WIN32 AND NOT MINGW)
 
 SET(X11_LIBRARIES "")
-SET(ADDITIONAL_GLFW_LIBS "")
 
 if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
 
+	find_package(X11)
 	find_package(GLFW3 REQUIRED)
 	if(NOT GLFW3_FOUND)
 		message(FATAL_ERROR "GLFW3 not found! Aborting!")
 	endif(NOT GLFW3_FOUND)
-
-	# GLFW's linux dependencies are not straightforward.
-	# Thanks to http://ubuntuforums.org/showthread.php?t=2168824 for this solution
-	find_package(X11)
-	set( ADDITIONAL_GLFW_LIBS
-		 -lGLU
-		 -pthread
-		 -lrt
-		 -lXinerama
-		 -lXrandr
-		 -lXxf86vm
-		 -lXi
-	)
 
 	find_package(GLEW REQUIRED)
 	if(NOT GLEW_FOUND)
@@ -145,7 +132,7 @@ endif(APPLE)
 add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP} ${Sigma_SRC_CONTROLLERS_H} ${Sigma_SRC_CONTROLLERS_CPP} ${Sigma_SRC_RESOURCES_H})
 
 # Link the executable to all required libraries
-target_link_libraries (Sigma ${OPENGL_LIBRARIES} ${GLFW3_LIBRARY} ${X11_LIBRARIES} ${ADDITIONAL_GLFW_LIBS} ${GLEW_LIBRARY} ${SOIL_LIBRARY} ${BULLET_LINEARMATH_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${AWESOMIUM_LIBRARY})
+target_link_libraries (Sigma ${OPENGL_LIBRARIES} ${GLFW3_LIBRARY} ${X11_LIBRARIES} ${GLEW_LIBRARY} ${SOIL_LIBRARY} ${BULLET_LINEARMATH_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${AWESOMIUM_LIBRARY})
 
 # build the Tests subproject
 #ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/tests")

@@ -30,7 +30,7 @@ ELSE(WIN32)
 
 	# Prefer the static library.
 	FIND_LIBRARY( GLFW3_LIBRARY
-        NAMES libGLFW.a glfw3 GLFW libGLFW3.a GLFW3 libglfw.so libglfw.so.3 libglfw.so.3.0
+        NAMES libGLFW.a GLFW libGLFW3.a GLFW3 libglfw.so libglfw.so.3 libglfw.so.3.0 glfw3
 		PATHS
 		/usr/lib64
 		/usr/lib
