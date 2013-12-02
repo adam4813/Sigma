@@ -29,6 +29,11 @@ namespace Sigma{
     }
 
     void GLMesh::InitializeBuffers() {
+
+		if(!this->shader) {
+			assert(0 && "Shader must be loaded before buffers can be initialized.");
+		}
+
         // We must create a vao and then store it in our GLMesh.
         if (this->vao == 0) {
             glGenVertexArrays(1, &this->vao); // Generate the VAO

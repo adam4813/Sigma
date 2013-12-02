@@ -52,7 +52,7 @@ public:
 	virtual void RenderText(std::string text, float x, float y, unsigned int texture_id);
 	virtual void LoadFont(std::string file, unsigned int ptSize);
 
-	virtual void Present(int fbo_id);
+	virtual void Present(int fbo_id, int fbo_2);
 	virtual unsigned int GetWindowWidth();
 	virtual unsigned int GetWindowHeight();
 

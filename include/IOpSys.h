@@ -42,7 +42,7 @@ public:
 	 * \brief Flips the context buffers
 	 *
 	 */
-	virtual void Present(int fbo_id) = 0;
+	virtual void Present(int fbo_id, int fbo2_id) = 0;
 
 	/**
 	 * \brief Does the OS specific message looping.

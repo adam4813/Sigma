@@ -283,7 +283,7 @@ void SDLSys::RenderText(std::string text, float x, float y, unsigned int texture
 	}
 }
 
-void SDLSys::Present(int fbo_id) {
+void SDLSys::Present(int fbo_id, int fbo2_id) {
 	// For now, use glBlitFramebuffer, but rendering using a screen space quad
 	// will be faster
 	if(fbo_id > 0) {
@@ -292,23 +292,36 @@ void SDLSys::Present(int fbo_id) {
 
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo_id);
 
+		// Color Buffer
 		glReadBuffer(GL_COLOR_ATTACHMENT0);
 		glBlitFramebuffer(0, 0, (GLsizei)this->GetWindowWidth(), (GLsizei)this->GetWindowHeight(),
 						  0, (GLsizei)(this->GetWindowHeight()/2.0f), (GLsizei)(this->GetWindowWidth()/2.0f), (GLsizei)(this->GetWindowHeight()),
 						  GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
+		// Normal Buffer
 		glReadBuffer(GL_COLOR_ATTACHMENT1);
 		glBlitFramebuffer(0, 0, this->GetWindowWidth(), this->GetWindowHeight(),
 						  (GLsizei)(this->GetWindowWidth()/2.0f), (GLsizei)(this->GetWindowHeight()/2.0f), (GLsizei)(this->GetWindowWidth()), (GLsizei)(this->GetWindowHeight()),
 						  GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
+		// Depth Buffer
 		glReadBuffer(GL_COLOR_ATTACHMENT2);
 		glBlitFramebuffer(0, 0, this->GetWindowWidth(), this->GetWindowHeight(),
 						  0, 0, (GLsizei)(this->GetWindowWidth()/2.0f), (GLsizei)(this->GetWindowHeight()/2.0f),
 						  GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	}
 
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	if(fbo2_id > 0) {
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo2_id);
+		glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+		// Light Buffer
+		glBlitFramebuffer(0, 0, this->GetWindowWidth(), this->GetWindowHeight(),
+						  (GLsizei)(this->GetWindowWidth()/2.0f), 0, (GLsizei)(this->GetWindowWidth()/2.0f), (GLsizei)(this->GetWindowHeight()/2.0f),
+						  GL_COLOR_BUFFER_BIT, GL_LINEAR);
 	}
     
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+
 	SDL_GL_SwapWindow(this->_Window);
 }

@@ -182,7 +182,7 @@ namespace Sigma{
 
 		std::vector<std::unique_ptr<IGLComponent>> screensSpaceComp; // A vector that holds only screen space components. These are rendered separately.
 
-		std::map<std::string, Sigma::resource::GLTexture> textures;
+		//std::map<std::string, Sigma::resource::GLTexture> textures;
     }; // class OpenGLSystem
 } // namespace Sigma
 #endif // OPENGLSYSTEM_H

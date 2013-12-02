@@ -49,6 +49,8 @@ namespace Sigma{
     OpenGLSystem::OpenGLSystem() : windowWidth(1024), windowHeight(768), deltaAccumulator(0.0),
 		framerate(60.0f), viewMode("") {}
 		
+	std::map<std::string, resource::GLTexture> OpenGLSystem::textures = std::map<std::string, resource::GLTexture>();
+
 	std::map<std::string, Sigma::IFactory::FactoryFunction>
         OpenGLSystem::getFactoryFunctions() {
 		using namespace std::placeholders;
@@ -659,10 +661,10 @@ namespace Sigma{
 
 			// Screen space quad for rendering
 			GLScreenQuad renderQuad(999);
-			renderQuad.SetSize(this->windowWidth, this->windowHeight);
+			renderQuad.SetSize(1.0f, 1.0f);
 			renderQuad.SetPosition(0, 0);
-			renderQuad.InitializeBuffers();
 			renderQuad.LoadShader("shaders/pointlight");
+			renderQuad.InitializeBuffers();
 			renderQuad.SetCullFace("none");
 			renderQuad.GetShader()->AddUniform("viewProjInverse");
 			renderQuad.GetShader()->AddUniform("lightPosW");
@@ -672,7 +674,7 @@ namespace Sigma{
 			renderQuad.GetShader()->AddUniform("depthBuffer");
 
 			// Enable point light shader
-			renderQuad.GetShader()->Use();
+			//renderQuad.GetShader()->Use();
 
 			// Setup textures
 
@@ -683,7 +685,8 @@ namespace Sigma{
 					PointLight *light = dynamic_cast<PointLight*>(citr->second.get());
 
 					// If it is a light, and it intersects the frustum, then render
-					if(light /* && this->GetView(0)->CameraFrustum.isectSphere(light->position, light->radius) */) {
+					//if(light && this->GetView(0)->CameraFrustum.isectSphere(light->position, light->radius) ) {
+					if(light) {
 						GLSLShader &shader = (*renderQuad.GetShader().get());
 
 						// Load variables
@@ -697,6 +700,8 @@ namespace Sigma{
 
 						glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[1]);
 						glActiveTexture(GL_TEXTURE1);
+
+						renderQuad.Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 					}
 				}
 			}
@@ -712,14 +717,14 @@ namespace Sigma{
 			}
 
 			// Disable point lighting shader
-			renderQuad.GetShader()->UnUse();
+			//renderQuad.GetShader()->UnUse();
 
 			// Remove blending
 			glDisable(GL_BLEND);
 			
 			// Re-enabled depth test
 			glDepthFunc(GL_LESS);
-
+			
 			////////////////////
 			// Composite Pass //
 			////////////////////

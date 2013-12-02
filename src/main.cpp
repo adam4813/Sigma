@@ -237,9 +237,14 @@ int main(int argCount, char **argValues) {
 		bphys.Update(deltaSec);
 		webguisys.Update(deltaSec);
 
+		// Framebuffer(s) to draw
+		int fbos[2];
+		fbos[0] = glsys.getRenderTarget(geoBuffer);
+		fbos[1] = glsys.getRenderTarget(lightBuffer);
+
 		// Update the renderer and present
 		if (glsys.Update(delta)) {
-			os->Present(glsys.getRenderTarget(geoBuffer));
+			os->Present(fbos[0], fbos[1]);
 		}
 	}
 
