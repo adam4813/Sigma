@@ -25,7 +25,7 @@ namespace Sigma{
 	void RenderTarget::Use(int slot) {
 		glBindFramebuffer(GL_FRAMEBUFFER, this->fbo_id);
 	}
-	
+
 	std::map<std::string, Sigma::resource::GLTexture> OpenGLSystem::textures;
     OpenGLSystem::OpenGLSystem() : windowWidth(1024), windowHeight(768), deltaAccumulator(0.0),
 		framerate(60.0f), viewMode("") {}
@@ -468,17 +468,17 @@ namespace Sigma{
 
 		glGenFramebuffers(1, &newRT->fbo_id);
 		glBindFramebuffer(GL_FRAMEBUFFER, newRT->fbo_id);
-		
+
 		//Attach 2D texture to this FBO
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, newRT->texture_id, 0);
-		
+
 		glGenRenderbuffers(1, &newRT->depth_id);
 		glBindRenderbuffer(GL_RENDERBUFFER, newRT->depth_id);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, w, h);
-		
+
 		//Attach depth buffer to FBO
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, newRT->depth_id);
-		
+
 		//Does the GPU support current FBO configuration?
 		GLenum status;
 		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -506,7 +506,7 @@ namespace Sigma{
         // Check if the deltaAccumulator is greater than 1/<framerate>th of a second.
         //  ..if so, it's time to render a new frame
         if (this->deltaAccumulator > 1.0f / this->framerate) {
-            
+
 			// Hacky for now, but if we created at least one render target
 			// then the 0th one is the draw buffer, 1+ could be for post-processing
 			if(this->renderTargets.size() > 0) {
@@ -532,7 +532,7 @@ namespace Sigma{
 			// TODO: Implement scissors test
 			// Potentially move to deferred shading depending on
 			// visual style needs
-			
+
 			// Ambient Pass
 			// Loop through and draw each component.
 
@@ -688,6 +688,7 @@ namespace Sigma{
 		}
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
+        glEnable(GL_DEPTH_TEST);
 
 		// Create main framebuffer (index 0)
 		//this->createRenderTarget(1024, 768, GL_RGBA8);
