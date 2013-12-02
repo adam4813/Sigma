@@ -1,5 +1,7 @@
 #include <GL/glew.h>
+#ifndef __unix
 #include <GL/wglew.h>
+#endif
 #include <GLFW/glfw3.h>
 #include <string>
 

@@ -5,17 +5,16 @@ project (Sigma)
 include_directories("${CMAKE_SOURCE_DIR}/include")
 
 # Set the cmake search paths
-set(CMAKE_INCLUDE_PATH ${CMAKE_SOURCE_DIR}/include)
+SET(CMAKE_INCLUDE_PATH ${CMAKE_SOURCE_DIR}/include)
 
 # change output directory of executable so that relative paths in the code are correct
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 
 #Setup the core variables
-set(Sigma_SRC "")
-set(Sigma_LIB "")
+SET(Sigma_SRC "")
 
-# Set the directory where to find FindSLD2.cmake
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
+# Set the directory of Find<Library>.cmake modules
+SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
 
 # find all source files in the src directory
 file(GLOB Sigma_SRC "include/*.h" "src/*.cpp")
@@ -39,25 +38,29 @@ source_group("Header Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_H})
 file(GLOB Sigma_SRC_CONTROLLERS_CPP "src/controllers/*.cpp")
 source_group("Source Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_CPP})
 
+# Put all Resource files into a filter
+file(GLOB Sigma_SRC_RESOURCES_H "include/resources/*.h")
+source_group("Header Files\\resources" FILES ${Sigma_SRC_RESOURCES_H})
+
 # Outpit the compiler ID.
 message("Compiler ID: " ${CMAKE_CXX_COMPILER_ID})
 
 # check for gcc version to set c++11 or c++0x
 # thanks to http://stackoverflow.com/questions/10984442/how-to-detect-c11-support-of-a-compiler-with-cmake
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
-    execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-    if (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
-        # c++11 std only appears in gcc 4.7 or higher. c++0x will work for lesser versions.
-        message("gcc ${GCC_VERSION} does not support c++11, only c++0x. This may cause some problems in the future. We recommend upgrading to gcc-4.7 or greater.")
+	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+	if (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
+		# c++11 std only appears in gcc 4.7 or higher. c++0x will work for lesser versions.
+		message("gcc ${GCC_VERSION} does not support c++11, only c++0x. This may cause some problems in the future. We recommend upgrading to gcc-4.7 or greater.")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-    else(NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
-        # compiler is gcc 4.7 or higher. Force c++11.
+	else(NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
+		# compiler is gcc 4.7 or higher. Force c++11.
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    endif (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
+	endif (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
 elseif (MSVC AND (MSVC10 OR MSVC11))
-    message("Support Visual Studio!")
+	message("Support Visual Studio!")
 else ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
-    message(FATAL_ERROR "Your C++ compiler does not support C++11.")
+	message(FATAL_ERROR "Your C++ compiler does not support C++11.")
 endif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
 
 add_definitions(
@@ -79,17 +82,21 @@ if(WIN32 AND NOT MINGW) # Windows
 	include_directories("${CMAKE_SOURCE_DIR}/include/libraries")
 	set(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x86)
 	link_directories("${CMAKE_SOURCE_DIR}/lib/x86")
-	
+
 	SET(GLFW3_LIBRARY glfw3)
 	set(GLEW_LIBRARY glew32s glew32)
 	set(BULLET_LINEARMATH_LIBRARIES LinearMath)
 	set(BULLET_COLLISION_LIBRARIES BulletCollision)
 	set(BULLET_DYNAMICS_LIBRARIES BulletDynamics)
 	SET(SOIL_LIBRARY SOIL)
-	SET(AWSOMEIUM_LIBRARY Awesomium)
+	SET(AWESOMIUM_LIBRARY Awesomium)
 endif(WIN32 AND NOT MINGW)
 
+SET(X11_LIBRARIES "")
+
 if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
+
+	find_package(X11)
 	find_package(GLFW3 REQUIRED)
 	if(NOT GLFW3_FOUND)
 		message(FATAL_ERROR "GLFW3 not found! Aborting!")
@@ -104,12 +111,17 @@ if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
 	if(NOT (BULLET_DYNAMICS_FOUND AND BULLET_COLLISION_FOUND AND BULLET_LINEARMATH_FOUND))
 		message(FATAL_ERROR "Bullet Physics was not found. Aborting!")
 	endif(NOT (BULLET_DYNAMICS_FOUND AND BULLET_COLLISION_FOUND AND BULLET_LINEARMATH_FOUND))
-	
+
 	find_package(SOIL REQUIRED)
 	if(NOT ${SOIL_FOUND})
 		message(FATAL_ERROR "SOIL wasn't found!")
 		message(ERROR "Please install SOIL, or if you have it installed, make sure that modules/FindSOIL.cmake looks for it")
 	endif(NOT ${SOIL_FOUND})
+
+	find_package(Awesomium REQUIRED)
+	if(NOT ${AWESOMIUM_FOUND})
+		message(FATAL_ERROR "Awesomium wasn't found!")
+	endif(NOT ${AWESOMIUM_FOUND})
 endif(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 if(APPLE) # Mac OSX
@@ -117,13 +129,10 @@ if(APPLE) # Mac OSX
 endif(APPLE)
 
 # add the executable
-add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP} ${Sigma_SRC_CONTROLLERS_H} ${Sigma_SRC_CONTROLLERS_CPP})
+add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP} ${Sigma_SRC_CONTROLLERS_H} ${Sigma_SRC_CONTROLLERS_CPP} ${Sigma_SRC_RESOURCES_H})
 
-# Set the preprocessor define for the IOpSys to use.
-add_definitions(-D${IOPSYS})
-
-# Link the executable to the Hello library.
-target_link_libraries (Sigma ${Sigma_LIB} ${OPENGL_LIBRARIES} ${GLFW3_LIBRARY} ${GLEW_LIBRARY} ${SOIL_LIBRARY} ${BULLET_LINEARMATH_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${AWSOMEIUM_LIBRARY})
+# Link the executable to all required libraries
+target_link_libraries (Sigma ${OPENGL_LIBRARIES} ${GLFW3_LIBRARY} ${X11_LIBRARIES} ${GLEW_LIBRARY} ${SOIL_LIBRARY} ${BULLET_LINEARMATH_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${AWESOMIUM_LIBRARY})
 
 # build the Tests subproject
 #ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/tests")
