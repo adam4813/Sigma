@@ -6,10 +6,12 @@ namespace Sigma {
 	GLScreenQuad::~GLScreenQuad() {}
 
 	void GLScreenQuad::InitializeBuffers() {
+
 		float left = this->x * 2.0f - 1.0f;
 		float top = this->y * -2.0f + 1.0f;
 		float right = (this->x + this->w) * 2.0f - 1.0f;
 		float bottom = (this->y + this->h) * -2.0f + 1.0f;
+
 		this->AddVertex(Vertex(left, top, 0.0f)); // -1, 1
 		this->AddVertex(Vertex(right, top, 0.0f)); // 1, 1
 		this->AddVertex(Vertex(left, bottom, 0.0f)); // -1, -1
@@ -30,7 +32,7 @@ namespace Sigma {
 	}
 
 	void GLScreenQuad::Render(glm::mediump_float *view, glm::mediump_float *proj) {
-		this->shader->Use();
+		//this->shader->Use();
 
 		glDisable(GL_CULL_FACE);
 		glDisable(GL_DEPTH_TEST);
@@ -60,7 +62,7 @@ namespace Sigma {
 		glDepthMask(GL_TRUE);
 		glEnable(GL_CULL_FACE);
 
-		this->shader->UnUse();
+		//this->shader->UnUse();
 	}
 
 	unsigned int GLScreenQuad::GetTexture() {

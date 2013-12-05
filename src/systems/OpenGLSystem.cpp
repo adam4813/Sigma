@@ -47,7 +47,7 @@ namespace Sigma{
 	}
 
     OpenGLSystem::OpenGLSystem() : windowWidth(1024), windowHeight(768), deltaAccumulator(0.0),
-		framerate(60.0f), viewMode("") {}
+		framerate(60.0f), renderQuad(999), viewMode("") {}
 		
 	std::map<std::string, resource::GLTexture> OpenGLSystem::textures = std::map<std::string, resource::GLTexture>();
 
@@ -549,7 +549,7 @@ namespace Sigma{
 
 		switch(status) {
 			case GL_FRAMEBUFFER_COMPLETE:
-				std::cout << "Successfully created render target.";
+				std::cout << "Successfully created render target." << std::endl;
 				break;
 			default:
 				assert(0 && "Error: Framebuffer format is not compatible.");
@@ -598,13 +598,15 @@ namespace Sigma{
 				this->renderTargets[0]->BindWrite();
 			}
 
+			// Disable blending
+			glDisable(GL_BLEND);
+
 			// Clear the GBuffer
             glClearColor(0.0f,0.0f,0.0f,1.0f);
             glViewport(0, 0, this->windowWidth, this->windowHeight); // Set the viewport size to fill the window
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
 			// Loop through and draw each GL Component component.
-			glDisable(GL_BLEND);
 
 			for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
 				for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
@@ -652,29 +654,12 @@ namespace Sigma{
 			}
 
 			// Clear it
-			glClearColor(0.0f,0.0f,0.0f,1.0f);
+			glClearColor(0.0f,0.5f,0.0f,1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 			// Loop through each light, rendering all components
 			// TODO: Cull components based on light
 			// TODO: Implement scissors test or sphere based rendering
-
-			// Screen space quad for rendering
-			GLScreenQuad renderQuad(999);
-			renderQuad.SetSize(1.0f, 1.0f);
-			renderQuad.SetPosition(0, 0);
-			renderQuad.LoadShader("shaders/pointlight");
-			renderQuad.InitializeBuffers();
-			renderQuad.SetCullFace("none");
-			renderQuad.GetShader()->AddUniform("viewProjInverse");
-			renderQuad.GetShader()->AddUniform("lightPosW");
-			renderQuad.GetShader()->AddUniform("lightRadius");
-			renderQuad.GetShader()->AddUniform("lightColor");
-			renderQuad.GetShader()->AddUniform("normalBuffer");
-			renderQuad.GetShader()->AddUniform("depthBuffer");
-
-			// Enable point light shader
-			//renderQuad.GetShader()->Use();
 
 			// Setup textures
 
@@ -687,10 +672,12 @@ namespace Sigma{
 					// If it is a light, and it intersects the frustum, then render
 					//if(light && this->GetView(0)->CameraFrustum.isectSphere(light->position, light->radius) ) {
 					if(light) {
-						GLSLShader &shader = (*renderQuad.GetShader().get());
+						GLSLShader &shader = (*this->renderQuad.GetShader().get());
+
+						shader.Use();
 
 						// Load variables
-						glUniformMatrix4fv(shader("viewProjInverse"), 1, false, &viewProjInv[0][0]);
+						/*glUniformMatrix4fv(shader("viewProjInverse"), 1, false, &viewProjInv[0][0]);
 						glUniform3fv(shader("lightPosW"), 1, &light->position[0]);
 						glUniform1f(shader("lightRadius"), light->radius);
 						glUniform4fv(shader("lightColor"), 1, &light->color[0]);
@@ -699,9 +686,11 @@ namespace Sigma{
 						glActiveTexture(GL_TEXTURE0);
 
 						glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[1]);
-						glActiveTexture(GL_TEXTURE1);
+						glActiveTexture(GL_TEXTURE1);*/
 
-						renderQuad.Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
+						this->renderQuad.Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
+						
+						shader.UnUse();
 					}
 				}
 			}
@@ -715,9 +704,6 @@ namespace Sigma{
 			if(this->renderTargets.size() > 1) {
 				this->renderTargets[1]->UnbindWrite();
 			}
-
-			// Disable point lighting shader
-			//renderQuad.GetShader()->UnUse();
 
 			// Remove blending
 			glDisable(GL_BLEND);
@@ -812,6 +798,22 @@ namespace Sigma{
 		}
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
+
+		// Setup a screen quad for deferred rendering
+		this->renderQuad.SetSize(1.0f, 1.0f);
+		this->renderQuad.SetPosition(0.0f, 0.0f);
+		this->renderQuad.LoadShader("shaders/pointlight");
+		this->renderQuad.InitializeBuffers();
+		this->renderQuad.SetCullFace("none");
+
+		this->renderQuad.GetShader()->Use();
+		this->renderQuad.GetShader()->AddUniform("viewProjInverse");
+		this->renderQuad.GetShader()->AddUniform("lightPosW");
+		this->renderQuad.GetShader()->AddUniform("lightRadius");
+		this->renderQuad.GetShader()->AddUniform("lightColor");
+		this->renderQuad.GetShader()->AddUniform("normalBuffer");
+		this->renderQuad.GetShader()->AddUniform("depthBuffer");
+		this->renderQuad.GetShader()->UnUse();
 
         return OpenGLVersion;
     }

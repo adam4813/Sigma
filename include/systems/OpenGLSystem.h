@@ -16,6 +16,7 @@
 #include "systems/IGLView.h"
 #include <vector>
 #include "resources/GLTexture.h"
+#include "components/GLScreenQuad.h"
 
 struct IGLView;
 
@@ -176,6 +177,8 @@ namespace Sigma{
 		
 		// Type of view to create
 		std::string viewMode;
+
+		GLScreenQuad renderQuad;
 
 		// Render targets to draw to
 		std::vector<std::unique_ptr<RenderTarget>> renderTargets;
