@@ -57,6 +57,22 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
 		# compiler is gcc 4.7 or higher. Force c++11.
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 	endif (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
+elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+	# Clang 3.3 and up support c++11.  
+	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE CLANG_VERSION)
+	if (NOT (CLANG_VERSION VERSION_GREATER 3.3 OR CLANG_VERSION VERSION_EQUAL 3.3))
+		# c++11 std only appears in clang 3.3 or higher. c++0x will work for lesser versions.
+		message("clang ${CLANG_VERSION} does not support c++11, only c++0x. This may cause some problems in the future. We recommend upgrading to clang-3.3 or greater.")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+	else (NOT (CLANG_VERSION VERSION_GREATER 3.3 OR CLANG_VERSION VERSION_EQUAL 3.3))
+		# compiler is clang 3.3 or higher. Force c++11 and use libc++.
+		if (XCODE_VERSION)
+			set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD c++11)
+    		set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY libc++)
+		else (XCODE_VERSION)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
+		endif (XCODE_VERSION)
+	endif (NOT (CLANG_VERSION VERSION_GREATER 3.3 OR CLANG_VERSION VERSION_EQUAL 3.3))
 elseif (MSVC AND (MSVC10 OR MSVC11))
 	message("Support Visual Studio!")
 else ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
@@ -96,16 +112,20 @@ SET(X11_LIBRARIES "")
 
 if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
 
-	find_package(X11)
+	SET(GLEW_LIBRARY "")
+
+	if (NOT APPLE) # X11 and GLEW are not needed on OS X.
+		find_package(X11)
+		find_package(GLEW REQUIRED)
+		if(NOT GLEW_FOUND)
+			message(FATAL_ERROR "GLEW not found! Aborting!")
+		endif(NOT GLEW_FOUND)
+	endif (NOT APPLE)
+
 	find_package(GLFW3 REQUIRED)
 	if(NOT GLFW3_FOUND)
 		message(FATAL_ERROR "GLFW3 not found! Aborting!")
 	endif(NOT GLFW3_FOUND)
-
-	find_package(GLEW REQUIRED)
-	if(NOT GLEW_FOUND)
-		message(FATAL_ERROR "GLEW not found! Aborting!")
-	endif(NOT GLEW_FOUND)
 
 	find_package(Bullet REQUIRED)
 	if(NOT (BULLET_DYNAMICS_FOUND AND BULLET_COLLISION_FOUND AND BULLET_LINEARMATH_FOUND))
@@ -124,15 +144,41 @@ if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
 	endif(NOT ${AWESOMIUM_FOUND})
 endif(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
+SET(OSX_CF_LIBRARY "")
+
 if(APPLE) # Mac OSX
-  #TODO: Add stuff here if needed
+	# Awesomium does not support 64-bit.
+	set(CMAKE_OSX_ARCHITECTURES i386)
+	set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS "i386")
+	set(CMAKE_XCODE_ATTRIBUTE_SUPPORTED_PLATFORMS macosx)
+
+	# Need the 10.7 SDK or later.
+	execute_process(COMMAND xcodebuild -sdk macosx -version SDKVersion OUTPUT_VARIABLE OSX_SDK_VERSION)
+	if(NOT (OSX_SDK_VERSION VERSION_GREATER 10.7 OR OSX_SDK_VERSION VERSION_EQUAL 10.7))
+		message(FATAL_ERROR "The installed version of Xcode does not support the 10.7 SDK or later.  Please upgrade Xcode and try again.")
+	endif(NOT (OSX_SDK_VERSION VERSION_GREATER 10.7 OR OSX_SDK_VERSION VERSION_EQUAL 10.7))
+
+	# Configure the project to use the correct SDK.
+    if(XCODE_VERSION)
+        SET(CMAKE_OSX_SYSROOT macosx)
+    else(XCODE_VERSION)
+    	# Non-Xcode generators need the full path.
+        execute_process(COMMAND xcodebuild -sdk macosx -version Path | head -n 1 OUTPUT_VARIABLE CMAKE_OSX_SYSROOT)
+        string(REGEX REPLACE "(\r?\n)+$" "" CMAKE_OSX_SYSROOT "${CMAKE_OSX_SYSROOT}")
+    endif(XCODE_VERSION)
+
+	# Can deploy back to 10.7, the first OS X to support the GL Core.
+	set(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
+
+	# Need Core Foundation
+	set(OSX_CF_LIBRARY "-framework CoreFoundation")
 endif(APPLE)
 
 # add the executable
 add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP} ${Sigma_SRC_CONTROLLERS_H} ${Sigma_SRC_CONTROLLERS_CPP} ${Sigma_SRC_RESOURCES_H})
 
 # Link the executable to all required libraries
-target_link_libraries (Sigma ${OPENGL_LIBRARIES} ${GLFW3_LIBRARY} ${X11_LIBRARIES} ${GLEW_LIBRARY} ${SOIL_LIBRARY} ${BULLET_LINEARMATH_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${AWESOMIUM_LIBRARY})
+target_link_libraries (Sigma ${OPENGL_LIBRARIES} ${GLFW3_LIBRARY} ${X11_LIBRARIES} ${OSX_CF_LIBRARY} ${GLEW_LIBRARY} ${SOIL_LIBRARY} ${BULLET_LINEARMATH_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${AWESOMIUM_LIBRARY})
 
 # build the Tests subproject
 #ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/tests")

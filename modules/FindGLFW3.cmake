@@ -27,6 +27,10 @@ ELSE(WIN32)
         /opt/local/include
 		${GLFW_ROOT_DIR}/include
 		DOC "The directory where GLFW/glfw3.h resides")
+	IF(APPLE)
+		# For the case where GLFW is installed in a non-standard lib path such as /opt or /sw
+		INCLUDE_DIRECTORIES( "${GLFW3_INCLUDE_PATH}" )
+	ENDIF(APPLE)
 
 	# Prefer the static library.
 	FIND_LIBRARY( GLFW3_LIBRARY
