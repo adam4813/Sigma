@@ -1,5 +1,7 @@
 #include "components/GLSprite.h"
+#ifndef __APPLE__
 #include "GL/glew.h"
+#endif
 #include "resources/GLTexture.h"
 
 namespace Sigma{

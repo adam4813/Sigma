@@ -2,7 +2,9 @@
 #ifndef IGLCOMPONENT_H
 #define IGLCOMPONENT_H
 
+#ifndef __APPLE__
 #include "GL/glew.h"
+#endif
 #include "IComponent.h"
 #include "GLTransform.h"
 #include "systems/GLSLShader.h"

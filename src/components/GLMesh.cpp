@@ -1,6 +1,8 @@
 #include "components/GLMesh.h"
 
+#ifndef __APPLE__
 #include "GL/glew.h"
+#endif
 #include "strutils.h"
 
 #include <algorithm>

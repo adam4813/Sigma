@@ -13,6 +13,11 @@ namespace Sigma {
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, glMajor);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, glMinor);
 
+#ifdef __APPLE__
+        // Must use the Core Profile on OS X to get GL 3.2.
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
+        
 		// Create a windowed mode window and its OpenGL context.
 		this->window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
 
@@ -26,6 +31,7 @@ namespace Sigma {
 		// Make the window's context current.
 		glfwMakeContextCurrent(this->window);
 		
+#ifndef __APPLE__
 		// setting glewExperimental fixes a glfw context problem
 		// (tested on Ubuntu 13.04)
 		glewExperimental = GL_TRUE;
@@ -35,6 +41,7 @@ namespace Sigma {
 		if (error != GLEW_OK) {
 			return false;
 		}
+#endif
 
 		// Associate a pointer for this instance with this window.
 		glfwSetWindowUserPointer(this->window, this);

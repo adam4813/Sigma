@@ -3,7 +3,11 @@
 //Last Modified: February 2, 2011
 
 #pragma once
+#ifdef __APPLE__
+#include <OpenGL/gl3.h>
+#else
 #include "GL/glew.h"
+#endif
 #include <map>
 #include <string>
 

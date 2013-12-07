@@ -1,6 +1,8 @@
+#ifndef __APPLE__
 #include <GL/glew.h>
 #ifndef __unix
 #include <GL/wglew.h>
+#endif
 #endif
 #include <GLFW/glfw3.h>
 #include <string>
