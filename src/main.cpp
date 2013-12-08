@@ -244,7 +244,8 @@ int main(int argCount, char **argValues) {
 
 		// Update the renderer and present
 		if (glsys.Update(delta)) {
-			os->Present(fbos[0], fbos[1]);
+			//os->Present(fbos[0], fbos[1]);
+			os->Present(-1, -1);
 		}
 	}
 

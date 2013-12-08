@@ -622,6 +622,7 @@ namespace Sigma{
 						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "ambLightIntensity"), 0.05f);
 						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "diffuseLightIntensity"), 0.0f);
 						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "specularLightIntensity"), 0.0f);
+					
 						glComp->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 					}
 				}
@@ -649,12 +650,12 @@ namespace Sigma{
 			}
 
 			// Bind the second buffer, which is the Light Accumulation Buffer
-			if(this->renderTargets.size() > 1) {
-				this->renderTargets[1]->BindWrite();
-			}
+			//if(this->renderTargets.size() > 1) {
+			//	this->renderTargets[1]->BindWrite();
+			//}
 
 			// Clear it
-			glClearColor(0.0f,0.5f,0.0f,1.0f);
+			glClearColor(0.0f,0.0f,0.0f,1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 			// Loop through each light, rendering all components
@@ -677,7 +678,7 @@ namespace Sigma{
 						shader.Use();
 
 						// Load variables
-						/*glUniformMatrix4fv(shader("viewProjInverse"), 1, false, &viewProjInv[0][0]);
+						glUniformMatrix4fv(shader("viewProjInverse"), 1, false, &viewProjInv[0][0]);
 						glUniform3fv(shader("lightPosW"), 1, &light->position[0]);
 						glUniform1f(shader("lightRadius"), light->radius);
 						glUniform4fv(shader("lightColor"), 1, &light->color[0]);
@@ -686,7 +687,7 @@ namespace Sigma{
 						glActiveTexture(GL_TEXTURE0);
 
 						glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[1]);
-						glActiveTexture(GL_TEXTURE1);*/
+						glActiveTexture(GL_TEXTURE1);
 
 						this->renderQuad.Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 						
@@ -701,9 +702,9 @@ namespace Sigma{
 			}
 
 			// Unbind the second buffer, which is the Light Accumulation Buffer
-			if(this->renderTargets.size() > 1) {
-				this->renderTargets[1]->UnbindWrite();
-			}
+			//if(this->renderTargets.size() > 1) {
+			//	this->renderTargets[1]->UnbindWrite();
+			//}
 
 			// Remove blending
 			glDisable(GL_BLEND);
@@ -806,14 +807,14 @@ namespace Sigma{
 		this->renderQuad.InitializeBuffers();
 		this->renderQuad.SetCullFace("none");
 
-		this->renderQuad.GetShader()->Use();
+		/*this->renderQuad.GetShader()->Use();
 		this->renderQuad.GetShader()->AddUniform("viewProjInverse");
 		this->renderQuad.GetShader()->AddUniform("lightPosW");
 		this->renderQuad.GetShader()->AddUniform("lightRadius");
 		this->renderQuad.GetShader()->AddUniform("lightColor");
 		this->renderQuad.GetShader()->AddUniform("normalBuffer");
 		this->renderQuad.GetShader()->AddUniform("depthBuffer");
-		this->renderQuad.GetShader()->UnUse();
+		this->renderQuad.GetShader()->UnUse();*/
 
         return OpenGLVersion;
     }
