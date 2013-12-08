@@ -172,6 +172,13 @@ if(APPLE) # Mac OSX
 
 	# Need Core Foundation
 	set(OSX_CF_LIBRARY "-framework CoreFoundation")
+
+	if(NOT XCODE_VERSION)
+		# Yuck. The Makefile generator is not emitting a -F/Path/To/Awesomium flag.
+		# As a workaround, add the necessary flags ourself assuming the Awesomium was installed in its default location.
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -F/Library/Frameworks")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -F/Library/Frameworks")
+	endif(NOT XCODE_VERSION)
 endif(APPLE)
 
 # add the executable
