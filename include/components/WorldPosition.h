@@ -24,7 +24,7 @@
 #include <functional>
 #include <iterator>
 
-#ifdef GCC
+#if defined(__GNUG__)
 #include"components/WorldPosition_SIMD_gcc.hpp"
 #else
 #include"components/WorldPosition_SIMD.hpp"
@@ -142,33 +142,33 @@ namespace Sigma {
         *
         *
         * \param entity_id type_id id of the entity
-        * \return SharedPointerMap<type_id, coordinate_type>& a reference on the 
+        * \return SharedPointerMap<type_id, coordinate_type>& a reference on the
 coordinate
         *
         */
-        SharedPointerMap<type_id, coordinate_type>& PositionWrite_x(type_id 
+        SharedPointerMap<type_id, coordinate_type>& PositionWrite_x(type_id
 entity_id);
 
         /** \brief Set a y coordinate by reference
         *
         *
         * \param entity_id type_id id of the entity
-        * \return SharedPointerMap<type_id, coordinate_type>& a reference on the 
+        * \return SharedPointerMap<type_id, coordinate_type>& a reference on the
 coordinate
         *
         */
-        SharedPointerMap<type_id, coordinate_type>& PositionWrite_y(type_id 
+        SharedPointerMap<type_id, coordinate_type>& PositionWrite_y(type_id
 entity_id);
 
         /** \brief Set a z coordinate by reference
         *
         *
         * \param entity_id type_id id of the entity
-        * \return SharedPointerMap<type_id, coordinate_type>& a reference on the 
+        * \return SharedPointerMap<type_id, coordinate_type>& a reference on the
 coordinate
         *
         */
-        SharedPointerMap<type_id, coordinate_type>& PositionWrite_z(type_id 
+        SharedPointerMap<type_id, coordinate_type>& PositionWrite_z(type_id
 entity_id);
 
         /** \brief Remove a position
@@ -202,19 +202,19 @@ entity_id);
 
         /** \brief Get an iterator on the id
          *
-         *  The iterator gives the id in the same order as the internal position 
+         *  The iterator gives the id in the same order as the internal position
 vector
          *
          * \return std::vector<type_id>::const_iterator the iterator
          *
          */
-        std::vector<type_id>::const_iterator IteratorEntityId() const noexcept { 
+        std::vector<type_id>::const_iterator IteratorEntityId() const noexcept {
 return id_vector.cbegin(); }
 
-        /** \brief Get an array of all positions relative to (x, y, z) converted 
+        /** \brief Get an array of all positions relative to (x, y, z) converted
 to float
          *
-         * This performs a translation of (-x, -y, -z) and a conversion to 
+         * This performs a translation of (-x, -y, -z) and a conversion to
 float.
          *
          * \param x const coordinate_type x coordinate of the center
@@ -223,7 +223,7 @@ float.
          * \return position_array a struct containing 3 pointers to arrays
          *
          */
-        std::unique_ptr<position_array> RelativeTo(const coordinate_type x, 
+        std::unique_ptr<position_array> RelativeTo(const coordinate_type x,
 const coordinate_type y, const coordinate_type z);
 
         /** \brief Get the translated positions using bitmaps
@@ -254,7 +254,7 @@ const coordinate_type y, const coordinate_type z);
         std::shared_ptr<BitArray> InViewPositions(const coordinate_type x,
                                                   const coordinate_type y,
                                                   const coordinate_type z,
-                                                  const coordinate_type 
+                                                  const coordinate_type
 distance) const;
 
     private:
@@ -264,24 +264,24 @@ distance) const;
          * \return void
          *
          */
-        void MarkUpdated(type_id id) { auto i = FindIdElement(id); if (i>=0) 
+        void MarkUpdated(type_id id) { auto i = FindIdElement(id); if (i>=0)
 (*updated)[i] = true; };
 
         /** \brief Resize the vector
          *
          * \param v aligned_vector_type& the vector to resize
-         * \param SharedPointerMap<type_id,coordinate_type>& gf the map impacted 
+         * \param SharedPointerMap<type_id,coordinate_type>& gf the map impacted
 by the resize
          * \return void
          *
          */
-        void Resize(aligned_vector_type& v, SharedPointerMap<type_id, 
+        void Resize(aligned_vector_type& v, SharedPointerMap<type_id,
 coordinate_type>& gf);
 
         /** \brief Returns a rvalue to write a coordinate
          *
          * \param entity_id type_id the id to write
-         * \param SharedPointerMap<type_id, coordinate_type>& gf the array/map 
+         * \param SharedPointerMap<type_id, coordinate_type>& gf the array/map
 to write (x, y or z)
          * \return SharedPointerMap<type_id, coordinate_type>& A rvalue
          *

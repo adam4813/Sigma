@@ -4,7 +4,7 @@
 #include "components/BitArray.h"
 
 // include for cpuid intrinsic
-#ifdef GCC
+#if defined(__GNUG__)
 #include <x86intrin.h>
 #include "cpuid.h"
 
@@ -40,7 +40,7 @@ struct AlignedPointerDelete {
 } ;
 
 
-#elif defined VISUAL_STUDIO
+#elif defined(_MSC_VER)
 #include <intrin.h>
 static inline bool
 has_SSE2() {
