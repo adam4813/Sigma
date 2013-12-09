@@ -31,14 +31,14 @@ namespace Sigma{
 			for(int i = 0; i < 6; ++i) {
 
 				// find the distance to this plane
-				distToPlane = glm::dot(this->planes[i].normal, position) + this->planes[i].distance;
+				distToPlane = (float)fabs(glm::dot(this->planes[i].normal, position) + this->planes[i].distance);
 
 				// if this distance is < -sphere.radius, we are outside
 				if(distToPlane < -radius)
 					return false;
 
 				// else if the distance is between +- radius, then we intersect
-				if((float)fabs(distToPlane) < radius)
+				if(distToPlane < radius)
 					return true; // intersection
 			}
 

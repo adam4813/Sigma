@@ -178,7 +178,9 @@ namespace Sigma{
 		// Type of view to create
 		std::string viewMode;
 
-		GLScreenQuad renderQuad;
+		// Utility quads for rendering
+		// TODO make this smarter, allow multiple shaders/materials per glcomponent
+		GLScreenQuad renderQuad, ambientQuad;
 
 		// Render targets to draw to
 		std::vector<std::unique_ptr<RenderTarget>> renderTargets;
