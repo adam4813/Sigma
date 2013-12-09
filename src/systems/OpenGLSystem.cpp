@@ -9,7 +9,9 @@
 #include "components/GLScreenQuad.h"
 #include "components/PointLight.h"
 
+#ifndef __APPLE__
 #include "GL/glew.h"
+#endif
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 
@@ -680,12 +682,18 @@ namespace Sigma{
 
         // App specific global gl settings
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-		if (GLEW_AMD_seamless_cubemap_per_texture) {
+#if __APPLE__
+        // GL_TEXTURE_CUBE_MAP_SEAMLESS and GL_MULTISAMPLE are Core.
+        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // allows for cube-mapping without seams
+        glEnable(GL_MULTISAMPLE);
+#else
+        if (GLEW_AMD_seamless_cubemap_per_texture) {
 			glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // allows for cube-mapping without seams
 		}
 		if (GLEW_ARB_multisample) {
 			glEnable(GL_MULTISAMPLE_ARB);
 		}
+#endif
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
         glEnable(GL_DEPTH_TEST);
