@@ -2,6 +2,7 @@
 
 #include <bullet/btBulletCollisionCommon.h>
 #include <bullet/btBulletDynamicsCommon.h>
+#include "components/PhysicalWorldComponent.h"
 
 namespace Sigma {
 

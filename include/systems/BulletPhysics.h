@@ -7,7 +7,6 @@
 #include "IMoverComponent.h"
 #include "IBulletShape.h"
 #include "components/BulletMover.h"
-#include "components/PhysicalWorldComponent.h"
 
 class Property;
 class IMoverComponent;
@@ -17,7 +16,7 @@ namespace Sigma {
 	class BulletPhysics
 		: public Sigma::IFactory, public Sigma::ISystem<IBulletShape> {
 	public:
-		BulletPhysics() : mover(1) { }
+		BulletPhysics() {};
 		~BulletPhysics();
 		/**
 		 * \brief Starts the Simple Physics system.
@@ -33,21 +32,20 @@ namespace Sigma {
 		 * \param[in] const float delta The change in time since the last update
 		 * \return bool Returns true if we had an update interval passed.
 		 */
-		bool Update(const double delta);
+		bool Update(BulletMover& mover, const double delta);
 
 		IComponent* createBulletShapeMesh(const unsigned int entityID, const std::vector<Property> &properties);
 		IComponent* createBulletShapeSphere(const unsigned int entityID, const std::vector<Property> &properties);
 
+		void initBulletMover(BulletMover& mover, const coordinate_type x, const coordinate_type y, const coordinate_type z,
+                         const coordinate_type rx, const coordinate_type ry, const coordinate_type rz);
+
 		std::map<std::string,FactoryFunction> getFactoryFunctions();
-		BulletMover* getViewMover() {
-			return &this->mover;
-		}
 	private:
 		btBroadphaseInterface* broadphase;
 		btDefaultCollisionConfiguration* collisionConfiguration;
 		btCollisionDispatcher* dispatcher;
 		btSequentialImpulseConstraintSolver* solver;
 		btDiscreteDynamicsWorld* dynamicsWorld;
-		BulletMover mover;
 	};
 }

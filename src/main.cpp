@@ -1,12 +1,12 @@
 #include <iostream>
 
+#define BT_USE_DOUBLE_PRECISION
 #include "systems/OpenGLSystem.h"
 #include "systems/BulletPhysics.h"
 #include "systems/FactorySystem.h"
 #include "controllers/GLSixDOFViewController.h"
-#include "controllers/GUIController.h"
 #include "controllers/FPSCamera.h"
-#include "components/BulletMover.h"
+#include "components/PhysicalWorldComponent.h"
 #include "components/GLScreenQuad.h"
 #include "SCParser.h"
 #include "systems/WebGUISystem.h"
@@ -16,6 +16,7 @@ int main(int argCount, char **argValues) {
 	Sigma::OS glfwos;
 	Sigma::OpenGLSystem glsys;
 	Sigma::BulletPhysics bphys;
+	Sigma::PhysicalWorldComponent pworld(bphys);
 	Sigma::WebGUISystem webguisys;
 
 	Sigma::FactorySystem& factory = Sigma::FactorySystem::getInstance();
@@ -42,6 +43,7 @@ int main(int argCount, char **argValues) {
 	}
 
 	bphys.Start();
+	pworld.AddViewer(1, FAR_DISTANCE_MAX);
 
 	webguisys.Start();
 	webguisys.SetWindowSize(glfwos.GetWindowWidth(), glfwos.GetWindowHeight());
@@ -98,7 +100,7 @@ int main(int argCount, char **argValues) {
 
 	// Still hard coded to use entity ID #1
 	// Link the graphics view to the physics system's view mover
-	Sigma::BulletMover* mover = bphys.getViewMover();
+	Sigma::BulletMover* mover = pworld.GetViewMover();
 
 	//Create the controller
 	//Perhaps a little awkward currently, should create a generic
@@ -109,7 +111,7 @@ int main(int argCount, char **argValues) {
 		glfwos.RegisterKeyboardEventHandler(theCamera);
 		//glfwos.RegisterMouseEventHandler(theCamera);
 		theCamera->SetMover(mover);
-		mover->SetTransform(theCamera->Transform);
+        mover->SetTransform(theCamera->Transform);
 	} else if (glsys.GetViewMode() == "GLSixDOFView") {
 		Sigma::event::handler::GLSixDOFViewController cameraController(glsys.GetView(), mover);
 		glfwos.RegisterKeyboardEventHandler(&cameraController);
@@ -139,7 +141,7 @@ int main(int argCount, char **argValues) {
 		double deltaSec = glfwos.GetDeltaTime();
 
 		// Pass in delta time in seconds
-		bphys.Update(deltaSec);
+		bphys.Update(*mover, deltaSec);
 		webguisys.Update(deltaSec);
 
 		// Update the renderer and present

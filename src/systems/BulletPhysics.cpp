@@ -2,6 +2,7 @@
 #include "components/BulletShapeMesh.h"
 #include "components/GLMesh.h"
 #include "components/BulletShapeSphere.h"
+#include "components/PhysicalWorldComponent.h"
 
 namespace Sigma {
 	BulletPhysics::~BulletPhysics() {
@@ -29,11 +30,6 @@ namespace Sigma {
 		this->solver = new btSequentialImpulseConstraintSolver();
 		this->dynamicsWorld = new btDiscreteDynamicsWorld(this->dispatcher, this->broadphase, this->solver, this->collisionConfiguration);
 		this->dynamicsWorld->setGravity(btVector3(0,-10,0));
-
-		PhysicalWorldComponent::AddObject(this->mover.IBulletShape::GetEntityID(), 0 , 1.5, 0, 0, 0, 0);
-		this->mover.InitializeRigidBody();
-		this->dynamicsWorld->addRigidBody(this->mover.GetRigidBody());
-
 		return true;
 	}
 
@@ -145,12 +141,19 @@ namespace Sigma {
 		return sphere;
 	}
 
-	bool BulletPhysics::Update(const double delta) {
-		this->mover.ApplyForces(delta);
+    void BulletPhysics::initBulletMover(BulletMover& mover, const coordinate_type x, const coordinate_type y, const coordinate_type z,
+                 const coordinate_type rx, const coordinate_type ry, const coordinate_type rz) {
+        mover.InitializeRigidBody();
+        this->dynamicsWorld->addRigidBody(mover.GetRigidBody());
+    }
+
+
+	bool BulletPhysics::Update(BulletMover& mover, const double delta) {
+		mover.ApplyForces(delta);
 
 		dynamicsWorld->stepSimulation(delta, 10);
 
-		this->mover.UpdateTransform();
+		mover.UpdateTransform();
 
 		return true;
 	}

@@ -3,7 +3,6 @@
 #include "IBulletShape.h"
 #include "IMoverComponent.h"
 #include "GLTransform.h"
-#include "components/PhysicalWorldComponent.h"
 
 namespace Sigma {
 
