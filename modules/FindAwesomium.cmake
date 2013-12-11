@@ -8,6 +8,7 @@ find_path(AWESOMIUM_INCLUDE_DIR Awesomium/WebCore.h
 	~/Library/Frameworks
 	/Library/Frameworks
 	/usr/local/
+	/usr/include/
 	/usr/
 	/sw          # Fink
 	/opt/local/  # DarwinPorts
@@ -15,7 +16,7 @@ find_path(AWESOMIUM_INCLUDE_DIR Awesomium/WebCore.h
 	/opt/)
 	
 find_library(AWESOMIUM_LIBRARY 
-	NAMES awesomium
+	NAMES awesomium awesomium-1-7
 	PATH_SUFFIXES lib64 lib build/lib 
 	PATHS
 	${AWESOMIUM_ROOT}
@@ -23,6 +24,7 @@ find_library(AWESOMIUM_LIBRARY
 	~/Library/Frameworks
 	/Library/Frameworks
 	/usr/local/
+	/usr/lib/
 	/usr/
 	/sw          # Fink
 	/opt/local/  # DarwinPorts
