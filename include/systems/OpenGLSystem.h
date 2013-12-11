@@ -99,7 +99,7 @@ namespace Sigma{
 		 * \brief creates a new render target of desired size
 		 */
 		int createRenderTarget(const unsigned int w, const unsigned int h, const unsigned int format);
-		
+
 		/*
 		 * \brief returns the fbo_id of primary render target (index 0)
 		 */
@@ -127,7 +127,7 @@ namespace Sigma{
 		 * \brief Adds a view to the stack.
 		 *
 		 * \param[in/out] IGLView * view The view to add to the stack.
-		 * \return void 
+		 * \return void
 		 */
 		void PushView(IGLView* view) {
 			this->views.push_back(view);
@@ -137,7 +137,7 @@ namespace Sigma{
 		 * \brief Pops a view from the stack.
 		 *
 		 * Pops a view from the stack and deletes it.
-		 * \return void 
+		 * \return void
 		 */
 		void PopView() {
 			if (this->views.size() > 0) {
@@ -157,6 +157,7 @@ namespace Sigma{
 		const std::string& GetViewMode() { return this->viewMode; }
 
 		static std::map<std::string, Sigma::resource::GLTexture> textures;
+
     private:
         unsigned int windowWidth; // Store the width of our window
         unsigned int windowHeight; // Store the height of our window
@@ -169,7 +170,7 @@ namespace Sigma{
 
         double deltaAccumulator; // milliseconds since last render
         double framerate; // default is 60fps
-		
+
 		// Type of view to create
 		std::string viewMode;
 

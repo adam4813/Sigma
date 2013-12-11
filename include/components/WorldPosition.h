@@ -254,8 +254,7 @@ const coordinate_type y, const coordinate_type z);
         std::shared_ptr<BitArray> InViewPositions(const coordinate_type x,
                                                   const coordinate_type y,
                                                   const coordinate_type z,
-                                                  const coordinate_type
-distance) const;
+                                                  const coordinate_type distance) const;
 
     private:
         /** \brief Mark an entity as updated
@@ -264,25 +263,21 @@ distance) const;
          * \return void
          *
          */
-        void MarkUpdated(type_id id) { auto i = FindIdElement(id); if (i>=0)
-(*updated)[i] = true; };
+        void MarkUpdated(type_id id) { auto i = FindIdElement(id); if (i>=0) (*updated)[i] = true; };
 
         /** \brief Resize the vector
          *
          * \param v aligned_vector_type& the vector to resize
-         * \param SharedPointerMap<type_id,coordinate_type>& gf the map impacted
-by the resize
+         * \param SharedPointerMap<type_id,coordinate_type>& gf the map impacted by the resize
          * \return void
          *
          */
-        void Resize(aligned_vector_type& v, SharedPointerMap<type_id,
-coordinate_type>& gf);
+        void Resize(aligned_vector_type& v, SharedPointerMap<type_id, coordinate_type>& gf);
 
         /** \brief Returns a rvalue to write a coordinate
          *
          * \param entity_id type_id the id to write
-         * \param SharedPointerMap<type_id, coordinate_type>& gf the array/map
-to write (x, y or z)
+         * \param SharedPointerMap<type_id, coordinate_type>& gf the array/map to write (x, y or z)
          * \return SharedPointerMap<type_id, coordinate_type>& A rvalue
          *
          */

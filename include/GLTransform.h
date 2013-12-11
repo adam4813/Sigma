@@ -12,6 +12,8 @@ public:
 
 	GLTransform() : orientation(glm::quat(1,0,0,0)), position(glm::vec3(0,0,0)), rotation(glm::vec3(0,0,0)), Euler(false) {}
 
+	virtual ~GLTransform() {}
+
 	void Translate(float x, float y, float z) {
 		this->position += glm::vec3(x, y, z);
 		this->translateMatrix = glm::translate(this->translateMatrix, x, y, z);
@@ -49,7 +51,7 @@ public:
 			this->orientation = glm::normalize(change * this->orientation);
 			this->rotateMatrix = glm::mat4_cast(this->orientation);
 		}
-		
+
 		this->MMhasChanged = true;
 	}
 
@@ -73,7 +75,7 @@ public:
 	 * \param[in] float right
 	 * \param[in] float up
 	 * \param[in] float forward
-	 * 
+	 *
 	 * \returns void
 	*/
 	void Move(float right, float up, float forward) {
@@ -84,7 +86,7 @@ public:
 		glm::vec3 right_vector(this->rotateMatrix[0][0], this->rotateMatrix[1][0], this->rotateMatrix[2][0]);
 		return right_vector;
 	}
-	
+
 	glm::vec3 GetUp() {
 		glm::vec3 up_vector(this->rotateMatrix[0][1], this->rotateMatrix[1][1], this->rotateMatrix[2][1]);
 		return up_vector;
@@ -144,7 +146,7 @@ public:
 	void SetMaxRotation(glm::vec3 maxrot) {
 		this->maxRotation = maxrot;
 	}
-	
+
 
 	/**
 	 * \brief Restricts the rotation to a defined value.
