@@ -6,7 +6,7 @@ namespace Sigma {
 
     WorldOrientation::~WorldOrientation() {}
 
-    const std::weak_ptr<const orientation_type> WorldOrientation::operator()(type_id entity_id) const {
+    const orientation_ptr WorldOrientation::euler(type_id entity_id) const {
         return orientation_guard.Read(entity_id);
     }
 

@@ -7,8 +7,6 @@
 #include <vector>
 #include <functional>
 #include <iterator>
-#include "gtest/gtest_prod.h"
-#include <cstdio>
 
 
 namespace Sigma {
@@ -16,21 +14,40 @@ namespace Sigma {
 
     struct orientation_type {
         orientation_type() : alpha(0), beta(0), gamma(0) {};
-        orientation_type(float alpha, float beta, float gamma) : alpha(alpha), beta(beta), gamma(gamma) {};
+        orientation_type(double alpha, double beta, double gamma) : alpha(alpha), beta(beta), gamma(gamma) {};
 
-        float alpha;
-        float beta;
-        float gamma;
+        double alpha;
+        double beta;
+        double gamma;
 
         bool operator==(const orientation_type& v) const {
             return this->alpha == v.alpha && this->beta == v.beta && this->gamma == v.gamma;
         }
     };
 
+    struct orientation_ptr {
+        orientation_ptr(const std::weak_ptr<const orientation_type>& ptr) : ptr(ptr) {};
+        virtual ~orientation_ptr() {};
+
+        operator const std::weak_ptr<const orientation_type>() const { return ptr; };
+        operator const orientation_type() const { return *ptr.lock(); }
+
+        bool operator==(const orientation_ptr& p) const {
+            return (*p.lock() == *this->lock());
+        }
+
+        bool expired() const { return ptr.expired(); };
+
+        std::shared_ptr<const orientation_type> lock() const { return ptr.lock(); };
+
+        std::weak_ptr<const orientation_type> ptr;
+    };
+
+
     /** \brief A vector storing orientations in continuous location
      *  with a reference map for fast access and data lifecycle management
      *
-     *  The orientations are 3 floats representing the Euler angles.
+     *  The orientations are 3 doubles representing the Euler angles.
      *
      *  operator() and OrientationWrite() methods access to the map, while
      *  AllOrientations gives a pointer to the vector.
@@ -56,14 +73,13 @@ namespace Sigma {
              * \return a weak pointer on the orientation
              *
              */
-            const std::weak_ptr<const orientation_type> operator()(type_id entity_id) const;
+            const orientation_ptr euler(type_id entity_id) const;
 
             /** \brief Set a orientation by reference
             *
             *
             * \param entity_id type_id id of the entity
-            * \return SharedPointerMap<type_id, vec3>& a reference on the 
-orientation
+            * \return SharedPointerMap<type_id, vec3>& a reference on the orientation
             *
             */
             SharedPointerMap<type_id, orientation_type>& OrientationWrite(type_id entity_id);
