@@ -3,6 +3,7 @@
 #include "IBulletShape.h"
 #include "IMoverComponent.h"
 #include "GLTransform.h"
+#include "components/PhysicalWorldComponent.h"
 
 namespace Sigma {
 
@@ -25,16 +26,14 @@ namespace Sigma {
 		/**
 		 * \brief Initialize the rigid body.
 		 *
-		 * \param[in] float x, y, z The initial position.
-		 * \param[in] float rx, ry, rz The initial rotation.
-		 * \return    void 
+		 * \return    void
 		 */
-		void InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz);
+		void InitializeRigidBody();
 
 		/**
 		 * \brief Updates the transform to match its collision rigid body.
 		 *
-		 * \return void 
+		 * \return void
 		 */
 		void UpdateTransform();
 
@@ -49,7 +48,7 @@ namespace Sigma {
 		/**
 		 * \brief Sets the target rotation amount.
 		 *
-		 * 
+		 *
 		 * \param[in/out] float x, y, z The amount to rotate to.
 		 * \return void
 		 */

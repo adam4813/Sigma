@@ -1,8 +1,11 @@
 #ifndef SIGMAMOTIONSTATE_INCLUDED
 #define SIGMAMOTIONSTATE_INCLUDED
 
+#define BT_USE_DOUBLE_PRECISION
 #include "bullet/btBulletDynamicsCommon.h"
 #include "components/WorldPosition.h"
+#include "components/WorldOrientation.h"
+#include <cmath>
 
 namespace Sigma {
     class SigmaMotionState : public btMotionState {
@@ -13,9 +16,10 @@ namespace Sigma {
         virtual ~SigmaMotionState() {};
 
         virtual void getWorldTransform(btTransform &worldTrans) const {
-            worldTrans.setOrigin(btVector3(*wp->x(id).lock(), *wp->y(id).lock(), *wp->z(id).lock()));
-            //TODO rotation matrix
-            worldTrans.setBasis(btMatrix3x3(0,0,0,0,0,0,0,0,0));
+            worldTrans.setIdentity();
+            worldTrans.setOrigin(btVector3(wp->x(id), wp->y(id), wp->z(id)));
+            orientation_type o = wo->euler(id);
+            worldTrans.getBasis().setEulerZYX(o.alpha, o.beta, o.gamma);
         };
 
         virtual void setWorldTransform(const btTransform &worldTrans) {
@@ -23,8 +27,9 @@ namespace Sigma {
             wp->PositionWrite_x(id) = vec.x();
             wp->PositionWrite_y(id) = vec.y();
             wp->PositionWrite_z(id) = vec.z();
-
-            // TODO orientation
+            double a, b, g;
+            worldTrans.getBasis().getEulerZYX(a, b, g);
+            wo->OrientationWrite(id) = orientation_type(a, b, g);
         };
 
     private:

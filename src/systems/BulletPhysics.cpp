@@ -30,7 +30,8 @@ namespace Sigma {
 		this->dynamicsWorld = new btDiscreteDynamicsWorld(this->dispatcher, this->broadphase, this->solver, this->collisionConfiguration);
 		this->dynamicsWorld->setGravity(btVector3(0,-10,0));
 
-		this->mover.InitializeRigidBody(0,1.5f,0,0,0,0);
+		PhysicalWorldComponent::AddObject(this->mover.IBulletShape::GetEntityID(), 0 , 1.5, 0, 0, 0, 0);
+		this->mover.InitializeRigidBody();
 		this->dynamicsWorld->addRigidBody(this->mover.GetRigidBody());
 
 		return true;
@@ -85,6 +86,8 @@ namespace Sigma {
 				mesh->SetMesh(&meshFile);
 			}
 		}
+		PhysicalWorldComponent::AddObject(entityID, x, y, z, rx, ry, rz);
+
 		mesh->InitializeRigidBody(x, y, z, rx, ry, rz);
 
 		this->dynamicsWorld->addRigidBody(mesh->GetRigidBody());
@@ -130,6 +133,8 @@ namespace Sigma {
 				sphere->SetRadius(p->Get<float>());
 			}
 		}
+
+		PhysicalWorldComponent::AddObject(entityID, x, y, z, rx, ry, rz);
 
 		sphere->InitializeRigidBody(x, y, z, rx, ry, rz);
 

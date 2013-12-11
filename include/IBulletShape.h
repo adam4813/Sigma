@@ -1,7 +1,9 @@
 #pragma once
+#define BT_USE_DOUBLE_PRECISION
 #include <bullet/btBulletCollisionCommon.h>
 #include <bullet/btBulletDynamicsCommon.h>
 #include "IComponent.h"
+#include "components/PhysicalWorldComponent.h"
 
 
 namespace Sigma{
@@ -25,8 +27,9 @@ namespace Sigma{
 			transform.setIdentity();
 			transform.setRotation(btQuaternion(btVector3(0,1,0), btRadians(ry)));
 			transform.setOrigin(btVector3(x, y, z));
-			this->motionState = new btDefaultMotionState(transform);
-			this->body = new btRigidBody(0, this->motionState, this->shape);
+//			this->motionState = new btDefaultMotionState(transform);
+			this->motionState = PhysicalWorldComponent::GetMotionState(this->GetEntityID());
+			this->body = new btRigidBody(0.0d, this->motionState, this->shape);
 			this->body->setContactProcessingThreshold(BT_LARGE_FLOAT);
 			this->body->setCcdMotionThreshold(.5);
 			this->body->setCcdSweptSphereRadius(0);
@@ -37,6 +40,6 @@ namespace Sigma{
 	protected:
 		btCollisionShape* shape;
 		btRigidBody* body;
-		btDefaultMotionState* motionState;
+		SigmaMotionState* motionState;
 	};
 }

@@ -1,11 +1,13 @@
 #pragma  once
 
+#define BT_USE_DOUBLE_PRECISION
 #include "IFactory.h"
 #include "ISystem.h"
 #include "bullet/btBulletDynamicsCommon.h"
 #include "IMoverComponent.h"
 #include "IBulletShape.h"
 #include "components/BulletMover.h"
+#include "components/PhysicalWorldComponent.h"
 
 class Property;
 class IMoverComponent;

@@ -53,11 +53,12 @@ namespace Sigma {
 		}
 	}
 
-	void BulletMover::InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz) {
-		this->shape = new btCapsuleShape(0.3f, 1.3f);
+	void BulletMover::InitializeRigidBody() {
+		this->shape = new btCapsuleShape(0.3d, 1.3d);
 		btScalar mass = 1;
 		btVector3 fallInertia(0,0,0);
-		this->motionState =	new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(x, y, z)));
+//		this->motionState =	new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(x, y, z)));
+		this->motionState =	PhysicalWorldComponent::GetMotionState(this->Sigma::IBulletShape::GetEntityID());
 		btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, motionState, shape,fallInertia);
 		this->shape->calculateLocalInertia(mass,fallInertia);
 		this->body = new btRigidBody(fallRigidBodyCI);
