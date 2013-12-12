@@ -111,9 +111,6 @@ endif(WIN32 AND NOT MINGW)
 SET(X11_LIBRARIES "")
 
 if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
-
-	SET(GLEW_LIBRARY "")
-
 	if (NOT APPLE) # X11 and GLEW are not needed on OS X.
 		find_package(X11)
 		find_package(GLEW REQUIRED)
@@ -147,6 +144,8 @@ endif(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 SET(OSX_CF_LIBRARY "")
 
 if(APPLE) # Mac OSX
+	SET(GLEW_LIBRARY "")
+
 	# Awesomium does not support 64-bit.
 	set(CMAKE_OSX_ARCHITECTURES i386)
 	set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS "i386")
