@@ -70,7 +70,7 @@ namespace Sigma{
 			}
 
 			void FPSCamera::SetMover(BulletMover* m){
-				if (this->mover) {
+				if (m) {
 					m->SetTransform(this->Transform);
 					this->mover = m;
 				}

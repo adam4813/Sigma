@@ -5,48 +5,52 @@
 
 namespace Sigma {
 
-	BulletMover::BulletMover(const int entityID) : IBulletShape(entityID) {
+	BulletMover::BulletMover(const int entityID) : IBulletShape(entityID), transform(nullptr) {
 	}
 
 	BulletMover::~BulletMover() {
 	}
 
 	void BulletMover::ApplyForces(const double delta) {
-		glm::vec3 deltavec(delta);
-		glm::vec3 totalForce;
-		glm::vec3 targetrvel;
+		if (this->transform) {
+			glm::vec3 deltavec(delta);
+			glm::vec3 totalForce;
+			glm::vec3 targetrvel;
 
-		for (auto forceitr = this->forces.begin(); forceitr != this->forces.end(); ++forceitr) {
-			totalForce += *forceitr;
-		}
+			for (auto forceitr = this->forces.begin(); forceitr != this->forces.end(); ++forceitr) {
+				totalForce += *forceitr;
+			}
 
-		glm::vec3 right_direction = glm::normalize(glm::cross(this->transform->GetForward(), GLTransform::UP_VECTOR));
-		glm::vec3 forward_direction = glm::normalize(glm::cross(GLTransform::UP_VECTOR, right_direction));
+			glm::vec3 right_direction = glm::normalize(glm::cross(this->transform->GetForward(), GLTransform::UP_VECTOR));
+			glm::vec3 forward_direction = glm::normalize(glm::cross(GLTransform::UP_VECTOR, right_direction));
 
-		glm::vec3 finalForce = (totalForce.z * -forward_direction) + (totalForce.y * GLTransform::UP_VECTOR) + (totalForce.x * -right_direction);
+			glm::vec3 finalForce = (totalForce.z * -forward_direction) + (totalForce.y * GLTransform::UP_VECTOR) + (totalForce.x * -right_direction);
 
-		body->setActivationState(DISABLE_DEACTIVATION);
-		this->body->setLinearVelocity(btVector3(finalForce.x, this->body->getLinearVelocity().y() + 0.000000001f, finalForce.z));
+			body->setActivationState(DISABLE_DEACTIVATION);
+			this->body->setLinearVelocity(btVector3(finalForce.x, this->body->getLinearVelocity().y() + 0.000000001f, finalForce.z));
 
-		for (auto rotitr = this->rotationForces.begin(); rotitr != this->rotationForces.end(); ++rotitr) {
-			this->transform->Rotate((*rotitr) * deltavec);
-		}
+			for (auto rotitr = this->rotationForces.begin(); rotitr != this->rotationForces.end(); ++rotitr) {
+				this->transform->Rotate((*rotitr) * deltavec);
+			}
 
-		// Inertial rotation
-		targetrvel = _rotationtarget * deltavec;
-		if(fabs(targetrvel.x) > 0.0001f || fabs(targetrvel.y) > 0.0001f || fabs(targetrvel.z) > 0.0001f) {
+			// Inertial rotation
+			targetrvel = _rotationtarget * deltavec;
+			if(fabs(targetrvel.x) > 0.0001f || fabs(targetrvel.y) > 0.0001f || fabs(targetrvel.z) > 0.0001f) {
+				targetrvel = this->transform->Restrict(targetrvel);
+				this->transform->Rotate(targetrvel);
+				_rotationtarget -= targetrvel;
+			}
 			targetrvel = this->transform->Restrict(targetrvel);
-			this->transform->Rotate(targetrvel);
-			_rotationtarget -= targetrvel;
+			this->rotationForces.clear();
 		}
-		targetrvel = this->transform->Restrict(targetrvel);
-		this->rotationForces.clear();
 	}
 
 	void BulletMover::UpdateTransform() {
-		btTransform trans;
-		this->body->getMotionState()->getWorldTransform(trans);
-		this->transform->TranslateTo(trans.getOrigin().x(),trans.getOrigin().y(), trans.getOrigin().z());
+		if (this->transform) {
+			btTransform trans;
+			this->body->getMotionState()->getWorldTransform(trans);
+			this->transform->TranslateTo(trans.getOrigin().x(),trans.getOrigin().y(), trans.getOrigin().z());
+		}
 	}
 
 	void BulletMover::InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz) {

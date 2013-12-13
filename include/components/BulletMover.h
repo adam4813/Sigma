@@ -9,7 +9,7 @@ namespace Sigma {
 	class BulletMover : public IBulletShape, public IMoverComponent {
 	public:
 		SET_COMPONENT_TYPENAME("BulletMover");
-		BulletMover() : IBulletShape(0) { }
+		BulletMover() : IBulletShape(0), transform(nullptr) { }
 		BulletMover(const int entityID);
 		~BulletMover();
 
