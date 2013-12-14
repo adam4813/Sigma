@@ -1,5 +1,9 @@
 #pragma once
+#ifdef __APPLE__
+#include <OpenGL/gl3.h>
+#else
 #include "GL/glew.h"
+#endif
 #include <string>
 #include "SOIL/SOIL.h"
 
@@ -21,7 +25,12 @@ namespace Sigma {
 				this->width = width;
 				this->height = height;
 				glBindTexture(GL_TEXTURE_2D, this->id);
+#if __APPLE__
+                // GL_BGRA_EXT is not available under Core.  Use the Core functionality, GL_BGRA, instead.
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, this->width, this->height, 0, GL_BGRA, GL_UNSIGNED_BYTE, data);
+#else
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, this->width, this->height, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, data);
+#endif
 				glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 				glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 				glBindTexture(GL_TEXTURE_2D, 0);

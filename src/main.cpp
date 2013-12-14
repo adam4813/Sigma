@@ -10,14 +10,10 @@
 #include "components/GLScreenQuad.h"
 #include "SCParser.h"
 #include "systems/WebGUISystem.h"
-
-#if defined OS_Win32
-#include "os/win32/win32.h"
-#elif defined OS_SDL
-#include "os/sdl/SDLSys.h"
-#endif
+#include "OS.h"
 
 int main(int argCount, char **argValues) {
+	Sigma::OS glfwos;
 	Sigma::OpenGLSystem glsys;
 	Sigma::BulletPhysics bphys;
 	Sigma::WebGUISystem webguisys;
@@ -27,39 +23,28 @@ int main(int argCount, char **argValues) {
 	factory.register_Factory(bphys);
 	factory.register_Factory(webguisys);
 
-	IOpSys* os = nullptr;
-
-#if defined OS_Win32
-	os = new win32();
-#elif defined OS_SDL
-	os = new SDLSys();
-#endif
-
-	// Create the window
-	std::cout << "Creating graphics window." << std::endl;
-	if(os->CreateGraphicsWindow(1024,768) == 0) {
-		std::cerr << "Error creating window!" << std::endl;
-		delete os;
+	if (!glfwos.InitializeWindow(1024,768, "Sigma GLFW Test Window")) {
+		std::cerr << "Failed creating the window or context." << std::endl;
 		return -1;
 	}
 
 	// Start the openGL system
 	std::cout << "Initializing OpenGL system." << std::endl;
 	const int* version = glsys.Start();
-	glsys.SetViewportSize(os->GetWindowWidth(), os->GetWindowHeight());
+	glsys.SetViewportSize(glfwos.GetWindowWidth(), glfwos.GetWindowHeight());
 
 	if (version[0] == -1) {
 		std::cerr << "Error starting OpenGL!" << std::endl;
-		delete os;
 		return -1;
-	} else {
+	}
+	else {
 		std::cout << "OpenGL version: " << version[0] << "." << version[1] << std::endl;
 	}
 
 	bphys.Start();
 
 	webguisys.Start();
-	webguisys.SetWindowSize(os->GetWindowWidth(), os->GetWindowHeight());
+	webguisys.SetWindowSize(glfwos.GetWindowWidth(), glfwos.GetWindowHeight());
 
 	// Parse the scene file to retrieve entities
 	Sigma::parser::SCParser parser;
@@ -115,81 +100,54 @@ int main(int argCount, char **argValues) {
 	// Link the graphics view to the physics system's view mover
 	Sigma::BulletMover* mover = bphys.getViewMover();
 
-	// Create the controller
-	// Perhaps a little awkward currently, should create a generic
-	// controller class ancestor
+	//Create the controller
+	//Perhaps a little awkward currently, should create a generic
+	//controller class ancestor
 	if(glsys.GetViewMode() == "FPSCamera") {
-	    using Sigma::event::handler::FPSCamera;
-        FPSCamera* theCamera = static_cast<FPSCamera*>(glsys.GetView());
-		IOpSys::KeyboardEventSystem.Register(theCamera);
-		IOpSys::MouseEventSystem.Register(theCamera);
+		using Sigma::event::handler::FPSCamera;
+		FPSCamera* theCamera = static_cast<FPSCamera*>(glsys.GetView());
+		glfwos.RegisterKeyboardEventHandler(theCamera);
+		//glfwos.RegisterMouseEventHandler(theCamera);
 		theCamera->SetMover(mover);
 		mover->SetTransform(theCamera->Transform);
 	} else if (glsys.GetViewMode() == "GLSixDOFView") {
 		Sigma::event::handler::GLSixDOFViewController cameraController(glsys.GetView(), mover);
-		IOpSys::KeyboardEventSystem.Register(&cameraController);
+		glfwos.RegisterKeyboardEventHandler(&cameraController);
 	}
 
 	Sigma::event::handler::GUIController guicon;
 	guicon.SetGUI(webguisys.getComponent(100, Sigma::WebGUIView::getStaticComponentTypeName()));
-	IOpSys::KeyboardEventSystem.Register(&guicon);
-	IOpSys::MouseEventSystem.Register(&guicon);
+	glfwos.RegisterKeyboardEventHandler(&guicon);
+	glfwos.RegisterMouseEventHandler(&guicon);
 
 	Sigma::event::handler::GUIController guicon2;
 	guicon2.SetGUI(webguisys.getComponent(101, Sigma::WebGUIView::getStaticComponentTypeName()));
-	IOpSys::KeyboardEventSystem.Register(&guicon2);
-	IOpSys::MouseEventSystem.Register(&guicon2);
+	glfwos.RegisterKeyboardEventHandler(&guicon2);
+	glfwos.RegisterMouseEventHandler(&guicon2);
 
 	Sigma::event::handler::GUIController guicon3;
 	guicon3.SetGUI(webguisys.getComponent(102, Sigma::WebGUIView::getStaticComponentTypeName()));
-	IOpSys::KeyboardEventSystem.Register(&guicon3);
-	IOpSys::MouseEventSystem.Register(&guicon3);
+	glfwos.RegisterKeyboardEventHandler(&guicon3);
+	glfwos.RegisterMouseEventHandler(&guicon3);
+	
+	// Call now to clear the delta after startup.
+	glfwos.GetDeltaTime();
 
-	// Setup the timer
-	os->SetupTimer();
-
-	// Begin main loop
-	double delta;
-	bool isWireframe=false;
-
-	// Load a font
-	while (os->MessageLoop()) {
-
+	while (!glfwos.Closing()) {
 		// Get time in ms, store it in seconds too
-		delta = os->GetDeltaTime();
-		double deltaSec = (double)delta/1000.0f;
 
-		// Debug keys
-		if (os->KeyReleased('P', true)) { // Wireframe mode
-			if (!isWireframe) {
-				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-				isWireframe = true;
-			} else {
-				glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-				isWireframe = false;
-			}
-		}
-
-		if (os->KeyReleased('M', true)) {
-			os->ToggleFullscreen();
-			glsys.SetViewportSize(os->GetWindowWidth(), os->GetWindowHeight());
-		}
-
-		// Temporary exit key for when mouse is under control
-		if (os->KeyReleased(Sigma::event::KEY_ESCAPE, true)) {
-			break;
-		}
+		double deltaSec = glfwos.GetDeltaTime();
 
 		// Pass in delta time in seconds
 		bphys.Update(deltaSec);
 		webguisys.Update(deltaSec);
 
 		// Update the renderer and present
-		if (glsys.Update(delta)) {
-			os->Present(glsys.getRender());
+		if (glsys.Update(deltaSec)) {
+			glfwos.SwapBuffers();
 		}
+		glfwos.OSMessageLoop();
 	}
 
-	delete os;
 	return 0;
 }
