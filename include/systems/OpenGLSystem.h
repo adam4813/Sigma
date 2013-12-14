@@ -4,7 +4,9 @@
 
 #include "Property.h"
 
+#ifndef __APPLE__
 #include "GL/glew.h"
+#endif
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 
