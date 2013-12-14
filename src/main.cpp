@@ -6,7 +6,8 @@
 #include "systems/FactorySystem.h"
 #include "controllers/GLSixDOFViewController.h"
 #include "controllers/FPSCamera.h"
-#include "components/PhysicalWorldComponent.h"
+#include "controllers/PhysicalWorldController.h"
+#include "controllers/GUIController.h"
 #include "components/GLScreenQuad.h"
 #include "SCParser.h"
 #include "systems/WebGUISystem.h"
@@ -16,7 +17,7 @@ int main(int argCount, char **argValues) {
 	Sigma::OS glfwos;
 	Sigma::OpenGLSystem glsys;
 	Sigma::BulletPhysics bphys;
-	Sigma::PhysicalWorldComponent pworld(bphys);
+	Sigma::PhysicalWorldController pworld(bphys);
 	Sigma::WebGUISystem webguisys;
 
 	Sigma::FactorySystem& factory = Sigma::FactorySystem::getInstance();
@@ -131,7 +132,7 @@ int main(int argCount, char **argValues) {
 	guicon3.SetGUI(webguisys.getComponent(102, Sigma::WebGUIView::getStaticComponentTypeName()));
 	glfwos.RegisterKeyboardEventHandler(&guicon3);
 	glfwos.RegisterMouseEventHandler(&guicon3);
-	
+
 	// Call now to clear the delta after startup.
 	glfwos.GetDeltaTime();
 

@@ -2,7 +2,7 @@
 #include "components/BulletShapeMesh.h"
 #include "components/GLMesh.h"
 #include "components/BulletShapeSphere.h"
-#include "components/PhysicalWorldComponent.h"
+#include "controllers/PhysicalWorldController.h"
 
 namespace Sigma {
 	BulletPhysics::~BulletPhysics() {
@@ -82,7 +82,7 @@ namespace Sigma {
 				mesh->SetMesh(&meshFile);
 			}
 		}
-		PhysicalWorldComponent::AddObject(entityID, x, y, z, rx, ry, rz);
+		PhysicalWorldController::AddObject(entityID, x, y, z, rx, ry, rz);
 
 		mesh->InitializeRigidBody(x, y, z, rx, ry, rz);
 
@@ -130,7 +130,7 @@ namespace Sigma {
 			}
 		}
 
-		PhysicalWorldComponent::AddObject(entityID, x, y, z, rx, ry, rz);
+		PhysicalWorldController::AddObject(entityID, x, y, z, rx, ry, rz);
 
 		sphere->InitializeRigidBody(x, y, z, rx, ry, rz);
 

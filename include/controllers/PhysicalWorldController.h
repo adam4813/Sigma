@@ -11,11 +11,11 @@
 #include <map>
 
 namespace Sigma {
-    class PhysicalWorldComponent {
+    class PhysicalWorldController {
     public:
-        PhysicalWorldComponent(BulletPhysics& bphys) : mover(1), bphys(&bphys) {};
+        PhysicalWorldController(BulletPhysics& bphys) : mover(1), bphys(&bphys) {};
 
-        virtual ~PhysicalWorldComponent() {};
+        virtual ~PhysicalWorldController() {};
 
         static void AddObject(type_id id, const coordinate_type x, const coordinate_type y,
                        const coordinate_type z, const coordinate_type rx, const coordinate_type ry, const coordinate_type rz);

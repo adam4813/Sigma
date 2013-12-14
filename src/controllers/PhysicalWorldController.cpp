@@ -1,10 +1,10 @@
-#include "components/PhysicalWorldComponent.h"
+#include "controllers/PhysicalWorldController.h"
 
 namespace Sigma {
-    WorldPosition PhysicalWorldComponent::pphysical;
-    WorldOrientation PhysicalWorldComponent::ophysical;
+    WorldPosition PhysicalWorldController::pphysical;
+    WorldOrientation PhysicalWorldController::ophysical;
 
-    void PhysicalWorldComponent::AddObject(type_id id, const coordinate_type x, const coordinate_type y,
+    void PhysicalWorldController::AddObject(type_id id, const coordinate_type x, const coordinate_type y,
                    const coordinate_type z, const coordinate_type rx, const coordinate_type ry, const coordinate_type rz) {
         pphysical.PositionWrite_x(id) = x;
         pphysical.PositionWrite_y(id) = y;

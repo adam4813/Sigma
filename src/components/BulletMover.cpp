@@ -2,7 +2,7 @@
 
 #include <bullet/btBulletCollisionCommon.h>
 #include <bullet/btBulletDynamicsCommon.h>
-#include "components/PhysicalWorldComponent.h"
+#include "controllers/PhysicalWorldController.h"
 
 namespace Sigma {
 
@@ -59,7 +59,7 @@ namespace Sigma {
 		btScalar mass = 1;
 		btVector3 fallInertia(0,0,0);
 //		this->motionState =	new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(x, y, z)));
-		this->motionState =	PhysicalWorldComponent::GetMotionState(this->Sigma::IBulletShape::GetEntityID());
+		this->motionState =	PhysicalWorldController::GetMotionState(this->Sigma::IBulletShape::GetEntityID());
 		btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, motionState, shape,fallInertia);
 		this->shape->calculateLocalInertia(mass,fallInertia);
 		this->body = new btRigidBody(fallRigidBodyCI);
