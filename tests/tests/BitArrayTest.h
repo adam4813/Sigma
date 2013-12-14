@@ -149,6 +149,42 @@ namespace Sigma {
         ASSERT_FALSE((*bit_arrayA)[151]) << "~true == true !";
         ASSERT_TRUE((*bit_arrayA)[100]) << "~false == false !";
     }
+
+    TEST(BitArrayTest, BitArrayCount) {
+        auto bit_array = BitArray::Create((size_t) 573); //573 bits
+        auto count = bit_array->count();
+        ASSERT_EQ(0, count) << "Empty array count() should return 0";
+        (*bit_array)[0] = true;
+        count = bit_array->count();
+        ASSERT_EQ(1, count) << "count() should return 1";
+        (*bit_array)[1] = true;
+        count = bit_array->count();
+        ASSERT_EQ(2, count) << "count() should return 2";
+        (*bit_array)[15] = true;
+        count = bit_array->count();
+        ASSERT_EQ(3, count) << "count() should return 3";
+        (*bit_array)[16] = true;
+        count = bit_array->count();
+        ASSERT_EQ(4, count) << "count() should return 4";
+        (*bit_array)[100] = true;
+        count = bit_array->count();
+        ASSERT_EQ(5, count) << "count() should return 5";
+        (*bit_array)[300] = true;
+        count = bit_array->count();
+        ASSERT_EQ(6, count) << "count() should return 6";
+        (*bit_array)[569] = true;
+        count = bit_array->count();
+        ASSERT_EQ(7, count) << "count() should return 7";
+        (*bit_array)[570] = true;
+        count = bit_array->count();
+        ASSERT_EQ(8, count) << "count() should return 8";
+        (*bit_array)[571] = true;
+        count = bit_array->count();
+        ASSERT_EQ(9, count) << "count() should return 9";
+        (*bit_array)[572] = true;
+        count = bit_array->count();
+        ASSERT_EQ(10, count) << "count() should return 10";
+    }
 }
 
 #endif // BITARRAYTEST_H_INCLUDED

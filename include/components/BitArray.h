@@ -6,7 +6,7 @@
 #include <memory>
 #include <iostream>
 #include "components/SharedPointerMap.hpp"
-//#include "systems/WorldObjectsSystem.h"
+#include "components/AlignedVectorAllocator.hpp"
 
 #define ROUND_DOWN(x, s) ((x) & ~((s)-1)) // rounds down x to a multiple of s (i.e. ROUND_DOWN(5, 4) becomes 4)
 
@@ -261,6 +261,31 @@ namespace Sigma {
             return bitarray.data();
         }
 
+        const size_t count() const {
+            size_t sum = 0;
+            auto length = size();
+            #if defined(__GNUG__) || defined(_MSC_VER)
+                size_t j = ROUND_DOWN(size(), 64);
+                unsigned long long* start = (unsigned long long*) bitarray.data();
+                auto end = start + (j >> 6);
+                for (auto i = start; i < end; i++) {
+                    #if defined(__GNUG__)
+                    sum += __builtin_popcountll(*i);
+                    #elif defined(_MSC_VER)
+                    sum += __popcnt64(*i);
+                    #endif
+                }
+            #else
+                size_t j = 0;
+            #endif
+            for (; j < length; j++) {
+                if ((*this)[j]) {
+                    sum++;
+                }
+            }
+            return sum;
+        }
+
     private:
         // Default constructor
         BitArray() : bsize(0), def_value(0) {};
@@ -273,7 +298,7 @@ namespace Sigma {
             bitarray.assign(bitarray.size(), this->def_value);
         };
 
-        std::vector<unsigned short> bitarray;
+        std::vector<unsigned short, AlignedVectorAllocator<unsigned short>> bitarray;
         size_t bsize;
         unsigned short def_value;
     };

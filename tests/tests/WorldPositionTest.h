@@ -65,7 +65,8 @@
         std::vector<std::weak_ptr<const Sigma::coordinate_type>> stored_x;
         std::vector<std::weak_ptr<const Sigma::coordinate_type>> stored_y;
         std::vector<std::weak_ptr<const Sigma::coordinate_type>> stored_z;
-        std::default_random_engine random{(unsigned long int) std::chrono::system_clock::now().time_since_epoch().count()};
+        unsigned long int seed = (unsigned long int) std::chrono::system_clock::now().time_since_epoch().count();
+        std::default_random_engine random{seed};
         std::vector<Sigma::coordinate_type> translation_x;
         std::vector<Sigma::coordinate_type> translation_y;
         std::vector<Sigma::coordinate_type> translation_z;
@@ -81,6 +82,8 @@ namespace Sigma {
         ASSERT_FALSE(wp256.x(0).expired()) << "Failed to fetch element created";
         EXPECT_EQ((size_t) wp256.x(0).lock().get() & (size_t)0xF, 0) << "Vector is not 16-byte aligned";
         EXPECT_EQ(wp256.x(0), original.x) << "Position retrieved is different";
+        wp256.PositionWrite_y(0) = original.y;
+        wp256.PositionWrite_z(0) = original.z;
         EXPECT_NO_THROW(wp256.RemoveEntityPosition(0)) << "Could not remove element";
         EXPECT_THROW(wp256.x(0).expired(), std::out_of_range) << "Fail to remove element";
     }
@@ -156,7 +159,7 @@ namespace Sigma {
         steady_clock::time_point t1 = steady_clock::now();
         for (int i =0; i < 5000; i++) {
             bm = wp4096.InViewPositions(translation_x[i], translation_y[i], translation_z[i], FAR_DISTANCE_MAX);
-            w = wp4096.RelativeTo(translation_x[i], translation_y[i], translation_z[i], bm);
+            w = wp4096.RelativeTo(translation_x[i], translation_y[i], translation_z[i]);
         }
         steady_clock::time_point t2 = steady_clock::now();
         duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
@@ -165,6 +168,11 @@ namespace Sigma {
                 if ((*bm)[i]) {
                     EXPECT_EQ((w->x.get())[i],(float)((*wp4096.All_x())[i] - translation_x[4999])) << "Translation error";
                     EXPECT_GT(FAR_DISTANCE_MAX, fabs((w->x.get())[i])) << "View distance error at " << i;
+                }
+                else {
+                    EXPECT_TRUE(FAR_DISTANCE_MAX < fabs((*wp4096.All_x())[i] - translation_x[4999])\
+                              || FAR_DISTANCE_MAX < fabs((*wp4096.All_y())[i] - translation_y[4999])\
+                              || FAR_DISTANCE_MAX < fabs((*wp4096.All_z())[i] - translation_z[4999])) << "View distance error at " << i;
                 }
         }
         std::cout << w->length * 5000 / time_span.count() << " entities/s." << std::endl;

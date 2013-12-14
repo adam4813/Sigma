@@ -81,9 +81,9 @@ struct AlignedPointerDelete {
 
     template<class T>
     inline T * AlignedMalloc(size_t s) {
-#ifdef GCC
+#if defined(__GNUG__)
         T* p = static_cast<T*>(_mm_malloc(s, 16));
-#elif defined VISUAL_STUDIO
+#elif defined(_MSC_VER)
         T* p = static_cast<T*>(_aligned_malloc(s, 16));
 #else   // TODO : generic aligned malloc
         T* p = static_cast<T*>(malloc(s));
@@ -94,12 +94,9 @@ struct AlignedPointerDelete {
 template<class Operation>
 inline static void transform_n_sse2(size_t length, Operation op)
 {
-  size_t n;
-  size_t end = ROUND_DOWN(length, op.BLOCK_SIZE);
-  op.initialize();
+  size_t n = ROUND_DOWN(length, op.BLOCK_SIZE);
   // execute op on array elements block-wise
-  for(n = 0; n < end; n += op.BLOCK_SIZE)
-    op.vector_op_sse2(n);
+  op.vector_op_sse2(n);
   // execute the remaining array elements one by one
   for(; n < length; n++) {
         op.scalar_op(n);
@@ -109,16 +106,12 @@ inline static void transform_n_sse2(size_t length, Operation op)
 template<class Operation>
 inline static void transform_n_sse2(size_t length, Sigma::BitArray& bitmap, Operation op)
 {
-  size_t n;
-  size_t end = ROUND_DOWN(length, op.BLOCK_SIZE);
-  op.initialize();
+  size_t n = ROUND_DOWN(length, op.BLOCK_SIZE);
   // execute op on array elements block-wise
-  auto i = bitmap.iterator_word();
-  for(n = i++; n < end; n = i++) {
+//  auto i = bitmap.iterator_word();
     op.vector_op_sse2(n);
-  }
   // execute the remaining array elements one by one
-  for(n = end; n < length; n++) {
+  for(; n < length; n++) {
         op.scalar_op(n);
   }
 }

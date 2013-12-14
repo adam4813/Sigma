@@ -16,7 +16,6 @@
 #define DABS_MASK 0x7FFFFFFFFFFFFFFF
 
 #include "components/SharedPointerMap.hpp"
-#include "components/AlignedVectorAllocator.hpp"
 #include "components/BitArray.h"
 #include <memory>
 #include <unordered_map>
@@ -142,34 +141,28 @@ namespace Sigma {
         *
         *
         * \param entity_id type_id id of the entity
-        * \return SharedPointerMap<type_id, coordinate_type>& a reference on the
-coordinate
+        * \return SharedPointerMap<type_id, coordinate_type>& a reference on the coordinate
         *
         */
-        SharedPointerMap<type_id, coordinate_type>& PositionWrite_x(type_id
-entity_id);
+        SharedPointerMap<type_id, coordinate_type>& PositionWrite_x(type_id entity_id);
 
         /** \brief Set a y coordinate by reference
         *
         *
         * \param entity_id type_id id of the entity
-        * \return SharedPointerMap<type_id, coordinate_type>& a reference on the
-coordinate
+        * \return SharedPointerMap<type_id, coordinate_type>& a reference on the coordinate
         *
         */
-        SharedPointerMap<type_id, coordinate_type>& PositionWrite_y(type_id
-entity_id);
+        SharedPointerMap<type_id, coordinate_type>& PositionWrite_y(type_id entity_id);
 
         /** \brief Set a z coordinate by reference
         *
         *
         * \param entity_id type_id id of the entity
-        * \return SharedPointerMap<type_id, coordinate_type>& a reference on the
-coordinate
+        * \return SharedPointerMap<type_id, coordinate_type>& a reference on the coordinate
         *
         */
-        SharedPointerMap<type_id, coordinate_type>& PositionWrite_z(type_id
-entity_id);
+        SharedPointerMap<type_id, coordinate_type>& PositionWrite_z(type_id entity_id);
 
         /** \brief Remove a position
         *
@@ -202,20 +195,16 @@ entity_id);
 
         /** \brief Get an iterator on the id
          *
-         *  The iterator gives the id in the same order as the internal position
-vector
+         *  The iterator gives the id in the same order as the internal position vector
          *
          * \return std::vector<type_id>::const_iterator the iterator
          *
          */
-        std::vector<type_id>::const_iterator IteratorEntityId() const noexcept {
-return id_vector.cbegin(); }
+        std::vector<type_id>::const_iterator IteratorEntityId() const noexcept { return id_vector.cbegin(); }
 
-        /** \brief Get an array of all positions relative to (x, y, z) converted
-to float
+        /** \brief Get an array of all positions relative to (x, y, z) converted to float
          *
-         * This performs a translation of (-x, -y, -z) and a conversion to
-float.
+         * This performs a translation of (-x, -y, -z) and a conversion to float.
          *
          * \param x const coordinate_type x coordinate of the center
          * \param y const coordinate_type y coordinate of the center
@@ -223,24 +212,7 @@ float.
          * \return position_array a struct containing 3 pointers to arrays
          *
          */
-        std::unique_ptr<position_array> RelativeTo(const coordinate_type x,
-const coordinate_type y, const coordinate_type z);
-
-        /** \brief Get the translated positions using bitmaps
-         *
-         * The positions are converted in float.
-         *
-         * \param x const coordinate_type x coordinate of the center
-         * \param y const coordinate_type y coordinate of the center
-         * \param z const coordinate_type z coordinate of the center
-         * \param input the bitmap that will be used as input
-         * \return the positions
-         *
-         */
-        std::unique_ptr<position_array> RelativeTo(const coordinate_type x,
-                                   const coordinate_type y,
-                                   const coordinate_type z,
-                                   const std::shared_ptr<BitArray>& bitmap);
+        std::unique_ptr<position_array> RelativeTo(const coordinate_type x, const coordinate_type y, const coordinate_type z);
 
         /** \brief Get the bitarray of the positions that are in view range
          *

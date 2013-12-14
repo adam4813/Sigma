@@ -87,7 +87,6 @@ namespace Sigma {
                 *addr_z = std::move(positions_z.back());
                 position_guard_z.SetElement(last_id, addr_z);
                 id_vector[index] = std::move(last_id);
-                std::cout << "top" << std::endl;
         }
         // remove last element
         positions_x.pop_back();
@@ -98,16 +97,11 @@ namespace Sigma {
     }
 
     std::unique_ptr<position_array> WorldPosition::RelativeTo(const coordinate_type x, const coordinate_type y,
-                                              const coordinate_type z, const std::shared_ptr<BitArray>& bitmap) {
-        auto xa = translate.RelativeTo(x, positions_x, *bitmap);
-        auto ya = translate.RelativeTo(y, positions_y, *bitmap);
-        auto za = translate.RelativeTo(z, positions_z, *bitmap);
+                                              const coordinate_type z) {
+        auto xa = translate.RelativeTo(x, positions_x);
+        auto ya = translate.RelativeTo(y, positions_y);
+        auto za = translate.RelativeTo(z, positions_z);
         return std::unique_ptr<position_array>(new position_array(std::move(xa), std::move(ya), std::move(za), positions_x.size()));
-    }
-
-    std::unique_ptr<position_array> WorldPosition::RelativeTo(const coordinate_type x, const coordinate_type y, const coordinate_type z) {
-        auto bitmap = BitArray::Create(positions_x.size(), true);
-        return RelativeTo(x, y, z, bitmap);
     }
 
     std::shared_ptr<BitArray> WorldPosition::InViewPositions(const coordinate_type x,
