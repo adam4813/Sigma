@@ -43,12 +43,12 @@ install:
     #- cd /home/travis/build/croxis/Sigma
     - cd $BUILD_PATH
     # Temporary to manually build bullet
-    - sudo apt-get -y install automake libtool cmake freeglut3-dev subversion
-    - svn checkout http://bullet.googlecode.com/svn/trunk/ bullet-read-only
-    - cd bullet-read-only
-    - cmake . -G "Unix Makefiles" -DBUILD_SHARED_LIBS=ON
-    - make -j10 && sudo make install
-    - cd ..
+    - sudo apt-get -y install automake libtool cmake freeglut3-dev subversion libbullet-dev
+    #- svn checkout http://bullet.googlecode.com/svn/trunk/ bullet-read-only
+    #- cd bullet-read-only
+    #- cmake . -G "Unix Makefiles" -DBUILD_SHARED_LIBS=ON
+    #- make -j10 && sudo make install
+    #- cd ..
 script:
     - ls
     - ls ..
@@ -62,4 +62,4 @@ notifications:
     # I can also set up Glitch to output build results as well if we don't want the travis bot join/part spam
     irc:
         - "chat.freenode.net#sigma-gcf"
-        #- "chat.freenode.net#project-trillek"
+        - "chat.freenode.net#project-trillek"
