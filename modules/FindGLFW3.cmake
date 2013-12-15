@@ -5,7 +5,7 @@
 # GLFW3_FOUND
 # GLFW3_INCLUDE_PATH
 # GLFW3_LIBRARY
-# 
+#
 
 IF(WIN32)
     FIND_PATH( GLFW3_INCLUDE_PATH GLFW/glfw3.h
@@ -32,9 +32,8 @@ ELSE(WIN32)
 		INCLUDE_DIRECTORIES( "${GLFW3_INCLUDE_PATH}" )
 	ENDIF(APPLE)
 
-	# Prefer the static library.
 	FIND_LIBRARY( GLFW3_LIBRARY
-        NAMES libGLFW.a GLFW libGLFW3.a GLFW3 libglfw.so libglfw.so.3 libglfw.so.3.0 glfw3
+        NAMES libglfw.so libglfw.so.3 libglfw.so.3.0 glfw3
 		PATHS
 		/usr/lib64
 		/usr/lib
