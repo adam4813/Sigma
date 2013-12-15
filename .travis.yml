@@ -8,14 +8,7 @@ before_install:
     - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
     # clang++-3.2 and gcc 4.8
     - sudo add-apt-repository --yes ppa:h-rayflood/llvm
-    # libsdl2
-    #- sudo add-apt-repository --yes ppa:zoogie/sdl2-snapshots
-    # Playdeb has a repo that provides bullet. However their site has issues today and I was unable to use it
-    # This would provide bullet without needing to compile by hand
-    #- wget -q -O - http://archive.getdeb.net/getdeb-archive.key | sudo apt-key add -
-    #- sudo sh -c 'echo "deb http://archive.getdeb.net/ubuntu precise-getdeb games" >> /etc/apt/sources.list.d/getdeb.list'
-    #- wget http://archive.getdeb.net/install_deb/getdeb-repository_0.1-1~getdeb1_all.deb
-    #- sudo dpkg -i getdeb-repository_0.1-1~getdeb1_all.deb
+    # Playdeb has bullet in their repo
     - wget http://archive.getdeb.net/install_deb/playdeb_0.3-1~getdeb1_all.deb
     - sudo dpkg -i playdeb_0.3-1~getdeb1_all.deb
     - wget http://www.awesomium.com/downloads/awesomium_1_7_2_sdk_linux64.tar.gz
@@ -24,6 +17,7 @@ before_install:
     - sudo make all
     - cd ..
     - sudo apt-get -qq update
+    # No ppa for glfw3 at this time. Compiling by hand!
     - sudo apt-get install xorg-dev libglu1-mesa-dev
     - git clone https://github.com/glfw/glfw.git
     - cd glfw
@@ -41,22 +35,13 @@ install:
     - sudo cmake CMakeLists.txt
     - sudo make
     - sudo cp *.a /usr/lib
-    # Hardcoded for now until we get to a better system
-    #- cd /home/travis/build/croxis/Sigma
     - cd $BUILD_PATH
-    # Temporary to manually build bullet
-    - sudo apt-get -y install automake libtool cmake freeglut3-dev subversion libbullet-dev
-    #- svn checkout http://bullet.googlecode.com/svn/trunk/ bullet-read-only
-    #- cd bullet-read-only
-    #- cmake . -G "Unix Makefiles" -DBUILD_SHARED_LIBS=ON
-    #- make -j10 && sudo make install
-    #- cd ..
+    - sudo apt-get -y install automake libtool cmake freeglut3-dev libbullet-dev
 script:
     - ls
     - ls ..
     - cp test.sc.complex test.sc
     - "sudo ln -s /usr/include/SOIL/SOIL.h /usr/include/SOIL.h"
-    #- make rebuild
     - make clean
     - make
 notifications:
