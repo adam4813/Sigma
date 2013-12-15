@@ -25,7 +25,8 @@ before_install:
     - cd ..
     - git clone https://github.com/glfw/glfw.git
     - cd glfw
-    - cmake .
+    - cmake -DCMAKE_INSTALL_PREFIX=/usr .
+    - make install
     - cd ..
 install:
     - sudo apt-get -qq install libstdc++-4.8-dev clang-3.3
