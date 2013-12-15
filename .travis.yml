@@ -26,7 +26,7 @@ before_install:
     - git clone https://github.com/glfw/glfw.git
     - cd glfw
     - cmake -DCMAKE_INSTALL_PREFIX=/usr .
-    - make install
+    - sudo make install
     - cd ..
 install:
     - sudo apt-get -qq install libstdc++-4.8-dev clang-3.3
@@ -62,4 +62,4 @@ notifications:
     # I can also set up Glitch to output build results as well if we don't want the travis bot join/part spam
     irc:
         - "chat.freenode.net#sigma-gcf"
-        - "chat.freenode.net#project-trillek"
+        #- "chat.freenode.net#project-trillek"
