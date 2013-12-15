@@ -9,7 +9,7 @@ before_install:
     # clang++-3.2 and gcc 4.8
     - sudo add-apt-repository --yes ppa:h-rayflood/llvm
     # libsdl2
-    - sudo add-apt-repository --yes ppa:zoogie/sdl2-snapshots
+    #- sudo add-apt-repository --yes ppa:zoogie/sdl2-snapshots
     # Playdeb has a repo that provides bullet. However their site has issues today and I was unable to use it
     # This would provide bullet without needing to compile by hand
     - wget -q -O - http://archive.getdeb.net/getdeb-archive.key | sudo apt-key add -
@@ -17,10 +17,15 @@ before_install:
     - wget http://archive.getdeb.net/install_deb/getdeb-repository_0.1-1~getdeb1_all.deb
     - sudo dpkg -i getdeb-repository_0.1-1~getdeb1_all.deb
     - sudo apt-get -qq update
+    - sudo apt-get install xorg-dev libglu1-mesa-dev
     - wget http://www.awesomium.com/downloads/awesomium_1_7_2_sdk_linux64.tar.gz
     - tar -zxvf awesomium_1_7_2_sdk_linux64.tar.gz
     - cd awesomium_v1.7.2_sdk_linux64
     - sudo make all
+    - cd ..
+    - git clone https://github.com/glfw/glfw.git
+    - cd glfw
+    - cmake .
     - cd ..
 install:
     - sudo apt-get -qq install libstdc++-4.8-dev clang-3.3
@@ -44,6 +49,8 @@ install:
     - make -j10 && sudo make install
     - cd ..
 script:
+    - ls
+    - ls ..
     - cp test.sc.complex test.sc
     - "sudo ln -s /usr/include/SOIL/SOIL.h /usr/include/SOIL.h"
     #- make rebuild
