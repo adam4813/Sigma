@@ -44,13 +44,12 @@ ELSE(WIN32)
 		/opt/local/lib
 		${GLFW_ROOT_DIR}/lib
 		DOC "The GLFW library")
+		# Fix linker complaining about undefined references
+		SET(GLFW3_LIBRARY ${GLFW3_LIBRARY} Xxf86vm)
 ENDIF(WIN32)
 
 INCLUDE(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(GLFW3 DEFAULT_MESSAGE GLFW3_LIBRARY GLFW3_INCLUDE_PATH)
-
-# Fix linker complaining about undefined references
-SET(GLFW3_LIBRARY ${GLFW3_LIBRARY} Xxf86vm)
 
 #SET(GLFW3_FOUND "NO")
 #IF(GLFW3_INCLUDE_PATH AND GLFW3_LIBRARY)
