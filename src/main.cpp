@@ -107,7 +107,7 @@ int main(int argCount, char **argValues) {
 		using Sigma::event::handler::FPSCamera;
 		FPSCamera* theCamera = static_cast<FPSCamera*>(glsys.GetView());
 		glfwos.RegisterKeyboardEventHandler(theCamera);
-		//glfwos.RegisterMouseEventHandler(theCamera);
+		glfwos.RegisterMouseEventHandler(theCamera);
 		theCamera->SetMover(mover);
 		mover->SetTransform(theCamera->Transform);
 	} else if (glsys.GetViewMode() == "GLSixDOFView") {

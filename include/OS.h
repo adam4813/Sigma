@@ -13,7 +13,7 @@
 namespace Sigma {
 	class OS {
 	public:
-		OS() { event::KEY_ESCAPE = GLFW_KEY_ESCAPE; }
+		OS() : mouseLock(false) { event::KEY_ESCAPE = GLFW_KEY_ESCAPE; }
 		~OS() { }
 
 		/**
@@ -112,6 +112,8 @@ namespace Sigma {
 		void RegisterKeyboardEventHandler(event::IKeyboardEventHandler* handler);
 		void RegisterMouseEventHandler(event::IMouseEventHandler* handler);
 
+		void ToggleMouseLock(bool hideCursor);
+
 	private:
 		/**
 		 * \brief Updates the internal size variables from the windowResized callback.
@@ -163,7 +165,7 @@ namespace Sigma {
 		int width, height; // Current window's client width and height.
 		double oldMouseX, oldMouseY;
 		double lastTime; // The time at the last call to GetDeltaTime().
-
+		bool mouseLock; // If mouse lock is enabled causing the cursor to snap to mid-window each movement event.
 		event::KeyboardInputSystem KeyboardEventSystem;
 		event::MouseInputSystem MouseEventSystem;
 	};

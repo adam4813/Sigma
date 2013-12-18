@@ -53,6 +53,8 @@ namespace Sigma {
 		glfwSetCharCallback(this->window, &OS::characterEvent);
 		glfwSetMouseButtonCallback(this->window, &OS::mouseButtonEvent);
 
+		glfwGetCursorPos(this->window, &this->oldMouseX, &this->oldMouseY);
+
 		return true;
 	}
 
@@ -158,33 +160,55 @@ namespace Sigma {
 	}
 
 	void OS::DispatchMouseMoveEvent(const double x, const double y) {
-		this->MouseEventSystem.MouseMove(static_cast<float>(x / width), static_cast<float>(y / height), static_cast<float>((x - this->oldMouseX) / width), static_cast<float>((y - this->oldMouseY) / height));
+		// If we are in mouse lock we will snap the mouse to the middle of the screen.
+		if (this->mouseLock) {
+			this->oldMouseX = this->width / 2;
+			this->oldMouseY = this->height / 2;
+			glfwSetCursorPos(this->window, this->oldMouseX, this->oldMouseY);
+		}
+		else {
 		this->oldMouseX = x;
 		this->oldMouseY = y;
+	}
+		this->MouseEventSystem.MouseMove(static_cast<float>(x / this->width), static_cast<float>(y / this->height), static_cast<float>((x - this->oldMouseX) / this->width), static_cast<float>((y - this->oldMouseY) / this->height));
 	}
 
 	void OS::DispatchMouseButtonEvent(const int button, const int action, const int mods) {
 		if (action == GLFW_PRESS) {
 			if (button == GLFW_MOUSE_BUTTON_LEFT) {
-				this->MouseEventSystem.MouseDown(Sigma::event::LEFT, static_cast<float>(oldMouseX / width), static_cast<float>(oldMouseY / height));
+				this->MouseEventSystem.MouseDown(event::LEFT, static_cast<float>(oldMouseX / width), static_cast<float>(oldMouseY / height));
 			}
 			else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
-				this->MouseEventSystem.MouseDown(Sigma::event::RIGHT, static_cast<float>(oldMouseX / width), static_cast<float>(oldMouseY / height));
+				this->MouseEventSystem.MouseDown(event::RIGHT, static_cast<float>(oldMouseX / width), static_cast<float>(oldMouseY / height));
 			}
 			else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
-				this->MouseEventSystem.MouseDown(Sigma::event::MIDDLE, static_cast<float>(oldMouseX / width), static_cast<float>(oldMouseY / height));
+				this->MouseEventSystem.MouseDown(event::MIDDLE, static_cast<float>(oldMouseX / width), static_cast<float>(oldMouseY / height));
 			}
 		}
 		else if (action == GLFW_RELEASE) {
 			if (button == GLFW_MOUSE_BUTTON_LEFT) {
-				this->MouseEventSystem.MouseUp(Sigma::event::LEFT, static_cast<float>(oldMouseX / width), static_cast<float>(oldMouseY / height));
+				this->MouseEventSystem.MouseUp(event::LEFT, static_cast<float>(oldMouseX / width), static_cast<float>(oldMouseY / height));
 			}
 			else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
-				this->MouseEventSystem.MouseUp(Sigma::event::RIGHT, static_cast<float>(oldMouseX / width), static_cast<float>(oldMouseY / height));
+				this->MouseEventSystem.MouseUp(event::RIGHT, static_cast<float>(oldMouseX / width), static_cast<float>(oldMouseY / height));
 			}
 			else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
-				this->MouseEventSystem.MouseUp(Sigma::event::MIDDLE, static_cast<float>(oldMouseX / width), static_cast<float>(oldMouseY / height));
+				this->MouseEventSystem.MouseUp(event::MIDDLE, static_cast<float>(oldMouseX / width), static_cast<float>(oldMouseY / height));
 			}
 		}
 	}
+
+	void OS::ToggleMouseLock(bool hideCursor) {
+		this->mouseLock = !this->mouseLock;
+		if (this->mouseLock) {
+			glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			if (hideCursor) {
+				glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+			}
+		}
+		else {
+			glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		}
+	}
+
 }
