@@ -167,9 +167,9 @@ namespace Sigma {
 			glfwSetCursorPos(this->window, this->oldMouseX, this->oldMouseY);
 		}
 		else {
-		this->oldMouseX = x;
-		this->oldMouseY = y;
-	}
+			this->oldMouseX = x;
+			this->oldMouseY = y;
+		}
 		this->MouseEventSystem.MouseMove(static_cast<float>(x / this->width), static_cast<float>(y / this->height), static_cast<float>((x - this->oldMouseX) / this->width), static_cast<float>((y - this->oldMouseY) / this->height));
 	}
 
@@ -198,17 +198,29 @@ namespace Sigma {
 		}
 	}
 
-	void OS::ToggleMouseLock(bool hideCursor) {
+	void OS::ToggleMouseLock() {
 		this->mouseLock = !this->mouseLock;
 		if (this->mouseLock) {
 			glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-			if (hideCursor) {
-				glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-			}
 		}
 		else {
 			glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		}
+	}
+
+	bool OS::CheckKeyState(event::KEY_STATE state, const int key) {
+		if (state == event::KS_DOWN) {
+			if (glfwGetKey(this->window, key) == GLFW_PRESS) {
+				return true;
+			}
+		}
+		else {
+			if (glfwGetKey(this->window, key) == GLFW_RELEASE) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 }

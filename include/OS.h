@@ -112,7 +112,9 @@ namespace Sigma {
 		void RegisterKeyboardEventHandler(event::IKeyboardEventHandler* handler);
 		void RegisterMouseEventHandler(event::IMouseEventHandler* handler);
 
-		void ToggleMouseLock(bool hideCursor);
+		void ToggleMouseLock();
+
+		bool CheckKeyState(event::KEY_STATE state, const int key);
 
 	private:
 		/**
