@@ -1,7 +1,7 @@
 #ifndef SIMD_HPP_INCLUDED
 #define SIMD_HPP_INCLUDED
 
-#include "components/BitArray.h"
+#include "BitArray.hpp"
 
 // include for cpuid intrinsic
 #if defined(__GNUG__)
@@ -104,7 +104,7 @@ inline static void transform_n_sse2(size_t length, Operation op)
 }
 
 template<class Operation>
-inline static void transform_n_sse2(size_t length, Sigma::BitArray& bitmap, Operation op)
+inline static void transform_n_sse2(size_t length, Sigma::BitArray<unsigned short>& bitmap, Operation op)
 {
   size_t n = ROUND_DOWN(length, op.BLOCK_SIZE);
   // execute op on array elements block-wise
@@ -125,7 +125,7 @@ inline static void transform_n_scalar(size_t length, Operation op)
 }
 
 template<class Operation>
-inline static void transform_n_scalar(size_t length, const Sigma::BitArray& bitmap, Operation op)
+inline static void transform_n_scalar(size_t length, const Sigma::BitArray<unsigned short>& bitmap, Operation op)
 {
   size_t n;
   // execute the array elements one by one

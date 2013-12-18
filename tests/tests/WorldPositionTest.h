@@ -2,7 +2,7 @@
 #define WORLDPOSITIONTEST_H_INCLUDED
 
 #include "components/WorldPosition.h"
-#include "components/BitArray.h"
+#include "BitArray.hpp"
 #include <stdexcept>
 #include <random>
 #include <chrono>
@@ -51,7 +51,7 @@
 
         void PopulateBitmap(const size_t vec_size, const size_t bitarray_size) {
             for (auto i = 0; i < vec_size; i++) {
-                bitmaps.push_back(Sigma::BitArray::Create(bitarray_size));
+                bitmaps.push_back(Sigma::BitArray<unsigned short>::Create(bitarray_size));
             }
         }
 
@@ -70,7 +70,7 @@
         std::vector<Sigma::coordinate_type> translation_x;
         std::vector<Sigma::coordinate_type> translation_y;
         std::vector<Sigma::coordinate_type> translation_z;
-        std::vector<std::shared_ptr<Sigma::BitArray>> bitmaps;
+        std::vector<std::shared_ptr<Sigma::BitArray<unsigned short>>> bitmaps;
     };
 
 using Sigma::WorldPosition;
@@ -154,7 +154,7 @@ namespace Sigma {
         FillRandom(translation_y, 5000);
         FillRandom(translation_z, 5000);
         std::unique_ptr<position_array> w;
-        auto bm = BitArray::Create((size_t) 5000);
+        auto bm = BitArray<unsigned short>::Create((size_t) 5000);
         using namespace std::chrono;
         steady_clock::time_point t1 = steady_clock::now();
         for (int i =0; i < 5000; i++) {

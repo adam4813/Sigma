@@ -5,7 +5,7 @@
 #include "components/WorldOrientation.h"
 #include "components/SigmaMotionState.h"
 #include "components/SharedPointerMap.hpp"
-#include "components/BitArray.h"
+#include "BitArray.hpp"
 #include "components/BulletMover.h"
 #include "systems/BulletPhysics.h"
 #include <map>
@@ -23,7 +23,7 @@ namespace Sigma {
         // TODO : move to UserViewSystem
         void AddViewer(type_id id, coordinate_type view_limit) {
             viewDistanceMap.insert({{id, view_limit}});
-            viewBitsetMap.insert({{id, BitArray::Create()}});
+            viewBitsetMap.insert({{id, BitArray<unsigned short>::Create()}});
             AddObject(id, 0 , 1.5, 0, 0, 0, 0);
             this->bphys->initBulletMover(mover, 0, 1.5, 0, 0, 0, 0);
         };
@@ -53,7 +53,7 @@ namespace Sigma {
 
 
         // TODO : move to UserViewSystem
-        std::map<type_id, std::shared_ptr<BitArray>> viewBitsetMap;
+        std::map<type_id, std::shared_ptr<BitArray<unsigned short>>> viewBitsetMap;
         std::map<type_id, coordinate_type> viewDistanceMap;
     };
 }

@@ -16,7 +16,7 @@
 #define DABS_MASK 0x7FFFFFFFFFFFFFFF
 
 #include "components/SharedPointerMap.hpp"
-#include "components/BitArray.h"
+#include "BitArray.hpp"
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -223,7 +223,7 @@ namespace Sigma {
          * \return a bitarray of positions in the view range specified
          *
          */
-        std::shared_ptr<BitArray> InViewPositions(const coordinate_type x,
+        std::shared_ptr<BitArray<unsigned short>> InViewPositions(const coordinate_type x,
                                                   const coordinate_type y,
                                                   const coordinate_type z,
                                                   const coordinate_type distance) const;
@@ -281,7 +281,7 @@ namespace Sigma {
         Translate translate;
 
         // the bitset for updated positions
-        std::shared_ptr<BitArray> updated = BitArray::Create();
+        std::shared_ptr<BitArray<unsigned short>> updated = BitArray<unsigned short>::Create();
     };
 }
 

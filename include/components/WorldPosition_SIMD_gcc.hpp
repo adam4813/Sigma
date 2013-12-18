@@ -18,7 +18,7 @@ namespace Sigma {
         enum {BLOCK_SIZE = 8};
 
         build_bitmap_distance_view_kernel(const coordinate_type aa, const coordinate_type * const xx,
-                                        const coordinate_type distance_view, BitArray& bitmap) :
+                                        const coordinate_type distance_view, BitArray<unsigned short>& bitmap) :
             a(aa), x(xx), distance(distance_view), bitmap(bitmap) {}
 
         inline void scalar_op (const size_t i) const {
@@ -84,7 +84,7 @@ namespace Sigma {
         const coordinate_type a;
         const coordinate_type * const x;
         const coordinate_type distance;
-        BitArray& bitmap;
+        BitArray<unsigned short>& bitmap;
         const unsigned short* bm = bitmap.data();
     };
 
@@ -181,7 +181,7 @@ namespace Sigma {
             return (this->*functor)(x, v);
         }
 
-        void InViewPositions(const coordinate_type x, const aligned_vector_type& v, const coordinate_type distance, BitArray& bitmap) const {
+        void InViewPositions(const coordinate_type x, const aligned_vector_type& v, const coordinate_type distance, BitArray<unsigned short>& bitmap) const {
             return (this->*functor_with_distance_view)(x, v, distance, bitmap);
         }
 
@@ -202,7 +202,7 @@ namespace Sigma {
         void InViewPositions_sse2(const coordinate_type x,
                                                               const aligned_vector_type& v,
                                                               const coordinate_type distance,
-                                                              BitArray& bitmap) const {
+                                                              BitArray<unsigned short>& bitmap) const {
             size_t length = v.size();
             transform_n_sse2(length, build_bitmap_distance_view_kernel(-x, v.data(), distance, bitmap));
         };
@@ -217,14 +217,14 @@ namespace Sigma {
 
         void InViewPositions_default(const coordinate_type x, const aligned_vector_type& v,
                                                                      const coordinate_type distance,
-                                                                     BitArray& bitmap) const {
+                                                                     BitArray<unsigned short>& bitmap) const {
             size_t length = v.size();
             transform_n_scalar(length, build_bitmap_distance_view_kernel(-x, v.data(), distance, bitmap));
         };
 
     private:
         coordinate_array (Translate::*functor)(const coordinate_type, const aligned_vector_type&);
-        void (Translate::*functor_with_distance_view)(const coordinate_type, const aligned_vector_type&, const coordinate_type, BitArray&) const;
+        void (Translate::*functor_with_distance_view)(const coordinate_type, const aligned_vector_type&, const coordinate_type, BitArray<unsigned short>&) const;
         // A pool of allocated array
         ArrayPool<float> arraypool;
     };

@@ -104,11 +104,11 @@ namespace Sigma {
         return std::unique_ptr<position_array>(new position_array(std::move(xa), std::move(ya), std::move(za), positions_x.size()));
     }
 
-    std::shared_ptr<BitArray> WorldPosition::InViewPositions(const coordinate_type x,
+    std::shared_ptr<BitArray<unsigned short>> WorldPosition::InViewPositions(const coordinate_type x,
                                                              const coordinate_type y,
                                                              const coordinate_type z,
                                                              const coordinate_type distance) const {
-        auto bitmap = BitArray::Create(positions_x.size(), true);
+        auto bitmap = BitArray<unsigned short>::Create(positions_x.size(), true);
         translate.InViewPositions(x, positions_x, distance, *bitmap);
         translate.InViewPositions(y, positions_y, distance, *bitmap);
         translate.InViewPositions(z, positions_z, distance, *bitmap);
