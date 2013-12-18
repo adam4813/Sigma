@@ -87,7 +87,7 @@ namespace Sigma {
 		 * \param[in] unsigned int uchar The unicode character key code.
 		 * \return void
 		 */
-		static void charcterEvent(GLFWwindow* window, unsigned int uchar);
+		static void characterEvent(GLFWwindow* window, unsigned int uchar);
 
 		/**
 		 * \brief Callback for mouse move events.

@@ -50,7 +50,7 @@ namespace Sigma {
 		glfwSetWindowSizeCallback(this->window, &OS::windowResized);
 		glfwSetKeyCallback(this->window, &OS::keyboardEvent);
 		glfwSetCursorPosCallback(this->window, &OS::mouseMoveEvent);
-		glfwSetCharCallback(this->window, &OS::charcterEvent);
+		glfwSetCharCallback(this->window, &OS::characterEvent);
 		glfwSetMouseButtonCallback(this->window, &OS::mouseButtonEvent);
 
 		return true;
@@ -101,7 +101,7 @@ namespace Sigma {
 		}
 	}
 
-	void OS::charcterEvent(GLFWwindow* window, unsigned int uchar) {
+	void OS::characterEvent(GLFWwindow* window, unsigned int uchar) {
 		// Get the user pointer and cast it.
 		OS* os = static_cast<OS*>(glfwGetWindowUserPointer(window));
 
