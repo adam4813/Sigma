@@ -8,6 +8,21 @@
 
 namespace Sigma {
 	namespace parser {
+    /**
+     * Change locals to "C" for numbers inside the code block were is created as uses RAII
+     */
+    struct SetLocals {
+      SetLocals() {
+      
+        setlocale(LC_ALL|~LC_NUMERIC, "");
+        setlocale(LC_NUMERIC, "C"); // We must parse numbers in a consistent way
+      }
+
+      ~SetLocals() {
+        setlocale(LC_ALL, ""); // Restores system local
+      }
+    };
+
 		bool SCParser::Parse(const std::string& fname) {	
       this->fname = fname;
 			std::ifstream in(this->fname, std::ios::in);
@@ -18,9 +33,8 @@ namespace Sigma {
 				return false;
 			}
 
-      setlocale(LC_ALL|~LC_NUMERIC, "");
-      setlocale(LC_NUMERIC, "C"); // We must parse numbers in a consistent way
-
+      auto locals = SetLocals();
+  
       std::string line;
 			Sigma::parser::Entity* currentEntity = nullptr;
 
@@ -94,7 +108,6 @@ namespace Sigma {
 				delete currentEntity; // delete the heap original
 			}
 
-      setlocale(LC_ALL, "");
 			return true; // Successfully parsed a file. It might have been empty though.
 		}
 
