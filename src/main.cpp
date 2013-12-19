@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "systems/OpenGLSystem.h"
+#include "systems/OpenALSystem.h"
 #include "systems/BulletPhysics.h"
 #include "systems/FactorySystem.h"
 #include "controllers/GLSixDOFViewController.h"
@@ -15,6 +16,7 @@
 int main(int argCount, char **argValues) {
 	Sigma::OS glfwos;
 	Sigma::OpenGLSystem glsys;
+	Sigma::OpenALSystem alsys;
 	Sigma::BulletPhysics bphys;
 	Sigma::WebGUISystem webguisys;
 
@@ -45,6 +47,9 @@ int main(int argCount, char **argValues) {
 
 	webguisys.Start();
 	webguisys.SetWindowSize(glfwos.GetWindowWidth(), glfwos.GetWindowHeight());
+
+	std::cout << "Initializing OpenAL system." << std::endl;
+	alsys.Start();
 
 	// Parse the scene file to retrieve entities
 	Sigma::parser::SCParser parser;
@@ -132,6 +137,8 @@ int main(int argCount, char **argValues) {
 	
 	// Call now to clear the delta after startup.
 	glfwos.GetDeltaTime();
+
+	alsys.test(); // try sound
 
 	while (!glfwos.Closing()) {
 		// Get time in ms, store it in seconds too
