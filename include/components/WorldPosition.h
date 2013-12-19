@@ -15,7 +15,7 @@
 #define FABS_MASK 0x7FFFFFFF
 #define DABS_MASK 0x7FFFFFFFFFFFFFFF
 
-#include "components/SharedPointerMap.hpp"
+#include "SharedPointerMap.hpp"
 #include "BitArray.hpp"
 #include <memory>
 #include <unordered_map>

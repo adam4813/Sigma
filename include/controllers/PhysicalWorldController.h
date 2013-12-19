@@ -4,7 +4,7 @@
 #include "components/WorldPosition.h"
 #include "components/WorldOrientation.h"
 #include "components/SigmaMotionState.h"
-#include "components/SharedPointerMap.hpp"
+#include "SharedPointerMap.hpp"
 #include "BitArray.hpp"
 #include "components/BulletMover.h"
 #include "systems/BulletPhysics.h"

@@ -1,7 +1,7 @@
 #ifndef WORLDORIENTATION_H
 #define WORLDORIENTATION_H
 
-#include "components/SharedPointerMap.hpp"
+#include "SharedPointerMap.hpp"
 #include <memory>
 #include <unordered_map>
 #include <vector>
