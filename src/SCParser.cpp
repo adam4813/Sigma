@@ -21,8 +21,10 @@ namespace Sigma {
 			Sigma::parser::Entity* currentEntity = nullptr;
 
 			while (getline(in, line)) {
-                // strip line's whitespace
-                line = rtrim(line);
+        // strip line's whitespace
+        line = rtrim(line);
+        // Strip C style comments
+        line = rcomment(line);
 
 				char key[1];
 				key[0] = line.substr(0,1)[0];
