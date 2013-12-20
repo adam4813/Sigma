@@ -5,7 +5,11 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <memory>
+#include <vector>
+#include <map>
+#include <string>
 #include "resources/ALBuffer.h"
+#include "resources/SoundFile.h"
 
 namespace Sigma {
 	class OpenALSystem
@@ -31,9 +35,12 @@ namespace Sigma {
 
 		void test();
 	private:
-		std::unique_ptr<resource::ALBuffer> testbuff;
+		std::vector<std::unique_ptr<resource::ALBuffer>> buffers;
 		ALuint testsource;
-
+		ALuint lbuf;
+		std::map<std::string, resource::SoundFile> audiofiles;
+		int lbi;
+		bool altn;
 		ALCdevice* device;
 		ALCcontext* context;
 
