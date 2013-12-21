@@ -109,9 +109,13 @@ if(WIN32 AND NOT MINGW) # Windows
 	set(BULLET_DYNAMICS_LIBRARIES BulletDynamics)
 	SET(SOIL_LIBRARY SOIL)
 	SET(AWESOMIUM_LIBRARY Awesomium)
+
+	set(USE_STATIC_OGGVORBIS FALSE CACHE BOOL "Use static versions of ogg and vorbis libraries")
 endif(WIN32 AND NOT MINGW)
 
 SET(X11_LIBRARIES "")
+
+find_package(OggVorbis REQUIRED)
 
 if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
 	if (NOT APPLE) # X11 and GLEW are not needed on OS X.
