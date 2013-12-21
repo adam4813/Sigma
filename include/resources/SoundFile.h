@@ -29,18 +29,16 @@ namespace Sigma {
 
 		class SoundFile {
 		public:
-			SoundFile() : data(nullptr) { }
-			~SoundFile() {
-				if(data != nullptr) {
-					delete data;
-				}
-			}
+			SoundFile() : data(nullptr), dataformat(0) { }
+			~SoundFile();
 			bool isLoaded() { return (this->data != nullptr); }
 			void LoadFromFile(std::string fn);
 			void LoadWAV(std::ifstream &fh, std::ifstream::pos_type sz);
 			void LoadOgg(std::ifstream &fh, std::ifstream::pos_type sz);
+			AUDIO_FORMAT Format() { return dataformat; }
 		private:
 			unsigned char* data;
+			AUDIO_FORMAT dataformat;
 		};
 	}
 }
