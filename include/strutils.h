@@ -23,8 +23,9 @@ static inline std::string &rtrim(std::string &s) {
 // Trim a C style comment that begins with '//'
 static inline std::string &rcomment(std::string &s) {
   auto p = s.rfind("//");
-  if (p != std::string::npos)
+  if (p != std::string::npos) {
     s.erase(p);
+  }
   return s;
 }
 
