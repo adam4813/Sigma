@@ -120,7 +120,7 @@ namespace Sigma{
         size_t prev = 0;
         for (int i = 0, cur = this->MeshGroup_ElementCount(0); cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
             if (this->faceGroups.size() > 0) {
-                Material& mat = this->mats[this->faceGroups[(int) prev]];
+                Material& mat = this->mats[this->faceGroups[prev]];
 
 				if (mat.ambientMap) {
 					glUniform1i((*this->shader)("texEnabled"), 1);
