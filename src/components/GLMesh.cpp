@@ -146,7 +146,7 @@ namespace Sigma{
 				glUniform1i((*this->shader)("diffuseTexEnabled"), 0);
 				glUniform1i((*this->shader)("ambientTexEnabled"), 0);
 			}
-            glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_INT, (void*)prev);
+            glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_INT, &prev);
         }
 
         // reset defaults

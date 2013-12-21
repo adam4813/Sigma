@@ -13,7 +13,7 @@
 namespace Sigma {
 	class OS {
 	public:
-		OS() { event::KEY_ESCAPE = GLFW_KEY_ESCAPE; }
+		OS() : mouseLock(false) { event::KEY_ESCAPE = GLFW_KEY_ESCAPE; }
 		~OS() { }
 
 		/**
@@ -87,7 +87,7 @@ namespace Sigma {
 		 * \param[in] unsigned int uchar The unicode character key code.
 		 * \return void
 		 */
-		static void charcterEvent(GLFWwindow* window, unsigned int uchar);
+		static void characterEvent(GLFWwindow* window, unsigned int uchar);
 
 		/**
 		 * \brief Callback for mouse move events.
@@ -111,6 +111,10 @@ namespace Sigma {
 
 		void RegisterKeyboardEventHandler(event::IKeyboardEventHandler* handler);
 		void RegisterMouseEventHandler(event::IMouseEventHandler* handler);
+
+		void ToggleMouseLock();
+
+		bool CheckKeyState(event::KEY_STATE state, const int key);
 
 	private:
 		/**
@@ -163,7 +167,7 @@ namespace Sigma {
 		int width, height; // Current window's client width and height.
 		double oldMouseX, oldMouseY;
 		double lastTime; // The time at the last call to GetDeltaTime().
-
+		bool mouseLock; // If mouse lock is enabled causing the cursor to snap to mid-window each movement event.
 		event::KeyboardInputSystem KeyboardEventSystem;
 		event::MouseInputSystem MouseEventSystem;
 	};

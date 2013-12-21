@@ -8,7 +8,7 @@ namespace Sigma{
 			const float FPSCamera::SPEED_ROTATE      = 20.0f * 3.14159f;
 			const float FPSCamera::BOOST_MULTIPLIER  = 2.0f;
 
-			FPSCamera::FPSCamera(int entityID) : IGLView(entityID) {
+			FPSCamera::FPSCamera(int entityID) : IGLView(entityID), mouseLook(false) {
 				// Set the view mover's view pointer.
 				this->Transform.SetEuler(true);
 				this->Transform.SetMaxRotation(glm::vec3(45.0f,0,0));
@@ -53,8 +53,20 @@ namespace Sigma{
 			} // function KeyStateChange
 
 			void FPSCamera::MouseMove(float x, float y, float dx, float dy) {
-				if (this->mover) {
-					this->mover->RotateTarget(dy,dx,0.0f);
+				if (this->mover && this->mouseLook) {
+					this->mover->RotateNow(dy*10.0f,dx*10.0f,0.0f);
+				}
+			}
+
+			void FPSCamera::MouseDown(BUTTON btn, float x, float y) {
+				if (btn == RIGHT) {
+					this->mouseLook = true;
+				}
+			}
+
+			void FPSCamera::MouseUp(BUTTON btn, float x, float y) {
+				if (btn == RIGHT) {
+					this->mouseLook = false;
 				}
 			}
 
