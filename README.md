@@ -95,7 +95,7 @@ Sigma on OS X requires a [patched version](https://github.com/DeVaukz/SOIL) of S
 
 	git clone https://github.com/DeVaukz/SOIL.git
 	cd SOIL
-	cmake .. -G "Unix Makefiles"
+	cmake . -G "Unix Makefiles"
 	make -j10 && sudo make install 
 
 Awesomium is only distributed in binary form.  Download and run the installer from the [Awesomium website](http://www.awesomium.com/). 
@@ -137,4 +137,4 @@ cd build/
 cmake .. -G Xcode
 ```
 
-You must change the current scheme to Sigma by clicking on the scheme popup menu and selecting Sigma.  You can also change the working directory used when Sigma is started by Xcode.  Select Edit Scheme from the scheme popup menu, check the box next to Working Directory, and enter the path to the Sigma assets in the text field.
+You must change the current scheme to Sigma by clicking on the scheme popup menu and selecting Sigma.  You can also change the working directory used when Sigma is started by Xcode.  Select Edit Scheme from the scheme popup menu, switch to the Options tab, check the box next to Working Directory, and enter the path to the Sigma assets in the text field.
