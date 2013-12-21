@@ -117,9 +117,10 @@ namespace Sigma{
             glCullFace(this->cull_face);
         }
 
-        for (int i = 0, cur = this->MeshGroup_ElementCount(0), prev = 0; cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
+        size_t prev = 0;
+        for (int i = 0, cur = this->MeshGroup_ElementCount(0); cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
             if (this->faceGroups.size() > 0) {
-                Material& mat = this->mats[this->faceGroups[prev]];
+                Material& mat = this->mats[this->faceGroups[(int) prev]];
 
 				if (mat.ambientMap) {
 					glUniform1i((*this->shader)("texEnabled"), 1);
@@ -146,7 +147,7 @@ namespace Sigma{
 				glUniform1i((*this->shader)("diffuseTexEnabled"), 0);
 				glUniform1i((*this->shader)("ambientTexEnabled"), 0);
 			}
-            glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_INT, &prev);
+            glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_INT, (void*)prev);
         }
 
         // reset defaults

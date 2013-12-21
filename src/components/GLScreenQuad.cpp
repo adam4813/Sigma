@@ -44,8 +44,9 @@ namespace Sigma {
 			glBindTexture(GL_TEXTURE_2D, this->texture->GetID());
 			glActiveTexture(GL_TEXTURE0);
 
-			for (int i = 0, cur = this->MeshGroup_ElementCount(0), prev = 0; cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
-				glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_INT, &prev);
+			size_t prev = 0;
+			for (int i = 0, cur = this->MeshGroup_ElementCount(0); cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
+				glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_INT, (void*)prev);
 			}
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
