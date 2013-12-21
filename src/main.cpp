@@ -22,6 +22,7 @@ int main(int argCount, char **argValues) {
 
 	Sigma::FactorySystem& factory = Sigma::FactorySystem::getInstance();
 	factory.register_Factory(glsys);
+	factory.register_Factory(alsys);
 	factory.register_Factory(bphys);
 	factory.register_Factory(webguisys);
 
@@ -50,7 +51,8 @@ int main(int argCount, char **argValues) {
 
 	std::cout << "Initializing OpenAL system." << std::endl;
 	alsys.Start();
-
+	alsys.test(); // try sound
+	
 	// Parse the scene file to retrieve entities
 	Sigma::parser::SCParser parser;
 
@@ -138,8 +140,6 @@ int main(int argCount, char **argValues) {
 	// Call now to clear the delta after startup.
 	glfwos.GetDeltaTime();
 
-	alsys.test(); // try sound
-
 	while (!glfwos.Closing()) {
 		// Get time in ms, store it in seconds too
 
@@ -148,7 +148,7 @@ int main(int argCount, char **argValues) {
 		// Pass in delta time in seconds
 		bphys.Update(deltaSec);
 		webguisys.Update(deltaSec);
-
+		alsys.Update();
 		// Update the renderer and present
 		if (glsys.Update(deltaSec)) {
 			glfwos.SwapBuffers();

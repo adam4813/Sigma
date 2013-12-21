@@ -10,12 +10,16 @@
 #include <string>
 #include "resources/ALBuffer.h"
 #include "resources/SoundFile.h"
+#include "components/ALSound.h"
+#include "IFactory.h"
+#include "ISystem.h"
 
 namespace Sigma {
 	class OpenALSystem
-	{
+		: public Sigma::IFactory, public ISystem<IComponent> {
 	public:
 		OpenALSystem();
+		virtual ~OpenALSystem() {}
 
 		/**
 		 * \brief Starts the OpenAL audio system.
@@ -33,15 +37,31 @@ namespace Sigma {
 		 */
 		bool Update();
 
+		IComponent* CreateALSource(const unsigned int, const std::vector<Property> &);
+		std::map<std::string,FactoryFunction> getFactoryFunctions();
+
+		long CreateSoundFile();
+		long CreateSoundFile(std::string);
+		long LoadSoundFile(std::string);
+		std::weak_ptr<resource::SoundFile> GetSoundFile(long i) {
+			std::weak_ptr<resource::SoundFile> p;
+			if (audiofiles.find(i) != audiofiles.end()) {
+				p = audiofiles[i];
+			}
+			return p;
+		}
+
 		void test();
 	private:
 		std::vector<std::unique_ptr<resource::ALBuffer>> buffers;
 		ALuint testsource;
 		ALuint lbuf;
-		std::map<std::string, resource::SoundFile> audiofiles;
+		std::map<std::string, long> audioindex;
+		std::map<long, std::shared_ptr<resource::SoundFile>> audiofiles;
+		long nextindex;
 		int lbi;
 		bool altn;
-		ALCdevice* device;
+ALCdevice* device;
 		ALCcontext* context;
 
 	}; // class OpenALSystem
