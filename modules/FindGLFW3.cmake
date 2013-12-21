@@ -33,7 +33,7 @@ ELSE(WIN32)
 	ENDIF(APPLE)
 
 	FIND_LIBRARY( GLFW3_LIBRARY
-        NAMES libglfw.so libglfw.so.3 libglfw.so.3.0 glfw3
+        NAMES libglfw.so libglfw.so.3 libglfw.so.3.0 glfw.3 glfw3
 		PATHS
 		/usr/lib64
 		/usr/lib
