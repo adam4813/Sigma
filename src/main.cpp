@@ -60,6 +60,7 @@ int main(int argCount, char **argValues) {
 	for (unsigned int i = 0; i < parser.EntityCount(); ++i) {
 		Sigma::parser::Entity* e = parser.GetEntity(i);
 		for (auto itr = e->components.begin(); itr != e->components.end(); ++itr) {
+
 			// Currently, physicsmover components must come after gl* components
 			if((*itr).type == "PhysicsMover") {
 				GLTransform *transform = glsys.GetTransformFor(e->id);

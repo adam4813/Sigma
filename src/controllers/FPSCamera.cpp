@@ -16,6 +16,7 @@ namespace Sigma{
 				// Clear out the internal key state buffers.
 				memset(this->keys, 0, sizeof(this->keys));
 				memset(this->keyState, 0, sizeof(this->keyState));
+
 				// set to 1 all keys that should trigger an event in this class
 				this->keys['W'] = 1; this->keys['B'] = 1; this->keys['S'] = 1;
 				this->keys['A'] = 1; this->keys['D'] = 1;
@@ -54,6 +55,7 @@ namespace Sigma{
 
 			void FPSCamera::MouseMove(float x, float y, float dx, float dy) {
 				if (this->mover) {
+					std::cout << "Rotating: " << x << ", " << y << std::endl;
 					this->mover->RotateNow(dy*10.0f,dx*10.0f,0.0f);
 				}
 			}
