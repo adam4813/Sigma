@@ -31,6 +31,7 @@ void main(void)
 	vec4 position = (in_Model * vec4(in_Position,1)); 
 	ex_LightDirW = lightPositionW - position.xyz;
 	ex_ViewDirW = viewPosW - position.xyz;
-	gl_Position = in_Proj * (in_View * position);
-	ex_Depth = vec2(gl_Position.z, gl_Position.w);
+	posH = in_Proj * (in_View * position);
+	ex_Depth = vec2(posH.z, posH.w);
+	gl_Position = posH;
 }

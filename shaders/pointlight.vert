@@ -11,6 +11,6 @@ void main()
 {
 	//float3 alignedPos = float3(input.Position.x - gHalfPixel.x, input.Position.y - gHalfPixel.y, input.Position.z);
 
-	gl_Position = vec4(in_Position, 1.0f);
+	gl_Position = vec4(in_Position, 1.0);
 	ex_UV = in_UV;
 }

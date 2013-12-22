@@ -1,3 +1,5 @@
+#version 140
+
 uniform mat4 viewProjInverse;
 uniform vec3 lightPosW;
 uniform float lightRadius;
@@ -7,9 +9,10 @@ uniform sampler2D normalBuffer;
 uniform sampler2D depthBuffer;
 
 in vec2 ex_UV;
+out vec4 out_Color;
 
 vec3 decode(vec3 normal) {
-	return normal * 2.0f - 1.0f;
+	return normal * 2.0 - 1.0;
 }
 
 void main(void) {
@@ -17,39 +20,40 @@ void main(void) {
 	vec4 normalData = texture(normalBuffer,ex_UV);
 
 	// Transform normal back to [-1, 1] range
-	float3 normal = decode(normalData.rgb);
+	vec3 normal = decode(normalData.rgb);
 	
 	// RECREATE POSITION
 	// Retrieve screen-space depth value
 	float depthValue = texture(depthBuffer, ex_UV).r;
 
 	// screen space position
-	float4 position;
+	vec4 position;
 
-	position.x = ex_UV.u * 2.0f - 1.0f;
-	position.y = -(ex_UV.v * 2.0f - 1.0f);
+	position.x = ex_UV.s * 2.0 - 1.0;
+	position.y = -(ex_UV.t * 2.0 - 1.0);
 	position.z = depthValue;
-	position.w = 1.0f;
+	position.w = 1.0;
 
 	// transform to world space
-	position = mul(position, viewProjInverse);
+	position = viewProjInverse * position;
 	position /= position.w;
 
 	// CALCULATE LIGHTING //
 	// surface-to-light vector
-	float3 lightVector = lightPosW - position.xyz;
+	vec3 lightVector = lightPosW - position.xyz;
 
 	// ATTENUATION ////////
 	//float d = length(lightVector); 
 	//float A = saturate( 1.0f - d / lightRadius );
 	
-	float A = 1.0f - dot(lightDirW, lightDirW) / (lightRadius*lightRadius);
+	float A = 1.0 - dot(lightPosW, lightPosW) / (lightRadius*lightRadius);
 
 	lightVector = normalize(lightVector);
 
 	// DIFFUSE ////////////
 	float	NdL				= dot(normal, lightVector);
-	float3	diffuseLight	= NdL * lightColor.rgb;
+	vec3	diffuseLight	= NdL * lightColor.rgb;
 
-	return float4(diffuseLight*A, 1.0f);
+	//out_Color = vec4(diffuseLight*A, 1.0);
+	out_Color = normalData;
 }
