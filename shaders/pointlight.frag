@@ -1,5 +1,7 @@
 #version 140
 
+precision highp float; // needed only for version 1.30
+
 uniform mat4 viewProjInverse;
 uniform vec3 lightPosW;
 uniform float lightRadius;
@@ -16,6 +18,8 @@ vec3 decode(vec3 normal) {
 }
 
 void main(void) {
+	//out_Color = vec4(0.0, 0.0, 1.0, 0.5);
+	
 	// GET NORMAL DATA
 	vec4 normalData = texture(normalBuffer,ex_UV);
 
@@ -30,7 +34,7 @@ void main(void) {
 	vec4 position;
 
 	position.x = ex_UV.s * 2.0 - 1.0;
-	position.y = -(ex_UV.t * 2.0 - 1.0);
+	position.y = ex_UV.t * 2.0 - 1.0;
 	position.z = depthValue;
 	position.w = 1.0;
 
@@ -43,10 +47,12 @@ void main(void) {
 	vec3 lightVector = lightPosW - position.xyz;
 
 	// ATTENUATION ////////
-	//float d = length(lightVector); 
-	//float A = saturate( 1.0f - d / lightRadius );
+	float d = length(lightVector); 
+	float A = clamp(1.0 - (d/3)*d / lightRadius, 0.0, 1.0);
 	
-	float A = 1.0 - dot(lightPosW, lightPosW) / (lightRadius*lightRadius);
+	//float A = 1.0f - sqrt(dot(lightVector, lightVector)) / lightRadius;
+	
+	//float A = 1.0 - dot(lightPosW, lightPosW) / (lightRadius*lightRadius);
 
 	lightVector = normalize(lightVector);
 
@@ -54,6 +60,7 @@ void main(void) {
 	float	NdL				= dot(normal, lightVector);
 	vec3	diffuseLight	= NdL * lightColor.rgb;
 
-	//out_Color = vec4(diffuseLight*A, 1.0);
-	out_Color = normalData;
+	out_Color = vec4(diffuseLight*A, 1.0f);
+	//out_Color = vec4(normal, 1.0);
+	//out_Color = vec4(depthValue, depthValue, depthValue, 1.0);
 }

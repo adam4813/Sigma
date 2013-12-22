@@ -40,6 +40,10 @@ namespace Sigma{
 
 	void RenderTarget::UnbindWrite() {
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+		std::vector<GLenum> buffers;
+		buffers.push_back(GL_COLOR_ATTACHMENT0);
+		glDrawBuffers(1, &buffers[0]);
 	}
 
 	void RenderTarget::UnbindRead() {
@@ -47,7 +51,7 @@ namespace Sigma{
 	}
 
     OpenGLSystem::OpenGLSystem() : windowWidth(1024), windowHeight(768), deltaAccumulator(0.0),
-		framerate(60.0f), renderQuad(999), viewMode("") {}
+		framerate(60.0f), renderQuad(1000), ambientQuad(1001), viewMode("") {}
 		
 	std::map<std::string, resource::GLTexture> OpenGLSystem::textures = std::map<std::string, resource::GLTexture>();
 
@@ -581,8 +585,7 @@ namespace Sigma{
 			}
 
 			// Setup the projection matrix
-			glm::mat4 viewProj = viewMatrix;
-			viewProj *= this->ProjectionMatrix;
+			glm::mat4 viewProj = glm::mul(this->ProjectionMatrix, viewMatrix);
 
 			viewProjInv = glm::inverse(viewProj);
 
@@ -644,11 +647,6 @@ namespace Sigma{
 			// Disable depth testing
 			glDepthFunc(GL_NONE);
 
-			// Bind the Geometry buffer for reading
-			if(this->renderTargets.size() > 0) {
-				this->renderTargets[0]->BindRead();
-			}
-
 			// Bind the second buffer, which is the Light Accumulation Buffer
 			//if(this->renderTargets.size() > 1) {
 			//	this->renderTargets[1]->BindWrite();
@@ -658,21 +656,41 @@ namespace Sigma{
 			glClearColor(0.0f,0.0f,0.0f,1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-			// Loop through each light, rendering all components
-			// TODO: Cull components based on light
-			// TODO: Implement scissors test or sphere based rendering
+			// Bind the Geometry buffer for reading
+			if(this->renderTargets.size() > 0) {
+				this->renderTargets[0]->BindRead();
+			}
 
-			// Setup textures
+			// Ambient light pass
+			// Currently simple constant ambient light, could use SSAO here
+			GLSLShader &shader = (*this->ambientQuad.GetShader().get());
 
-			// Light passes
+			shader.Use();
+
+			glm::vec4 ambientLight(0.1f, 0.1f, 0.1f, 1.0f);
+
+			// Load variables
+			glUniform4f(shader("ambientColor"), ambientLight.r, ambientLight.g, ambientLight.b, ambientLight.a);
+			glUniform1i(shader("colorBuffer"), 0);
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[0]);
+
+			this->ambientQuad.Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
+						
+			shader.UnUse();
+
+			// Dynamic light passes
+			// Loop through each light, render a fullscreen quad if it is visible
+
 			for(auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
 				for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
 					// Check if this component is a light
 					PointLight *light = dynamic_cast<PointLight*>(citr->second.get());
 
 					// If it is a light, and it intersects the frustum, then render
-					//if(light && this->GetView(0)->CameraFrustum.isectSphere(light->position, light->radius) ) {
-					if(light) {
+					if(light && this->GetView(0)->CameraFrustum.isectSphere(light->position, light->radius) ) {
+						
 						GLSLShader &shader = (*this->renderQuad.GetShader().get());
 
 						shader.Use();
@@ -683,11 +701,14 @@ namespace Sigma{
 						glUniform1f(shader("lightRadius"), light->radius);
 						glUniform4fv(shader("lightColor"), 1, &light->color[0]);
 
-						glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[0]);
-						glActiveTexture(GL_TEXTURE0);
+						glUniform1i(shader("normalBuffer"), 0);
+						glUniform1i(shader("depthBuffer"), 1);
 
+						glActiveTexture(GL_TEXTURE0);
 						glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[1]);
+
 						glActiveTexture(GL_TEXTURE1);
+						glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[2]);
 
 						this->renderQuad.Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 						
@@ -807,14 +828,25 @@ namespace Sigma{
 		this->renderQuad.InitializeBuffers();
 		this->renderQuad.SetCullFace("none");
 
-		/*this->renderQuad.GetShader()->Use();
+		this->renderQuad.GetShader()->Use();
 		this->renderQuad.GetShader()->AddUniform("viewProjInverse");
 		this->renderQuad.GetShader()->AddUniform("lightPosW");
 		this->renderQuad.GetShader()->AddUniform("lightRadius");
 		this->renderQuad.GetShader()->AddUniform("lightColor");
 		this->renderQuad.GetShader()->AddUniform("normalBuffer");
 		this->renderQuad.GetShader()->AddUniform("depthBuffer");
-		this->renderQuad.GetShader()->UnUse();*/
+		this->renderQuad.GetShader()->UnUse();
+
+		this->ambientQuad.SetSize(1.0f, 1.0f);
+		this->ambientQuad.SetPosition(0.0f, 0.0f);
+		this->ambientQuad.LoadShader("shaders/ambient");
+		this->ambientQuad.InitializeBuffers();
+		this->ambientQuad.SetCullFace("none");
+
+		this->ambientQuad.GetShader()->Use();
+		this->ambientQuad.GetShader()->AddUniform("ambientColor");
+		this->ambientQuad.GetShader()->AddUniform("colorBuffer");
+		this->ambientQuad.GetShader()->UnUse();
 
         return OpenGLVersion;
     }
