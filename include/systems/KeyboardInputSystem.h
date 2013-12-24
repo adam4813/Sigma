@@ -6,14 +6,15 @@
 namespace Sigma {
 	namespace event {
 		enum KEY_STATE {KS_UP, KS_DOWN};
+    static const unsigned int MAX_KEY = 348;
 
 		static int KEY_ESCAPE;
 
 		// A keyboard event handler interface. Handlers can be controllers, loggers, etc.
 		struct IKeyboardEventHandler {
-			unsigned int keys[256]; // The keys this handler triggers off.
-			unsigned int chars[256]; // The keys this handler triggers off.
-			KEY_STATE keyState[256]; // State of the keys.
+			unsigned int keys[MAX_KEY]; // The keys this handler triggers off.
+			unsigned int chars[MAX_KEY]; // The keys this handler triggers off.
+			KEY_STATE keyState[MAX_KEY]; // State of the keys.
 			/**
 			 * \brief Called when on the keys reported during register has a state change.
 			 *
@@ -35,12 +36,12 @@ namespace Sigma {
 			 * \param[in] Sigma::event::IKeyboardEventHandler * e The keyboard even handler to register.
 			 */
 			void Register( Sigma::event::IKeyboardEventHandler *e ) {
-				for (unsigned int i = 0; i < 256; i++) {
+				for (unsigned int i = 0; i < MAX_KEY; i++) {
 					if (e->keys[i] > 0) {
 						this->eventHandlers[i].push_back(e);
 					}
 				}
-				for (unsigned int i = 0; i < 256; i++) {
+				for (unsigned int i = 0; i < MAX_KEY; i++) {
 					if (e->chars[i] > 0) {
 						this->charHandlers[i].push_back(e);
 					}
