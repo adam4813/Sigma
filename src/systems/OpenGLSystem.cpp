@@ -8,6 +8,7 @@
 #include "components/GLMesh.h"
 #include "components/GLScreenQuad.h"
 #include "components/PointLight.h"
+#include "components/SpotLight.h"
 
 #include "GL/glew.h"
 #include "glm/glm.hpp"
@@ -51,7 +52,7 @@ namespace Sigma{
 	}
 
     OpenGLSystem::OpenGLSystem() : windowWidth(1024), windowHeight(768), deltaAccumulator(0.0),
-		framerate(60.0f), renderQuad(1000), ambientQuad(1001), viewMode("") {}
+		framerate(60.0f), pointQuad(1000), ambientQuad(1001), spotQuad(1002), viewMode("") {}
 		
 	std::map<std::string, resource::GLTexture> OpenGLSystem::textures = std::map<std::string, resource::GLTexture>();
 
@@ -67,6 +68,7 @@ namespace Sigma{
 		retval["FPSCamera"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2, "FPSCamera");
 		retval["GLSixDOFView"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2, "GLSixDOFView");
 		retval["PointLight"] = std::bind(&OpenGLSystem::createPointLight,this,_1,_2);
+		retval["SpotLight"] = std::bind(&OpenGLSystem::createSpotLight,this,_1,_2);
 		retval["GLScreenQuad"] = std::bind(&OpenGLSystem::createScreenQuad,this,_1,_2);
 
         return retval;
@@ -117,8 +119,10 @@ namespace Sigma{
 			}
 		}
 
-		this->views[this->views.size() - 1]->Transform.Move(x,y,z);
-		this->views[this->views.size() - 1]->Transform.Rotate(rx,ry,rz);
+		this->views[this->views.size() - 1]->Transform()->TranslateTo(x,y,z);
+		this->views[this->views.size() - 1]->Transform()->Rotate(rx,ry,rz);
+
+		this->addComponent(entityID, this->views[this->views.size() - 1]);
 
 		return this->views[this->views.size() - 1];
 	}
@@ -349,7 +353,7 @@ namespace Sigma{
 				std::cerr << "Loading mesh: " << p->Get<std::string>() << std::endl;
 				mesh->LoadMesh(p->Get<std::string>());
 			}
-			else if (p->GetName() == "shader"){
+			else if (p->GetName() == "shader") {
 				shaderfile = p->Get<std::string>();
 			}
 			else if (p->GetName() == "id") {
@@ -360,6 +364,20 @@ namespace Sigma{
 			}
 			else if (p->GetName() == "lightEnabled") {
 				mesh->SetLightingEnabled(p->Get<bool>());
+			}
+			else if (p->GetName() == "parent") {
+				int parentID = p->Get<int>();
+				SpatialComponent *comp = dynamic_cast<SpatialComponent *>(this->getComponent(parentID, Sigma::IGLComponent::getStaticComponentTypeName()));
+
+				if(comp) {
+					mesh->SetParent(comp->Transform());
+				} else {
+					comp = dynamic_cast<SpatialComponent *>(this->getComponent(parentID, Sigma::event::handler::FPSCamera::getStaticComponentTypeName()));
+
+					if(comp) {
+						mesh->SetParent(comp->Transform());
+					}
+				}
 			}
 		}
 
@@ -482,6 +500,57 @@ namespace Sigma{
 		return light;
 	}
 
+	IComponent* OpenGLSystem::createSpotLight(const unsigned int entityID, const std::vector<Property> &properties) {
+		Sigma::SpotLight *light = new Sigma::SpotLight(entityID);
+
+		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
+			const Property*  p = &*propitr;
+			if (p->GetName() == "x") {
+				light->position.x = p->Get<float>();
+			}
+			else if (p->GetName() == "y") {
+				light->position.y = p->Get<float>();
+			}
+			else if (p->GetName() == "z") {
+				light->position.z = p->Get<float>();
+			}
+			else if (p->GetName() == "dx") {
+				light->direction.x = p->Get<float>();
+			}
+			else if (p->GetName() == "dy") {
+				light->direction.y = p->Get<float>();
+			}
+			else if (p->GetName() == "dz") {
+				light->direction.z = p->Get<float>();
+			}
+			else if (p->GetName() == "intensity") {
+				light->intensity = p->Get<float>();
+			}
+			else if (p->GetName() == "cr") {
+				light->color.r = p->Get<float>();
+			}
+			else if (p->GetName() == "cg") {
+				light->color.g = p->Get<float>();
+			}
+			else if (p->GetName() == "cb") {
+				light->color.b = p->Get<float>();
+			}
+			else if (p->GetName() == "ca") {
+				light->color.a = p->Get<float>();
+			}
+			else if (p->GetName() == "angle") {
+				light->angle = p->Get<float>();
+				light->cosCutoff = glm::cos(light->angle);
+			}
+			else if (p->GetName() == "exponent") {
+				light->exponent = p->Get<float>();
+			}
+		}
+
+		this->addComponent(entityID, light);
+		return light;
+	}
+
 	int OpenGLSystem::createRenderTarget(const unsigned int w, const unsigned int h) {
 		std::unique_ptr<RenderTarget> newRT(new RenderTarget());
 
@@ -581,7 +650,7 @@ namespace Sigma{
 			glm::mat4 viewMatrix;
 			if (this->views.size() > 0) {
 				viewMatrix = this->views[this->views.size() - 1]->GetViewMatrix();
-				viewPosition = this->views[this->views.size() - 1]->Transform.GetPosition();
+				viewPosition = this->views[this->views.size() - 1]->Transform()->GetPosition();
 			}
 
 			// Setup the projection matrix
@@ -610,12 +679,11 @@ namespace Sigma{
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
 			// Loop through and draw each GL Component component.
-
 			for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
 				for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
 					IGLComponent *glComp = dynamic_cast<IGLComponent *>(citr->second.get());
 
-					if(glComp) {
+					if(glComp && glComp->IsLightingEnabled()) {
 						glComp->GetShader()->Use();
 
 						// Set view position
@@ -646,6 +714,7 @@ namespace Sigma{
 
 			// Disable depth testing
 			glDepthFunc(GL_NONE);
+			glDepthMask(GL_FALSE);
 
 			// Bind the second buffer, which is the Light Accumulation Buffer
 			//if(this->renderTargets.size() > 1) {
@@ -653,8 +722,7 @@ namespace Sigma{
 			//}
 
 			// Clear it
-			glClearColor(0.0f,0.0f,0.0f,1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT);
 
 			// Bind the Geometry buffer for reading
 			if(this->renderTargets.size() > 0) {
@@ -662,17 +730,17 @@ namespace Sigma{
 			}
 
 			// Ambient light pass
+
 			// Currently simple constant ambient light, could use SSAO here
-			GLSLShader &shader = (*this->ambientQuad.GetShader().get());
-
-			shader.Use();
-
 			glm::vec4 ambientLight(0.1f, 0.1f, 0.1f, 1.0f);
+
+			GLSLShader &shader = (*this->ambientQuad.GetShader().get());
+			shader.Use();
 
 			// Load variables
 			glUniform4f(shader("ambientColor"), ambientLight.r, ambientLight.g, ambientLight.b, ambientLight.a);
+			
 			glUniform1i(shader("colorBuffer"), 0);
-
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[0]);
 
@@ -681,18 +749,18 @@ namespace Sigma{
 			shader.UnUse();
 
 			// Dynamic light passes
+
 			// Loop through each light, render a fullscreen quad if it is visible
 
 			for(auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
 				for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
-					// Check if this component is a light
+					// Check if this component is a point light
 					PointLight *light = dynamic_cast<PointLight*>(citr->second.get());
 
-					// If it is a light, and it intersects the frustum, then render
+					// If it is a point light, and it intersects the frustum, then render
 					if(light && this->GetView(0)->CameraFrustum.isectSphere(light->position, light->radius) ) {
 						
-						GLSLShader &shader = (*this->renderQuad.GetShader().get());
-
+						GLSLShader &shader = (*this->pointQuad.GetShader().get());
 						shader.Use();
 
 						// Load variables
@@ -701,18 +769,57 @@ namespace Sigma{
 						glUniform1f(shader("lightRadius"), light->radius);
 						glUniform4fv(shader("lightColor"), 1, &light->color[0]);
 
-						glUniform1i(shader("normalBuffer"), 0);
-						glUniform1i(shader("depthBuffer"), 1);
+						glUniform1i(shader("diffuseBuffer"), 0);
+						glUniform1i(shader("normalBuffer"), 1);
+						glUniform1i(shader("depthBuffer"), 2);
 
+						// Bind GBuffer textures
 						glActiveTexture(GL_TEXTURE0);
-						glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[1]);
-
+						glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[0]);
 						glActiveTexture(GL_TEXTURE1);
+						glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[1]);
+						glActiveTexture(GL_TEXTURE2);
 						glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[2]);
 
-						this->renderQuad.Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
+						this->pointQuad.Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 						
 						shader.UnUse();
+
+						continue;
+					}
+
+					SpotLight *spotLight = dynamic_cast<SpotLight *>(citr->second.get());
+
+					if(spotLight) {
+						GLSLShader &shader = (*this->spotQuad.GetShader().get());
+						shader.Use();
+
+						// Load variables
+						glUniformMatrix4fv(shader("viewProjInverse"), 1, false, &viewProjInv[0][0]);
+						glUniform3fv(shader("lightPosW"), 1, &spotLight->position[0]);
+						glUniform3fv(shader("lightDirW"), 1, &spotLight->direction[0]);
+						glUniform4fv(shader("lightColor"), 1, &spotLight->color[0]);
+						glUniform1f(shader("lightAngle"), spotLight->angle);
+						glUniform1f(shader("lightCosCutoff"), spotLight->cosCutoff);
+						glUniform1f(shader("lightExponent"), spotLight->exponent);
+
+						glUniform1i(shader("diffuseBuffer"), 0);
+						glUniform1i(shader("normalBuffer"), 1);
+						glUniform1i(shader("depthBuffer"), 2);
+
+						// Bind GBuffer textures
+						glActiveTexture(GL_TEXTURE0);
+						glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[0]);
+						glActiveTexture(GL_TEXTURE1);
+						glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[1]);
+						glActiveTexture(GL_TEXTURE2);
+						glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[2]);
+
+						this->spotQuad.Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
+						
+						shader.UnUse();
+
+						continue;
 					}
 				}
 			}
@@ -732,11 +839,33 @@ namespace Sigma{
 			
 			// Re-enabled depth test
 			glDepthFunc(GL_LESS);
+			glDepthMask(GL_TRUE);
 			
+			///////////////////////
+			// Draw Unlit Objects
+			///////////////////////
+
+			// Loop through and draw each GL Component component.
+			for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
+				for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
+					IGLComponent *glComp = dynamic_cast<IGLComponent *>(citr->second.get());
+
+					if(glComp && !glComp->IsLightingEnabled()) {
+						glComp->GetShader()->Use();
+
+						// Set view position
+						glUniform3f(glGetUniformBlockIndex(glComp->GetShader()->GetProgram(), "viewPosW"), viewPosition.x, viewPosition.y, viewPosition.z);
+					
+						glComp->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
+					}
+				}
+			}
+
 			////////////////////
 			// Composite Pass //
 			////////////////////
 
+			// Not needed yet
 
 			//////////////////
 			// Overlay Pass //
@@ -822,20 +951,40 @@ namespace Sigma{
         glCullFace(GL_BACK);
 
 		// Setup a screen quad for deferred rendering
-		this->renderQuad.SetSize(1.0f, 1.0f);
-		this->renderQuad.SetPosition(0.0f, 0.0f);
-		this->renderQuad.LoadShader("shaders/pointlight");
-		this->renderQuad.InitializeBuffers();
-		this->renderQuad.SetCullFace("none");
+		this->pointQuad.SetSize(1.0f, 1.0f);
+		this->pointQuad.SetPosition(0.0f, 0.0f);
+		this->pointQuad.LoadShader("shaders/pointlight");
+		this->pointQuad.InitializeBuffers();
+		this->pointQuad.SetCullFace("none");
 
-		this->renderQuad.GetShader()->Use();
-		this->renderQuad.GetShader()->AddUniform("viewProjInverse");
-		this->renderQuad.GetShader()->AddUniform("lightPosW");
-		this->renderQuad.GetShader()->AddUniform("lightRadius");
-		this->renderQuad.GetShader()->AddUniform("lightColor");
-		this->renderQuad.GetShader()->AddUniform("normalBuffer");
-		this->renderQuad.GetShader()->AddUniform("depthBuffer");
-		this->renderQuad.GetShader()->UnUse();
+		this->pointQuad.GetShader()->Use();
+		this->pointQuad.GetShader()->AddUniform("viewProjInverse");
+		this->pointQuad.GetShader()->AddUniform("lightPosW");
+		this->pointQuad.GetShader()->AddUniform("lightRadius");
+		this->pointQuad.GetShader()->AddUniform("lightColor");
+		this->pointQuad.GetShader()->AddUniform("diffuseBuffer");
+		this->pointQuad.GetShader()->AddUniform("normalBuffer");
+		this->pointQuad.GetShader()->AddUniform("depthBuffer");
+		this->pointQuad.GetShader()->UnUse();
+
+		this->spotQuad.SetSize(1.0f, 1.0f);
+		this->spotQuad.SetPosition(0.0f, 0.0f);
+		this->spotQuad.LoadShader("shaders/spotlight");
+		this->spotQuad.InitializeBuffers();
+		this->spotQuad.SetCullFace("none");
+
+		this->spotQuad.GetShader()->Use();
+		this->spotQuad.GetShader()->AddUniform("viewProjInverse");
+		this->spotQuad.GetShader()->AddUniform("lightPosW");
+		this->spotQuad.GetShader()->AddUniform("lightDirW");
+		this->spotQuad.GetShader()->AddUniform("lightColor");
+		this->spotQuad.GetShader()->AddUniform("lightAngle");
+		this->spotQuad.GetShader()->AddUniform("lightCosCutoff");
+		this->spotQuad.GetShader()->AddUniform("lightExponent");
+		this->spotQuad.GetShader()->AddUniform("diffuseBuffer");
+		this->spotQuad.GetShader()->AddUniform("normalBuffer");
+		this->spotQuad.GetShader()->AddUniform("depthBuffer");
+		this->spotQuad.GetShader()->UnUse();
 
 		this->ambientQuad.SetSize(1.0f, 1.0f);
 		this->ambientQuad.SetPosition(0.0f, 0.0f);

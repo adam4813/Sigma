@@ -3,7 +3,7 @@
 #define IGL_VIEW_H
 
 #include "GLTransform.h"
-#include "IComponent.h"
+#include "components\SpatialComponent.h"
 
 namespace Sigma{
 
@@ -47,11 +47,10 @@ namespace Sigma{
 		}
 	};
 
-    struct IGLView : public Sigma::IComponent {
+    struct IGLView : public Sigma::SpatialComponent {
 
-        IGLView(int entityID) : IComponent(entityID) {}
+        IGLView(int entityID) : SpatialComponent(entityID) {}
 
-        GLTransform Transform;
 		Frustum CameraFrustum;
 
         virtual const glm::mat4 GetViewMatrix() = 0;

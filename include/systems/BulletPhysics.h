@@ -37,6 +37,9 @@ namespace Sigma {
 		IComponent* createBulletShapeSphere(const unsigned int entityID, const std::vector<Property> &properties);
 
 		std::map<std::string,FactoryFunction> getFactoryFunctions();
+
+		void initViewMover();
+
 		BulletMover* getViewMover() {
 			return &this->mover;
 		}

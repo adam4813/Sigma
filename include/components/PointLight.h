@@ -15,15 +15,6 @@ namespace Sigma {
 
 		SET_COMPONENT_TYPENAME("PointLight");
 
-		/*
-		 * /brief Sets this point light as the
-		 *        light used by the given shader
-		 *
-		 * /params shader: the shader to use
-		 *
-		 */
-		void Activate(GLSLShader *shader);
-
 		glm::vec3 position;
 		glm::vec4 color;
 		float intensity;

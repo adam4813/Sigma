@@ -10,8 +10,8 @@ namespace Sigma{
 
 			FPSCamera::FPSCamera(int entityID) : IGLView(entityID) {
 				// Set the view mover's view pointer.
-				this->Transform.SetEuler(true);
-				this->Transform.SetMaxRotation(glm::vec3(45.0f,0,0));
+				this->transform.SetEuler(true);
+				this->transform.SetMaxRotation(glm::vec3(45.0f,0,0));
 
 				// Clear out the internal key state buffers.
 				memset(this->keys, 0, sizeof(this->keys));
@@ -28,25 +28,26 @@ namespace Sigma{
 
 				float speed = this->keyState['B'] == KS_DOWN ? SPEED_TRANSLATE * BOOST_MULTIPLIER : SPEED_TRANSLATE;
 
+				glm::vec3 translation(0.0f, 0.0f, 0.0f);
+
 				// Translation keys
-				float fwd = 0.0f, strafe = 0.0f, rise = 0.0f;
 				if (this->keyState['W'] == KS_DOWN) { // Move forward
-					fwd += speed;
+					translation += speed*GLTransform::FORWARD_VECTOR;
 				}
 				if (this->keyState['S'] == KS_DOWN) { // Move backward
-					fwd -= speed;
+					translation -= speed*GLTransform::FORWARD_VECTOR;
 				}
 				if (this->keyState['A'] == KS_DOWN) { // Strafe left
-					strafe -= speed;
+					translation -= speed*GLTransform::RIGHT_VECTOR;
 				}
 				if (this->keyState['D'] == KS_DOWN) { // Strafe right
-					strafe += speed;
+					translation += speed*GLTransform::RIGHT_VECTOR;
 				}
 
 				// remove previous force and add new one
 				if (this->mover) {
 					this->mover->RemoveForce(this->translation);
-					this->translation = glm::vec3(strafe, rise, fwd);
+					this->translation = translation;
 					this->mover->AddForce(this->translation);
 				}
 
@@ -61,17 +62,19 @@ namespace Sigma{
 			const glm::mat4 FPSCamera::GetViewMatrix() {
 				// Limit rotation to pitch and yaw, apply pitch first to ensure
 				// yaw rotation happens correctly
-				glm::mat4 viewMatrix = glm::rotate(glm::mat4(1.0f), this->Transform.GetPitch(), glm::vec3(1.0f, 0, 0));
-				viewMatrix = glm::rotate(viewMatrix, this->Transform.GetYaw(), glm::vec3(0, 1.0f, 0));
+				glm::mat4 viewMatrix = glm::rotate(glm::mat4(1.0f), this->transform.GetPitch(), GLTransform::RIGHT_VECTOR);
+				viewMatrix = glm::rotate(viewMatrix, this->transform.GetYaw(), GLTransform::UP_VECTOR);
 
-				viewMatrix = glm::translate(viewMatrix, -1.0f * this->Transform.GetPosition());
+				viewMatrix = glm::translate(viewMatrix, -1.0f * this->transform.GetPosition());
 
 				return viewMatrix;
+
+				//return this->transform.GetMatrix();
 			}
 
 			void FPSCamera::SetMover(BulletMover* m){
 				if (this->mover) {
-					m->SetTransform(this->Transform);
+					m->SetTransform(this->transform);
 					this->mover = m;
 				}
 			}

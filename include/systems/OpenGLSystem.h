@@ -88,6 +88,7 @@ namespace Sigma{
         std::map<std::string,FactoryFunction> getFactoryFunctions();
 
 		IComponent* createPointLight(const unsigned int entityID, const std::vector<Property> &properties);
+		IComponent* createSpotLight(const unsigned int entityID, const std::vector<Property> &properties);
 		IComponent* createScreenQuad(const unsigned int entityID, const std::vector<Property> &properties);
 
 		// TODO: Move these methods to the components themselves.
@@ -180,7 +181,7 @@ namespace Sigma{
 
 		// Utility quads for rendering
 		// TODO make this smarter, allow multiple shaders/materials per glcomponent
-		GLScreenQuad renderQuad, ambientQuad;
+		GLScreenQuad pointQuad, spotQuad, ambientQuad;
 
 		// Render targets to draw to
 		std::vector<std::unique_ptr<RenderTarget>> renderTargets;

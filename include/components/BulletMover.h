@@ -9,7 +9,7 @@ namespace Sigma {
 	class BulletMover : public IBulletShape, public IMoverComponent {
 	public:
 		SET_COMPONENT_TYPENAME("BulletMover");
-		BulletMover() : IBulletShape(0) { }
+		BulletMover() : transform(0), IBulletShape(0) { }
 		BulletMover(const int entityID);
 		~BulletMover();
 
@@ -30,6 +30,13 @@ namespace Sigma {
 		 * \return    void 
 		 */
 		void InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz);
+
+		/**
+		 * \brief Initalize the rigid body using the current transform or defaults if none
+		 *
+		 * \return void
+		 */
+		void InitializeRigidBody();
 
 		/**
 		 * \brief Updates the transform to match its collision rigid body.

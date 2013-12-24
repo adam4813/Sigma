@@ -75,6 +75,7 @@ int main(int argCount, char **argValues) {
 	unsigned int lightBuffer = glsys.createRenderTarget(os->GetWindowWidth(), os->GetWindowHeight());
 	glsys.createRTBuffer(lightBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE); // Light accumulation buffer
 
+	
 	///////////////////
 	// Setup physics //
 	///////////////////
@@ -163,6 +164,8 @@ int main(int argCount, char **argValues) {
 		Sigma::event::handler::GLSixDOFViewController cameraController(glsys.GetView(), mover);
 		IOpSys::KeyboardEventSystem.Register(&cameraController);
 	}
+	
+	bphys.initViewMover();
 
 	///////////////////
 	// Configure GUI //

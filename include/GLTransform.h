@@ -14,7 +14,7 @@ public:
 
 	void Translate(float x, float y, float z) {
 		this->position += glm::vec3(x, y, z);
-		this->translateMatrix = glm::translate(this->translateMatrix, x, y, z);
+		this->translateMatrix = glm::translate(this->position.x, this->position.y, this->position.z);
 		this->MMhasChanged = true;
 	}
 
@@ -37,14 +37,14 @@ public:
 		this->rotation += glm::vec3(x, y, z);
 
 		if(this->Euler) {
-			this->rotateMatrix = glm::rotate(glm::mat4(1.0f), this->rotation.x, glm::vec3(1.0f, 0, 0));
-			this->rotateMatrix = glm::rotate(this->rotateMatrix, this->rotation.y, glm::vec3(0, 1.0f, 0));
-			this->rotateMatrix = glm::rotate(this->rotateMatrix, this->rotation.z, glm::vec3(0, 0, 1.0f));
+			this->rotateMatrix = glm::rotate(glm::mat4(1.0f), this->rotation.x, RIGHT_VECTOR);
+			this->rotateMatrix = glm::rotate(this->rotateMatrix, this->rotation.y, UP_VECTOR);
+			this->rotateMatrix = glm::rotate(this->rotateMatrix, this->rotation.z, FORWARD_VECTOR);
 		}
 		else {
-			glm::quat qX = glm::angleAxis(x, 1.0f,0.0f,0.0f);
-			glm::quat qY = glm::angleAxis(y, 0.0f,1.0f,0.0f);
-			glm::quat qZ = glm::angleAxis(z, 0.0f,0.0f,1.0f);
+			glm::quat qX = glm::angleAxis(x, RIGHT_VECTOR);
+			glm::quat qY = glm::angleAxis(y, UP_VECTOR);
+			glm::quat qZ = glm::angleAxis(z, FORWARD_VECTOR);
 			glm::quat change = qX * qY * qZ;
 			this->orientation = glm::normalize(change * this->orientation);
 			this->rotateMatrix = glm::mat4_cast(this->orientation);

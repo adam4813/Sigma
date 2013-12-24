@@ -3,7 +3,7 @@
 #define IGLCOMPONENT_H
 
 #include "GL/glew.h"
-#include "IComponent.h"
+#include "components/SpatialComponent.h"
 #include "GLTransform.h"
 #include "systems/GLSLShader.h"
 #include <unordered_map>
@@ -58,10 +58,14 @@ namespace Sigma {
         GLuint specularMap;
     };
 
-	class IGLComponent : public IComponent {
+	class IGLComponent : public SpatialComponent {
 	public:
-		IGLComponent() : IComponent(0) { } // Default ctor setting entity ID to 0.
-		IGLComponent(const int entityID) : lightingEnabled(true), IComponent(entityID) { } // Ctor that sets the entity ID.
+		SET_COMPONENT_TYPENAME("IGLComponent");
+
+		IGLComponent() 
+			: lightingEnabled(true), parentTransform(0), SpatialComponent(0) {} // Default ctor setting entity ID to 0.
+		IGLComponent(const int entityID)
+			: lightingEnabled(true), parentTransform(0), SpatialComponent(entityID) {} // Ctor that sets the entity ID.
 
         typedef std::unordered_map<std::string, std::shared_ptr<GLSLShader>> ShaderMap;
 
@@ -71,7 +75,6 @@ namespace Sigma {
 		 * \param entityID The entity this component belongs to.
 		 */
 		virtual void InitializeBuffers() = 0;
-
 
 		/**
 		 * \brief Retrieves the specified buffer.
@@ -110,7 +113,12 @@ namespace Sigma {
 		 *
 		 * \return GLTransform& The transform object.
 		 */
-		GLTransform* Transform() { return &transform; }
+		//GLTransform* Transform() { return &transform; }
+
+		/**
+		 * \brief Sets the parent transformation of this component.
+		 */
+		void SetParent(GLTransform *trans) { this->parentTransform = trans; }
 
 		/**
 		 * \brief Return the VAO ID of this component.
@@ -162,7 +170,7 @@ namespace Sigma {
 		unsigned int vao; // The VAO that describes this component's data.
 		unsigned int drawMode; // The current draw mode (ex. GL_TRIANGLES, GL_TRIANGLE_STRIP).
 		GLuint cull_face; // The current culling method for this component.
-		GLTransform transform; // The transform of this component.
+		GLTransform *parentTransform; // Transform of parent object
 
         std::shared_ptr<GLSLShader> shader; // shaders are shared among components
         // name-->shader map to look up already-loaded shaders (so each can be loaded only once)
