@@ -14,6 +14,14 @@ struct OggLinkedPacket {
 	void * next;
 };
 
+struct VorbisState {
+	vorbis_info info;
+	vorbis_comment com;
+	vorbis_dsp_state dsp;
+	vorbis_block block;
+	OggLinkedPacket * obj;
+};
+
 namespace Sigma {
 	namespace resource {
 
@@ -28,7 +36,7 @@ namespace Sigma {
 			ogg_sync_state sync;
 			ogg_stream_state stream;
 			ogg_page page;
-			long offs;
+			unsigned long offs;
 			size_t datasz;
 			size_t allosz;
 			size_t ndatasz;
@@ -68,6 +76,7 @@ namespace Sigma {
 							if(!offs) {
 								if(vorbis_synthesis_idheader(&opdata->pack) == 1) {
 									std::cerr << "\nVorbis ";
+									dataformat = Vorbis;
 								}
 							}
 							// expand packet buffer
@@ -93,9 +102,179 @@ namespace Sigma {
 					}
 				}
 			}
+
+			// build pointers & linked list
+			OggLinkedPacket *lastlp;
+			opdata = nullptr;
+			for(offs = 0; offs < datasz; ) {
+				lastlp = opdata;
+				opdata = (OggLinkedPacket*)(data + offs);
+				opdata->pack.packet = (data + offs + sizeof(OggLinkedPacket));
+				offs += sizeof(OggLinkedPacket);
+				if(offs < datasz) { offs += opdata->pack.bytes; } // avoid random data overflows
+				opdata->next = (OggLinkedPacket*)(data + offs);
+			}
+			if(lastlp) { lastlp->next = nullptr; }
+
 			std::cerr << datasz << " bytes loaded.";
 			ogg_stream_clear(&stream);
 			ogg_sync_clear(&sync);
+		}
+		Decoder::Decoder() : decoderstate(nullptr), decoderinit(false), hasmeta(false) {
+		}
+		Decoder::~Decoder() {
+			if(this->decoderstate) { delete this->decoderstate; }
+		}
+		void Decoder::Rewind() {
+		}
+		bool Decoder::EndOfStream() {
+			return true;
+		}
+		int Decoder::FetchBuffer(SoundFile &sf, void * out, AUDIO_PCM_FORMAT fmt, long count) {
+			if(!this->hasmeta) {
+				ProcessMeta(sf);
+			}
+			VorbisState *vs;
+			int i, samples;
+			float **fbp;
+			switch(sf.dataformat) {
+			case Vorbis:
+				vs = (VorbisState*)this->decoderstate;
+				if(!this->decoderinit) {
+					if(vorbis_synthesis_init(&vs->dsp, &vs->info) == 0) {
+						vorbis_block_init(&vs->dsp, &vs->block);
+						this->decoderinit = true;
+					}
+				}
+				if(this->decoderinit) {
+					samples = vorbis_synthesis_pcmout(&vs->dsp, &fbp);
+					if(samples == 0) {
+						if(vs->obj) {
+							if(!vorbis_synthesis(&vs->block, &vs->obj->pack)) {
+								vorbis_synthesis_blockin(&vs->dsp, &vs->block);
+							}
+							vs->obj = (OggLinkedPacket*)vs->obj->next;
+						} else {
+							return 0;
+						}
+					} else {
+						if(samples > count) { samples = count; }
+						Resample(out, fmt, *fbp, sf.pcmsize, samples);
+						vorbis_synthesis_read(&vs->dsp, samples);
+						return samples;
+					}
+				}
+				break;
+			default:
+				break;
+			}
+			return 0;
+		}
+		int Decoder::FetchBuffer(SoundFile &sf, void * out, AUDIO_PCM_FORMAT fmt, long count, int freq) {
+			return 0;
+		}
+		int Decoder::Frequency(SoundFile &sf) {
+			return 0;
+		}
+		void Decoder::ProcessMeta(SoundFile &sf) {
+			switch(sf.dataformat) {
+			case Vorbis:
+				{
+				this->decoderstate = new VorbisState;
+				VorbisState * vs = (VorbisState*)this->decoderstate;
+				vorbis_info_init(&vs->info);
+				vorbis_comment_init(&vs->com);
+				vs->obj = (OggLinkedPacket*)sf.data;
+				int i = 0;
+				while((i++ < 3) && vs->obj != nullptr && vorbis_synthesis_headerin(&vs->info, &vs->com, &vs->obj->pack) == 0) {
+					vs->obj = (OggLinkedPacket*)vs->obj->next;
+				}
+				this->hasmeta = true;
+				if(!sf.hasmeta) {
+					sf.freq = vs->info.rate;
+					sf.chann = vs->info.channels;
+					sf.pcmsize = (sf.chann != 1 ? PCM_STEREOf32 : PCM_MONOf32);
+					sf.hasmeta = true;
+				}
+				}
+				break;
+			case PCM:
+				sf.hasmeta = true;
+				break;
+			default:
+				sf.hasmeta = true;
+				break;
+			}
+		}
+		int Decoder::Resample(void * out, AUDIO_PCM_FORMAT outfmt, void * in, AUDIO_PCM_FORMAT infmt, long count) {
+			int inchanbytes;
+			int outchanbytes;
+			int inchannels;
+			int outchannels;
+			unsigned char *cidat, *codat;
+			short *sidat, *sodat;
+			unsigned long *lidat, *lodat;
+			float *fidat, *fodat;
+			bool chanadd = false;
+			bool chancomp = false;
+			long fcount;
+			// AUDIO_PCM_FORMAT defines x in lower 2 bits (x+1 = bytes per channel)
+			//  and y in remaining upper bits (y+1 = channels)
+			inchannels = 1 + (infmt >> 2);
+			inchanbytes = 1 + (infmt & 3);
+			outchannels = 1 + (outfmt >> 2);
+			outchanbytes = 1 + (outfmt & 3);
+			if(infmt == outfmt) {
+				memmove(out, in, count * inchanbytes * inchannels);
+				return count;
+			}
+			fcount = count * inchannels;
+			if(inchannels > outchannels) { chancomp = true; }
+			if(outchannels > inchannels) { chanadd = true; }
+			switch(inchanbytes) {
+			case 1:
+				return 0;
+			case 2:
+				return 0;
+			case 3: // int 24
+				switch(outchanbytes) {
+					case 1:
+						return count;
+					case 2: // int 16
+						for(cidat = (unsigned char *)in, sodat = (short*)out; fcount-- > 0; cidat+=3, sodat++) {
+							*((unsigned short*)sodat) = (unsigned short)((*((unsigned long*)cidat)) >> 8);
+							if(chanadd) { cidat-=3; }
+							if(chancomp) { cidat+=3; }
+						}
+						return count;
+					case 3: // int 24
+						return count;
+					case 4: // float 32
+						return count;
+				}
+			case 4: // float 32
+				switch(outchanbytes) {
+					case 1:
+						return count;
+					case 2: // int 16
+						for(fidat = (float*)in, sodat = (short*)out; fcount-- > 0; fidat++, sodat++) {
+							*sodat = (short)((*fidat) * 32767.f);
+							if(chanadd) { fidat--; }
+							if(chancomp) { fidat++; }
+						}
+						return count;
+					case 3: // int 24
+						return count;
+					case 4: // float 32
+						for(fidat = (float*)in, fodat = (float*)out; fcount-- > 0; fidat++, fodat++) {
+							*fodat = *fidat;
+							if(chanadd) { fidat--; }
+							if(chancomp) { fidat++; }
+						}
+						return count;
+				}
+			}
+			return 0;
 		}
 		void SoundFile::LoadFromFile(std::string fn) {
 			std::ifstream::pos_type sz;
@@ -115,6 +294,7 @@ namespace Sigma {
 				else if(fourcc == FourCC('O','g','g','S')) {
 					std::cerr << "Loading Sound from Ogg file: " << fn;
 					LoadOgg(fh, sz);
+					ProcessMeta();
 					std::cerr << '\n';
 				}
 				else {

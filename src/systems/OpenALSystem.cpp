@@ -55,7 +55,7 @@ namespace Sigma {
 	}
 
 	IComponent* OpenALSystem::CreateALSource(const unsigned int entityID, const std::vector<Property> &properties) {
-		ALSound * sound = new ALSound(entityID);
+		ALSound * sound = new ALSound(entityID, this);
 
 		std::string soundFilename;
 

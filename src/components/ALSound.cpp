@@ -11,8 +11,10 @@ namespace Sigma {
 			this->sourceid = 0;
 		}
 	}
-
-	void ALSound::Play(PLAYBACK mode){}
+	void ALSound::Update() {
+	}
+	void ALSound::Play(PLAYBACK mode) {
+	}
 	void ALSound::Pause(){}
 	void ALSound::Stop(){}
 	void ALSound::PlayMode(ORDERING o, PLAYBACK mode){}

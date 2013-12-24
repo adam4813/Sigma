@@ -26,7 +26,7 @@ namespace Sigma {
 
 	class ISound : public IComponent {
 	public:
-		ISound(int entityID) : IComponent(entityID), playorder(ORDERING_SEQ), playloop(PLAYBACK_NORMAL) {}
+		ISound(int entityID) : IComponent(entityID), playindex(0), playorder(ORDERING_SEQ), playloop(PLAYBACK_NORMAL) {}
 		virtual ~ISound() {}
 
 		virtual void Play(PLAYBACK mode = PLAYBACK_NONE) = 0;
@@ -42,8 +42,9 @@ namespace Sigma {
 		virtual void ClearSounds() {
 			playlist.clear();
 		}
-	private:
+	protected:
 		std::vector<long> playlist;
+		int playindex;
 		ORDERING playorder;
 		PLAYBACK playloop;
 	};

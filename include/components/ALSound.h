@@ -5,12 +5,14 @@
 #include <AL/al.h>
 
 namespace Sigma {
+	class OpenALSystem;
 
 	class ALSound : public ISound {
+		friend class OpenALSystem;
 	public:
 		SET_COMPONENT_TYPENAME("ALSound");
 
-		ALSound(int entityID) : ISound(entityID), sourceid(0) { }
+		ALSound(int entityID,OpenALSystem *m) : ISound(entityID), buffercount(0), bufferindex(0), master(m), sourceid(0), stream(false) { }
 		virtual ~ALSound() { Destroy(); }
 
 		void Generate();
@@ -29,7 +31,14 @@ namespace Sigma {
 		void Velocity(glm::vec3 v);
 
 		ALuint GetID() { return sourceid; }
-	private:
+	protected:
+		void Update();
 		ALuint sourceid;
+		bool stream;
+		int buffers[4];
+		int bufferindex;
+		int buffercount;
+		resource::Decoder codec;
+		OpenALSystem *master;
 	};
 } // namespace Sigma
