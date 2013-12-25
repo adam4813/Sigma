@@ -43,12 +43,21 @@ namespace Sigma {
 		public:
 			Decoder();
 			~Decoder();
-			void Rewind();
+			void Rewind(SoundFile &sf);
 			bool EndOfStream();
 			int FetchBuffer(SoundFile &, void * out, AUDIO_PCM_FORMAT fmt, long count);
 			int FetchBuffer(SoundFile &, void * out, AUDIO_PCM_FORMAT fmt, long count, int freq);
 			int Frequency(SoundFile &);
-			static int Resample(void * out, AUDIO_PCM_FORMAT outfmt, void * in, AUDIO_PCM_FORMAT infmt, long count);
+
+			/*
+			 * Converts between sample formats
+			 */
+			static void * Resample(void * out, AUDIO_PCM_FORMAT outfmt, void * in, AUDIO_PCM_FORMAT infmt, long count);
+			
+			/*
+			 * Interlaces two channels while converting sample formats
+			 */
+			static void * MergeSample(void * out, AUDIO_PCM_FORMAT outfmt, void * inl, void * inr, AUDIO_PCM_FORMAT infmt, long count);
 			void ProcessMeta(SoundFile &);
 		protected:
 			void * decoderstate;
@@ -66,11 +75,21 @@ namespace Sigma {
 			void LoadWAV(std::ifstream &fh, std::ifstream::pos_type sz);
 			void LoadOgg(std::ifstream &fh, std::ifstream::pos_type sz);
 			AUDIO_CODEC Format() { return dataformat; }
+			bool isStream() { return true; }
 			int Frequency() {
-				if(hasmeta) { return freq; }
-				else {
-					Decoder d;
-					return d.Frequency(*this);
+				if(hasmeta) {
+					return freq;
+				} else {
+					ProcessMeta();
+					return freq;
+				}
+			}
+			int Channels() {
+				if(hasmeta) {
+					return chann;
+				} else {
+					ProcessMeta();
+					return chann;
 				}
 			}
 			void ProcessMeta() {

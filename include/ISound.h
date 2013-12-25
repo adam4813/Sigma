@@ -26,7 +26,7 @@ namespace Sigma {
 
 	class ISound : public IComponent {
 	public:
-		ISound(int entityID) : IComponent(entityID), playindex(0), playorder(ORDERING_SEQ), playloop(PLAYBACK_NORMAL) {}
+		ISound(int entityID) : IComponent(entityID), paused(false), playing(false), playindex(0), playorder(ORDERING_SEQ), playloop(PLAYBACK_NORMAL) {}
 		virtual ~ISound() {}
 
 		virtual void Play(PLAYBACK mode = PLAYBACK_NONE) = 0;
@@ -47,5 +47,7 @@ namespace Sigma {
 		int playindex;
 		ORDERING playorder;
 		PLAYBACK playloop;
+		bool playing;
+		bool paused;
 	};
 } // namespace Sigma

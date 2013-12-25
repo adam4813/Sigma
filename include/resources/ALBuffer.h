@@ -2,6 +2,7 @@
 
 #include <AL/al.h>
 #include <math.h>
+#include "resources/SoundFile.h"
 
 namespace Sigma {
 	namespace resource {

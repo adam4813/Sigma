@@ -140,6 +140,13 @@ int main(int argCount, char **argValues) {
 	// Call now to clear the delta after startup.
 	glfwos.GetDeltaTime();
 
+	{
+		Sigma::ALSound *als = (Sigma::ALSound *)alsys.getComponent(30, Sigma::ALSound::getStaticComponentTypeName());
+		if(als) {
+			als->Play();
+		}
+	}
+
 	while (!glfwos.Closing()) {
 		// Get time in ms, store it in seconds too
 

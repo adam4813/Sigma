@@ -16,7 +16,8 @@
 
 namespace Sigma {
 	class OpenALSystem
-		: public Sigma::IFactory, public ISystem<IComponent> {
+	    : public Sigma::IFactory, public ISystem<IComponent> {
+		friend class ALSound;
 	public:
 		OpenALSystem();
 		virtual ~OpenALSystem() {}
@@ -53,6 +54,7 @@ namespace Sigma {
 
 		void test();
 	private:
+		int AllocateBuffer();
 		std::vector<std::unique_ptr<resource::ALBuffer>> buffers;
 		ALuint testsource;
 		ALuint lbuf;
@@ -61,7 +63,7 @@ namespace Sigma {
 		long nextindex;
 		int lbi;
 		bool altn;
-ALCdevice* device;
+		ALCdevice* device;
 		ALCcontext* context;
 
 	}; // class OpenALSystem

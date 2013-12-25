@@ -57,6 +57,8 @@ namespace Sigma {
 	IComponent* OpenALSystem::CreateALSource(const unsigned int entityID, const std::vector<Property> &properties) {
 		ALSound * sound = new ALSound(entityID, this);
 
+		sound->Generate();
+
 		std::string soundFilename;
 
 		long index;
@@ -88,6 +90,7 @@ namespace Sigma {
 
 		sound->Position(x,y,z);
 
+		this->addComponent(entityID, sound);
 		return sound;
 	}
 	std::map<std::string, Sigma::IFactory::FactoryFunction>
@@ -102,23 +105,36 @@ namespace Sigma {
 
 	bool OpenALSystem::Update() {
 		ALint i;
+		for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
+			for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
+				ALSound *sound = dynamic_cast<ALSound *>(citr->second.get());
+				sound->Update();
+			}
+		}
 		//this whole function is a hack right now!
 		alGetSourcei(this->testsource, AL_BUFFER, &i);
-		if(i == 0) { alSourcePlay(this->testsource); }
+		//if(i == 0) { alSourcePlay(this->testsource); }
 		if(lbuf != i) {
 			ALuint b = buffers[lbi]->GetID();
 			if(i != 0 && i != b) { // Test "streaming" data, by swapping between two buffers and updating one of them
 				alSourceUnqueueBuffers(this->testsource, 1, &b);
 				if(lbi) { buffers[lbi]->SineSynth((this->altn = !this->altn) ? 0.03f : 0.02f); }
-				alSourceQueueBuffers(this->testsource, 1, &b);
+				//alSourceQueueBuffers(this->testsource, 1, &b);
 				lbi = lbi ^ 1;
 			}
 			lbuf = i;
 		}
-		std::cerr << i << "," << lbuf << ": ";
+		//std::cerr << i << "," << lbuf << ": ";
 		return false;
 	}
-
+	int OpenALSystem::AllocateBuffer() {
+		int x;
+		std::unique_ptr<resource::ALBuffer> testbuff(new resource::ALBuffer());
+		testbuff->GenerateBuffer();
+		x = this->buffers.size();
+		this->buffers.push_back(std::move(testbuff));
+		return x;
+	}
 	void OpenALSystem::test() {
 		lbi = 0;
 		alGenSources(1, &this->testsource);

@@ -3,7 +3,9 @@
 #include "ISound.h"
 #include "glm/glm.hpp"
 #include <AL/al.h>
+#include "systems/OpenALSystem.h"
 
+#define ALSOUND_BUFFERS 4
 namespace Sigma {
 	class OpenALSystem;
 
@@ -35,7 +37,8 @@ namespace Sigma {
 		void Update();
 		ALuint sourceid;
 		bool stream;
-		int buffers[4];
+		int buffers[ALSOUND_BUFFERS];
+		int streamend;
 		int bufferindex;
 		int buffercount;
 		resource::Decoder codec;

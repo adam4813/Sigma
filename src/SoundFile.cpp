@@ -82,7 +82,7 @@ namespace Sigma {
 							// expand packet buffer
 							ndatasz = datasz + bytec + sizeof(OggLinkedPacket);
 							if(ndatasz > allosz) {
-								allosz = ((ndatasz+1) - ((ndatasz+1) & 0x3fff)) + 0x4000;
+								allosz = ((ndatasz+1) - ((ndatasz+1) & 0x3fff)) + 0x8000;
 								redata = (unsigned char*)realloc(this->data, allosz);
 							} else {
 								redata = this->data;
@@ -125,7 +125,19 @@ namespace Sigma {
 		Decoder::~Decoder() {
 			if(this->decoderstate) { delete this->decoderstate; }
 		}
-		void Decoder::Rewind() {
+		void Decoder::Rewind(SoundFile &sf) {
+			VorbisState *vs;
+			
+			switch(sf.dataformat) {
+			case Vorbis:
+				if(this->decoderinit) {
+					vs = (VorbisState*)this->decoderstate;
+					if(vorbis_synthesis_restart(&vs->dsp) == 0) {
+					}
+					vs->obj = (OggLinkedPacket*)sf.data;
+				}
+				break;
+			}
 		}
 		bool Decoder::EndOfStream() {
 			return true;
@@ -136,6 +148,7 @@ namespace Sigma {
 			}
 			VorbisState *vs;
 			int i, samples;
+			int readsamples;
 			float **fbp;
 			switch(sf.dataformat) {
 			case Vorbis:
@@ -147,22 +160,33 @@ namespace Sigma {
 					}
 				}
 				if(this->decoderinit) {
-					samples = vorbis_synthesis_pcmout(&vs->dsp, &fbp);
-					if(samples == 0) {
-						if(vs->obj) {
-							if(!vorbis_synthesis(&vs->block, &vs->obj->pack)) {
-								vorbis_synthesis_blockin(&vs->dsp, &vs->block);
+					readsamples = 0;
+					while(count > readsamples) {
+						samples = vorbis_synthesis_pcmout(&vs->dsp, &fbp);
+						if(samples == 0) {
+							if(vs->obj) {
+								if(!(i=vorbis_synthesis(&vs->block, &vs->obj->pack))) {
+									i = vorbis_synthesis_blockin(&vs->dsp, &vs->block);
+									if(i < 0) {
+										i = 0;
+									}
+								} else {
+									i = 0;
+								}
+								vs->obj = (OggLinkedPacket*)vs->obj->next;
+							} else {
+								return 0;
 							}
-							vs->obj = (OggLinkedPacket*)vs->obj->next;
 						} else {
-							return 0;
+							if(readsamples + samples > count) {
+								samples = count - readsamples;
+							}
+							out = MergeSample(out, fmt, fbp[0], fbp[1], sf.pcmsize, samples);
+							vorbis_synthesis_read(&vs->dsp, samples);
+							readsamples += samples;
 						}
-					} else {
-						if(samples > count) { samples = count; }
-						Resample(out, fmt, *fbp, sf.pcmsize, samples);
-						vorbis_synthesis_read(&vs->dsp, samples);
-						return samples;
 					}
+					return readsamples;
 				}
 				break;
 			default:
@@ -206,18 +230,73 @@ namespace Sigma {
 				break;
 			}
 		}
-		int Decoder::Resample(void * out, AUDIO_PCM_FORMAT outfmt, void * in, AUDIO_PCM_FORMAT infmt, long count) {
+		void * Decoder::MergeSample(void * out, AUDIO_PCM_FORMAT outfmt, void * inl, void * inr, AUDIO_PCM_FORMAT infmt, long count) {
+			int inchanbytes;
+			int outchanbytes;
+			//unsigned char *cidat, *codat;
+			//short *sidat;
+			short *sodat;
+			//unsigned long *lidat, *lodat;
+			float *fildat, *firdat;
+			//float *fodat;
+			long k;
+			// AUDIO_PCM_FORMAT defines x in lower 2 bits (x+1 = bytes per channel)
+			//  and y in remaining upper bits (y+1 = channels)
+			inchanbytes = 1 + (infmt & 3);
+			outchanbytes = 1 + (outfmt & 3);
+			switch(inchanbytes) {
+			case 1:
+				return out;
+			case 2:
+				return out;
+			case 3: // int 24
+				switch(outchanbytes) {
+					case 1:
+						return out;
+					case 2: // int 16
+						return out;
+					case 3: // int 24
+						return out;
+					case 4: // float 32
+						return out;
+				}
+			case 4: // float 32
+				switch(outchanbytes) {
+					case 1:
+						return out;
+					case 2: // int 16
+						fildat = (float*)inl;
+						firdat = (float*)inr;
+						sodat = (short*)out;
+						for(k = 0; k++ < count; firdat++, fildat++) {
+							*(unsigned short*)sodat = static_cast<unsigned short>(((*fildat)+1.0f) * 16383.f);
+							sodat++;
+							*(unsigned short*)sodat = static_cast<unsigned short>(((*firdat)+1.0f) * 16383.f);
+							sodat++;
+						}
+						return sodat;
+					case 3: // int 24
+						return out;
+					case 4: // float 32
+						return out;
+				}
+			}
+			return out;
+		}
+		void * Decoder::Resample(void * out, AUDIO_PCM_FORMAT outfmt, void * in, AUDIO_PCM_FORMAT infmt, long count) {
 			int inchanbytes;
 			int outchanbytes;
 			int inchannels;
 			int outchannels;
-			unsigned char *cidat, *codat;
-			short *sidat, *sodat;
-			unsigned long *lidat, *lodat;
+			unsigned char *cidat;
+			short *sodat;
+			//unsigned long *lidat, *lodat;
 			float *fidat, *fodat;
 			bool chanadd = false;
 			bool chancomp = false;
+			float fmax = 1.0f, fmin = -1.0f;
 			long fcount;
+			long k;
 			// AUDIO_PCM_FORMAT defines x in lower 2 bits (x+1 = bytes per channel)
 			//  and y in remaining upper bits (y+1 = channels)
 			inchannels = 1 + (infmt >> 2);
@@ -226,55 +305,58 @@ namespace Sigma {
 			outchanbytes = 1 + (outfmt & 3);
 			if(infmt == outfmt) {
 				memmove(out, in, count * inchanbytes * inchannels);
-				return count;
+				return ((char*)out) + (count * inchanbytes * inchannels);
 			}
 			fcount = count * inchannels;
 			if(inchannels > outchannels) { chancomp = true; }
 			if(outchannels > inchannels) { chanadd = true; }
 			switch(inchanbytes) {
 			case 1:
-				return 0;
+				return out;
 			case 2:
-				return 0;
+				return out;
 			case 3: // int 24
 				switch(outchanbytes) {
 					case 1:
-						return count;
+						return out;
 					case 2: // int 16
-						for(cidat = (unsigned char *)in, sodat = (short*)out; fcount-- > 0; cidat+=3, sodat++) {
+						for(cidat = (unsigned char *)in, sodat = (short*)out; fcount-- >= 0; cidat+=3, sodat++) {
 							*((unsigned short*)sodat) = (unsigned short)((*((unsigned long*)cidat)) >> 8);
 							if(chanadd) { cidat-=3; }
 							if(chancomp) { cidat+=3; }
 						}
-						return count;
+						return sodat;
 					case 3: // int 24
-						return count;
+						return out;
 					case 4: // float 32
-						return count;
+						return out;
 				}
 			case 4: // float 32
 				switch(outchanbytes) {
 					case 1:
-						return count;
+						return out;
 					case 2: // int 16
-						for(fidat = (float*)in, sodat = (short*)out; fcount-- > 0; fidat++, sodat++) {
-							*sodat = (short)((*fidat) * 32767.f);
+						k = 0;
+						for(fidat = (float*)in, sodat = (short*)out; k++ < fcount; fidat++, sodat++) {
+							*(unsigned short*)sodat = static_cast<unsigned short>(((*fidat)+1.0f) * 16383.f);
+							if(*fidat < fmin) { std::cerr << "m" << *fidat; sodat--; }
+							if(*fidat > fmax) { std::cerr << "x" << *fidat; sodat--; }
 							if(chanadd) { fidat--; }
 							if(chancomp) { fidat++; }
 						}
-						return count;
+						return sodat;
 					case 3: // int 24
-						return count;
+						return out;
 					case 4: // float 32
-						for(fidat = (float*)in, fodat = (float*)out; fcount-- > 0; fidat++, fodat++) {
+						for(fidat = (float*)in, fodat = (float*)out; fcount-- >= 0; fidat++, fodat++) {
 							*fodat = *fidat;
 							if(chanadd) { fidat--; }
 							if(chancomp) { fidat++; }
 						}
-						return count;
+						return fodat;
 				}
 			}
-			return 0;
+			return out;
 		}
 		void SoundFile::LoadFromFile(std::string fn) {
 			std::ifstream::pos_type sz;
