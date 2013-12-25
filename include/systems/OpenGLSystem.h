@@ -127,7 +127,7 @@ namespace Sigma{
 		 * \brief Adds a view to the stack.
 		 *
 		 * \param[in/out] IGLView * view The view to add to the stack.
-		 * \return void 
+		 * \return void
 		 */
 		void PushView(IGLView* view) {
 			this->views.push_back(view);
@@ -137,7 +137,7 @@ namespace Sigma{
 		 * \brief Pops a view from the stack.
 		 *
 		 * Pops a view from the stack and deletes it.
-		 * \return void 
+		 * \return void
 		 */
 		void PopView() {
 			if (this->views.size() > 0) {

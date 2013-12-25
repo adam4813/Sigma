@@ -36,9 +36,23 @@ namespace Sigma {
 				 */
 				virtual void MouseMove(float x, float y, float dx, float dy);
 
-				// Not used but required to implement.
-				virtual void MouseDown(Sigma::event::BUTTON btn, float x, float y) {}
-				virtual void MouseUp(Sigma::event::BUTTON btn, float x, float y) {}
+				/**
+				 * \brief Enables mouse look when the right mouse button is clicked.
+				 *
+				 * \param[in/out] event::BUTTON btn The button that was clicked.
+				 * \param[in/out] float x, y Position of the cursor when the click occurred.
+				 * \return void
+				 */
+				virtual void MouseDown(BUTTON btn, float x, float y);
+
+				/**
+				 * \brief Disables mouse look when the right mouse button is released.
+				 *
+				 * \param[in/out] event::BUTTON btn The button that was releaed.
+				 * \param[in/out] float x, y Position of the cursor when the release occurred.
+				 * \return void
+				 */
+				virtual void MouseUp(BUTTON btn, float x, float y);
 
 				/**
 				 * \brief Updates and returns the view matrix.
@@ -59,6 +73,7 @@ namespace Sigma {
 				BulletMover* mover; // The view mover component that applies the rotations and forces set in the trigger method.
                 static const float SPEED_TRANSLATE, SPEED_ROTATE, BOOST_MULTIPLIER; // Speed variables
                 glm::vec3 translation; // Current translation.
+				bool mouseLook;
 			};
 		}
 	}

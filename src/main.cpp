@@ -50,7 +50,7 @@ int main(int argCount, char **argValues) {
 	Sigma::parser::SCParser parser;
 
 	std::cout << "Parsing test.sc scene file." << std::endl;
-	if (!parser.Parse("test.sc")) {
+	if (!parser.Parse("testnew.sc")) {
 		assert(0 && "Failed to load entities from file.");
 	}
 

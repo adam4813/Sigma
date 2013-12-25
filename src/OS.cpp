@@ -165,6 +165,7 @@ namespace Sigma {
 	}
 
 	void OS::DispatchMouseMoveEvent(const double x, const double y) {
+		this->MouseEventSystem.MouseMove(static_cast<float>(x / this->width), static_cast<float>(y / this->height), static_cast<float>((x - this->oldMouseX) / this->width), static_cast<float>((y - this->oldMouseY) / this->height));
 		// If we are in mouse lock we will snap the mouse to the middle of the screen.
 		if (this->mouseLock) {
 			this->oldMouseX = this->width / 2;
@@ -175,7 +176,6 @@ namespace Sigma {
 			this->oldMouseX = x;
 			this->oldMouseY = y;
 		}
-		this->MouseEventSystem.MouseMove(static_cast<float>(x / this->width), static_cast<float>(y / this->height), static_cast<float>((x - this->oldMouseX) / this->width), static_cast<float>((y - this->oldMouseY) / this->height));
 	}
 
 	void OS::DispatchMouseButtonEvent(const int button, const int action, const int mods) {
