@@ -39,6 +39,12 @@ namespace Sigma {
 					if(i > 0) {
 						alBufferData(albuf, ((chancount == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16), buf, buflen * sizeof(short), samplecount);
 						alSourceQueueBuffers(this->sourceid, 1, &albuf);
+					} else {
+						if(playloop == PLAYBACK_LOOPING) {
+							this->codec.Rewind(*sfp);
+						} else {
+							playing = false;
+						}
 					}
 					delete buf;
 				}
@@ -54,6 +60,10 @@ namespace Sigma {
 		ALuint albuf[ALSOUND_BUFFERS];
 		unsigned short *buf;
 		std::shared_ptr<resource::SoundFile> sfp;
+
+		if(mode != PLAYBACK_NONE) {
+			playloop = mode;
+		}
 		if(paused && !playing) {
 			alSourcePlay(this->sourceid);
 			playing = true;

@@ -92,8 +92,6 @@ if(NOT OPENGL_FOUND)
 	message(FATAL_ERROR "OpenGL not found! Aborting!")
 endif(NOT OPENGL_FOUND)
 
-set(OPENAL_LIBRARY "")
-
 # Figure out what Operating System to compile against
 if(WIN32 AND NOT MINGW) # Windows
 	set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${CMAKE_SOURCE_DIR}/include/libraries)
@@ -107,7 +105,6 @@ if(WIN32 AND NOT MINGW) # Windows
 	endif (CMAKE_CL_64)
 
 	SET(GLFW3_LIBRARY glfw3)
-	set(OPENAL_LIBRARY OpenAL32)
 	set(GLEW_LIBRARY glew32s glew32)
 	set(BULLET_LINEARMATH_LIBRARIES LinearMath)
 	set(BULLET_COLLISION_LIBRARIES BulletCollision)
@@ -120,6 +117,7 @@ endif(WIN32 AND NOT MINGW)
 SET(X11_LIBRARIES "")
 
 find_package(OggVorbis REQUIRED)
+find_package(OpenAL REQUIRED)
 
 if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
 	if (NOT APPLE) # X11 and GLEW are not needed on OS X.

@@ -63,6 +63,7 @@ namespace Sigma {
 
 		long index;
 		float x, y, z;
+		bool loop = false;
 		x = y = z = 0.0f;
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
@@ -80,10 +81,15 @@ namespace Sigma {
 				z = p->Get<float>();
 				continue;
 			}
+			else if (p->GetName() == "loop") {
+				sound->PlayMode(ORDERING_NONE,PLAYBACK_LOOPING);
+				continue;
+			}
 			else if (p->GetName() == "soundFilename") {
 				soundFilename = p->Get<std::string>();
 				index = LoadSoundFile(soundFilename);
 				sound->AddSound(index);
+				loop = false;
 				continue;
 			}
 		}

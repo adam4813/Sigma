@@ -269,9 +269,9 @@ namespace Sigma {
 						firdat = (float*)inr;
 						sodat = (short*)out;
 						for(k = 0; k++ < count; firdat++, fildat++) {
-							*(unsigned short*)sodat = static_cast<unsigned short>(((*fildat)+1.0f) * 16383.f);
+							*(short*)sodat = static_cast<short>(((*fildat)) * 16383.f);
 							sodat++;
-							*(unsigned short*)sodat = static_cast<unsigned short>(((*firdat)+1.0f) * 16383.f);
+							*(short*)sodat = static_cast<short>(((*firdat)) * 16383.f);
 							sodat++;
 						}
 						return sodat;
