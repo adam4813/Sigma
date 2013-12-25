@@ -13,8 +13,6 @@ namespace Sigma {
      */
     struct SetLocals {
       SetLocals() {
-      
-        setlocale(LC_ALL|~LC_NUMERIC, "");
         setlocale(LC_NUMERIC, "C"); // We must parse numbers in a consistent way
       }
 
