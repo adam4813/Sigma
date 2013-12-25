@@ -27,7 +27,7 @@ namespace Sigma {
 			virtual void KeyStateChange(const unsigned int key, const KEY_STATE state) = 0;
 			virtual void CharDown(const unsigned int c) { }
 			virtual void LostKeyboardFocus() { }
-			KeyboardInputSystem* system;
+			KeyboardInputSystem* keyboardSystem;
 		};
 
 		class KeyboardInputSystem {
@@ -39,7 +39,7 @@ namespace Sigma {
 			 * \brief Called to request focus lock.
 			 *
 			 * By requesting focus lock all future keyboard events will go to that handler until it calls ReleaseFocusLock.
-			 * \param[in/out] IKeyboardEventHandler * e
+			 * \param[in] IKeyboardEventHandler* e
 			 * \return bool True is focus was locked or if this handler already has focus lock otherwise false.
 			 */
 			bool RequestFocusLock(IKeyboardEventHandler* e) {
@@ -68,7 +68,7 @@ namespace Sigma {
 			/**
 			 * \brief Releases focus lock if the handler currently has the lock.
 			 *
-			 * \param[in/out] IKeyboardEventHandler * e
+			 * \param[in] IKeyboardEventHandler* e
 			 * \return void No return indication if the lock was successfully released.
 			 */
 			void ReleaseFocusLock(IKeyboardEventHandler* e) {
@@ -80,11 +80,11 @@ namespace Sigma {
 			/**
 			 * \brief Register a KeyboardEventHandler.
 			 *
-			 * \param[in] IKeyboardEventHandler* e The keyboard even handler to register.
+			 * \param[in] IKeyboardEventHandler* e The keyboard event handler to register.
 			 * \return void
 			 */
 			void Register(IKeyboardEventHandler* e) {
-				e->system = this;
+				e->keyboardSystem = this;
 				for (unsigned int i = 0; i < MAX_KEY; i++) {
 					if (e->keys[i] > 0) {
 						this->eventHandlers[i].push_back(e);

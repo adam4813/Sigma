@@ -29,10 +29,12 @@ namespace Sigma {
 				// Store the new key state
 				if (this->gui) {
 					if (this->gui->InjectMouseDown(btn, x, y)) {
-						this->system->RequestFocusLock(this);
+						this->keyboardSystem->RequestFocusLock(this);
+						this->mouseSystem->RequestFocusLock(this);
 					}
 					else {
-						this->system->ReleaseFocusLock(this);
+						this->keyboardSystem->ReleaseFocusLock(this);
+						this->mouseSystem->ReleaseFocusLock(this);
 					}
 				}
 			}
@@ -41,10 +43,12 @@ namespace Sigma {
 				// Store the new key state
 				if (this->gui) {
 					if (this->gui->InjectMouseUp(btn, x, y)) {
-						this->system->RequestFocusLock(this);
+						this->keyboardSystem->RequestFocusLock(this);
+						this->mouseSystem->RequestFocusLock(this);
 					}
 					else {
-						this->system->ReleaseFocusLock(this);
+						this->keyboardSystem->ReleaseFocusLock(this);
+						this->mouseSystem->ReleaseFocusLock(this);
 					}
 				}
 			}
@@ -53,10 +57,12 @@ namespace Sigma {
 				// Store the new key state
 				if (this->gui) {
 					if (this->gui->InjectMouseMove(x, y)) {
-						this->system->RequestFocusLock(this);
+						this->keyboardSystem->RequestFocusLock(this);
+						this->mouseSystem->RequestFocusLock(this);
 					}
 					else {
-						this->system->ReleaseFocusLock(this);
+						this->keyboardSystem->ReleaseFocusLock(this);
+						this->mouseSystem->ReleaseFocusLock(this);
 					}
 				}
 			}
