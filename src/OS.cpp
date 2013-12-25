@@ -1,7 +1,6 @@
 #include "OS.h"
 
 namespace Sigma {
-
 	bool OS::InitializeWindow(const int width, const int height, const std::string title, const unsigned int glMajor /*= 3*/, const unsigned int glMinor /*= 2*/) {
 		// Initialize the library.
 		if (!glfwInit()) {
@@ -14,10 +13,10 @@ namespace Sigma {
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, glMinor);
 
 #ifdef __APPLE__
-        // Must use the Core Profile on OS X to get GL 3.2.
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		// Must use the Core Profile on OS X to get GL 3.2.
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #endif
-        
+		
 		// Create a windowed mode window and its OpenGL context.
 		this->window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
 
@@ -52,6 +51,7 @@ namespace Sigma {
 		glfwSetCursorPosCallback(this->window, &OS::mouseMoveEvent);
 		glfwSetCharCallback(this->window, &OS::characterEvent);
 		glfwSetMouseButtonCallback(this->window, &OS::mouseButtonEvent);
+		glfwSetWindowFocusCallback(this->window, &OS::windowFocusChange);
 
 		glfwGetCursorPos(this->window, &this->oldMouseX, &this->oldMouseY);
 
@@ -127,6 +127,17 @@ namespace Sigma {
 
 		if (os) {
 			os->DispatchMouseButtonEvent(button, action, mods);
+		}
+	}
+
+	void OS::windowFocusChange(GLFWwindow* window, int focused) {
+		if (focused == GL_FALSE) {
+			// Get the user pointer and cast it.
+			OS* os = static_cast<OS*>(glfwGetWindowUserPointer(window));
+
+			if (os) {
+				os->KeyboardEventSystem.LostKeyboardFocus();
+			}
 		}
 	}
 
@@ -222,5 +233,4 @@ namespace Sigma {
 
 		return false;
 	}
-
 }
