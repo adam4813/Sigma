@@ -6,6 +6,7 @@
 #include "glm/glm.hpp"
 #include "IComponent.h"
 #include "systems/GLSLShader.h"
+#include "GLTransform.h"
 
 namespace Sigma {
 	class SpotLight : public IComponent {
@@ -15,8 +16,9 @@ namespace Sigma {
 
 		SET_COMPONENT_TYPENAME("SpotLight");
 
-		glm::vec3 position;
-		glm::vec3 direction;
+		//glm::vec3 position;
+		//glm::vec3 direction;
+		GLTransform transform;
 		glm::vec4 color;
 		float intensity;
 

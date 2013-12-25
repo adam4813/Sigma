@@ -165,6 +165,7 @@ int main(int argCount, char **argValues) {
 		IOpSys::KeyboardEventSystem.Register(&cameraController);
 	}
 	
+	// Sync bullet physics object with gl camera
 	bphys.initViewMover();
 
 	///////////////////

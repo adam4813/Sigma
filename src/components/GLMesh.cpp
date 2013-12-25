@@ -105,9 +105,9 @@ namespace Sigma{
     void GLMesh::Render(glm::mediump_float *view, glm::mediump_float *proj) {
         glm::mat4 modelMatrix = this->Transform()->GetMatrix();
 
-		if(this->parentTransform != 0) {
-			modelMatrix = this->parentTransform->GetMatrix() * modelMatrix;
-		}
+		//if(this->parentTransform != 0) {
+		//	modelMatrix = this->parentTransform->GetMatrix() * modelMatrix;
+		//}
 
         this->shader->Use();
         glUniformMatrix4fv((*this->shader)("in_Model"), 1, GL_FALSE, &modelMatrix[0][0]);

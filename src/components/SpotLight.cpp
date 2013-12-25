@@ -2,8 +2,8 @@
 
 namespace Sigma {
 	SpotLight::SpotLight(const unsigned int entityID) : IComponent(entityID) {
-		this->position = glm::vec3(0.0f, 0.0f, 0.0f);
-		this->direction = glm::vec3(0.0f, 0.0f, 1.0f);
+		this->transform.TranslateTo(glm::vec3(0.0f, 0.0f, 0.0f));
+		this->transform.Rotate(glm::vec3(0.0f, 0.0f, 0.0f));
 		this->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		this->intensity = 1.0f;
 

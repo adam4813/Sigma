@@ -366,16 +366,18 @@ namespace Sigma{
 				mesh->SetLightingEnabled(p->Get<bool>());
 			}
 			else if (p->GetName() == "parent") {
+				/* Right now hacky, only GLMesh and FPSCamera are supported as parents */
+
 				int parentID = p->Get<int>();
-				SpatialComponent *comp = dynamic_cast<SpatialComponent *>(this->getComponent(parentID, Sigma::IGLComponent::getStaticComponentTypeName()));
+				SpatialComponent *comp = dynamic_cast<SpatialComponent *>(this->getComponent(parentID, Sigma::GLMesh::getStaticComponentTypeName()));
 
 				if(comp) {
-					mesh->SetParent(comp->Transform());
+					mesh->Transform()->SetParentTransform(comp->Transform());
 				} else {
 					comp = dynamic_cast<SpatialComponent *>(this->getComponent(parentID, Sigma::event::handler::FPSCamera::getStaticComponentTypeName()));
 
 					if(comp) {
-						mesh->SetParent(comp->Transform());
+						mesh->Transform()->SetParentTransform(comp->Transform());
 					}
 				}
 			}
@@ -503,25 +505,28 @@ namespace Sigma{
 	IComponent* OpenGLSystem::createSpotLight(const unsigned int entityID, const std::vector<Property> &properties) {
 		Sigma::SpotLight *light = new Sigma::SpotLight(entityID);
 
+		float x=0.0f, y=0.0f, z=0.0f;
+		float rx=0.0f, ry=0.0f, rz=0.0f;
+
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			const Property*  p = &*propitr;
 			if (p->GetName() == "x") {
-				light->position.x = p->Get<float>();
+				x = p->Get<float>();
 			}
 			else if (p->GetName() == "y") {
-				light->position.y = p->Get<float>();
+				y = p->Get<float>();
 			}
 			else if (p->GetName() == "z") {
-				light->position.z = p->Get<float>();
+				z = p->Get<float>();
 			}
-			else if (p->GetName() == "dx") {
-				light->direction.x = p->Get<float>();
+			else if (p->GetName() == "rx") {
+				rx = p->Get<float>();
 			}
-			else if (p->GetName() == "dy") {
-				light->direction.y = p->Get<float>();
+			else if (p->GetName() == "ry") {
+				ry = p->Get<float>();
 			}
-			else if (p->GetName() == "dz") {
-				light->direction.z = p->Get<float>();
+			else if (p->GetName() == "rz") {
+				rz = p->Get<float>();
 			}
 			else if (p->GetName() == "intensity") {
 				light->intensity = p->Get<float>();
@@ -545,9 +550,29 @@ namespace Sigma{
 			else if (p->GetName() == "exponent") {
 				light->exponent = p->Get<float>();
 			}
+			else if (p->GetName() == "parent") {
+				/* Right now hacky, only GLMesh and FPSCamera are supported as parents */
+
+				int parentID = p->Get<int>();
+				SpatialComponent *comp = dynamic_cast<SpatialComponent *>(this->getComponent(parentID, Sigma::GLMesh::getStaticComponentTypeName()));
+
+				if(comp) {
+					light->transform.SetParentTransform(comp->Transform());
+				} else {
+					comp = dynamic_cast<SpatialComponent *>(this->getComponent(parentID, Sigma::event::handler::FPSCamera::getStaticComponentTypeName()));
+
+					if(comp) {
+						light->transform.SetParentTransform(comp->Transform());
+					}
+				}
+			}
 		}
 
+		light->transform.TranslateTo(x, y, z);
+		light->transform.Rotate(rx, ry, rz);
+
 		this->addComponent(entityID, light);
+		
 		return light;
 	}
 
@@ -794,10 +819,13 @@ namespace Sigma{
 						GLSLShader &shader = (*this->spotQuad.GetShader().get());
 						shader.Use();
 
+						glm::vec3 position = spotLight->transform.ExtractPosition();
+						glm::vec3 direction = spotLight->transform.ExtractDirection();
+
 						// Load variables
 						glUniformMatrix4fv(shader("viewProjInverse"), 1, false, &viewProjInv[0][0]);
-						glUniform3fv(shader("lightPosW"), 1, &spotLight->position[0]);
-						glUniform3fv(shader("lightDirW"), 1, &spotLight->direction[0]);
+						glUniform3fv(shader("lightPosW"), 1, &position[0]);
+						glUniform3fv(shader("lightDirW"), 1, &direction[0]);
 						glUniform4fv(shader("lightColor"), 1, &spotLight->color[0]);
 						glUniform1f(shader("lightAngle"), spotLight->angle);
 						glUniform1f(shader("lightCosCutoff"), spotLight->cosCutoff);

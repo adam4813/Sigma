@@ -10,11 +10,19 @@ public:
 	const static glm::vec3 UP_VECTOR;
 	const static glm::vec3 RIGHT_VECTOR;
 
-	GLTransform() : orientation(glm::quat(1,0,0,0)), position(glm::vec3(0,0,0)), rotation(glm::vec3(0,0,0)), Euler(false) {}
+	GLTransform() : orientation(glm::quat(1,0,0,0)), 
+					position(glm::vec3(0,0,0)), 
+					rotation(glm::vec3(0,0,0)), 
+					scale(glm::vec3(0,0,0)),
+					translateMatrix(glm::mat4(1.0f)),
+					rotateMatrix(glm::mat4(1.0f)),
+					scaleMatrix(glm::mat4(1.0f)),
+					Euler(false),
+					parentTransform(0) {}
 
 	void Translate(float x, float y, float z) {
 		this->position += glm::vec3(x, y, z);
-		this->translateMatrix = glm::translate(this->position.x, this->position.y, this->position.z);
+		this->translateMatrix = glm::translate(glm::mat4(1.0f), this->position);
 		this->MMhasChanged = true;
 	}
 
@@ -58,6 +66,7 @@ public:
 	}
 
 	void Scale(float x, float y, float z) {
+		this->scale = this->scale*glm::vec3(x, y, z);
 		this->scaleMatrix = glm::scale(this->scaleMatrix, x, y, z);
 		this->MMhasChanged = true;
 	}
@@ -116,10 +125,14 @@ public:
 
 	const glm::mat4 GetMatrix() {
 		if (this->MMhasChanged) {
-			this->transformMatrix = glm::mat4(1.0f);
+			//this->transformMatrix = glm::mat4(1.0f);
 			this->transformMatrix =  this->translateMatrix * this->rotateMatrix * this->scaleMatrix;
 			//this->modelMatrix =  this->modelMatrix*this->scaleMatrix*this->rotateMatrix*this->translateMatrix;
 			this->MMhasChanged = false;
+		}
+
+		if(this->parentTransform) {
+			return this->parentTransform->GetMatrix() * this->transformMatrix;
 		}
 
 		return this->transformMatrix;
@@ -131,6 +144,28 @@ public:
 
 	const glm::vec3 GetPosition() {
 		return this->position;
+	}
+
+	/**
+	 * \brief Pulls the position vector directly from the transform matrix
+	 *
+	 * \returns the vec3 position vector
+	 */
+	glm::vec3 ExtractPosition() {
+		glm::mat4 matrix = this->GetMatrix();
+
+		return glm::vec3(matrix[3][0], matrix[3][1], matrix[3][2]);
+	}
+
+	/**
+	 * \brief Gets the direction from the transform matrix
+	 *        This only works if scale is uniform
+	 *
+	 * \returns the vec3 direction vector
+	 */
+	glm::vec3 ExtractDirection() {
+		glm::mat4 curTransform = this->GetMatrix();
+		return -1.0f * glm::normalize(glm::vec3(curTransform[2][0], curTransform[2][1], curTransform[2][2]));
 	}
 
 	const glm::quat GetOrientation() {
@@ -195,10 +230,13 @@ public:
 		return rot;
 	}
 
+	void SetParentTransform(GLTransform *trans) { this->parentTransform = trans; }
+
 private:
 	glm::quat orientation;
 	glm::vec3 position;
 	glm::vec3 rotation;
+	glm::vec3 scale;
 
 	glm::mat4 transformMatrix;
 	glm::mat4 scaleMatrix;
@@ -206,6 +244,8 @@ private:
 	glm::mat4 translateMatrix;
 
 	glm::vec3 maxRotation;
+
+	GLTransform *parentTransform;
 
 	bool MMhasChanged; // Set to true if the modelMatrix has changed and needs to be updated
 	bool Euler; // Set to true to toggle rotation matrix construction between quaternions and euler angles

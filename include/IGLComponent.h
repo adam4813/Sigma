@@ -63,9 +63,9 @@ namespace Sigma {
 		SET_COMPONENT_TYPENAME("IGLComponent");
 
 		IGLComponent() 
-			: lightingEnabled(true), parentTransform(0), SpatialComponent(0) {} // Default ctor setting entity ID to 0.
+			: lightingEnabled(true), SpatialComponent(0) {} // Default ctor setting entity ID to 0.
 		IGLComponent(const int entityID)
-			: lightingEnabled(true), parentTransform(0), SpatialComponent(entityID) {} // Ctor that sets the entity ID.
+			: lightingEnabled(true), SpatialComponent(entityID) {} // Ctor that sets the entity ID.
 
         typedef std::unordered_map<std::string, std::shared_ptr<GLSLShader>> ShaderMap;
 
@@ -107,18 +107,6 @@ namespace Sigma {
 		 * \param proj The current project matrix
 		 */
 		virtual void Render(glm::mediump_float *view, glm::mediump_float *proj)=0;
-
-		/**
-		 * \brief Retrieves the transform object for this component.
-		 *
-		 * \return GLTransform& The transform object.
-		 */
-		//GLTransform* Transform() { return &transform; }
-
-		/**
-		 * \brief Sets the parent transformation of this component.
-		 */
-		void SetParent(GLTransform *trans) { this->parentTransform = trans; }
 
 		/**
 		 * \brief Return the VAO ID of this component.
@@ -170,7 +158,6 @@ namespace Sigma {
 		unsigned int vao; // The VAO that describes this component's data.
 		unsigned int drawMode; // The current draw mode (ex. GL_TRIANGLES, GL_TRIANGLE_STRIP).
 		GLuint cull_face; // The current culling method for this component.
-		GLTransform *parentTransform; // Transform of parent object
 
         std::shared_ptr<GLSLShader> shader; // shaders are shared among components
         // name-->shader map to look up already-loaded shaders (so each can be loaded only once)
