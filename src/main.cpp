@@ -143,7 +143,7 @@ int main(int argCount, char **argValues) {
 	{
 		Sigma::ALSound *als = (Sigma::ALSound *)alsys.getComponent(30, Sigma::ALSound::getStaticComponentTypeName());
 		if(als) {
-			als->Play();
+			als->Play(Sigma::PLAYBACK_LOOPING);
 		}
 	}
 

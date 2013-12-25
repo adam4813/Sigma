@@ -117,20 +117,6 @@ namespace Sigma {
 				sound->Update();
 			}
 		}
-		//this whole function is a hack right now!
-		alGetSourcei(this->testsource, AL_BUFFER, &i);
-		//if(i == 0) { alSourcePlay(this->testsource); }
-		if(lbuf != i) {
-			ALuint b = buffers[lbi]->GetID();
-			if(i != 0 && i != b) { // Test "streaming" data, by swapping between two buffers and updating one of them
-				alSourceUnqueueBuffers(this->testsource, 1, &b);
-				if(lbi) { buffers[lbi]->SineSynth((this->altn = !this->altn) ? 0.03f : 0.02f); }
-				//alSourceQueueBuffers(this->testsource, 1, &b);
-				lbi = lbi ^ 1;
-			}
-			lbuf = i;
-		}
-		//std::cerr << i << "," << lbuf << ": ";
 		return false;
 	}
 	int OpenALSystem::AllocateBuffer() {
