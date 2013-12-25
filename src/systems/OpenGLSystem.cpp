@@ -719,7 +719,7 @@ namespace Sigma{
 						glComp->GetShader()->Use();
 
 						// Set view position
-						glUniform3f(glGetUniformBlockIndex(glComp->GetShader()->GetProgram(), "viewPosW"), viewPosition.x, viewPosition.y, viewPosition.z);
+						//glUniform3f(glGetUniformBlockIndex(glComp->GetShader()->GetProgram(), "viewPosW"), viewPosition.x, viewPosition.y, viewPosition.z);
 
 						// For now, turn on ambient intensity and turn off lighting
 						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "ambLightIntensity"), 0.05f);
@@ -811,6 +811,7 @@ namespace Sigma{
 						shader.Use();
 
 						// Load variables
+						glUniform3fv(shader("viewPosW"), 3, &viewPosition[0]);
 						glUniformMatrix4fv(shader("viewProjInverse"), 1, false, &viewProjInv[0][0]);
 						glUniform3fv(shader("lightPosW"), 1, &light->position[0]);
 						glUniform1f(shader("lightRadius"), light->radius);
@@ -929,7 +930,7 @@ namespace Sigma{
 					citr->get()->GetShader()->Use();
 
 					// Set view position
-					glUniform3f(glGetUniformBlockIndex(citr->get()->GetShader()->GetProgram(), "viewPosW"), viewPosition.x, viewPosition.y, viewPosition.z);
+					//glUniform3f(glGetUniformBlockIndex(citr->get()->GetShader()->GetProgram(), "viewPosW"), viewPosition.x, viewPosition.y, viewPosition.z);
 
 					// For now, turn on ambient intensity and turn off lighting
 					glUniform1f(glGetUniformLocation(citr->get()->GetShader()->GetProgram(), "ambLightIntensity"), 0.05f);
@@ -1015,6 +1016,7 @@ namespace Sigma{
 		this->pointQuad.SetCullFace("none");
 
 		this->pointQuad.GetShader()->Use();
+		this->pointQuad.GetShader()->AddUniform("viewPosW");
 		this->pointQuad.GetShader()->AddUniform("viewProjInverse");
 		this->pointQuad.GetShader()->AddUniform("lightPosW");
 		this->pointQuad.GetShader()->AddUniform("lightRadius");
