@@ -52,6 +52,12 @@ namespace Sigma{
 
 			} // function KeyStateChange
 
+			void FPSCamera::LostKeyboardFocus() {
+				if (this->mover) {
+					this->mover->ClearForces();
+				}
+			}
+
 			void FPSCamera::MouseMove(float x, float y, float dx, float dy) {
 				if (this->mover && this->mouseLook) {
 					this->mover->RotateNow(dy*10.0f,dx*10.0f,0.0f);

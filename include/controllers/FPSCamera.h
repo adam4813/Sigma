@@ -14,7 +14,7 @@ namespace Sigma {
 			// A type of handler. This handler controls an OpenGL 6 DOF view.
 			class FPSCamera : public IKeyboardEventHandler, public IMouseEventHandler, public IGLView {
 			public:
-			    SET_COMPONENT_TYPENAME("FPS_CAMERA");
+				SET_COMPONENT_TYPENAME("FPS_CAMERA");
 
 				FPSCamera(int entityID);
 
@@ -27,6 +27,13 @@ namespace Sigma {
 				 * \return void
 				 */
 				void KeyStateChange(const unsigned int key, const KEY_STATE state);
+
+				/**
+				 * \brief Called when focus for this controller has been lost.
+				 *
+				 * \return void
+				 */
+				void LostKeyboardFocus();
 
 				/**
 				 * \brief Handles a change in mouse position.
@@ -66,13 +73,13 @@ namespace Sigma {
 				 *
 				 * The view mover does the moving.
 				 * \param[in/out] ViewMover * m The view mover.
-				 * \return    void 
+				 * \return void
 				 */
 				virtual void SetMover(BulletMover* m);
 			private:
 				BulletMover* mover; // The view mover component that applies the rotations and forces set in the trigger method.
-                static const float SPEED_TRANSLATE, SPEED_ROTATE, BOOST_MULTIPLIER; // Speed variables
-                glm::vec3 translation; // Current translation.
+				static const float SPEED_TRANSLATE, SPEED_ROTATE, BOOST_MULTIPLIER; // Speed variables
+				glm::vec3 translation; // Current translation.
 				bool mouseLook;
 			};
 		}
