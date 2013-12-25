@@ -1,29 +1,31 @@
 #include "components/WebGUIComponent.h"
 
 namespace Sigma {
-	void WebGUIView::InjectKeyboardEvent(const unsigned int key, const Sigma::event::KEY_STATE state) {
-		Awesomium::WebKeyboardEvent key_event;
-		memset(&key_event, 0, sizeof(Awesomium::WebKeyboardEvent));
-	
-		char* buf = new char[20];
-		Awesomium::GetKeyIdentifierFromVirtualKeyCode(Awesomium::KeyCodes::AK_A, &buf);
-		memcpy(key_event.key_identifier, buf, 20);
-		delete[] buf;
+	void WebGUIView::InjectKeyboardEvent(const unsigned int key, const event::KEY_STATE state) {
+		if (this->hasFocus) {
+			Awesomium::WebKeyboardEvent key_event;
+			memset(&key_event, 0, sizeof(Awesomium::WebKeyboardEvent));
 
-		key_event.native_key_code = key;
-		key_event.virtual_key_code = key;
+			char* buf = new char[20];
+			Awesomium::GetKeyIdentifierFromVirtualKeyCode(Awesomium::KeyCodes::AK_A, &buf);
+			memcpy(key_event.key_identifier, buf, 20);
+			delete[] buf;
 
-		if (state == Sigma::event::KS_UP) {
-			key_event.type = WebKeyboardEvent::kTypeKeyUp;
-			this->view->InjectKeyboardEvent(key_event);
-		}
-		else {
-			key_event.type = WebKeyboardEvent::kTypeKeyDown;
+			key_event.native_key_code = key;
+			key_event.virtual_key_code = key;
 
-			key_event.text[0] = key;
-			key_event.unmodified_text[0] = key;
+			if (state == Sigma::event::KS_UP) {
+				key_event.type = WebKeyboardEvent::kTypeKeyUp;
+				this->view->InjectKeyboardEvent(key_event);
+			}
+			else {
+				key_event.type = WebKeyboardEvent::kTypeKeyDown;
 
-			this->view->InjectKeyboardEvent(key_event);
+				key_event.text[0] = key;
+				key_event.unmodified_text[0] = key;
+
+				this->view->InjectKeyboardEvent(key_event);
+			}
 		}
 	}
 
