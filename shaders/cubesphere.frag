@@ -13,6 +13,7 @@ in  vec3 ex_TangentW;
 in  vec3 ex_BiNormalW;
 in  vec3 ex_Light;
 in  vec3 ex_UVW;
+
 out vec4 out_Color;
  
 void main(void) {

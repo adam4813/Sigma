@@ -4,8 +4,12 @@ precision highp float; // needed only for version 1.30
 
 uniform mat4 viewProjInverse;
 uniform vec3 lightPosW;
-uniform float lightRadius;
+uniform vec3 lightDirW;
 uniform vec4 lightColor;
+
+uniform float lightAngle;
+uniform float lightCosCutoff;
+uniform float lightExponent;
 
 uniform sampler2D diffuseBuffer;
 uniform sampler2D normalBuffer;
@@ -45,21 +49,25 @@ void main(void) {
 	position /= position.w;
 
 	// CALCULATE LIGHTING //
-	// surface-to-light vector
-	vec3 lightVector = lightPosW - position.xyz;
-
-	// ATTENUATION ////////
-	//float d = length(lightVector); 
-	//float A = clamp(1.0 - (d/3)*d / lightRadius, 0.0, 1.0);
-	
-	//float A = 1.0f - sqrt(dot(lightVector, lightVector)) / lightRadius;	
-	float A = 1.0 - (dot(lightVector, lightVector) / (lightRadius*lightRadius));
-
-	lightVector = normalize(lightVector);
 
 	// DIFFUSE ////////////
-	float	NdL				= max(dot(normal, lightVector), 0.0);
-	vec3	diffuseLight	= NdL * lightColor.rgb;
+	vec3 lightVector = lightPosW - position.xyz;
+	
+	float	NdL	= max(dot(normal, normalize(lightVector)), 0.0);
+	float   spotLight = 0.0;
+	
+	float cos_outer_cone_angle = lightCosCutoff;
+	float cos_inner_cone_angle = lightCosCutoff + 0.15;
+	float cos_inner_minus_outer_angle = cos_inner_cone_angle - cos_outer_cone_angle;
+	
+	if (NdL > 0.0) {
+		float spotEffect = dot(normalize(lightDirW), normalize(-lightVector));
+		
+		//if(spotEffect > lightCosCutoff) {
+		//	spotLight = pow(spotEffect, lightExponent);
+		//}
+		spotLight = clamp((spotEffect - cos_outer_cone_angle) / cos_inner_minus_outer_angle, 0.0, 1.0);
+	}
 
-	out_Color = vec4(diffuse.rgb*diffuseLight*A, 1.0);
+	out_Color = vec4(diffuse.rgb*spotLight, 1.0);
 }
