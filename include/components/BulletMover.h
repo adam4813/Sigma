@@ -32,6 +32,13 @@ namespace Sigma {
 		void InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz);
 
 		/**
+		 * \brief Initalize the rigid body using the current transform or defaults if none
+		 *
+		 * \return void
+		 */
+		void InitializeRigidBody();
+
+		/**
 		 * \brief Updates the transform to match its collision rigid body.
 		 *
 		 * \return void 

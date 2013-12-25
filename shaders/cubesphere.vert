@@ -3,8 +3,8 @@
 #version 140
  
 in  vec3 in_Position;
-in  vec3 in_Color;
-in  vec3 in_Normal;
+//in  vec3 in_Color;
+//in  vec3 in_Normal;
 
 uniform  mat4 in_Model;
 uniform  mat4 in_View;
