@@ -45,8 +45,8 @@ public:
 		this->rotation += glm::vec3(x, y, z);
 
 		if(this->Euler) {
-			this->rotateMatrix = glm::rotate(glm::mat4(1.0f), this->rotation.x, RIGHT_VECTOR);
-			this->rotateMatrix = glm::rotate(this->rotateMatrix, this->rotation.y, UP_VECTOR);
+			this->rotateMatrix = glm::rotate(glm::mat4(1.0f), this->rotation.y, UP_VECTOR);
+			this->rotateMatrix = glm::rotate(this->rotateMatrix, this->rotation.x, RIGHT_VECTOR);
 			this->rotateMatrix = glm::rotate(this->rotateMatrix, this->rotation.z, FORWARD_VECTOR);
 		}
 		else {
@@ -89,24 +89,26 @@ public:
 		this->Translate((GetForward() * forward) + (GetRight() * right) + (GetUp() * up));
 	}
 
+	// NOTE:  These methods only work if the transform's scale is uniform
 	glm::vec3 GetRight() {
-		glm::vec3 right_vector(this->rotateMatrix[0][0], this->rotateMatrix[1][0], this->rotateMatrix[2][0]);
-		return right_vector;
+		glm::mat4 currTransform = this->GetMatrix();
+		glm::vec3 right_vector(currTransform[0][0], currTransform[0][1], currTransform[0][2]);
+		return glm::normalize(right_vector);
 	}
 	
 	glm::vec3 GetUp() {
-		glm::vec3 up_vector(this->rotateMatrix[0][1], this->rotateMatrix[1][1], this->rotateMatrix[2][1]);
-		return up_vector;
+		glm::mat4 currTransform = this->GetMatrix();
+		glm::vec3 up_vector(currTransform[1][0], currTransform[1][1], currTransform[1][2]);
+		return glm::normalize(up_vector);
 	}
 
 	glm::vec3 GetForward() {
-		glm::vec3 forward_vector(this->rotateMatrix[0][2], this->rotateMatrix[1][2], this->rotateMatrix[2][2]);
-		return forward_vector;
+		glm::mat4 currTransform = this->GetMatrix();
+		glm::vec3 back_vector(currTransform[2][0], currTransform[2][1], currTransform[2][2]);
+		return -1.0f * glm::normalize(back_vector);
 	}
 
 	float GetPitch() {
-		//return (glm::atan(this->rotateMatrix[1][0] / this->rotateMatrix[0][0]) / (3.14159f)) * 45.0f;
-		//return (glm::acos((float)this->rotateMatrix[3][3]));
 		return this->rotation.x;
 	}
 
@@ -125,9 +127,7 @@ public:
 
 	const glm::mat4 GetMatrix() {
 		if (this->MMhasChanged) {
-			//this->transformMatrix = glm::mat4(1.0f);
 			this->transformMatrix =  this->translateMatrix * this->rotateMatrix * this->scaleMatrix;
-			//this->modelMatrix =  this->modelMatrix*this->scaleMatrix*this->rotateMatrix*this->translateMatrix;
 			this->MMhasChanged = false;
 		}
 
@@ -148,6 +148,7 @@ public:
 
 	/**
 	 * \brief Pulls the position vector directly from the transform matrix
+	 *        useful when this matrix is the child of another
 	 *
 	 * \returns the vec3 position vector
 	 */

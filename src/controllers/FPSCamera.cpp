@@ -39,10 +39,10 @@ namespace Sigma{
 					translation += speed*GLTransform::FORWARD_VECTOR;
 				}
 				if (this->keyState['A'] == KS_DOWN) { // Strafe left
-					translation += speed*GLTransform::RIGHT_VECTOR;
+					translation -= speed*GLTransform::RIGHT_VECTOR;
 				}
 				if (this->keyState['D'] == KS_DOWN) { // Strafe right
-					translation -= speed*GLTransform::RIGHT_VECTOR;
+					translation += speed*GLTransform::RIGHT_VECTOR;
 				}
 
 				// remove previous force and add new one
@@ -56,7 +56,10 @@ namespace Sigma{
 
 			void FPSCamera::MouseMove(float x, float y, float dx, float dy) {
 				if (this->mover && this->mouseLook) {
-					this->mover->RotateTarget(dy*SPEED_ROTATE,dx*SPEED_ROTATE,0.0f);
+					// NOTE: dy is positive when the mouse is moved down, so it must be inverted
+					//       for some reason, dx needs to be inverted as well, perhaps because
+					//       negative z is forward in opengl
+					this->mover->RotateTarget(-1.0f*dy*SPEED_ROTATE,-1.0f*dx*SPEED_ROTATE,0.0f);
 				}
 			}
 
@@ -83,9 +86,12 @@ namespace Sigma{
 				return viewMatrix;*/
 
 				// This is more precise
-				return glm::lookAt(this->transform.GetPosition(),
-								   this->transform.GetPosition()+this->transform.GetForward(),
-								   GLTransform::UP_VECTOR);
+				glm::mat4 view =  glm::lookAt(this->transform.GetPosition(),
+											  this->transform.GetPosition()+this->transform.GetForward(),
+											  this->transform.GetUp());
+
+				return view;
+				//return this->transform.GetMatrix();
 			}
 
 			void FPSCamera::SetMover(BulletMover* m){

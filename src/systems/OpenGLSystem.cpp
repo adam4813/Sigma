@@ -843,7 +843,7 @@ namespace Sigma{
 						shader.Use();
 
 						glm::vec3 position = spotLight->transform.ExtractPosition();
-						glm::vec3 direction = spotLight->transform.ExtractDirection();
+						glm::vec3 direction = spotLight->transform.GetForward();
 
 						// Load variables
 						glUniformMatrix4fv(shader("viewProjInverse"), 1, false, &viewProjInv[0][0]);
