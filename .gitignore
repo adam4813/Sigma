@@ -215,3 +215,11 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+##################################
+## Chromium Embedded Framework
+##################################
+include/capi/
+include/internal/
+include/wrapper/
+include/cef_*

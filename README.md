@@ -14,69 +14,37 @@ Coding standards and practices can be found here https://docs.google.com/documen
 
 Installing
 ===
+Sigma requires the following dependencies:
+* [GLEW](http://glew.sourceforge.net) 1.5.2 or newer;
+* [GLFW](http://www.glfw.org) 3.0.0 or newer;
+* [GLM](http://glm.g-truc.net);
+* [SOIL](http://www.lonesock.net/soil.html);
+* [Bullet](http://www.bulletphysics.org);
+* [Chromium Embedded Framework](http://code.google.com/p/chromiumembedded) 3;
 
-## Linux ##
+Sigma on Linux also requires [GTK+ 2](http://www.gtk.org), due to usage of Chromium Embedded Framework.
 
-If you want to compile Sigma on Linux, you need to install dependencies separately. On Debian-based distributions, you can use the following command as root to obtain them:
+You'll also need a [package of assets](https://www.dropbox.com/s/7y8rzmi4i6ie0kn/assets12-13.zip). Unpack it in the build/bin/ directory.
 
-    apt-get install libglew-dev libsoil-dev libglm-dev libsdl2-dev libbullet-dev libsdl2-ttf
+## Setting up Chromium Embedded Framework ###
+Chromium Embedded Framework is not a standard library that is thrown into compiler's directories.
 
-Ubuntu will not contain all the required sdl2 dependencies until Trusting (14.04). The following ppa will need to be added:
+Make sure you use a binary release from [Adobe](http://www.cefbuilds.com). Sigma is developed using the latest stable version.
 
-    sudo add-apt-repository ppa:zoogie/sdl2-snapshots
+1. Unzip the downloaded tarball.
+2. This step depends on your platform. On Windows, build the included `libcef_dll_wrapper.vcxproj` project. On Linux, run `make libcef_dll_wrapper`. On OS X, use the `cefclient.xcodeproj` Xcode project.
+3. Copy the `libcef_dll_wrapper` library and directory of the same name, if any, and the contents of Debug/ and Resources/ directories into Sigma's build/bin/.
+4. Copy the contents of include/ directory into Sigma's include/.
 
-The google test package will need to be compiled manually:
+## Buildling ##
 
-    sudo apt-get install libgtest-dev
-    cd /usr/src/gtest
-    sudo cmake CMakeLists.txt
-    sudo make
-    sudo cp *.a /usr/lib
-
-Versions of ubuntu older than quantal (12.10) will need to compile bullet manually:
-
-    sudo apt-get -y install automake libtool cmake freeglut3-dev subversion
-    svn checkout http://bullet.googlecode.com/svn/trunk/ bullet-read-only
-    cd bullet-read-only
-    cmake . -G "Unix Makefiles" -DBUILD_SHARED_LIBS=ON
-    make -j10 && sudo make install 
-
-### GUI Mode ###
-
-* Run CMake and set the source directory to the root folder.
-* Set the build directory to root/build/
-* Configure and generate your make/project/solutions files.
-* Build and run.
-
-### Command Mode ###
-
-```sh
-mkdir build/
-cd build/
-cmake ..
-make
-```
-
-
-### Using the makefile-wrapper ###
-
-```sh
-make rebuild
-make clean
-make
-```
-
-### Eclipse CDT (Unix/Linux) ###
-
-```sh
-make eclipse
-```
+Use CMake to create makefiles or projects. The resulting executable will be saved in build/bin/.
 
 ## OS X ##
 
 If you want to compile Sigma on OS X, your system must be running OS X 10.7 or later.  You will  need to have installed Xcode and, unless your system is running 10.9, the Command Line Tools.  Both can be downloaded from the [Apple Developer Website](https://developer.apple.com/downloads).  
 
-Before you can build Sigma, you'll first need to install the dependencies separately.  Using a package manager, such as [MacPorts](http://macports.org), is recommended.  Building Sigma on OS X requires CMake, GLM, GLFW, SOIL, Bullet, and Awesomium.  Sigma can only be built as a 32-bit executable under OS X.  All dependencies, except cmake, that you install must include a 32-bit slice.
+Before you can build Sigma, you'll first need to install the dependencies separately.  Using a package manager, such as [MacPorts](http://macports.org), is recommended.
 
 If MacPorts is present, you can use the following commands to install CMake, GLM, and GLFW:
 
@@ -98,8 +66,6 @@ Sigma on OS X requires a [patched version](https://github.com/DeVaukz/SOIL) of S
 	cmake . -G "Unix Makefiles"
 	make -j10 && sudo make install 
 
-Awesomium is only distributed in binary form.  Download and run the installer from the [Awesomium website](http://www.awesomium.com/). 
-
 Once all the dependencies are installed, you can build Sigma.
 
 ```sh
@@ -108,10 +74,6 @@ cd build/
 cmake ..
 make
 ```
-	
-## After compiling ##
-
-Finally you must copy the shaders folder and test.sc into the executable folder. E.g. build/bin/ or maybe build/bin/Debug|Release.
 
 Running
 ===

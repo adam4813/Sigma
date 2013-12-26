@@ -12,11 +12,28 @@
 #include "systems/WebGUISystem.h"
 #include "OS.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 int main(int argCount, char **argValues) {
+	Sigma::WebGUISystem webguisys;
+
+#ifdef _WIN32
+	CefMainArgs mainArgs(GetModuleHandle(NULL));
+#else
+	CefMainArgs mainArgs(argCount, argValues);
+#endif
+	CefRefPtr<Sigma::WebGUISystem> app(&webguisys);
+
+	int exitCode = CefExecuteProcess(mainArgs, app.get());
+	if (exitCode >= 0) {
+		return exitCode;
+	}
+
 	Sigma::OS glfwos;
 	Sigma::OpenGLSystem glsys;
 	Sigma::BulletPhysics bphys;
-	Sigma::WebGUISystem webguisys;
 
 	Sigma::FactorySystem& factory = Sigma::FactorySystem::getInstance();
 	factory.register_Factory(glsys);
@@ -43,7 +60,7 @@ int main(int argCount, char **argValues) {
 
 	bphys.Start();
 
-	webguisys.Start();
+	webguisys.Start(mainArgs);
 	webguisys.SetWindowSize(glfwos.GetWindowWidth(), glfwos.GetWindowHeight());
 
 	// Parse the scene file to retrieve entities
@@ -149,5 +166,6 @@ int main(int argCount, char **argValues) {
 		glfwos.OSMessageLoop();
 	}
 
+	CefShutdown();
 	return 0;
 }
