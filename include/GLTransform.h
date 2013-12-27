@@ -80,32 +80,32 @@ public:
 		this->Translate((GetForward() * forward) + (GetRight() * right) + (GetUp() * up));
 	}
 
-	glm::vec3 GetRight() {
+	glm::vec3 GetRight() const {
 		glm::vec3 right_vector(this->rotateMatrix[0][0], this->rotateMatrix[1][0], this->rotateMatrix[2][0]);
 		return right_vector;
 	}
 	
-	glm::vec3 GetUp() {
+	glm::vec3 GetUp() const {
 		glm::vec3 up_vector(this->rotateMatrix[0][1], this->rotateMatrix[1][1], this->rotateMatrix[2][1]);
 		return up_vector;
 	}
 
-	glm::vec3 GetForward() {
+	glm::vec3 GetForward()  const {
 		glm::vec3 forward_vector(this->rotateMatrix[0][2], this->rotateMatrix[1][2], this->rotateMatrix[2][2]);
 		return forward_vector;
 	}
 
-	float GetPitch() {
+	float GetPitch() const {
 		//return (glm::atan(this->rotateMatrix[1][0] / this->rotateMatrix[0][0]) / (3.14159f)) * 45.0f;
 		//return (glm::acos((float)this->rotateMatrix[3][3]));
 		return this->rotation.x;
 	}
 
-	float GetYaw() {
+	float GetYaw() const {
 		return this->rotation.y;
 	}
 
-	float GetRoll() {
+	float GetRoll() const {
 		return this->rotation.z;
 	}
 
@@ -129,11 +129,11 @@ public:
 		return glm::inverse(this->GetMatrix());
 	}
 
-	const glm::vec3 GetPosition() {
+	const glm::vec3 GetPosition() const {
 		return this->position;
 	}
 
-	const glm::quat GetOrientation() {
+	const glm::quat GetOrientation() const {
 		return this->orientation;
 	}
 
