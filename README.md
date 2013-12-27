@@ -24,7 +24,7 @@ Sigma requires the following dependencies:
 
 Sigma on Linux also requires [GTK+ 2](http://www.gtk.org), due to usage of Chromium Embedded Framework.
 
-You'll also need a [package of assets](https://www.dropbox.com/s/7y8rzmi4i6ie0kn/assets12-13.zip). Unpack it in the build/bin/ directory.
+You'll also need a [package of assets](https://www.dropbox.com/s/8gtm4bj0g9yjo54/assets12-27.zip). Unpack it in the build/bin/ directory.
 
 ## Setting up Chromium Embedded Framework ###
 Chromium Embedded Framework is not a standard library that is thrown into compiler's directories.
@@ -36,7 +36,7 @@ Make sure you use a binary release from [Adobe](http://www.cefbuilds.com). Sigma
 3. Copy the `libcef_dll_wrapper` library and directory of the same name, if any, and the contents of Debug/ and Resources/ directories into Sigma's build/bin/.
 4. Copy the contents of include/ directory into Sigma's include/.
 
-## Buildling ##
+## Building ##
 
 Use CMake to create makefiles or projects. The resulting executable will be saved in build/bin/.
 
