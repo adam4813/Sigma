@@ -25,6 +25,10 @@ namespace Sigma {
 		float angle;
 		float cosCutoff;
 		float exponent;
+
+		bool enabled;
+
+		bool IsEnabled() { return enabled; }
 	};
 }
 #endif

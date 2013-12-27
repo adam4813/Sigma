@@ -11,6 +11,7 @@
 #include "SCParser.h"
 #include "systems/WebGUISystem.h"
 #include "OS.h"
+#include "components\SpotLight.h"
 
 int main(int argCount, char **argValues) {
 	Sigma::OS glfwos;
@@ -176,9 +177,45 @@ int main(int argCount, char **argValues) {
 	// Call now to clear the delta after startup.
 	glfwos.GetDeltaTime();
 
+	enum FlashlightState {
+		FL_ON,
+		FL_TURNING_ON,
+		FL_OFF,
+		FL_TURNING_OFF
+	};
+
+	FlashlightState fs = FL_OFF;
+
 	while (!glfwos.Closing()) {
 		// Get time in ms, store it in seconds too
 		double deltaSec = glfwos.GetDeltaTime();
+
+		// Process input
+		if(glfwos.CheckKeyState(Sigma::event::KS_DOWN, GLFW_KEY_F)) {			
+			if(fs==FL_OFF) {
+				fs=FL_TURNING_ON;
+			} else if (fs==FL_ON) {
+				fs=FL_TURNING_OFF;
+			}
+		}
+
+		if(glfwos.CheckKeyState(Sigma::event::KS_UP, GLFW_KEY_F)) {
+			if(fs==FL_TURNING_ON) {
+				// Enable flashlight
+				Sigma::SpotLight *spotlight = static_cast<Sigma::SpotLight *>(glsys.getComponent(151, Sigma::SpotLight::getStaticComponentTypeName()));
+				spotlight->enabled = true;
+				// Rotate flashlight up
+				// Enable spotlight
+				fs=FL_ON;
+			} else if (fs==FL_TURNING_OFF) {
+				// Disable spotlight
+				Sigma::SpotLight *spotlight = static_cast<Sigma::SpotLight *>(glsys.getComponent(151, Sigma::SpotLight::getStaticComponentTypeName()));
+				spotlight->enabled = false;
+				// Rotate flashlight down
+				// Disable flashlight
+				fs=FL_OFF;
+			}
+		}
 
 		///////////////////////
 		// Update subsystems //

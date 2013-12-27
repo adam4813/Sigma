@@ -13,6 +13,7 @@
 #ifndef __APPLE__
 #include "GL/glew.h"
 #endif
+
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 
@@ -584,17 +585,26 @@ namespace Sigma{
 
 		// Create the frame buffer object
 		glGenFramebuffers(1, &newRT->fbo_id);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, newRT->fbo_id);
+		glBindFramebuffer(GL_FRAMEBUFFER, newRT->fbo_id);
+
+		printOpenGLError();
+
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
 
 		newRT->width = w;
 		newRT->height = h;
 
 		glGenRenderbuffers(1, &newRT->depth_id);
 		glBindRenderbuffer(GL_RENDERBUFFER, newRT->depth_id);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, w, h);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, w, h);
+
+		printOpenGLError();
 
 		//Attach depth buffer to FBO
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, newRT->depth_id);
+
+		printOpenGLError();
 
 		//Does the GPU support current FBO configuration?
 		GLenum status;
@@ -838,7 +848,7 @@ namespace Sigma{
 
 					SpotLight *spotLight = dynamic_cast<SpotLight *>(citr->second.get());
 
-					if(spotLight) {
+					if(spotLight && spotLight->IsEnabled()) {
 						GLSLShader &shader = (*this->spotQuad.GetShader().get());
 						shader.Use();
 
@@ -1077,4 +1087,26 @@ namespace Sigma{
             10000.0f
             );
     }
+
 } // namespace Sigma
+
+//-----------------------------------------------------------------
+// Print for OpenGL errors
+//
+// Returns 1 if an OpenGL error occurred, 0 otherwise.
+//
+
+int printOglError(char *file, int line)
+{
+
+	GLenum glErr;
+	int    retCode = 0;
+
+	glErr = glGetError();
+	if (glErr != GL_NO_ERROR)
+	{
+		std::cerr << "glError in file " << file << " @ line " << line << ": " << gluErrorString(glErr) << std::endl;
+		retCode = 1;
+	}
+	return retCode;
+}

@@ -22,6 +22,9 @@
 
 struct IGLView;
 
+int printOglError(char *file, int line);
+#define printOpenGLError() printOglError(__FILE__, __LINE__)
+
 namespace Sigma{
 
 	struct RenderTarget {

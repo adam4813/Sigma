@@ -10,5 +10,7 @@ namespace Sigma {
 		this->angle = 3.14159f * 0.1f;
 		this->cosCutoff = glm::cos(this->angle);
 		this->exponent = 2.0f;
+
+		this->enabled = true;
 	}
 }
