@@ -18,6 +18,7 @@ in  vec2 in_UV;
 out vec2 ex_UV;
 out vec3 ex_Color;
 out vec3 ex_Normal;
+out vec2 ex_Depth;
 out vec3 ex_LightDirW;
 out vec3 ex_ViewDirW;
  
@@ -31,4 +32,5 @@ void main(void)
 	ex_LightDirW = lightPositionW - position.xyz;
 	ex_ViewDirW = viewPosW - position.xyz;
 	gl_Position = in_Proj * (in_View * position);
+	ex_Depth = vec2(gl_Position.z, gl_Position.w);
 }

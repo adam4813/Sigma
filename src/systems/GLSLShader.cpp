@@ -59,6 +59,12 @@ void GLSLShader::CreateAndLinkProgram() {
 
 	//link and check whether the program links fine
 	GLint status;
+
+	// Setup output for multiple render targets
+	glBindFragDataLocation(_program, 0, "out_Color");
+	glBindFragDataLocation(_program, 1, "out_Normal");
+	glBindFragDataLocation(_program, 2, "out_Depth");
+
 	glLinkProgram (_program);
 	glGetProgramiv (_program, GL_LINK_STATUS, &status);
 	if (status == GL_FALSE) {
