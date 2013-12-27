@@ -10,7 +10,7 @@ namespace Sigma {
     enum PLAYBACK {
         PLAYBACK_NONE = -1,
         PLAYBACK_NORMAL = 0,
-        PLAYBACK_LOOPING = 1
+        PLAYBACK_LOOP = 1
     };
 
     enum ORDERING {

@@ -57,7 +57,7 @@ namespace Sigma {
             /*
              * Interlaces two channels while converting sample formats
              */
-            static void * MergeSample(void * out, AUDIO_PCM_FORMAT outfmt, void * inl, void * inr, AUDIO_PCM_FORMAT infmt, long count);
+            static void * MergeSample(void * out, AUDIO_PCM_FORMAT outfmt, void ** inc, AUDIO_PCM_FORMAT infmt, long count);
             void ProcessMeta(SoundFile &);
         protected:
             void * decoderstate;

@@ -16,8 +16,10 @@ namespace Sigma {
         long sfi;
         int i;
         int buflen;
+        int bufbytes;
         int chancount;
         int samplecount;
+        int samplerate;
         ALuint albuf;
         short *buf;
         std::shared_ptr<resource::SoundFile> sfp;
@@ -28,19 +30,32 @@ namespace Sigma {
             if(param != 0 && albuf != param && playlist.size() > 0) {
                 sfi = playlist[playindex];
                 sfp = std::shared_ptr<resource::SoundFile>(master->GetSoundFile(sfi));
-                if(sfp->isStream()) {
+                if(stream) {
                     chancount = sfp->Channels();
-                    samplecount = sfp->Frequency(); // 1 sec buffers
+                    samplecount = samplerate = sfp->Frequency(); // 1 sec buffers
                     buflen = chancount * samplecount;
+                    bufbytes = buflen * sizeof(short);
                     buf = new short[buflen];
                     if(++this->bufferindex >= this->buffercount) { this->bufferindex = 0; }
                     i = codec.FetchBuffer(*sfp, buf, ((chancount == 1) ? resource::PCM_MONO16 : resource::PCM_STEREO16), samplecount);
                     alSourceUnqueueBuffers(this->sourceid, 1, &albuf);
                     if(i > 0) {
-                        alBufferData(albuf, ((chancount == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16), buf, buflen * sizeof(short), samplecount);
+                        if(i < samplecount) {
+                            buflen = chancount * i;
+                            bufbytes = buflen * sizeof(short);
+                            alBufferData(albuf, ((chancount == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16), buf, bufbytes, samplerate);
+                            if(playloop == PLAYBACK_LOOP) {
+                                this->codec.Rewind(*sfp);
+                            } else {
+                                playing = false;
+                            }
+                        }
+                        else {
+                            alBufferData(albuf, ((chancount == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16), buf, bufbytes, samplerate);
+                        }
                         alSourceQueueBuffers(this->sourceid, 1, &albuf);
                     } else {
-                        if(playloop == PLAYBACK_LOOPING) {
+                        if(playloop == PLAYBACK_LOOP) {
                             this->codec.Rewind(*sfp);
                         } else {
                             playing = false;
@@ -55,8 +70,10 @@ namespace Sigma {
         long sfi;
         int i, x;
         int buflen;
+        int bufbytes;
         int chancount;
         int samplecount;
+        int samplerate;
         ALuint albuf[ALSOUND_BUFFERS];
         unsigned short *buf;
         std::shared_ptr<resource::SoundFile> sfp;
@@ -80,20 +97,37 @@ namespace Sigma {
                 }
                 this->bufferindex = 0;
                 chancount = sfp->Channels();
-                samplecount = sfp->Frequency(); // 1 sec buffers
+                samplerate = samplecount = sfp->Frequency(); // 1 sec buffers
                 buflen = chancount * samplecount;
+                bufbytes = buflen * 2;
                 this->codec.Rewind(*sfp);
                 buf = new unsigned short[buflen];
                 x = 0;
                 while(x < this->buffercount && 0 < (i = codec.FetchBuffer(*sfp, buf, ((chancount == 1) ? resource::PCM_MONO16 : resource::PCM_STEREO16), samplecount))) {
                     albuf[x] = master->buffers[this->buffers[x]]->GetID();
-                    alBufferData(albuf[x], ((chancount == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16), buf, buflen * 2, samplecount);
+                    if(i < samplecount) {
+                        buflen = chancount * i;
+                        bufbytes = buflen * sizeof(short);
+                        alBufferData(albuf[x], ((chancount == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16), buf, bufbytes, samplerate);
+                        stream = false;
+                        break;
+                    }
+                    else {
+                        alBufferData(albuf[x], ((chancount == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16), buf, bufbytes, samplerate);
+                        stream = true;
+                    }
                     x++;
                 }
+                if(x < this->buffercount) { stream = false; }
                 delete buf;
-                if(i > 0) {
-                    alSourceQueueBuffers(this->sourceid, ALSOUND_BUFFERS, albuf);
+                if(x > 0) {
+                    alSourceQueueBuffers(this->sourceid, x, albuf);
                     alSourcePlay(this->sourceid);
+                    if(playloop == PLAYBACK_LOOP && !stream) {
+                        alSourcei(this->sourceid, AL_LOOPING, AL_TRUE);
+                    } else {
+                        alSourcei(this->sourceid, AL_LOOPING, AL_FALSE);
+                    }
                     playing = true;
                     paused = false;
                 }

@@ -181,7 +181,7 @@ namespace Sigma {
                             if(readsamples + samples > count) {
                                 samples = count - readsamples;
                             }
-                            out = MergeSample(out, fmt, fbp[0], fbp[1], sf.pcmsize, samples);
+                            out = MergeSample(out, fmt, (void**)fbp, sf.pcmsize, samples);
                             vorbis_synthesis_read(&vs->dsp, samples);
                             readsamples += samples;
                         }
@@ -230,9 +230,10 @@ namespace Sigma {
                 break;
             }
         }
-        void * Decoder::MergeSample(void * out, AUDIO_PCM_FORMAT outfmt, void * inl, void * inr, AUDIO_PCM_FORMAT infmt, long count) {
+        void * Decoder::MergeSample(void * out, AUDIO_PCM_FORMAT outfmt, void ** inc, AUDIO_PCM_FORMAT infmt, long count) {
             int inchanbytes;
             int outchanbytes;
+            int inchannels;
             //unsigned char *cidat, *codat;
             //short *sidat;
             short *sodat;
@@ -242,6 +243,7 @@ namespace Sigma {
             long k;
             // AUDIO_PCM_FORMAT defines x in lower 2 bits (x+1 = bytes per channel)
             //  and y in remaining upper bits (y+1 = channels)
+            inchannels = 1 + (infmt >> 2);
             inchanbytes = 1 + (infmt & 3);
             outchanbytes = 1 + (outfmt & 3);
             switch(inchanbytes) {
@@ -265,14 +267,16 @@ namespace Sigma {
                     case 1:
                         return out;
                     case 2: // int 16
-                        fildat = (float*)inl;
-                        firdat = (float*)inr;
+                        fildat = (float*)inc[0];
+                        firdat = (float*)inc[1];
                         sodat = (short*)out;
-                        for(k = 0; k++ < count; firdat++, fildat++) {
-                            *(short*)sodat = static_cast<short>(((*fildat)) * 16383.f);
+                        for(k = 0; k < count; k++) {
+                            *(short*)sodat = static_cast<short>(fildat[k] * 16383.f);
                             sodat++;
-                            *(short*)sodat = static_cast<short>(((*firdat)) * 16383.f);
-                            sodat++;
+                            if(inchannels == 2) {
+                                *(short*)sodat = static_cast<short>(firdat[k] * 16383.f);
+                                sodat++;
+                            }
                         }
                         return sodat;
                     case 3: // int 24

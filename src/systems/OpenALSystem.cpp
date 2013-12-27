@@ -7,6 +7,7 @@ namespace Sigma {
     }
 
     bool OpenALSystem::Start() {
+        const char * alcx;
         device = alcOpenDevice(nullptr);
         if(device == nullptr) {
             return false;
@@ -17,6 +18,10 @@ namespace Sigma {
         }
         if(!alcMakeContextCurrent(context)) {
             return false;
+        }
+        alcx = alcGetString(device, ALC_EXTENSIONS);
+        if( alcx != nullptr ) {
+            std::cerr << "OpenAL extentions: " << alcx << '\n';
         }
         return true;
     }
@@ -54,6 +59,22 @@ namespace Sigma {
         }
     }
 
+    void OpenALSystem::UpdateTransform(const GLTransform &t) {
+        glm::vec3 pos, forward, up;
+        pos = t.GetPosition();
+        forward = t.GetForward();
+        up = t.GetUp();
+        alListener3f(AL_POSITION, pos.x, pos.y, pos.z);
+        float fo[6] = {forward.x, forward.y, forward.z, up.x, up.y, up.z };
+        alListenerfv(AL_ORIENTATION, fo);
+    }
+
+    void OpenALSystem::UpdateTransform(glm::vec3 pos, glm::vec3 forward, glm::vec3 up) {
+        alListener3f(AL_POSITION, pos.x, pos.y, pos.z);
+        float fo[6] = {forward.x, forward.y, forward.z, up.x, up.y, up.z };
+        alListenerfv(AL_ORIENTATION, fo);
+    }
+
     IComponent* OpenALSystem::CreateALSource(const unsigned int entityID, const std::vector<Property> &properties) {
         ALSound * sound = new ALSound(entityID, this);
 
@@ -82,7 +103,7 @@ namespace Sigma {
                 continue;
             }
             else if (p->GetName() == "loop") {
-                sound->PlayMode(ORDERING_NONE,PLAYBACK_LOOPING);
+                sound->PlayMode(ORDERING_NONE, PLAYBACK_LOOP);
                 continue;
             }
             else if (p->GetName() == "soundFilename") {

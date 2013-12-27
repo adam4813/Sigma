@@ -4,6 +4,8 @@
 
 #include <AL/al.h>
 #include <AL/alc.h>
+#include "glm/glm.hpp"
+#include "GLTransform.h"
 #include <memory>
 #include <vector>
 #include <map>
@@ -74,6 +76,9 @@ namespace Sigma {
             }
             return p;
         }
+
+        void UpdateTransform(const GLTransform &t);
+        void UpdateTransform(glm::vec3 pos, glm::vec3 forward, glm::vec3 up);
 
         void test();
     private:
