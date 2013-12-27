@@ -11,7 +11,7 @@
 #include "SCParser.h"
 #include "systems/WebGUISystem.h"
 #include "OS.h"
-#include "components\SpotLight.h"
+#include "components/SpotLight.h"
 
 int main(int argCount, char **argValues) {
 	Sigma::OS glfwos;
