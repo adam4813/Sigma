@@ -25,12 +25,65 @@ struct VorbisState {
 namespace Sigma {
     namespace resource {
 
+        struct RIFFChunk {
+            FourCC id;
+            unsigned long size;
+        };
+        struct WAVEHeader {
+            unsigned short format;
+            unsigned short channels;
+            unsigned long samplerate;
+            unsigned long byterate;
+            unsigned short align;
+            unsigned short samplebits;
+        };
+
         SoundFile::~SoundFile() {
             if(data != nullptr) {
                 free( data );
             }
         }
+
+        // Note: WAV files can get huge!
+        // ogg can offer basically the same quality in less space
+        // both in memory and on disk.
         void SoundFile::LoadWAV(std::ifstream &fh, std::ifstream::pos_type sz) {
+            RIFFChunk chk;
+            FourCC ffid;
+            WAVEHeader head;
+            unsigned long readcount;
+            fh.read((char*)&chk, sizeof(RIFFChunk));
+            if(chk.id == FourCC('R','I','F','F')) {
+                readcount = chk.size;
+                fh.read((char*)&ffid, sizeof(FourCC));
+                readcount -= sizeof(FourCC);
+                if(ffid == FourCC('W','A','V','E')) {
+                    dataformat = RIFF;
+                    while(!fh.eof() && readcount) {
+                        fh.read((char*)&chk, sizeof(RIFFChunk));
+                        readcount -= sizeof(RIFFChunk);
+                        if(chk.id == FourCC('f','m','t',' ')) {
+                            fh.read((char*)&head, sizeof(WAVEHeader));
+                            readcount -= chk.size;
+                            if(chk.size > sizeof(WAVEHeader)) {
+                                fh.ignore(chk.size - sizeof(WAVEHeader));
+                            }
+                        }
+                        else if(chk.id == FourCC('d','a','t','a')) {
+                            if(this->data) { free(data); }
+                            this->data = (unsigned char*)malloc(sizeof(WAVEHeader) + 4 + chk.size);
+                            if(this->data == nullptr) { return; }
+                            *((unsigned long*)this->data) = chk.size;
+                            memcpy(this->data + 4, &head, sizeof(WAVEHeader));
+                            fh.read((char*)this->data + 4 + sizeof(WAVEHeader), chk.size);
+                            readcount -= chk.size;
+                        }
+                        else {
+                            fh.ignore(chk.size); // unknown chunks
+                        }
+                    }
+                }
+            }
         }
         void SoundFile::LoadOgg(std::ifstream &fh, std::ifstream::pos_type sz) {
             ogg_sync_state sync;
@@ -137,6 +190,15 @@ namespace Sigma {
                     vs->obj = (OggLinkedPacket*)sf.data;
                 }
                 break;
+            case RIFF:
+                unsigned long *rs;
+                rs = (unsigned long *)this->decoderstate;
+                if(rs == nullptr) {
+                    this->decoderstate = rs = new unsigned long[2];
+                }
+                rs[0] = 0;
+                rs[1] = 0;
+                break;
             }
         }
         bool Decoder::EndOfStream() {
@@ -189,18 +251,53 @@ namespace Sigma {
                     return readsamples;
                 }
                 break;
+            case RIFF:
+                {
+                WAVEHeader *head;
+                unsigned long *rs;
+                unsigned long filelen;
+                unsigned char * pcmdat;
+                rs = (unsigned long *)this->decoderstate;
+                if(rs == nullptr) {
+                    this->decoderstate = rs = new unsigned long[2];
+                }
+                if(!this->decoderinit) {
+                    rs[0] = 0;
+                    rs[1] = 0;
+                    this->decoderinit = true;
+                }
+                filelen = *((unsigned long*)sf.data);
+                head = (WAVEHeader *)(sf.data + 4);
+                pcmdat = (unsigned char *)(sf.data + 4 + sizeof(WAVEHeader));
+
+                samples = count;
+                if(samples + rs[0] > filelen) {
+                    samples = filelen - rs[0];
+                }
+                if(samples > 0) {
+                    out = Resample(out, fmt, pcmdat, sf.pcmsize, samples);
+                    rs[0] += samples;
+                }
+                return samples;
+                }
+                break;
             default:
                 break;
             }
             return 0;
         }
+
         int Decoder::FetchBuffer(SoundFile &sf, void * out, AUDIO_PCM_FORMAT fmt, long count, int freq) {
-            return 0;
+            return 0; // Rate conversion is not supported
         }
         int Decoder::Frequency(SoundFile &sf) {
+            if(sf.hasmeta) {
+                return sf.freq;
+            }
             return 0;
         }
         void Decoder::ProcessMeta(SoundFile &sf) {
+            if(this->hasmeta) { return; }
             switch(sf.dataformat) {
             case Vorbis:
                 {
@@ -218,6 +315,20 @@ namespace Sigma {
                     sf.freq = vs->info.rate;
                     sf.chann = vs->info.channels;
                     sf.pcmsize = (sf.chann != 1 ? PCM_STEREOf32 : PCM_MONOf32);
+                    sf.hasmeta = true;
+                }
+                }
+                break;
+            case RIFF:
+                {
+                WAVEHeader *head;
+                this->decoderstate = new unsigned long[2]; // simple!
+                head = (WAVEHeader *)(sf.data + 4);
+                this->hasmeta = true;
+                if(!sf.hasmeta) {
+                    sf.freq = head->samplerate;
+                    sf.chann = head->channels;
+                    sf.pcmsize = (AUDIO_PCM_FORMAT)(((sf.chann - 1) << 2) | (((head->samplebits >> 3)-1) & 0x3));
                     sf.hasmeta = true;
                 }
                 }
@@ -324,7 +435,8 @@ namespace Sigma {
                     case 1:
                         return out;
                     case 2: // int 16
-                        for(cidat = (unsigned char *)in, sodat = (short*)out; fcount-- >= 0; cidat+=3, sodat++) {
+                        k = 0;
+                        for(cidat = (unsigned char *)in, sodat = (short*)out; k++ < fcount; cidat+=3, sodat++) {
                             *((unsigned short*)sodat) = (unsigned short)((*((unsigned long*)cidat)) >> 8);
                             if(chanadd) { cidat-=3; }
                             if(chancomp) { cidat+=3; }
@@ -376,6 +488,7 @@ namespace Sigma {
                 if(fourcc == FourCC('R','I','F','F')) {
                     std::cerr << "Loading Sound from WAV file: " << fn << '\n';
                     LoadWAV(fh, sz);
+                    ProcessMeta();
                 }
                 else if(fourcc == FourCC('O','g','g','S')) {
                     std::cerr << "Loading Sound from Ogg file: " << fn;

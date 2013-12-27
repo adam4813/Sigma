@@ -42,13 +42,18 @@ namespace Sigma {
                     if(i > 0) {
                         if(i < samplecount) {
                             buflen = chancount * i;
-                            bufbytes = buflen * sizeof(short);
-                            alBufferData(albuf, ((chancount == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16), buf, bufbytes, samplerate);
                             if(playloop == PLAYBACK_LOOP) {
                                 this->codec.Rewind(*sfp);
+                                bufbytes = i;
+                                i = codec.FetchBuffer(*sfp, buf+bufbytes, ((chancount == 1) ? resource::PCM_MONO16 : resource::PCM_STEREO16), samplecount - i);
+                                buflen = bufbytes+i;
+                                buflen *= chancount;
                             } else {
                                 playing = false;
                             }
+                            bufbytes = buflen * sizeof(short);
+                            alBufferData(albuf, ((chancount == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16), buf, bufbytes, samplerate);
+                            
                         }
                         else {
                             alBufferData(albuf, ((chancount == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16), buf, bufbytes, samplerate);
@@ -107,9 +112,9 @@ namespace Sigma {
                     albuf[x] = master->buffers[this->buffers[x]]->GetID();
                     if(i < samplecount) {
                         buflen = chancount * i;
+                        stream = false;
                         bufbytes = buflen * sizeof(short);
                         alBufferData(albuf[x], ((chancount == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16), buf, bufbytes, samplerate);
-                        stream = false;
                         break;
                     }
                     else {

@@ -10,7 +10,8 @@ namespace Sigma {
         enum AUDIO_CODEC {
             Null,
             PCM,
-            Vorbis
+            Vorbis,
+            RIFF,
         };
 
         enum AUDIO_PCM_FORMAT {
