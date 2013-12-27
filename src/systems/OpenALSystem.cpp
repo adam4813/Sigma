@@ -59,7 +59,7 @@ namespace Sigma {
         }
     }
 
-    void OpenALSystem::UpdateTransform(const GLTransform &t) {
+    void OpenALSystem::UpdateTransform(GLTransform &t) {
         glm::vec3 pos, forward, up;
         pos = t.GetPosition();
         forward = t.GetForward();

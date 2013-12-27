@@ -1,9 +1,11 @@
 #include "OS.h"
 
+#include <iostream>
+
 namespace Sigma {
 	bool OS::InitializeWindow(const int width, const int height, const std::string title, const unsigned int glMajor /*= 3*/, const unsigned int glMinor /*= 2*/) {
 		// Initialize the library.
-		if (!glfwInit()) {
+		if (glfwInit() != GL_TRUE) {
 			return false;
 		}
 
@@ -13,14 +15,17 @@ namespace Sigma {
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, glMinor);
 
 #ifdef __APPLE__
-		// Must use the Core Profile on OS X to get GL 3.2.
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        // Must use the Core Profile on OS X to get GL 3.2.
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#else
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 #endif
 		
 		// Create a windowed mode window and its OpenGL context.
 		this->window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
-
+			
 		if (!this->window) {
+			glfwTerminate();
 			return false;
 		}
 

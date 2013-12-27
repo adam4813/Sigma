@@ -5,29 +5,15 @@
 
 namespace Sigma {
 
-	BulletMover::BulletMover(const int entityID) : IBulletShape(entityID), transform(nullptr) {
-	}
+	BulletMover::BulletMover(const int entityID) : IBulletShape(entityID), transform(nullptr) {}
 
-	BulletMover::~BulletMover() {
-	}
+	BulletMover::~BulletMover() {}
 
 	void BulletMover::ApplyForces(const double delta) {
 		if (this->transform) {
 			glm::vec3 deltavec(delta);
 			glm::vec3 totalForce;
 			glm::vec3 targetrvel;
-
-			for (auto forceitr = this->forces.begin(); forceitr != this->forces.end(); ++forceitr) {
-				totalForce += *forceitr;
-			}
-
-			glm::vec3 right_direction = glm::normalize(glm::cross(this->transform->GetForward(), GLTransform::UP_VECTOR));
-			glm::vec3 forward_direction = glm::normalize(glm::cross(GLTransform::UP_VECTOR, right_direction));
-
-			glm::vec3 finalForce = (totalForce.z * -forward_direction) + (totalForce.y * GLTransform::UP_VECTOR) + (totalForce.x * -right_direction);
-
-			body->setActivationState(DISABLE_DEACTIVATION);
-			this->body->setLinearVelocity(btVector3(finalForce.x, this->body->getLinearVelocity().y() + 0.000000001f, finalForce.z));
 
 			for (auto rotitr = this->rotationForces.begin(); rotitr != this->rotationForces.end(); ++rotitr) {
 				this->transform->Rotate((*rotitr) * deltavec);
@@ -42,6 +28,17 @@ namespace Sigma {
 			}
 			targetrvel = this->transform->Restrict(targetrvel);
 			this->rotationForces.clear();
+
+			for (auto forceitr = this->forces.begin(); forceitr != this->forces.end(); ++forceitr) {
+				totalForce += *forceitr;
+			}
+
+			glm::vec3 finalForce = (totalForce.z * this->transform->GetForward()) + 
+								   (totalForce.y * this->transform->GetUp()) + 
+								   (totalForce.x * this->transform->GetRight());
+
+			body->setActivationState(DISABLE_DEACTIVATION);
+			this->body->setLinearVelocity(btVector3(finalForce.x, this->body->getLinearVelocity().y() + 0.000000001f, finalForce.z));
 		}
 	}
 
@@ -61,6 +58,22 @@ namespace Sigma {
 		btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, motionState, shape,fallInertia);
 		this->shape->calculateLocalInertia(mass,fallInertia);
 		this->body = new btRigidBody(fallRigidBodyCI);
+	}
+
+	void BulletMover::InitializeRigidBody() {
+		if(this->transform) {
+			this->InitializeRigidBody(
+				this->transform->GetPosition().x,
+				this->transform->GetPosition().y,
+				this->transform->GetPosition().z,
+				this->transform->GetPitch(),
+				this->transform->GetYaw(),
+				this->transform->GetRoll()
+			);
+		}
+		else {
+			this->InitializeRigidBody(0,1.5f,0,0,0,0);
+		}
 	}
 
 	// immediate mode rotation (for mouse motion)

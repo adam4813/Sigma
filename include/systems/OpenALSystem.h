@@ -78,7 +78,7 @@ namespace Sigma {
         }
 
         void StopAll();
-        void UpdateTransform(const GLTransform &t);
+        void UpdateTransform(GLTransform &t);
         void UpdateTransform(glm::vec3 pos, glm::vec3 forward, glm::vec3 up);
 
         void test();

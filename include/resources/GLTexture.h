@@ -13,17 +13,25 @@ namespace Sigma {
 		public:
 			GLTexture() : id(0) { }
 
-			unsigned int GenerateGLTexutre(unsigned int width, unsigned int height) {
+			unsigned int GenerateGLTexture(unsigned int width, unsigned int height) {
 				glGenTextures(1, &this->id);
 				this->width = width;
 				this->height = height;
+
+				glBindTexture(GL_TEXTURE_2D, this->id);
+				glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, this->width, this->height, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, NULL);
+				glBindTexture(GL_TEXTURE_2D, 0);
 			}
+
 			void LoadDataFromMemory(const unsigned char* data, unsigned int width, unsigned int height) {
 				if (id == 0) {
 					glGenTextures(1, &this->id);
 				}
 				this->width = width;
 				this->height = height;
+
 				glBindTexture(GL_TEXTURE_2D, this->id);
 #if __APPLE__
                 // GL_BGRA_EXT is not available under Core.  Use the Core functionality, GL_BGRA, instead.
@@ -31,10 +39,13 @@ namespace Sigma {
 #else
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, this->width, this->height, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, data);
 #endif
+
 				glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 				glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, this->width, this->height, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, data);
 				glBindTexture(GL_TEXTURE_2D, 0);
 			}
+
 			void LoadDataFromFile(const std::string& filename) {
 				int width, height, channels;
 				unsigned char* data = SOIL_load_image(filename.c_str(), &width, &height, &channels, false);
@@ -66,7 +77,11 @@ namespace Sigma {
 					delete data;
 				}
 			}
-			unsigned int GetID() const { return id; }
+
+			void SetTextureID(const unsigned int id) { this->id = id; }
+
+			unsigned int GetID() const { return this->id; }
+
 		private:
 			unsigned int id;
 			unsigned int width;
