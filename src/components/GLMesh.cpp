@@ -17,7 +17,7 @@
 namespace Sigma{
 
     // static member initialization
-    const std::string GLMesh::DEFAULT_SHADER = "shaders/mesh";
+    const std::string GLMesh::DEFAULT_SHADER = "shaders/mesh_deferred";
 
     GLMesh::GLMesh(const int entityID) : IGLComponent(entityID) {
         memset(&this->buffers, 0, sizeof(this->buffers));
@@ -31,6 +31,11 @@ namespace Sigma{
     }
 
     void GLMesh::InitializeBuffers() {
+
+		if(!this->shader) {
+			assert(0 && "Shader must be loaded before buffers can be initialized.");
+		}
+
         // We must create a vao and then store it in our GLMesh.
         if (this->vao == 0) {
             glGenVertexArrays(1, &this->vao); // Generate the VAO
@@ -101,6 +106,10 @@ namespace Sigma{
 
     void GLMesh::Render(glm::mediump_float *view, glm::mediump_float *proj) {
         glm::mat4 modelMatrix = this->Transform()->GetMatrix();
+
+		//if(this->parentTransform != 0) {
+		//	modelMatrix = this->parentTransform->GetMatrix() * modelMatrix;
+		//}
 
         this->shader->Use();
         glUniformMatrix4fv((*this->shader)("in_Model"), 1, GL_FALSE, &modelMatrix[0][0]);

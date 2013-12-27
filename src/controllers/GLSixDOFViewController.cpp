@@ -10,7 +10,8 @@ namespace handler{
 
     GLSixDOFViewController::GLSixDOFViewController(IGLView* view, BulletMover* mover) : mover(mover) {
         // Set the view mover's view pointer.
-        this->mover->SetTransform(view->Transform);
+		// Dereferencing possibly null pointer!
+        this->mover->SetTransform(*view->Transform());
 
         // Clear out the internal key state buffers.
         memset(this->keys, 0, sizeof(this->keys));
