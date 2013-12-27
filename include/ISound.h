@@ -44,7 +44,7 @@ namespace Sigma {
         }
     protected:
         std::vector<long> playlist;
-        int playindex;
+        unsigned int playindex;
         ORDERING playorder;
         PLAYBACK playloop;
         bool playing;

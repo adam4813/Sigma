@@ -130,8 +130,15 @@ namespace Sigma {
         return retval;
     }
 
+    void OpenALSystem::StopAll() {
+        for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
+            for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
+                ALSound *sound = dynamic_cast<ALSound *>(citr->second.get());
+                sound->Stop();
+            }
+        }
+    }
     bool OpenALSystem::Update() {
-        ALint i;
         for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
             for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
                 ALSound *sound = dynamic_cast<ALSound *>(citr->second.get());
