@@ -4,6 +4,7 @@ extern "C" {
 #include <vorbis/codec.h>
 }
 #include <memory>
+#include <string.h>
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -176,7 +177,7 @@ namespace Sigma {
 		Decoder::Decoder() : decoderstate(nullptr), decoderinit(false), hasmeta(false) {
 		}
 		Decoder::~Decoder() {
-			if(this->decoderstate) { delete this->decoderstate; }
+			if(this->decoderstate) { free(this->decoderstate); }
 		}
 		void Decoder::Rewind(SoundFile &sf) {
 			VorbisState *vs;
@@ -194,7 +195,7 @@ namespace Sigma {
 				unsigned long *rs;
 				rs = (unsigned long *)this->decoderstate;
 				if(rs == nullptr) {
-					this->decoderstate = rs = new unsigned long[2];
+					this->decoderstate = rs = static_cast<unsigned long*>(malloc(sizeof(unsigned long) * 2));
 				}
 				rs[0] = 0;
 				rs[1] = 0;
@@ -259,7 +260,7 @@ namespace Sigma {
 				unsigned char * pcmdat;
 				rs = (unsigned long *)this->decoderstate;
 				if(rs == nullptr) {
-					this->decoderstate = rs = new unsigned long[2];
+					this->decoderstate = rs = static_cast<unsigned long*>(malloc(sizeof(unsigned long) * 2));
 				}
 				if(!this->decoderinit) {
 					rs[0] = 0;
@@ -301,8 +302,8 @@ namespace Sigma {
 			switch(sf.dataformat) {
 			case Vorbis:
 				{
-				this->decoderstate = new VorbisState;
-				VorbisState * vs = (VorbisState*)this->decoderstate;
+				this->decoderstate = malloc(sizeof(VorbisState));
+				VorbisState * vs = static_cast<VorbisState*>(this->decoderstate);
 				vorbis_info_init(&vs->info);
 				vorbis_comment_init(&vs->com);
 				vs->obj = (OggLinkedPacket*)sf.data;
@@ -322,7 +323,7 @@ namespace Sigma {
 			case RIFF:
 				{
 				WAVEHeader *head;
-				this->decoderstate = new unsigned long[2]; // simple!
+				this->decoderstate = malloc(sizeof(unsigned long) * 2);
 				head = (WAVEHeader *)(sf.data + 4);
 				this->hasmeta = true;
 				if(!sf.hasmeta) {

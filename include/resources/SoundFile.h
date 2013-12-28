@@ -34,7 +34,7 @@ namespace Sigma {
 			FourCC(char a, char b, char c, char d) {
 				cvalue[0] = a; cvalue[1] = b; cvalue[2] = c; cvalue[3] = d;
 			}
-			bool operator==(FourCC &rhv) {
+			bool operator==(FourCC rhv) {
 				return lvalue == rhv.lvalue;
 			}
 		};

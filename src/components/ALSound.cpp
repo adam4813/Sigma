@@ -151,8 +151,8 @@ namespace Sigma {
 		playing = false;
 	}
 	void ALSound::PlayMode(ORDERING o, PLAYBACK mode) {
-		if(o != PLAYBACK_NONE) { playorder = o; }
-		if(mode != ORDERING_NONE) { playloop = mode; }
+		if(o != ORDERING_NONE) { playorder = o; }
+		if(mode != PLAYBACK_NONE) { playloop = mode; }
 	}
 
 	void ALSound::Gain(float mul) {

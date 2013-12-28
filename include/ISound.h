@@ -33,8 +33,8 @@ namespace Sigma {
 		virtual void Pause() = 0;
 		virtual void Stop() = 0;
 		virtual void PlayMode(ORDERING o = ORDERING_NONE, PLAYBACK mode = PLAYBACK_NONE) {
-			if(o != PLAYBACK_NONE) { playorder = o; }
-			if(mode != ORDERING_NONE) { playloop = mode; }
+			if(o != ORDERING_NONE) { playorder = o; }
+			if(mode != PLAYBACK_NONE) { playloop = mode; }
 		}
 		virtual void AddSound(long i) {
 			playlist.push_back(i);
