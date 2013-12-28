@@ -583,6 +583,10 @@ namespace Sigma{
 	int OpenGLSystem::createRenderTarget(const unsigned int w, const unsigned int h) {
 		std::unique_ptr<RenderTarget> newRT(new RenderTarget());
 
+		int depthBits;
+		glGetIntegerv(GL_DEPTH_BITS, &depthBits);
+		std::cout << "Depth buffer bits: " << depthBits << std::endl;
+
 		// Create the frame buffer object
 		glGenFramebuffers(1, &newRT->fbo_id);
 		glBindFramebuffer(GL_FRAMEBUFFER, newRT->fbo_id);
@@ -597,8 +601,21 @@ namespace Sigma{
 
 		glGenRenderbuffers(1, &newRT->depth_id);
 		glBindRenderbuffer(GL_RENDERBUFFER, newRT->depth_id);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, w, h);
 
+		switch(depthBits) {
+		case 16:
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, w, h);
+			break;
+		case 24:
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, w, h);
+			break;
+		case 32:
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, w, h);
+			break;
+		default:
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, w, h);
+		}
+		
 		printOpenGLError();
 
 		//Attach depth buffer to FBO
