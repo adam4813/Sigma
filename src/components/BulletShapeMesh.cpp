@@ -12,6 +12,6 @@ namespace Sigma {
 			this->btmesh->addTriangle(btVector3(v1->x, v1->y, v1->z), btVector3(v2->x, v2->y, v2->z), btVector3(v3->x, v3->y, v3->z));
 		}
 
-		this->shape = new btBvhTriangleMeshShape(this->btmesh, false);
+		SetCollisionShape(new btBvhTriangleMeshShape(this->btmesh, false));
 	}
 }

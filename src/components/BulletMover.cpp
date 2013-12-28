@@ -33,31 +33,32 @@ namespace Sigma {
 				totalForce += *forceitr;
 			}
 
-			glm::vec3 finalForce = (totalForce.z * this->transform->GetForward()) + 
-								   (totalForce.y * this->transform->GetUp()) + 
+			glm::vec3 finalForce = (totalForce.z * this->transform->GetForward()) +
+								   (totalForce.y * this->transform->GetUp()) +
 								   (totalForce.x * this->transform->GetRight());
 
-			body->setActivationState(DISABLE_DEACTIVATION);
-			this->body->setLinearVelocity(btVector3(finalForce.x, this->body->getLinearVelocity().y() + 0.000000001f, finalForce.z));
+			GetRigidBody()->setActivationState(DISABLE_DEACTIVATION);
+			GetRigidBody()->setLinearVelocity(btVector3(finalForce.x, GetRigidBody()->getLinearVelocity().y() + 0.000000001f, finalForce.z));
 		}
 	}
 
 	void BulletMover::UpdateTransform() {
 		if (this->transform) {
 			btTransform trans;
-			this->body->getMotionState()->getWorldTransform(trans);
+			GetRigidBody()->getMotionState()->getWorldTransform(trans);
 			this->transform->TranslateTo(trans.getOrigin().x(),trans.getOrigin().y(), trans.getOrigin().z());
 		}
 	}
 
 	void BulletMover::InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz) {
-		this->shape = new btCapsuleShape(0.3f, 1.3f);
+		auto shape = new btCapsuleShape(0.3f, 1.3f);
+		SetCollisionShape(shape);
 		btScalar mass = 1;
 		btVector3 fallInertia(0,0,0);
-		this->motionState =	new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(x, y, z)));
+		auto motionState =	new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(x, y, z)));
 		btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, motionState, shape,fallInertia);
-		this->shape->calculateLocalInertia(mass,fallInertia);
-		this->body = new btRigidBody(fallRigidBodyCI);
+		shape->calculateLocalInertia(mass,fallInertia);
+		SetRigidBody(new btRigidBody(fallRigidBodyCI));
 	}
 
 	void BulletMover::InitializeRigidBody() {
