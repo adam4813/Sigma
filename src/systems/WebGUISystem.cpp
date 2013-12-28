@@ -26,7 +26,7 @@ namespace Sigma {
 		this->web_core->Update();
 		for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
 			for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
-				if (citr->second->GetSurface()->is_dirty()){
+				if (citr->second->GetSurface()->is_dirty()) {
 					// Update texture here. Not sure of the proper api for it
 					// http://www.awesomium.com/docs/1_7_2/cpp_api/class_awesomium_1_1_bitmap_surface.html
 					citr->second->UpdateTexture();
@@ -100,10 +100,12 @@ namespace Sigma {
 
 		if (Sigma::OpenGLSystem::textures.find(textureName) == Sigma::OpenGLSystem::textures.end()) {
 			Sigma::resource::GLTexture texture;
+			texture.Format(GL_BGRA);
 			texture.LoadDataFromMemory(surface->buffer(), surface->width(), surface->height());
 			Sigma::OpenGLSystem::textures[textureName] = texture;
 		}
 		else {
+			Sigma::OpenGLSystem::textures[textureName].Format(GL_BGRA);
 			Sigma::OpenGLSystem::textures[textureName].LoadDataFromMemory(surface->buffer(), surface->width(), surface->height());
 		}
 
