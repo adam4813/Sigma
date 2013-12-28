@@ -6,11 +6,12 @@
 #include "glm/glm.hpp"
 #include "IComponent.h"
 #include "systems/GLSLShader.h"
+#include "Sigma.h"
 
 namespace Sigma {
 	class PointLight : public IComponent {
 	public:
-		PointLight(const unsigned int entityID);
+		PointLight(const id_t entityID);
 		virtual ~PointLight() {}
 
 		SET_COMPONENT_TYPENAME("PointLight");

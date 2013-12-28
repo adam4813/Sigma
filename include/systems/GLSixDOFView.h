@@ -1,12 +1,13 @@
 #pragma once
 
 #include "IGLView.h"
+#include "Sigma.h"
 
 struct GLSixDOFView : public Sigma::IGLView {
 
     SET_COMPONENT_TYPENAME("SIX_DOF_VIEW");
 
-	GLSixDOFView(int entityID);
+	GLSixDOFView(const id_t entityID);
 
 	const glm::mat4 GetViewMatrix();
 	virtual void Move(float right, float up, float forward);

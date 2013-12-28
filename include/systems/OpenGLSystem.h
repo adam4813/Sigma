@@ -19,6 +19,7 @@
 #include <vector>
 #include "resources/GLTexture.h"
 #include "components/GLScreenQuad.h"
+#include "Sigma.h"
 
 struct IGLView;
 
@@ -92,24 +93,24 @@ namespace Sigma{
 
         std::map<std::string,FactoryFunction> getFactoryFunctions();
 
-		IComponent* createPointLight(const unsigned int entityID, const std::vector<Property> &properties);
-		IComponent* createSpotLight(const unsigned int entityID, const std::vector<Property> &properties);
-		IComponent* createScreenQuad(const unsigned int entityID, const std::vector<Property> &properties);
+		IComponent* createPointLight(const id_t entityID, const std::vector<Property> &properties);
+		IComponent* createSpotLight(const id_t entityID, const std::vector<Property> &properties);
+		IComponent* createScreenQuad(const id_t entityID, const std::vector<Property> &properties);
 
 		// TODO: Move these methods to the components themselves.
-        IComponent* createGLSprite(const unsigned int entityID, const std::vector<Property> &properties) ;
-        IComponent* createGLIcoSphere(const unsigned int entityID, const std::vector<Property> &properties) ;
-        IComponent* createGLCubeSphere(const unsigned int entityID, const std::vector<Property> &properties) ;
-        IComponent* createGLMesh(const unsigned int entityID, const std::vector<Property> &properties) ;
+        IComponent* createGLSprite(const id_t entityID, const std::vector<Property> &properties) ;
+        IComponent* createGLIcoSphere(const id_t entityID, const std::vector<Property> &properties) ;
+        IComponent* createGLCubeSphere(const id_t entityID, const std::vector<Property> &properties) ;
+        IComponent* createGLMesh(const id_t entityID, const std::vector<Property> &properties) ;
 		// Views are not technically components, but perhaps they should be
-		IComponent* createGLView(const unsigned int entityID, const std::vector<Property> &properties, std::string mode) ;
+		IComponent* createGLView(const id_t entityID, const std::vector<Property> &properties, std::string mode) ;
 
 		// Managing rendering internals
 		/*
 		 * \brief creates a new render target of desired size
 		 */
 		int createRenderTarget(const unsigned int w, const unsigned int h);
-		
+
 		/*
 		 * \brief returns the fbo_id of primary render target (index 0)
 		 */
@@ -180,7 +181,7 @@ namespace Sigma{
 
         double deltaAccumulator; // milliseconds since last render
         double framerate; // default is 60fps
-		
+
 		// Type of view to create
 		std::string viewMode;
 

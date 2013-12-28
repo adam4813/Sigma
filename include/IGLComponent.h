@@ -12,6 +12,7 @@
 #include "systems/GLSLShader.h"
 #include <unordered_map>
 #include <memory>
+#include "Sigma.h"
 
 namespace Sigma {
 	// A struct to store which index each of its verts are.
@@ -66,9 +67,9 @@ namespace Sigma {
 	public:
 		SET_COMPONENT_TYPENAME("IGLComponent");
 
-		IGLComponent() 
+		IGLComponent()
 			: lightingEnabled(true), SpatialComponent(0) {} // Default ctor setting entity ID to 0.
-		IGLComponent(const int entityID)
+		IGLComponent(const id_t entityID)
 			: lightingEnabled(true), SpatialComponent(entityID) {} // Ctor that sets the entity ID.
 
         typedef std::unordered_map<std::string, std::shared_ptr<GLSLShader>> ShaderMap;

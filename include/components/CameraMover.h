@@ -5,11 +5,12 @@
 
 #include "IMoverComponent.h"
 #include "systems/IGLView.h"
+#include "Sigma.h"
 
 namespace Sigma {
 	class CameraMover : public IMoverComponent {
 	public:
-		CameraMover(const int entityID);
+		CameraMover(const id_t entityID);
 
 		void ApplyForces(const double delta);
 

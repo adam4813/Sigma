@@ -3,13 +3,15 @@
 #define PHSYICS_MOVER_H
 
 #include "../IMoverComponent.h"
+#include "Sigma.h"
+
 class GLTransform;
 
 class PhysicsMover : public Sigma::IMoverComponent {
 public:
     SET_COMPONENT_TYPENAME("PhysicsMover");
 	PhysicsMover() : Sigma::IMoverComponent(0) { }
-	PhysicsMover(const int entityID);
+	PhysicsMover(const id_t entityID);
 
 	/**
 	 * \brief Apply all forces in this mover's list.

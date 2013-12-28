@@ -58,7 +58,7 @@ namespace Sigma{
 
 	OpenGLSystem::OpenGLSystem() : windowWidth(1024), windowHeight(768), deltaAccumulator(0.0),
 		framerate(60.0f), pointQuad(1000), ambientQuad(1001), spotQuad(1002), viewMode("") {}
-		
+
 	//std::map<std::string, resource::GLTexture> OpenGLSystem::textures = std::map<std::string, resource::GLTexture>();
 
 	std::map<std::string, Sigma::IFactory::FactoryFunction>
@@ -79,7 +79,7 @@ namespace Sigma{
         return retval;
     }
 
-	IComponent* OpenGLSystem::createGLView(const unsigned int entityID, const std::vector<Property> &properties, std::string mode) {
+	IComponent* OpenGLSystem::createGLView(const id_t entityID, const std::vector<Property> &properties, std::string mode) {
 		viewMode = mode;
 
 		if(mode=="FPSCamera") {
@@ -132,7 +132,7 @@ namespace Sigma{
 		return this->views[this->views.size() - 1];
 	}
 
-	IComponent* OpenGLSystem::createGLSprite(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* OpenGLSystem::createGLSprite(const id_t entityID, const std::vector<Property> &properties) {
 		GLSprite* spr = new GLSprite(entityID);
 		float scale = 1.0f;
 		float x = 0.0f;
@@ -184,7 +184,7 @@ namespace Sigma{
 		return spr;
 	}
 
-	IComponent* OpenGLSystem::createGLIcoSphere(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* OpenGLSystem::createGLIcoSphere(const id_t entityID, const std::vector<Property> &properties) {
 		Sigma::GLIcoSphere* sphere = new Sigma::GLIcoSphere(entityID);
 		float scale = 1.0f;
 		float x = 0.0f;
@@ -231,7 +231,7 @@ namespace Sigma{
 		return sphere;
 	}
 
-	IComponent* OpenGLSystem::createGLCubeSphere(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* OpenGLSystem::createGLCubeSphere(const id_t entityID, const std::vector<Property> &properties) {
 		Sigma::GLCubeSphere* sphere = new Sigma::GLCubeSphere(entityID);
 
 		std::string texture_name = "";
@@ -310,7 +310,7 @@ namespace Sigma{
 		return sphere;
 	}
 
-	IComponent* OpenGLSystem::createGLMesh(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* OpenGLSystem::createGLMesh(const id_t entityID, const std::vector<Property> &properties) {
 		Sigma::GLMesh* mesh = new Sigma::GLMesh(entityID);
 
 		float scale = 1.0f;
@@ -403,14 +403,14 @@ namespace Sigma{
         return mesh;
     }
 
-	IComponent* OpenGLSystem::createScreenQuad(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* OpenGLSystem::createScreenQuad(const id_t entityID, const std::vector<Property> &properties) {
 		Sigma::GLScreenQuad* quad = new Sigma::GLScreenQuad(entityID);
 
 		float x = 0.0f;
 		float y = 0.0f;
 		float w = 0.0f;
 		float h = 0.0f;
-		
+
 		int componentID = 0;
 		std::string textureName;
 		bool textureInMemory = false;
@@ -462,11 +462,11 @@ namespace Sigma{
 		quad->LoadShader("shaders/quad");
 		quad->InitializeBuffers();
 		this->screensSpaceComp.push_back(std::unique_ptr<IGLComponent>(quad));
-		
+
 		return quad;
 	}
 
-	IComponent* OpenGLSystem::createPointLight(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* OpenGLSystem::createPointLight(const id_t entityID, const std::vector<Property> &properties) {
 		Sigma::PointLight *light = new Sigma::PointLight(entityID);
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
@@ -507,7 +507,7 @@ namespace Sigma{
 		return light;
 	}
 
-	IComponent* OpenGLSystem::createSpotLight(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* OpenGLSystem::createSpotLight(const id_t entityID, const std::vector<Property> &properties) {
 		Sigma::SpotLight *light = new Sigma::SpotLight(entityID);
 
 		float x=0.0f, y=0.0f, z=0.0f;
@@ -576,7 +576,7 @@ namespace Sigma{
 		light->transform.Rotate(rx, ry, rz);
 
 		this->addComponent(entityID, light);
-		
+
 		return light;
 	}
 
@@ -648,7 +648,7 @@ namespace Sigma{
 					 (GLsizei)rt->width,
 					 (GLsizei)rt->height,
 					 0, internalFormat, type, NULL);
-		
+
 		//Attach 2D texture to this FBO
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+rt->texture_ids.size(), GL_TEXTURE_2D, texture_id, 0);
 
@@ -703,7 +703,7 @@ namespace Sigma{
 			glClearColor(0.0f,0.0f,0.0f,1.0f);
             glViewport(0, 0, this->windowWidth, this->windowHeight); // Set the viewport size to fill the window
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
-			
+
 			//////////////////
 			// GBuffer Pass //
 			//////////////////
@@ -735,7 +735,7 @@ namespace Sigma{
 						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "ambLightIntensity"), 0.05f);
 						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "diffuseLightIntensity"), 0.0f);
 						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "specularLightIntensity"), 0.0f);
-					
+
 						glComp->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 					}
 				}
@@ -754,9 +754,9 @@ namespace Sigma{
 			}
 
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-			glBlitFramebuffer(0, 0, this->windowWidth, this->windowHeight, 0, 0, this->windowWidth, this->windowHeight, 
+			glBlitFramebuffer(0, 0, this->windowWidth, this->windowHeight, 0, 0, this->windowWidth, this->windowHeight,
                   GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-			
+
 			if(this->renderTargets.size() > 0) {
 				this->renderTargets[0]->UnbindRead();
 			}
@@ -796,13 +796,13 @@ namespace Sigma{
 
 			// Load variables
 			glUniform4f(shader("ambientColor"), ambientLight.r, ambientLight.g, ambientLight.b, ambientLight.a);
-			
+
 			glUniform1i(shader("colorBuffer"), 0);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[0]);
 
 			this->ambientQuad.Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
-						
+
 			shader.UnUse();
 
 			// Dynamic light passes
@@ -816,7 +816,7 @@ namespace Sigma{
 
 					// If it is a point light, and it intersects the frustum, then render
 					if(light && this->GetView(0)->CameraFrustum.isectSphere(light->position, light->radius) ) {
-						
+
 						GLSLShader &shader = (*this->pointQuad.GetShader().get());
 						shader.Use();
 
@@ -840,7 +840,7 @@ namespace Sigma{
 						glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[2]);
 
 						this->pointQuad.Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
-						
+
 						shader.UnUse();
 
 						continue;
@@ -877,7 +877,7 @@ namespace Sigma{
 						glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[2]);
 
 						this->spotQuad.Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
-						
+
 						shader.UnUse();
 
 						continue;
@@ -897,7 +897,7 @@ namespace Sigma{
 
 			// Remove blending
 			glDisable(GL_BLEND);
-			
+
 			// Re-enabled depth test
 			glDepthFunc(GL_LESS);
 			glDepthMask(GL_TRUE);
@@ -922,7 +922,7 @@ namespace Sigma{
 
 						// Set view position
 						glUniform3f(glGetUniformBlockIndex(glComp->GetShader()->GetProgram(), "viewPosW"), viewPosition.x, viewPosition.y, viewPosition.z);
-					
+
 						glComp->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 					}
 				}
@@ -935,7 +935,7 @@ namespace Sigma{
 			// Enable transparent rendering
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			
+
 			for (auto citr = this->screensSpaceComp.begin(); citr != this->screensSpaceComp.end(); ++citr) {
 					citr->get()->GetShader()->Use();
 

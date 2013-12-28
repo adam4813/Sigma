@@ -6,6 +6,7 @@
 #include <string>
 #include <unordered_map>
 #include <iostream>
+#include "Sigma.h"
 
 namespace Sigma {
 
@@ -18,12 +19,12 @@ namespace Sigma {
              *
              * A factory method to create various components and add them to the system. These components will be used during the system update method
              * \param[in] const std::string type The type of componenet to create
-             * \param[in] const int entityID The ID of the entity this component belongs to.
+             * \param[in] const id_t entityID The ID of the entity this component belongs to.
              * \param[in] std::vector<Property> &properties A vector containing the properties to apply to the created component.
              * \return a pointer to the newly created component
              */
             IComponent* create(const std::string& type,
-                        const unsigned int entityID,
+                        const id_t entityID,
                         const std::vector<Property> &properties);
 
             /**

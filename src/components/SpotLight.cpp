@@ -1,7 +1,7 @@
 #include "components/SpotLight.h"
 
 namespace Sigma {
-	SpotLight::SpotLight(const unsigned int entityID) : IComponent(entityID) {
+	SpotLight::SpotLight(const id_t entityID) : IComponent(entityID) {
 		this->transform.TranslateTo(glm::vec3(0.0f, 0.0f, 0.0f));
 		this->transform.Rotate(glm::vec3(0.0f, 0.0f, 0.0f));
 		this->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);

@@ -6,15 +6,15 @@
 #include <iostream>
 
 #include "IComponent.h"
-
 #include "glm/glm.hpp"
+#include "Sigma.h"
 
 namespace Sigma{
 
     class IMoverComponent: public IComponent {
     public:
-        IMoverComponent() : IComponent(0) { } // Default ctor setting entity ID to 0.
-        IMoverComponent(const int entityID) : IComponent(entityID) { } // Ctor that sets the entity ID.
+        IMoverComponent() : entity_id(0) {} // Default ctor setting entity ID to 0.
+        IMoverComponent(const id_t entityID) : entity_id(entityID) {} // Ctor that sets the entity ID.
 
         /**
          * \brief Add a force to the list.
@@ -73,6 +73,7 @@ namespace Sigma{
     protected:
         std::list<glm::vec3> forces; // The list of forces to apply each update loop.
         std::list<glm::vec3> rotationForces;
+        const id_t entity_id; // the id of the entity owning this component
     }; // class IMoverComponent
 } // namespace Sigma
 

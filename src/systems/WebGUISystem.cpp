@@ -37,7 +37,7 @@ namespace Sigma {
 		return true;
 	}
 
-	IComponent* WebGUISystem::createWebGUIView(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* WebGUISystem::createWebGUIView(const id_t entityID, const std::vector<Property> &properties) {
 		float x, y, width, height;
 		bool transparent = false;
 		std::string textureName = "";
@@ -70,7 +70,7 @@ namespace Sigma {
 		}
 		WebGUIView* webview = new WebGUIView(entityID);
 		WebView* view = web_core->CreateWebView(width * this->windowWidth, height * this->windowHeight);
-		
+
 		if (!url.IsValid()) {
 			std::cerr << "Invalid URL" << std::endl;
 		}
