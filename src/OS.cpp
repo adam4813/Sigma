@@ -3,7 +3,6 @@
 #include <iostream>
 
 namespace Sigma {
-
 	bool OS::InitializeWindow(const int width, const int height, const std::string title, const unsigned int glMajor /*= 3*/, const unsigned int glMinor /*= 2*/) {
 		// Initialize the library.
 		if (glfwInit() != GL_TRUE) {
@@ -57,6 +56,7 @@ namespace Sigma {
 		glfwSetCursorPosCallback(this->window, &OS::mouseMoveEvent);
 		glfwSetCharCallback(this->window, &OS::characterEvent);
 		glfwSetMouseButtonCallback(this->window, &OS::mouseButtonEvent);
+		glfwSetWindowFocusCallback(this->window, &OS::windowFocusChange);
 
 		glfwGetCursorPos(this->window, &this->oldMouseX, &this->oldMouseY);
 
@@ -132,6 +132,17 @@ namespace Sigma {
 
 		if (os) {
 			os->DispatchMouseButtonEvent(button, action, mods);
+		}
+	}
+
+	void OS::windowFocusChange(GLFWwindow* window, int focused) {
+		if (focused == GL_FALSE) {
+			// Get the user pointer and cast it.
+			OS* os = static_cast<OS*>(glfwGetWindowUserPointer(window));
+
+			if (os) {
+				os->KeyboardEventSystem.LostKeyboardFocus();
+			}
 		}
 	}
 
@@ -227,5 +238,4 @@ namespace Sigma {
 
 		return false;
 	}
-
 }

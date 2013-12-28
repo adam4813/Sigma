@@ -4,11 +4,25 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <locale.h>
 
 namespace Sigma {
 	namespace parser {
-		bool SCParser::Parse(const std::string& fname) {
-			this->fname = fname;
+    /**
+     * Change locals to "C" for numbers inside the code block were is created as uses RAII
+     */
+    struct SetLocals {
+      SetLocals() {
+        setlocale(LC_NUMERIC, "C"); // We must parse numbers in a consistent way
+      }
+
+      ~SetLocals() {
+        setlocale(LC_ALL, ""); // Restores system local
+      }
+    };
+
+		bool SCParser::Parse(const std::string& fname) {	
+      this->fname = fname;
 			std::ifstream in(this->fname, std::ios::in);
 
 			// Some type of error opening the file
@@ -17,7 +31,9 @@ namespace Sigma {
 				return false;
 			}
 
-			std::string line;
+      auto locals = SetLocals();
+  
+      std::string line;
 			Sigma::parser::Entity* currentEntity = nullptr;
 
 			while (getline(in, line)) {
@@ -91,6 +107,7 @@ namespace Sigma {
 				this->entities.push_back(*currentEntity); // copy
 				delete currentEntity; // delete the heap original
 			}
+
 			return true; // Successfully parsed a file. It might have been empty though.
 		}
 

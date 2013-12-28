@@ -109,6 +109,15 @@ namespace Sigma {
 		 */
 		static void mouseButtonEvent(GLFWwindow* window, int button, int action, int mods);
 
+		/**
+		 * \brief Callback for window focus change events.
+		 *
+		 * \param[in/out] GLFWwindow * window
+		 * \param[in/out] int focused GL_TRUE if focused, GL_FALSE if unfocused.
+		 * \return void
+		 */
+		static void windowFocusChange(GLFWwindow* window, int focused);
+
 		void RegisterKeyboardEventHandler(event::IKeyboardEventHandler* handler);
 		void RegisterMouseEventHandler(event::IMouseEventHandler* handler);
 

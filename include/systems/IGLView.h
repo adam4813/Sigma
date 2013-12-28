@@ -3,7 +3,7 @@
 #define IGL_VIEW_H
 
 #include "GLTransform.h"
-#include "components\SpatialComponent.h"
+#include "components/SpatialComponent.h"
 
 namespace Sigma{
 

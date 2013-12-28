@@ -54,6 +54,12 @@ namespace Sigma{
 
 			} // function KeyStateChange
 
+			void FPSCamera::LostKeyboardFocus() {
+				if (this->mover) {
+					this->mover->ClearForces();
+				}
+			}
+
 			void FPSCamera::MouseMove(float x, float y, float dx, float dy) {
 				if (this->mover && this->mouseLook) {
 					// NOTE: dy is positive when the mouse is moved down, so it must be inverted

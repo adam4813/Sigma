@@ -21,28 +21,49 @@ namespace Sigma {
 
 			void GUIController::CharDown(const unsigned int c) {
 				if (this->gui) {
-					this->gui->InjectCharDown(c);	
+					this->gui->InjectCharDown(c);
 				}
 			}
 
 			void GUIController::MouseDown(Sigma::event::BUTTON btn, float x, float y) {
 				// Store the new key state
 				if (this->gui) {
-					this->gui->InjectMouseDown(btn, x, y);
+					if (this->gui->InjectMouseDown(btn, x, y)) {
+						this->keyboardSystem->RequestFocusLock(this);
+						this->mouseSystem->RequestFocusLock(this);
+					}
+					else {
+						this->keyboardSystem->ReleaseFocusLock(this);
+						this->mouseSystem->ReleaseFocusLock(this);
+					}
 				}
 			}
 
 			void GUIController::MouseUp(Sigma::event::BUTTON btn, float x, float y) {
 				// Store the new key state
 				if (this->gui) {
-					this->gui->InjectMouseUp(btn, x, y);
+					if (this->gui->InjectMouseUp(btn, x, y)) {
+						this->keyboardSystem->RequestFocusLock(this);
+						this->mouseSystem->RequestFocusLock(this);
+					}
+					else {
+						this->keyboardSystem->ReleaseFocusLock(this);
+						this->mouseSystem->ReleaseFocusLock(this);
+					}
 				}
 			}
 
 			void GUIController::MouseMove(float x, float y, float dx, float dy) {
 				// Store the new key state
 				if (this->gui) {
-					this->gui->InjectMouseMove(x, y);
+					if (this->gui->InjectMouseMove(x, y)) {
+						this->keyboardSystem->RequestFocusLock(this);
+						this->mouseSystem->RequestFocusLock(this);
+					}
+					else {
+						this->keyboardSystem->ReleaseFocusLock(this);
+						this->mouseSystem->ReleaseFocusLock(this);
+					}
 				}
 			}
 		}
