@@ -621,7 +621,7 @@ namespace Sigma{
 				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, rt->width, rt->height);
 			}*/
 		
-			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, rt->width, rt->height);
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, rt->width, rt->height);
 			printOpenGLError();
 
 			glBindRenderbuffer(GL_RENDERBUFFER, 0);
