@@ -3,7 +3,7 @@
 
 // Put in this header all the things shared by all code
 namespace Sigma {
-    typedef unsigned int id_t;
+    typedef uint32_t id_t;
     typedef std::string ComponentID;
 }
 
