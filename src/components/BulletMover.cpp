@@ -5,7 +5,7 @@
 
 namespace Sigma {
 
-	BulletMover::BulletMover(const int entityID) : IBulletShape(entityID), transform(nullptr) {}
+	BulletMover::BulletMover(const id_t entityID) : IBulletShape(entityID), transform(nullptr) {}
 
 	BulletMover::~BulletMover() {}
 
