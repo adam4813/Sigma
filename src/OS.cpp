@@ -21,7 +21,7 @@ namespace Sigma {
 #else
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 #endif
-        
+
 		// Create a windowed mode window and its OpenGL context.
 		this->window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
 			
