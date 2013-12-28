@@ -51,15 +51,12 @@ int main(int argCount, char **argValues) {
 	//////////////////////////////
 
 	// Create render target for the GBuffer, Light Accumulation buffer, and final composite buffer
-	unsigned int geoBuffer = glsys.createRenderTarget(glfwos.GetWindowWidth(), glfwos.GetWindowHeight());
-	glsys.createRTBuffer(geoBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE); // Diffuse buffer
-	glsys.createRTBuffer(geoBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE); // Normal buffer
-	glsys.createRTBuffer(geoBuffer, GL_R32F, GL_RED, GL_FLOAT);			  // Depth buffer
+	unsigned int geoBuffer = glsys.createRenderTarget(glfwos.GetWindowWidth(), glfwos.GetWindowHeight(), true);
+	glsys.createRTBuffer(geoBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE); // Diffuse texture
+	glsys.createRTBuffer(geoBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE); // Normal texture
+	glsys.createRTBuffer(geoBuffer, GL_R32F, GL_RED, GL_FLOAT);			  // Depth texture
+	glsys.initRenderTarget(geoBuffer); // Create the opengl assets
 
-	unsigned int lightBuffer = glsys.createRenderTarget(glfwos.GetWindowWidth(), glfwos.GetWindowHeight());
-	glsys.createRTBuffer(lightBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE); // Light accumulation buffer
-
-	
 	///////////////////
 	// Setup physics //
 	///////////////////

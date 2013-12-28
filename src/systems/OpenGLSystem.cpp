@@ -580,52 +580,77 @@ namespace Sigma{
 		return light;
 	}
 
-	int OpenGLSystem::createRenderTarget(const unsigned int w, const unsigned int h) {
+	int OpenGLSystem::createRenderTarget(const unsigned int w, const unsigned int h, bool hasDepth) {
 		std::unique_ptr<RenderTarget> newRT(new RenderTarget());
 
+		newRT->width = w;
+		newRT->height = h;
+		newRT->hasDepth = hasDepth;
+
+		this->renderTargets.push_back(std::move(newRT));
+		return (this->renderTargets.size() - 1);
+	}
+
+	void OpenGLSystem::initRenderTarget(unsigned int rtID) {
+		RenderTarget *rt = this->renderTargets[rtID].get();
+		
+		// Make sure we're on the back buffer
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		// Get backbuffer depth bit width
 		int depthBits;
 		glGetIntegerv(GL_DEPTH_BITS, &depthBits);
 		std::cout << "Depth buffer bits: " << depthBits << std::endl;
 
-		// Create the frame buffer object
-		glGenFramebuffers(1, &newRT->fbo_id);
-		glBindFramebuffer(GL_FRAMEBUFFER, newRT->fbo_id);
+		// Create the depth render buffer
+		if(rt->hasDepth) {
+			glGenRenderbuffers(1, &rt->depth_id);
+			glBindRenderbuffer(GL_RENDERBUFFER, rt->depth_id);
 
-		printOpenGLError();
-
-		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
-
-		newRT->width = w;
-		newRT->height = h;
-
-		glGenRenderbuffers(1, &newRT->depth_id);
-		glBindRenderbuffer(GL_RENDERBUFFER, newRT->depth_id);
-
-		switch(depthBits) {
-		case 16:
-			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, w, h);
-			break;
-		case 24:
-			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, w, h);
-			break;
-		case 32:
-			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, w, h);
-			break;
-		default:
-			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, w, h);
-		}
+			/*switch(depthBits) {
+			case 16:
+				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, rt->width, rt->height);
+				break;
+			case 24:
+				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, rt->width, rt->height);
+				break;
+			case 32:
+				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, rt->width, rt->height);
+				break;
+			default:
+				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, rt->width, rt->height);
+			}*/
 		
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, rt->width, rt->height);
+			printOpenGLError();
+
+			glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		}
+
+		// Create the frame buffer object
+		glGenFramebuffers(1, &rt->fbo_id);
 		printOpenGLError();
 
-		//Attach depth buffer to FBO
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, newRT->depth_id);
+		glBindFramebuffer(GL_FRAMEBUFFER, rt->fbo_id);
 
-		printOpenGLError();
+		//glDrawBuffer(GL_NONE);
+		//glReadBuffer(GL_NONE);
+
+		for(unsigned int i=0; i < rt->texture_ids.size(); ++i) {
+			//Attach 2D texture to this FBO
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+i, GL_TEXTURE_2D, rt->texture_ids[i], 0);
+			printOpenGLError();
+		}
+
+		if(rt->hasDepth) {
+			//Attach depth buffer to FBO
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rt->depth_id);
+			printOpenGLError();
+		}
 
 		//Does the GPU support current FBO configuration?
 		GLenum status;
-		status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
 		switch(status) {
 			case GL_FRAMEBUFFER_COMPLETE:
@@ -636,17 +661,11 @@ namespace Sigma{
 		}
 
 		// Unbind objects
-		glBindRenderbuffer(GL_RENDERBUFFER, 0);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-
-		this->renderTargets.push_back(std::move(newRT));
-		return (this->renderTargets.size() - 1);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void OpenGLSystem::createRTBuffer(unsigned int rtID, GLint format, GLenum internalFormat, GLenum type) {
 		RenderTarget *rt = this->renderTargets[rtID].get();
-
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, rt->fbo_id);
 
 		// Create a texture for each requested target
 		GLuint texture_id;
@@ -665,26 +684,10 @@ namespace Sigma{
 					 (GLsizei)rt->width,
 					 (GLsizei)rt->height,
 					 0, internalFormat, type, NULL);
-		
-		//Attach 2D texture to this FBO
-		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+rt->texture_ids.size(), GL_TEXTURE_2D, texture_id, 0);
 
 		this->renderTargets[rtID]->texture_ids.push_back(texture_id);
 
-		//Does the GPU support current FBO configuration?
-		GLenum status;
-		status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
-
-		switch(status) {
-			case GL_FRAMEBUFFER_COMPLETE:
-				std::cout << "Successfully created render target." << std::endl;
-				break;
-			default:
-				assert(0 && "Error: Framebuffer format is not compatible.");
-		}
-
 		glBindTexture(GL_TEXTURE_2D, 0);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	}
 
     bool OpenGLSystem::Update(const double delta) {
