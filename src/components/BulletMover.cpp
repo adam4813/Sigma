@@ -6,54 +6,18 @@
 namespace Sigma {
 
 	BulletMover::BulletMover(const id_t entityID) : IBulletShape(entityID), transform(nullptr) {
-        this->AddEntity(entityID);
+        IMoverComponent::AddEntity(entityID);
 	}
 
 	BulletMover::~BulletMover() {}
 
 	void BulletMover::ApplyForces(const id_t id, const double delta) {
-		if (this->transform) {
-			glm::vec3 deltavec(delta);
-			glm::vec3 totalForce;
-			glm::vec3 targetrvel;
+        IMoverComponent::ComputeInterpolatedForces(IBulletShape::GetEntityID(), delta, this->transform);
 
-			// TODO : use the id parameter
-			auto rotationForces = this->getRotationForces(IBulletShape::GetEntityID());
-			if (rotationForces == nullptr) {
-                    assert(0 && "id does not exist");
-			}
+        // TODO : use the id parameter
+        auto finalForce = IMoverComponent::GetTransformedForces(IBulletShape::GetEntityID(), this->transform);
 
-			for (auto rotitr = rotationForces->begin(); rotitr != rotationForces->end(); ++rotitr) {
-				this->transform->Rotate((*rotitr) * deltavec);
-			}
-
-			// Inertial rotation
-			targetrvel = _rotationtarget * deltavec;
-			if(fabs(targetrvel.x) > 0.0001f || fabs(targetrvel.y) > 0.0001f || fabs(targetrvel.z) > 0.0001f) {
-				targetrvel = this->transform->Restrict(targetrvel);
-				this->transform->Rotate(targetrvel);
-				_rotationtarget -= targetrvel;
-			}
-			targetrvel = this->transform->Restrict(targetrvel);
-			rotationForces->clear();
-
-			// TODO : use the id parameter
-			auto forces = this->getForces(IBulletShape::GetEntityID());
-			if (forces == nullptr) {
-                    assert(0 && "id does not exist");
-			}
-
-			for (auto forceitr = forces->begin(); forceitr != forces->end(); ++forceitr) {
-				totalForce += *forceitr;
-			}
-
-			glm::vec3 finalForce = (totalForce.z * this->transform->GetForward()) +
-								   (totalForce.y * this->transform->GetUp()) +
-								   (totalForce.x * this->transform->GetRight());
-
-			GetRigidBody()->setActivationState(DISABLE_DEACTIVATION);
-			GetRigidBody()->setLinearVelocity(btVector3(finalForce.x, GetRigidBody()->getLinearVelocity().y() + 0.000000001f, finalForce.z));
-		}
+        GetRigidBody()->setLinearVelocity(btVector3(finalForce->x, GetRigidBody()->getLinearVelocity().y() + 0.000000001f, finalForce->z));
 	}
 
 	void BulletMover::UpdateTransform() {
@@ -89,6 +53,7 @@ namespace Sigma {
 		else {
 			this->InitializeRigidBody(0,1.5f,0,0,0,0);
 		}
+        GetRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	}
 
 	// immediate mode rotation (for mouse motion)
@@ -99,7 +64,7 @@ namespace Sigma {
 	}
 	void BulletMover::RotateTarget(float x, float y, float z) {
 		if (this->transform) {
-			this->_rotationtarget += glm::vec3(x,y,z);
+			IMoverComponent::RotateTarget(IBulletShape::GetEntityID(), x, y, z);
 		}
 	}
 }

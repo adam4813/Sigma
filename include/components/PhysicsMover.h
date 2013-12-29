@@ -7,10 +7,10 @@
 
 class GLTransform;
 
-class PhysicsMover : public Sigma::IMoverComponent {
+class PhysicsMover : public Sigma::IComponent {
 public:
     SET_COMPONENT_TYPENAME("PhysicsMover");
-	PhysicsMover() : Sigma::IMoverComponent(0) { }
+	PhysicsMover() : Sigma::IComponent(0) { }
 	PhysicsMover(const id_t entityID);
 
     /**

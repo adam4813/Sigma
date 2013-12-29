@@ -1,8 +1,8 @@
 #include "components/PhysicsMover.h"
 #include "GLTransform.h"
 
-PhysicsMover::PhysicsMover(const id_t entityID) : IMoverComponent(entityID) {
-    this->AddEntity(entityID);
+PhysicsMover::PhysicsMover(const id_t entityID) : IComponent(entityID) {
+    Sigma::IMoverComponent::AddEntity(entityID);
 }
 
 void PhysicsMover::ApplyForces(const id_t id, const double delta) {
@@ -10,7 +10,7 @@ void PhysicsMover::ApplyForces(const id_t id, const double delta) {
 
 	// Rotation forces first
     // TODO : use the id parameter
-    auto rotationForces = this->getRotationForces(this->GetEntityID());
+    auto rotationForces = Sigma::IMoverComponent::getRotationForces(this->GetEntityID());
     if (rotationForces == nullptr) {
             assert(0 && "id does not exist");
     }
@@ -21,7 +21,7 @@ void PhysicsMover::ApplyForces(const id_t id, const double delta) {
 
 	// Directional forces second, as Move depends on transform.orientation
     // TODO : use the id parameter
-    auto forces = this->getForces(this->GetEntityID());
+    auto forces = Sigma::IMoverComponent::getForces(this->GetEntityID());
     if (forces == nullptr) {
             assert(0 && "id does not exist");
     }

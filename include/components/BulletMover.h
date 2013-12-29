@@ -7,7 +7,7 @@
 
 namespace Sigma {
 
-	class BulletMover : public IBulletShape, public IMoverComponent {
+	class BulletMover : public IBulletShape {
 	public:
 		SET_COMPONENT_TYPENAME("BulletMover");
 		BulletMover() : IBulletShape(0), transform(nullptr) { }
@@ -69,6 +69,5 @@ namespace Sigma {
 		}
 	private:
 		GLTransform* transform;
-		glm::vec3 _rotationtarget;
 	};
 }

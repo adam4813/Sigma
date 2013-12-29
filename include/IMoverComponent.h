@@ -5,40 +5,38 @@
 #include <list>
 #include <iostream>
 #include <unordered_map>
+#include <memory>
 
 #include "IComponent.h"
 #include "glm/glm.hpp"
 #include "Sigma.h"
+#include "GLTransform.h"
 
 namespace Sigma{
+    typedef std::list<glm::vec3> forces_list; // The list of forces for each entity
+    typedef std::list<glm::vec3> rotationForces_list;
 
-    class IMoverComponent: public IComponent {
-
-        typedef std::list<glm::vec3> forces_list; // The list of forces for each entity
-        typedef std::list<glm::vec3> rotationForces_list;
-
+    class IMoverComponent : IComponent {
     public:
 		SET_COMPONENT_TYPENAME("InterpolatedMovement");
-//        IMoverComponent() {} // Default ctor.
-
-        // TODO : delete these ctors when inheritance will be destroyed
-        IMoverComponent() : IComponent(0) { } // Default ctor setting entity ID to 0.
-        IMoverComponent(const int entityID) : IComponent(entityID) { } // Ctor that sets the entity ID.
+        IMoverComponent() { } // Default ctor setting entity ID to 0.
 
         virtual ~IMoverComponent() {};
 
-        bool AddEntity(const id_t id) {
+        static bool AddEntity(const id_t id) {
             if (getForces(id) == nullptr && getRotationForces(id) == nullptr) {
                 forces_map.emplace(id, forces_list());
                 rotationForces_map.emplace(id, rotationForces_list());
+                rotationtarget_map.emplace(id, glm::vec3());
                 return true;
             }
             return false;
         };
 
-        void RemoveEntity(const id_t id) {
+        static void RemoveEntity(const id_t id) {
             forces_map.erase(id);
             rotationForces_map.erase(id);
+            rotationtarget_map.erase(id);
         };
 
         /** \brief Add a force to the list for a specific entity.
@@ -49,7 +47,7 @@ namespace Sigma{
          * \return void
          *
          */
-        void AddForce(const id_t id, glm::vec3 force) {
+        static void AddForce(const id_t id, glm::vec3 force) {
             auto forces = getForces(id);
             if (forces == nullptr) {
                 assert(0 && "id does not exist");
@@ -68,7 +66,7 @@ namespace Sigma{
          * \param id const id_t the id of the entity
          * \param glm::vec3 force The force to remove. Is is evaluated based on glm's comparisson.
          */
-        void RemoveForce(const id_t id, const glm::vec3& force) {
+        static void RemoveForce(const id_t id, const glm::vec3& force) {
             auto forces = getForces(id);
             if (forces == nullptr) {
                 assert(0 && "id does not exist");
@@ -76,7 +74,7 @@ namespace Sigma{
             forces->remove(force);
         }
 
-        void AddRotationForce(const id_t id, const glm::vec3 rotation) {
+        static void AddRotationForce(const id_t id, const glm::vec3 rotation) {
             auto rotationForces = getRotationForces(id);
             if (rotationForces == nullptr) {
                 assert(0 && "id does not exist");
@@ -89,7 +87,7 @@ namespace Sigma{
             rotationForces->push_back(rotation);
         }
 
-        void RemoveRotationForce(const id_t id, glm::vec3 rotation) {
+        static void RemoveRotationForce(const id_t id, glm::vec3 rotation) {
             auto rotationForces = getRotationForces(id);
             if (rotationForces == nullptr) {
                 assert(0 && "id does not exist");
@@ -102,7 +100,7 @@ namespace Sigma{
          *
          * \param id const id_t the id of the entity
          */
-        void ClearForces(const id_t id) {
+        static void ClearForces(const id_t id) {
             auto forces = getForces(id);
             if (forces == nullptr) {
                 assert(0 && "id does not exist");
@@ -116,17 +114,71 @@ namespace Sigma{
             rotationForces->clear();
         }
 
-        /**
-         * \brief Apply all forces in this mover's list.
+        /** \brief Compute interpolated forces.
          *
-         * This needs to be overridden by each derived type as they might act on different types of objects.
-         * Physics movers apply forces on a transform object.
          * \param id const id_t the id of the entity
-         * \param[in] const double delta Change in time since the last call.
+         * \param delta const double Change in time since the last call.
+         * \param transform GLTransform* The transformation matrix to modify
          */
-        virtual void ApplyForces(const id_t id, const double delta) = 0;
+        static void ComputeInterpolatedForces(const id_t id, const double delta, GLTransform* transform) {
+            if (transform) {
+                glm::vec3 deltavec(delta);
+                glm::vec3 targetrvel;
 
-        forces_list* getForces(const id_t id) {
+                // TODO : use the id parameter
+                auto rotationForces = getRotationForces(id);
+                if (rotationForces == nullptr) {
+                    assert(0 && "id does not exist");
+                }
+
+                for (auto rotitr = rotationForces->begin(); rotitr != rotationForces->end(); ++rotitr) {
+                    transform->Rotate((*rotitr) * deltavec);
+                }
+
+                // Inertial rotation
+                auto _rotationtarget = getRotationTarget(id);
+                if (_rotationtarget == nullptr) {
+                    assert(0 && "id does not exist");
+                }
+
+                targetrvel = *_rotationtarget * deltavec;
+                if(fabs(targetrvel.x) > 0.0001f || fabs(targetrvel.y) > 0.0001f || fabs(targetrvel.z) > 0.0001f) {
+                    targetrvel = transform->Restrict(targetrvel);
+                    transform->Rotate(targetrvel);
+                    *_rotationtarget -= targetrvel;
+                }
+                targetrvel = transform->Restrict(targetrvel);
+                rotationForces->clear();
+                }
+        };
+
+        static void RotateTarget(const id_t id, float x, float y, float z) {
+            auto _rotationtarget = getRotationTarget(id);
+            if (_rotationtarget == nullptr) {
+                assert(0 && "id does not exist");
+            }
+            *_rotationtarget += glm::vec3(x,y,z);
+        }
+
+        static std::unique_ptr<glm::vec3> GetTransformedForces(const id_t id, GLTransform* transform) {
+            auto forces = getForces(id);
+			if (forces == nullptr) {
+                    assert(0 && "id does not exist");
+			}
+
+            glm::vec3 t;
+			for (auto forceitr = forces->begin(); forceitr != forces->end(); ++forceitr) {
+				t += *forceitr;
+			}
+
+	        auto finalForce = new glm::vec3( (t.z * transform->GetForward()) +
+                               (t.y * transform->GetUp()) +
+                               (t.x * transform->GetRight()) );
+
+            return std::unique_ptr<glm::vec3>(finalForce);
+        }
+
+        static forces_list* getForces(const id_t id) {
             auto forces = forces_map.find(id);
             if (forces != forces_map.end()) {
                 return &forces->second;
@@ -134,7 +186,7 @@ namespace Sigma{
             return nullptr;
         }
 
-        rotationForces_list* getRotationForces(const id_t id) {
+        static rotationForces_list* getRotationForces(const id_t id) {
             auto rotationForces = rotationForces_map.find(id);
             if (rotationForces != rotationForces_map.end()) {
                 return &rotationForces->second;
@@ -142,9 +194,18 @@ namespace Sigma{
             return nullptr;
         }
 
+        static glm::vec3* getRotationTarget(const id_t id) {
+            auto rts = rotationtarget_map.find(id);
+            if (rts != rotationtarget_map.end()) {
+                return &rts->second;
+            }
+            return nullptr;
+        }
+
     private:
-        std::unordered_map<id_t, forces_list> forces_map; // The list of forces to apply each update loop.
-        std::unordered_map<id_t, rotationForces_list> rotationForces_map;
+        static std::unordered_map<id_t, forces_list> forces_map; // The list of forces to apply each update loop.
+        static std::unordered_map<id_t, rotationForces_list> rotationForces_map;
+        static std::unordered_map<id_t, glm::vec3> rotationtarget_map;
     }; // class IMoverComponent
 } // namespace Sigma
 

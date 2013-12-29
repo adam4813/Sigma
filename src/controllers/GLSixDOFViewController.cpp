@@ -46,9 +46,9 @@ namespace handler{
         if (this->keyState['C'] == KS_DOWN) // Move down
             rise -= speed;
         // remove previous force and add new one
-        this->mover->RemoveForce(this->mover->IBulletShape::GetEntityID(), this->_translate);
+        IMoverComponent::RemoveForce(this->mover->IBulletShape::GetEntityID(), this->_translate);
         this->_translate = glm::vec3(strafe, rise, fwd);
-        this->mover->AddForce(this->mover->IBulletShape::GetEntityID(), this->_translate);
+        IMoverComponent::AddForce(this->mover->IBulletShape::GetEntityID(), this->_translate);
 
         // Rotation Keys
         float pitch = 0.0f, yaw = 0.0f, roll = 0.0f;
@@ -66,9 +66,9 @@ namespace handler{
             roll += SPEED_ROTATE;
 
         // remove previous force and add new one
-        this->mover->RemoveRotationForce(this->mover->IBulletShape::GetEntityID(), this->_rotate);
+        IMoverComponent::RemoveRotationForce(this->mover->IBulletShape::GetEntityID(), this->_rotate);
         this->_rotate = glm::vec3(pitch, yaw, roll);
-        this->mover->AddRotationForce(this->mover->IBulletShape::GetEntityID(), this->_rotate);
+        IMoverComponent::AddRotationForce(this->mover->IBulletShape::GetEntityID(), this->_rotate);
 
     } // function KeyStateChange
 } } } // namespace Sigma::event::handler
