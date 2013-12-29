@@ -1042,6 +1042,7 @@ namespace Sigma{
 		this->pointQuad.SetSize(1.0f, 1.0f);
 		this->pointQuad.SetPosition(0.0f, 0.0f);
 		this->pointQuad.LoadShader("shaders/pointlight");
+		this->pointQuad.Inverted(true);
 		this->pointQuad.InitializeBuffers();
 		this->pointQuad.SetCullFace("none");
 
@@ -1059,6 +1060,7 @@ namespace Sigma{
 		this->spotQuad.SetSize(1.0f, 1.0f);
 		this->spotQuad.SetPosition(0.0f, 0.0f);
 		this->spotQuad.LoadShader("shaders/spotlight");
+		this->spotQuad.Inverted(true);
 		this->spotQuad.InitializeBuffers();
 		this->spotQuad.SetCullFace("none");
 
@@ -1078,6 +1080,7 @@ namespace Sigma{
 		this->ambientQuad.SetSize(1.0f, 1.0f);
 		this->ambientQuad.SetPosition(0.0f, 0.0f);
 		this->ambientQuad.LoadShader("shaders/ambient");
+		this->ambientQuad.Inverted(true);
 		this->ambientQuad.InitializeBuffers();
 		this->ambientQuad.SetCullFace("none");
 
