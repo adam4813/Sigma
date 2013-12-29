@@ -76,13 +76,15 @@ make eclipse
 
 If you want to compile Sigma on OS X, your system must be running OS X 10.7 or later.  You will  need to have installed Xcode and, unless your system is running 10.9, the Command Line Tools.  Both can be downloaded from the [Apple Developer Website](https://developer.apple.com/downloads).  
 
-Before you can build Sigma, you'll first need to install the dependencies separately.  Using a package manager, such as [MacPorts](http://macports.org), is recommended.  Building Sigma on OS X requires CMake, GLM, GLFW, SOIL, Bullet, and Awesomium.  Sigma can only be built as a 32-bit executable under OS X.  All dependencies, except cmake, that you install must include a 32-bit slice.
+Before you can build Sigma, you'll first need to install the dependencies separately.  Using a package manager, such as [MacPorts](http://macports.org), is recommended.  Building Sigma on OS X requires CMake, GLM, GLFW, libogg, libvorbis, SOIL, Bullet, and Awesomium.  Sigma can only be built as a 32-bit executable under OS X.  All dependencies, except cmake, that you install must include a 32-bit slice.
 
-If MacPorts is present, you can use the following commands to install CMake, GLM, and GLFW:
+If MacPorts is present, you can use the following commands to install CMake, GLM, GLFW, libogg and libvorbis:
 
 	sudo port install cmake
 	sudo port install glm +universal
 	sudo port install glfw +universal
+	sudo port install libogg +universal
+	sudo port install libvorbis +universal
 	
 The current Macports version of Bullet does not include all of the libraries Sigma depends on.  You will need to compile Bullet manually.
 
