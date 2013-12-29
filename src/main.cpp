@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "systems/OpenGLSystem.h"
+#include "systems/OpenALSystem.h"
 #include "systems/BulletPhysics.h"
 #include "systems/FactorySystem.h"
 #include "controllers/GLSixDOFViewController.h"
@@ -16,11 +17,13 @@
 int main(int argCount, char **argValues) {
 	Sigma::OS glfwos;
 	Sigma::OpenGLSystem glsys;
+	Sigma::OpenALSystem alsys;
 	Sigma::BulletPhysics bphys;
 	Sigma::WebGUISystem webguisys;
 
 	Sigma::FactorySystem& factory = Sigma::FactorySystem::getInstance();
 	factory.register_Factory(glsys);
+	factory.register_Factory(alsys);
 	factory.register_Factory(bphys);
 	factory.register_Factory(webguisys);
 
@@ -70,6 +73,14 @@ int main(int argCount, char **argValues) {
 	webguisys.Start();
 	webguisys.SetWindowSize(glfwos.GetWindowWidth(), glfwos.GetWindowHeight());
 
+    /////////////////
+    // Setup Sound //
+    /////////////////
+
+    std::cout << "Initializing OpenAL system." << std::endl;
+    alsys.Start();
+    alsys.test(); // try sound
+	
 	////////////////
 	// Load scene //
 	////////////////
@@ -174,6 +185,13 @@ int main(int argCount, char **argValues) {
 	// Call now to clear the delta after startup.
 	glfwos.GetDeltaTime();
 
+	{
+		Sigma::ALSound *als = (Sigma::ALSound *)alsys.getComponent(30, Sigma::ALSound::getStaticComponentTypeName());
+		if(als) {
+			als->Play(Sigma::PLAYBACK_LOOP);
+		}
+	}
+
 	enum FlashlightState {
 		FL_ON,
 		FL_TURNING_ON,
@@ -221,6 +239,8 @@ int main(int argCount, char **argValues) {
 		// Pass in delta time in seconds
 		bphys.Update(deltaSec);
 		webguisys.Update(deltaSec);
+
+		alsys.Update();
 
 		// Framebuffer(s) to draw
 		//int fbos[2];

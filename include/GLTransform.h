@@ -108,15 +108,15 @@ public:
 		return -1.0f * glm::normalize(back_vector);
 	}
 
-	float GetPitch() {
+	float GetPitch() const {
 		return this->rotation.x;
 	}
 
-	float GetYaw() {
+	float GetYaw() const {
 		return this->rotation.y;
 	}
 
-	float GetRoll() {
+	float GetRoll() const {
 		return this->rotation.z;
 	}
 
@@ -142,7 +142,7 @@ public:
 		return glm::inverse(this->GetMatrix());
 	}
 
-	const glm::vec3 GetPosition() {
+	const glm::vec3 GetPosition() const {
 		return this->position;
 	}
 
@@ -169,7 +169,7 @@ public:
 		return -1.0f * glm::normalize(glm::vec3(curTransform[2][0], curTransform[2][1], curTransform[2][2]));
 	}
 
-	const glm::quat GetOrientation() {
+	const glm::quat GetOrientation() const {
 		return this->orientation;
 	}
 
