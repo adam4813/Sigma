@@ -1,8 +1,13 @@
 #pragma once
 
+#ifdef __APPLE__
+#include <OpenAL/al.h>
+#else
+#include <AL/al.h>
+#endif
+
 #include "ISound.h"
 #include "glm/glm.hpp"
-#include <AL/al.h>
 #include "systems/OpenALSystem.h"
 
 #define ALSOUND_BUFFERS 4
