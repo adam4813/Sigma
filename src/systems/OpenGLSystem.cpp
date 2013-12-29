@@ -62,7 +62,7 @@ namespace Sigma{
 
 	OpenGLSystem::OpenGLSystem() : windowWidth(1024), windowHeight(768), deltaAccumulator(0.0),
 		framerate(60.0f), pointQuad(1000), ambientQuad(1001), spotQuad(1002), viewMode("") {}
-		
+
 	//std::map<std::string, resource::GLTexture> OpenGLSystem::textures = std::map<std::string, resource::GLTexture>();
 
 	std::map<std::string, Sigma::IFactory::FactoryFunction>
@@ -414,7 +414,7 @@ namespace Sigma{
 		float y = 0.0f;
 		float w = 0.0f;
 		float h = 0.0f;
-		
+
 		int componentID = 0;
 		std::string textureName;
 		bool textureInMemory = false;
@@ -466,7 +466,7 @@ namespace Sigma{
 		quad->LoadShader("shaders/quad");
 		quad->InitializeBuffers();
 		this->screensSpaceComp.push_back(std::unique_ptr<IGLComponent>(quad));
-		
+
 		return quad;
 	}
 
@@ -580,7 +580,7 @@ namespace Sigma{
 		light->transform.Rotate(rx, ry, rz);
 
 		this->addComponent(entityID, light);
-		
+
 		return light;
 	}
 
@@ -597,7 +597,7 @@ namespace Sigma{
 
 	void OpenGLSystem::initRenderTarget(unsigned int rtID) {
 		RenderTarget *rt = this->renderTargets[rtID].get();
-		
+
 		// Make sure we're on the back buffer
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -629,7 +629,7 @@ namespace Sigma{
 			default:
 				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, rt->width, rt->height);
 			}*/
-		
+
 			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, rt->width, rt->height);
 			printOpenGLError();
 
@@ -732,7 +732,7 @@ namespace Sigma{
 			glClearColor(0.0f,0.0f,0.0f,1.0f);
             glViewport(0, 0, this->windowWidth, this->windowHeight); // Set the viewport size to fill the window
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
-			
+
 			//////////////////
 			// GBuffer Pass //
 			//////////////////
@@ -764,7 +764,7 @@ namespace Sigma{
 						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "ambLightIntensity"), 0.05f);
 						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "diffuseLightIntensity"), 0.0f);
 						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "specularLightIntensity"), 0.0f);
-					
+
 						glComp->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 					}
 				}
@@ -783,9 +783,9 @@ namespace Sigma{
 			}
 
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-			glBlitFramebuffer(0, 0, this->windowWidth, this->windowHeight, 0, 0, this->windowWidth, this->windowHeight, 
+			glBlitFramebuffer(0, 0, this->windowWidth, this->windowHeight, 0, 0, this->windowWidth, this->windowHeight,
                   GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-			
+
 			if(this->renderTargets.size() > 0) {
 				this->renderTargets[0]->UnbindRead();
 			}
@@ -825,13 +825,13 @@ namespace Sigma{
 
 			// Load variables
 			glUniform4f(shader("ambientColor"), ambientLight.r, ambientLight.g, ambientLight.b, ambientLight.a);
-			
+
 			glUniform1i(shader("colorBuffer"), 0);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[0]);
 
 			this->ambientQuad.Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
-						
+
 			shader.UnUse();
 
 			// Dynamic light passes
@@ -845,7 +845,7 @@ namespace Sigma{
 
 					// If it is a point light, and it intersects the frustum, then render
 					if(light && this->GetView(0)->CameraFrustum.isectSphere(light->position, light->radius) ) {
-						
+
 						GLSLShader &shader = (*this->pointQuad.GetShader().get());
 						shader.Use();
 
@@ -869,7 +869,7 @@ namespace Sigma{
 						glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[2]);
 
 						this->pointQuad.Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
-						
+
 						shader.UnUse();
 
 						continue;
@@ -906,7 +906,7 @@ namespace Sigma{
 						glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[2]);
 
 						this->spotQuad.Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
-						
+
 						shader.UnUse();
 
 						continue;
@@ -926,7 +926,7 @@ namespace Sigma{
 
 			// Remove blending
 			glDisable(GL_BLEND);
-			
+
 			// Re-enabled depth test
 			glDepthFunc(GL_LESS);
 			glDepthMask(GL_TRUE);
@@ -951,7 +951,7 @@ namespace Sigma{
 
 						// Set view position
 						glUniform3f(glGetUniformBlockIndex(glComp->GetShader()->GetProgram(), "viewPosW"), viewPosition.x, viewPosition.y, viewPosition.z);
-					
+
 						glComp->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 					}
 				}
@@ -964,7 +964,7 @@ namespace Sigma{
 			// Enable transparent rendering
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			
+
 			for (auto citr = this->screensSpaceComp.begin(); citr != this->screensSpaceComp.end(); ++citr) {
 					citr->get()->GetShader()->Use();
 
@@ -1128,7 +1128,7 @@ namespace Sigma{
 // Returns 1 if an OpenGL error occurred, 0 otherwise.
 //
 
-int printOglError(char *file, int line)
+int printOglError(const std::string &file, int line)
 {
 
 	GLenum glErr;

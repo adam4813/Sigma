@@ -22,7 +22,7 @@
 
 struct IGLView;
 
-int printOglError(char *file, int line);
+int printOglError(const std::string &file, int line);
 #define printOpenGLError() printOglError(__FILE__, __LINE__)
 
 namespace Sigma{
@@ -110,7 +110,7 @@ namespace Sigma{
 		 * \brief creates a new render target of desired size
 		 */
 		int createRenderTarget(const unsigned int w, const unsigned int h, bool hasDepth);
-		
+
 		/*
 		 * \brief returns the fbo_id of primary render target (index 0)
 		 */
@@ -183,7 +183,7 @@ namespace Sigma{
 
         double deltaAccumulator; // milliseconds since last render
         double framerate; // default is 60fps
-		
+
 		// Type of view to create
 		std::string viewMode;
 
