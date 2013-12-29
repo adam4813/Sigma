@@ -65,6 +65,7 @@ namespace Sigma{
 					// NOTE: dy is positive when the mouse is moved down, so it must be inverted
 					//       for some reason, dx needs to be inverted as well, perhaps because
 					//       negative z is forward in opengl
+					
 					float xRot = dy * SPEED_ROTATE * -1.0f;
 					float yRot = dx * SPEED_ROTATE * -1.0f;
 					
@@ -78,7 +79,6 @@ namespace Sigma{
 					pitch += xRot;
 					
 					this->mover->RotateNow(xRot, yRot, 0.0f);
-					this->os->SetMousePosition(os->GetWindowWidth() / 2, os->GetWindowHeight() / 2);
 				}
 			}
 
@@ -88,12 +88,9 @@ namespace Sigma{
 					os->ToggleMouseLock();
 				}
 			}
-
-			void FPSCamera::MouseUp(BUTTON btn, float x, float y) {
-				//if (btn == RIGHT) {
-				//	this->mouseLook = false;
-				//}
-			}
+			
+			//Does nothing, but has to be here because of IMouseEventHandler
+			void FPSCamera::MouseUp(BUTTON btn, float x, float y) {}
 
 			const glm::mat4 FPSCamera::GetViewMatrix() {
 				// Limit rotation to pitch and yaw, apply pitch first to ensure

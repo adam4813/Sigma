@@ -55,7 +55,7 @@ namespace Sigma {
 				virtual void MouseDown(BUTTON btn, float x, float y);
 
 				/**
-				 * \brief Disables mouse look when the right mouse button is released.
+				 * \brief Currently does nothing.
 				 *
 				 * \param[in/out] event::BUTTON btn The button that was releaed.
 				 * \param[in/out] float x, y Position of the cursor when the release occurred.
