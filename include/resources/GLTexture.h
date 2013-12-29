@@ -44,9 +44,9 @@ namespace Sigma {
 				this->height = height;
 
 				glBindTexture(GL_TEXTURE_2D, this->id);
-				glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-				glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, this->width, this->height, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, NULL);
+				glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, this->mag_filter);
+				glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, this->min_filter);
+				glTexImage2D(GL_TEXTURE_2D, 0, this->int_format, this->width, this->height, 0, this->format, GL_UNSIGNED_BYTE, NULL);
 				glBindTexture(GL_TEXTURE_2D, 0);
 			}
 

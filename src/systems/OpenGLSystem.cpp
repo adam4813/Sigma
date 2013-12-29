@@ -10,7 +10,11 @@
 #include "components/PointLight.h"
 #include "components/SpotLight.h"
 
-#ifndef __APPLE__
+#ifdef __APPLE__
+// Do not include <OpenGL/glu.h> because that will include gl.h which will mask all sorts of errors involving the use of deprecated GL APIs until runtime.
+// gluErrorString (and all of glu) is deprecated anyway (TODO).
+extern "C" const GLubyte * gluErrorString (GLenum error);
+#else
 #include "GL/glew.h"
 #endif
 
@@ -599,7 +603,12 @@ namespace Sigma{
 
 		// Get backbuffer depth bit width
 		int depthBits;
-		glGetIntegerv(GL_DEPTH_BITS, &depthBits);
+#ifdef __APPLE__
+        // The modern way.
+        glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_DEPTH, GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE, &depthBits);
+#else
+        glGetIntegerv(GL_DEPTH_BITS, &depthBits);
+#endif
 		std::cout << "Depth buffer bits: " << depthBits << std::endl;
 
 		// Create the depth render buffer
@@ -674,8 +683,8 @@ namespace Sigma{
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 
 		// Texture params for full screen quad
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
