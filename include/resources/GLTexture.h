@@ -38,7 +38,7 @@ namespace Sigma {
 			/**
 			 * Generates a empty texture of the desired size
 			 */
-			unsigned int GenerateGLTexutre(unsigned int width, unsigned int height) {
+			void GenerateGLTexture(unsigned int width, unsigned int height) {
 				glGenTextures(1, &this->id);
 				this->width = width;
 				this->height = height;
