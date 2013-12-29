@@ -13,13 +13,14 @@ public:
 	PhysicsMover() : Sigma::IMoverComponent(0) { }
 	PhysicsMover(const id_t entityID);
 
-	/**
-	 * \brief Apply all forces in this mover's list.
-	 *
-	 * Physics movers apply forces on a transform object.
-	 * \param[in] const double delta Change in time since the last call.
-	 */
-	void ApplyForces(const double delta);
+    /**
+     * \brief Apply all forces in this mover's list.
+     *
+     * Physics movers apply forces on a transform object.
+     * \param id const id_t the id of the entity
+     * \param[in] const double delta Change in time since the last call.
+     */
+    void ApplyForces(const id_t id, const double delta);
 
 	/**
 	 * \brief Sets the transform this mover acts on.

@@ -47,16 +47,16 @@ namespace Sigma{
 
 				// remove previous force and add new one
 				if (this->mover) {
-					this->mover->RemoveForce(this->translation);
+					this->mover->RemoveForce(this->mover->IBulletShape::GetEntityID(), this->translation);
 					this->translation = translation;
-					this->mover->AddForce(this->translation);
+					this->mover->AddForce(this->mover->IBulletShape::GetEntityID(), this->translation);
 				}
 
 			} // function KeyStateChange
 
 			void FPSCamera::LostKeyboardFocus() {
 				if (this->mover) {
-					this->mover->ClearForces();
+					this->mover->ClearForces(this->mover->IBulletShape::GetEntityID());
 				}
 			}
 

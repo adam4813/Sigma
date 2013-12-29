@@ -5,17 +5,25 @@
 
 namespace Sigma {
 
-	BulletMover::BulletMover(const id_t entityID) : IBulletShape(entityID), transform(nullptr) {}
+	BulletMover::BulletMover(const id_t entityID) : IBulletShape(entityID), transform(nullptr) {
+        this->AddEntity(entityID);
+	}
 
 	BulletMover::~BulletMover() {}
 
-	void BulletMover::ApplyForces(const double delta) {
+	void BulletMover::ApplyForces(const id_t id, const double delta) {
 		if (this->transform) {
 			glm::vec3 deltavec(delta);
 			glm::vec3 totalForce;
 			glm::vec3 targetrvel;
 
-			for (auto rotitr = this->rotationForces.begin(); rotitr != this->rotationForces.end(); ++rotitr) {
+			// TODO : use the id parameter
+			auto rotationForces = this->getRotationForces(IBulletShape::GetEntityID());
+			if (rotationForces == nullptr) {
+                    assert(0 && "id does not exist");
+			}
+
+			for (auto rotitr = rotationForces->begin(); rotitr != rotationForces->end(); ++rotitr) {
 				this->transform->Rotate((*rotitr) * deltavec);
 			}
 
@@ -27,9 +35,15 @@ namespace Sigma {
 				_rotationtarget -= targetrvel;
 			}
 			targetrvel = this->transform->Restrict(targetrvel);
-			this->rotationForces.clear();
+			rotationForces->clear();
 
-			for (auto forceitr = this->forces.begin(); forceitr != this->forces.end(); ++forceitr) {
+			// TODO : use the id parameter
+			auto forces = this->getForces(IBulletShape::GetEntityID());
+			if (forces == nullptr) {
+                    assert(0 && "id does not exist");
+			}
+
+			for (auto forceitr = forces->begin(); forceitr != forces->end(); ++forceitr) {
 				totalForce += *forceitr;
 			}
 
