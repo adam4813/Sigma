@@ -1,3 +1,7 @@
+#pragma once
+#ifndef OS_H
+#define OS_H
+
 #ifndef __APPLE__
 #include <GL/glew.h>
 #ifndef __unix
@@ -122,6 +126,8 @@ namespace Sigma {
 		void RegisterMouseEventHandler(event::IMouseEventHandler* handler);
 
 		void ToggleMouseLock();
+		
+		void SetMousePosition(double x, double y);
 
 		bool CheckKeyState(event::KEY_STATE state, const int key);
 
@@ -181,3 +187,4 @@ namespace Sigma {
 		event::MouseInputSystem MouseEventSystem;
 	};
 }
+#endif //OS_H

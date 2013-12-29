@@ -27,7 +27,7 @@ int main(int argCount, char **argValues) {
 	factory.register_Factory(bphys);
 	factory.register_Factory(webguisys);
 
-	if (!glfwos.InitializeWindow(1024,768, "Sigma GLFW Test Window")) {
+	if (!glfwos.InitializeWindow(1024, 768, "Sigma GLFW Test Window")) {
 		std::cerr << "Failed creating the window or context." << std::endl;
 		return -1;
 	}
@@ -152,6 +152,7 @@ int main(int argCount, char **argValues) {
 		FPSCamera* theCamera = static_cast<FPSCamera*>(glsys.GetView());
 		glfwos.RegisterKeyboardEventHandler(theCamera);
 		glfwos.RegisterMouseEventHandler(theCamera);
+		theCamera->os = &glfwos;
 		theCamera->SetMover(mover);
 		//mover->SetTransform(*theCamera->Transform());
 	} else if (glsys.GetViewMode() == "GLSixDOFView") {

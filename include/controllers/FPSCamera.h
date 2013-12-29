@@ -6,6 +6,8 @@
 #include "systems/MouseInputSystem.h"
 #include "systems/IGLView.h"
 
+#include "OS.h"
+
 namespace Sigma {
 	class BulletMover;
 
@@ -53,7 +55,7 @@ namespace Sigma {
 				virtual void MouseDown(BUTTON btn, float x, float y);
 
 				/**
-				 * \brief Disables mouse look when the right mouse button is released.
+				 * \brief Currently does nothing.
 				 *
 				 * \param[in/out] event::BUTTON btn The button that was releaed.
 				 * \param[in/out] float x, y Position of the cursor when the release occurred.
@@ -76,10 +78,13 @@ namespace Sigma {
 				 * \return void
 				 */
 				virtual void SetMover(BulletMover* m);
+				
+				OS* os; //Very ugly, but there is no good way to do it right now
 			private:
 				BulletMover* mover; // The view mover component that applies the rotations and forces set in the trigger method.
 				static const float SPEED_TRANSLATE, SPEED_ROTATE, BOOST_MULTIPLIER; // Speed variables
 				glm::vec3 translation; // Current translation.
+				float pitch; // Current pitch
 				bool mouseLook;
 			};
 		}

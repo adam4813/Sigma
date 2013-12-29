@@ -30,7 +30,7 @@ namespace Sigma{
 			/**
 				* \brief Called to request focus lock.
 				*
-				* By requesting focus lock all future keyboard events will go to that handler until it calls ReleaseFocusLock.
+				* By requesting focus lock all future mouse events will go to that handler until it calls ReleaseFocusLock.
 				* \param[in/out] IMouseEventHandler* e
 				* \return bool True is focus was locked or if this handler already has focus lock otherwise false.
 				*/
