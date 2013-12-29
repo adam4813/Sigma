@@ -68,6 +68,7 @@ namespace Sigma {
 
 		Sigma::resource::GLTexture texture;
 		Sigma::OpenGLSystem::textures[textureName] = texture;
+		Sigma::OpenGLSystem::textures[textureName].Format(GL_BGRA);
 
 		webview->SetCaputeArea(x, y, width, height);
 		webview->SetWindowSize(this->windowWidth, this->windowHeight);
