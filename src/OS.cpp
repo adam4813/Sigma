@@ -223,7 +223,13 @@ namespace Sigma {
 			glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		}
 	}
-
+	
+	void OS::SetMousePosition(double x, double y)
+	{
+		glfwSetCursorPos(this->window, x, y);
+	}
+	
+	
 	bool OS::CheckKeyState(event::KEY_STATE state, const int key) {
 		if (state == event::KS_DOWN) {
 			if (glfwGetKey(this->window, key) == GLFW_PRESS) {
