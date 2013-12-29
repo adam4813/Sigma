@@ -33,6 +33,7 @@ namespace Sigma{
 		GLuint depth_id;
 		unsigned int width;
 		unsigned int height;
+		bool hasDepth;
 
 		RenderTarget() : fbo_id(0), depth_id(0) {}
 		virtual ~RenderTarget();
@@ -108,7 +109,7 @@ namespace Sigma{
 		/*
 		 * \brief creates a new render target of desired size
 		 */
-		int createRenderTarget(const unsigned int w, const unsigned int h);
+		int createRenderTarget(const unsigned int w, const unsigned int h, bool hasDepth);
 		
 		/*
 		 * \brief returns the fbo_id of primary render target (index 0)
@@ -116,6 +117,8 @@ namespace Sigma{
 		int getRenderTarget(unsigned int rtID) { return (this->renderTargets.size() > rtID) ? this->renderTargets[rtID]->fbo_id : -1; }
 		int getRenderTexture(const unsigned int target=0) { return (this->renderTargets.size() > 0) ? this->renderTargets[0]->texture_ids[target] : -1; }
 		void createRTBuffer(unsigned int rtID, GLint format, GLenum internalFormat, GLenum type);
+		void initRenderTarget(unsigned int rtID);
+
 
 		// Rendering methods
 		void RenderTexture(GLuint texture_id);
