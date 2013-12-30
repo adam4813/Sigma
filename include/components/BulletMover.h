@@ -3,6 +3,7 @@
 #include "IBulletShape.h"
 #include "IMoverComponent.h"
 #include "components/ControllableMove.h"
+#include "components/RigidBody.h"
 #include "GLTransform.h"
 #include "Sigma.h"
 
@@ -39,7 +40,7 @@ namespace Sigma {
 		 *
 		 * \return void
 		 */
-		void InitializeRigidBody();
+		void InitializeRigidBody(btDiscreteDynamicsWorld* world);
 
 		/**
 		 * \brief Updates the transform to match its collision rigid body.

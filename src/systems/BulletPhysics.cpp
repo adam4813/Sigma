@@ -34,8 +34,7 @@ namespace Sigma {
 	}
 
 	void BulletPhysics::initViewMover() {
-		this->mover.InitializeRigidBody();
-		this->dynamicsWorld->addRigidBody(this->mover.GetRigidBody());
+		this->mover.InitializeRigidBody(dynamicsWorld);
 	}
 
 	std::map<std::string,Sigma::IFactory::FactoryFunction>

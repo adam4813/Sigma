@@ -18,7 +18,7 @@ namespace Sigma {
             // TODO : use the id parameter
             auto finalForce = IMoverComponent::GetTransformedForces(IBulletShape::GetEntityID(), transform);
 
-            GetRigidBody()->setLinearVelocity(btVector3(finalForce->x, GetRigidBody()->getLinearVelocity().y() + 0.000000001f, finalForce->z));
+            RigidBody::getBody(IBulletShape::GetEntityID())->setLinearVelocity(btVector3(finalForce->x, RigidBody::getBody(IBulletShape::GetEntityID())->getLinearVelocity().y() + 0.000000001f, finalForce->z));
 	    }
 	}
 
@@ -26,23 +26,17 @@ namespace Sigma {
 	    auto transform = ControllableMove::GetTransform(IBulletShape::GetEntityID());
 		if (transform != nullptr) {
 			btTransform trans;
-			GetRigidBody()->getMotionState()->getWorldTransform(trans);
+			RigidBody::getBody(IBulletShape::GetEntityID())->getMotionState()->getWorldTransform(trans);
 			transform->TranslateTo(trans.getOrigin().x(),trans.getOrigin().y(), trans.getOrigin().z());
 		}
 	}
 
 	void BulletMover::InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz) {
-		auto shape = new btCapsuleShape(0.3f, 1.3f);
-		SetCollisionShape(shape);
-		btScalar mass = 1;
-		btVector3 fallInertia(0,0,0);
-		auto motionState =	new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(x, y, z)));
-		btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, motionState, shape,fallInertia);
-		shape->calculateLocalInertia(mass,fallInertia);
-		SetRigidBody(new btRigidBody(fallRigidBodyCI));
+		RigidBody::AddEntity(IBulletShape::GetEntityID(), x, y, z, rx, ry, rz);
+		SetCollisionShape(RigidBody::getBody(IBulletShape::GetEntityID())->getCollisionShape());
 	}
 
-	void BulletMover::InitializeRigidBody() {
+	void BulletMover::InitializeRigidBody(btDiscreteDynamicsWorld* world) {
 	    auto transform = ControllableMove::GetTransform(IBulletShape::GetEntityID());
 		if(transform != nullptr) {
 			this->InitializeRigidBody(
@@ -57,6 +51,7 @@ namespace Sigma {
 		else {
 			this->InitializeRigidBody(0,1.5f,0,0,0,0);
 		}
-        GetRigidBody()->setActivationState(DISABLE_DEACTIVATION);
+		world->addRigidBody(RigidBody::getBody(IBulletShape::GetEntityID()));
+        RigidBody::getBody(IBulletShape::GetEntityID())->setActivationState(DISABLE_DEACTIVATION);
 	}
 }
