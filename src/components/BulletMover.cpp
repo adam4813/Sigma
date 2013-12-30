@@ -5,26 +5,31 @@
 
 namespace Sigma {
 
-	BulletMover::BulletMover(const id_t entityID) : IBulletShape(entityID), transform(nullptr) {
+	BulletMover::BulletMover(const id_t entityID) : IBulletShape(entityID) {
         IMoverComponent::AddEntity(entityID);
+        ControllableMove::AddEntity(entityID);
 	}
 
 	BulletMover::~BulletMover() {}
 
 	void BulletMover::ApplyForces(const id_t id, const double delta) {
-        IMoverComponent::ComputeInterpolatedForces(IBulletShape::GetEntityID(), delta, this->transform);
+	    auto transform = ControllableMove::GetTransform(IBulletShape::GetEntityID());
+	    if (transform != nullptr) {
+            IMoverComponent::ComputeInterpolatedForces(IBulletShape::GetEntityID(), delta, transform);
 
-        // TODO : use the id parameter
-        auto finalForce = IMoverComponent::GetTransformedForces(IBulletShape::GetEntityID(), this->transform);
+            // TODO : use the id parameter
+            auto finalForce = IMoverComponent::GetTransformedForces(IBulletShape::GetEntityID(), transform);
 
-        GetRigidBody()->setLinearVelocity(btVector3(finalForce->x, GetRigidBody()->getLinearVelocity().y() + 0.000000001f, finalForce->z));
+            GetRigidBody()->setLinearVelocity(btVector3(finalForce->x, GetRigidBody()->getLinearVelocity().y() + 0.000000001f, finalForce->z));
+	    }
 	}
 
 	void BulletMover::UpdateTransform() {
-		if (this->transform) {
+	    auto transform = ControllableMove::GetTransform(IBulletShape::GetEntityID());
+		if (transform != nullptr) {
 			btTransform trans;
 			GetRigidBody()->getMotionState()->getWorldTransform(trans);
-			this->transform->TranslateTo(trans.getOrigin().x(),trans.getOrigin().y(), trans.getOrigin().z());
+			transform->TranslateTo(trans.getOrigin().x(),trans.getOrigin().y(), trans.getOrigin().z());
 		}
 	}
 
@@ -40,14 +45,15 @@ namespace Sigma {
 	}
 
 	void BulletMover::InitializeRigidBody() {
-		if(this->transform) {
+	    auto transform = ControllableMove::GetTransform(IBulletShape::GetEntityID());
+		if(transform != nullptr) {
 			this->InitializeRigidBody(
-				this->transform->GetPosition().x,
-				this->transform->GetPosition().y,
-				this->transform->GetPosition().z,
-				this->transform->GetPitch(),
-				this->transform->GetYaw(),
-				this->transform->GetRoll()
+				transform->GetPosition().x,
+				transform->GetPosition().y,
+				transform->GetPosition().z,
+				transform->GetPitch(),
+				transform->GetYaw(),
+				transform->GetRoll()
 			);
 		}
 		else {
@@ -58,13 +64,12 @@ namespace Sigma {
 
 	// immediate mode rotation (for mouse motion)
 	void BulletMover::RotateNow(float x, float y, float z) {
-		if (this->transform) {
-			this->transform->Rotate(x,y,z);
+	    auto transform = ControllableMove::GetTransform(IBulletShape::GetEntityID());
+		if (transform != nullptr) {
+			transform->Rotate(x,y,z);
 		}
 	}
 	void BulletMover::RotateTarget(float x, float y, float z) {
-		if (this->transform) {
-			IMoverComponent::RotateTarget(IBulletShape::GetEntityID(), x, y, z);
-		}
+		IMoverComponent::RotateTarget(IBulletShape::GetEntityID(), x, y, z);
 	}
 }

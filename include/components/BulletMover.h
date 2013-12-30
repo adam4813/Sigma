@@ -2,6 +2,7 @@
 
 #include "IBulletShape.h"
 #include "IMoverComponent.h"
+#include "components/ControllableMove.h"
 #include "GLTransform.h"
 #include "Sigma.h"
 
@@ -10,7 +11,7 @@ namespace Sigma {
 	class BulletMover : public IBulletShape {
 	public:
 		SET_COMPONENT_TYPENAME("BulletMover");
-		BulletMover() : IBulletShape(0), transform(nullptr) { }
+		BulletMover() : IBulletShape(0) { }
 		BulletMover(const id_t entityID);
 		~BulletMover();
 
@@ -65,9 +66,7 @@ namespace Sigma {
 		void RotateTarget(float x, float y, float z);
 
 		void SetTransform(GLTransform& transform) {
-			this->transform = &transform;
+			ControllableMove::SetTransform(IBulletShape::GetEntityID(), &transform);
 		}
-	private:
-		GLTransform* transform;
 	};
 }
