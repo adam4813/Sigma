@@ -79,7 +79,9 @@ namespace Sigma {
 	// immediate mode rotation (for mouse motion)
 	void BulletMover::RotateNow(float x, float y, float z) {
 		if (this->transform) {
-			this->transform->Rotate(x,y,z);
+			glm::vec3 rotationVec(x,y,z);
+			rotationVec = this->transform->Restrict(rotationVec);
+			this->transform->Rotate(rotationVec);
 		}
 	}
 	void BulletMover::RotateTarget(float x, float y, float z) {

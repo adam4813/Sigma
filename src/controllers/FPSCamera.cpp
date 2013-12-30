@@ -65,18 +65,8 @@ namespace Sigma{
 					// NOTE: dy is positive when the mouse is moved down, so it must be inverted
 					//       for some reason, dx needs to be inverted as well, perhaps because
 					//       negative z is forward in opengl
-					
 					float xRot = dy * SPEED_ROTATE * -1.0f;
 					float yRot = dx * SPEED_ROTATE * -1.0f;
-					
-					if (pitch > 80.0f && xRot > 0.0f) { //limits looking up
-						xRot = 0.0f;
-					}
-					else if(pitch < -70.0f && xRot < 0.0f) { //limits looking down
-						xRot = 0.0f;
-					}
-					
-					pitch += xRot;
 					
 					this->mover->RotateNow(xRot, yRot, 0.0f);
 				}
