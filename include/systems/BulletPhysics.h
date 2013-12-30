@@ -3,7 +3,7 @@
 #include "IFactory.h"
 #include "ISystem.h"
 #include "bullet/btBulletDynamicsCommon.h"
-#include "IMoverComponent.h"
+#include "components/InterpolatedMovement.h"
 #include "IBulletShape.h"
 #include "components/BulletMover.h"
 #include "Sigma.h"

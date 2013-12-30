@@ -2,7 +2,7 @@
 #ifndef PHSYICS_MOVER_H
 #define PHSYICS_MOVER_H
 
-#include "../IMoverComponent.h"
+#include "components/CanMove.h"
 #include "Sigma.h"
 
 class GLTransform;

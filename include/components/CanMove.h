@@ -1,34 +1,31 @@
-#pragma once
-#ifndef IMOVER_COMPONENT_H
-#define IMOVER_COMPONENT_H
+#ifndef CANMOVE_H_INCLUDED
+#define CANMOVE_H_INCLUDED
 
 #include <list>
-#include <iostream>
 #include <unordered_map>
 #include <memory>
 
-#include "IComponent.h"
 #include "glm/glm.hpp"
-#include "Sigma.h"
+#include "IComponent.h"
 #include "GLTransform.h"
 #include "components/ControllableMove.h"
+#include "components/RigidBody.h"
 
 namespace Sigma{
     typedef std::list<glm::vec3> forces_list; // The list of forces for each entity
     typedef std::list<glm::vec3> rotationForces_list;
 
-    class IMoverComponent : IComponent {
+    class CanMove : IComponent {
     public:
-		SET_COMPONENT_TYPENAME("InterpolatedMovement");
-        IMoverComponent() { } // Default ctor setting entity ID to 0.
+		SET_COMPONENT_TYPENAME("CanMove");
+        CanMove() { } // Default ctor setting entity ID to 0.
 
-        virtual ~IMoverComponent() {};
+        virtual ~CanMove() {};
 
         static bool AddEntity(const id_t id) {
             if (getForces(id) == nullptr && getRotationForces(id) == nullptr) {
                 forces_map.emplace(id, forces_list());
                 rotationForces_map.emplace(id, rotationForces_list());
-                rotationtarget_map.emplace(id, glm::vec3());
                 return true;
             }
             return false;
@@ -37,7 +34,6 @@ namespace Sigma{
         static void RemoveEntity(const id_t id) {
             forces_map.erase(id);
             rotationForces_map.erase(id);
-            rotationtarget_map.erase(id);
         };
 
         /** \brief Add a force to the list for a specific entity.
@@ -115,70 +111,27 @@ namespace Sigma{
             rotationForces->clear();
         }
 
-        /** \brief Compute interpolated forces.
+        /**
+         * \brief Apply all forces of all entities that have this component.
          *
-         * This function will compute the interpolated position of all entities that have this component
-         * It will update the transformation matrix of the ControllableMove component
-         *
-         * \param delta const double Change in time since the last call.
+         * Calculates the total force and sets the rigid body's linear force.
          */
-        static void ComputeInterpolatedForces(const double delta) {
-            glm::vec3 deltavec(delta);
-            for (auto it = rotationForces_map.begin(); it != rotationForces_map.end(); it++) {
-                auto transform = ControllableMove::GetTransform(it->first);
+        static void ApplyForces() {
+            for (auto itr = forces_map.begin(); itr != forces_map.end(); ++itr) {
+                auto transform = ControllableMove::GetTransform(itr->first);
+                auto body = RigidBody::getBody(itr->first);
                 if (transform != nullptr) {
-
-                    // TODO : use the id parameter
-                    auto rotationForces = it->second;
-                    for (auto rotitr = rotationForces.begin(); rotitr != rotationForces.end(); ++rotitr) {
-                        transform->Rotate((*rotitr) * deltavec);
+                    glm::vec3 t;
+                    for (auto forceitr = itr->second.begin(); forceitr != itr->second.end(); ++forceitr) {
+                        t += *forceitr;
                     }
-                    it->second.clear();
-                }
-            }
-
-                // Inertial rotation
-            for (auto it2 = rotationtarget_map.begin(); it2 != rotationtarget_map.end(); it2++) {
-                auto transform = ControllableMove::GetTransform(it2->first);
-                if (transform != nullptr) {
-                    glm::vec3 targetrvel;
-                    auto _rotationtarget = it2->second;
-
-                    targetrvel = _rotationtarget * deltavec;
-                    if(fabs(targetrvel.x) > 0.0001f || fabs(targetrvel.y) > 0.0001f || fabs(targetrvel.z) > 0.0001f) {
-                        targetrvel = transform->Restrict(targetrvel);
-                        transform->Rotate(targetrvel);
-                        _rotationtarget -= targetrvel;
-                        it2->second = _rotationtarget;
-                    }
-                }
-            }
-        };
-
-        static void RotateTarget(const id_t id, float x, float y, float z) {
-            auto _rotationtarget = getRotationTarget(id);
-            if (_rotationtarget == nullptr) {
-                assert(0 && "id does not exist");
-            }
-            *_rotationtarget += glm::vec3(x,y,z);
-        }
-
-        static std::unique_ptr<glm::vec3> GetTransformedForces(const id_t id, GLTransform* transform) {
-            auto forces = getForces(id);
-			if (forces == nullptr) {
-                    assert(0 && "id does not exist");
-			}
-
-            glm::vec3 t;
-			for (auto forceitr = forces->begin(); forceitr != forces->end(); ++forceitr) {
-				t += *forceitr;
-			}
-
-	        auto finalForce = new glm::vec3( (t.z * transform->GetForward()) +
+                    auto finalForce = (t.z * transform->GetForward()) +
                                (t.y * transform->GetUp()) +
-                               (t.x * transform->GetRight()) );
+                               (t.x * transform->GetRight());
 
-            return std::unique_ptr<glm::vec3>(finalForce);
+                    body->setLinearVelocity(btVector3(finalForce.x, body->getLinearVelocity().y() + 0.000000001f, finalForce.z));
+                }
+            }
         }
 
         static forces_list* getForces(const id_t id) {
@@ -197,19 +150,11 @@ namespace Sigma{
             return nullptr;
         }
 
-        static glm::vec3* getRotationTarget(const id_t id) {
-            auto rts = rotationtarget_map.find(id);
-            if (rts != rotationtarget_map.end()) {
-                return &rts->second;
-            }
-            return nullptr;
-        }
-
     private:
         static std::unordered_map<id_t, forces_list> forces_map; // The list of forces to apply each update loop.
         static std::unordered_map<id_t, rotationForces_list> rotationForces_map;
-        static std::unordered_map<id_t, glm::vec3> rotationtarget_map;
     }; // class IMoverComponent
 } // namespace Sigma
 
-#endif // IMOVER_COMPONENT_H
+
+#endif // CANMOVE_H_INCLUDED

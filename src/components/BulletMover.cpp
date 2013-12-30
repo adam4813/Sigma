@@ -6,21 +6,12 @@
 namespace Sigma {
 
 	BulletMover::BulletMover(const id_t entityID) : IBulletShape(entityID) {
-        IMoverComponent::AddEntity(entityID);
+	    CanMove::AddEntity(entityID);
+        InterpolatedMovement::AddEntity(entityID);
         ControllableMove::AddEntity(entityID);
 	}
 
 	BulletMover::~BulletMover() {}
-
-	void BulletMover::ApplyForces(const id_t id, const double delta) {
-	    auto transform = ControllableMove::GetTransform(IBulletShape::GetEntityID());
-	    if (transform != nullptr) {
-            // TODO : use the id parameter
-            auto finalForce = IMoverComponent::GetTransformedForces(IBulletShape::GetEntityID(), transform);
-
-            RigidBody::getBody(IBulletShape::GetEntityID())->setLinearVelocity(btVector3(finalForce->x, RigidBody::getBody(IBulletShape::GetEntityID())->getLinearVelocity().y() + 0.000000001f, finalForce->z));
-	    }
-	}
 
 	void BulletMover::InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz) {
 		RigidBody::AddEntity(IBulletShape::GetEntityID(), x, y, z, rx, ry, rz);

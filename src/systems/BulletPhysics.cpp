@@ -142,10 +142,9 @@ namespace Sigma {
 	}
 
 	bool BulletPhysics::Update(const double delta) {
-        IMoverComponent::ComputeInterpolatedForces(delta);
+        InterpolatedMovement::ComputeInterpolatedForces(delta);
 
-	    // TODO : we use 0 as a fake entity id, to be replaced
-		this->mover.ApplyForces(0, delta);
+		CanMove::ApplyForces();
 
 		dynamicsWorld->stepSimulation(delta, 10);
 
