@@ -47,16 +47,16 @@ namespace Sigma{
 
 				// remove previous force and add new one
 				if (this->mover) {
-					CanMove::RemoveForce(this->mover->IBulletShape::GetEntityID(), this->translation);
+					CanMove::RemoveForce(this->mover->GetEntityID(), this->translation);
 					this->translation = translation;
-					CanMove::AddForce(this->mover->IBulletShape::GetEntityID(), this->translation);
+					CanMove::AddForce(this->mover->GetEntityID(), this->translation);
 				}
 
 			} // function KeyStateChange
 
 			void FPSCamera::LostKeyboardFocus() {
 				if (this->mover) {
-					CanMove::ClearForces(this->mover->IBulletShape::GetEntityID());
+					CanMove::ClearForces(this->mover->GetEntityID());
 				}
 			}
 
@@ -65,7 +65,7 @@ namespace Sigma{
 					// NOTE: dy is positive when the mouse is moved down, so it must be inverted
 					//       for some reason, dx needs to be inverted as well, perhaps because
 					//       negative z is forward in opengl
-					InterpolatedMovement::RotateTarget(this->mover->IBulletShape::GetEntityID(),\
+					InterpolatedMovement::RotateTarget(this->mover->GetEntityID(),\
                                    -1.0f*dy*SPEED_ROTATE,-1.0f*dx*SPEED_ROTATE,0.0f);
 				}
 			}
@@ -103,7 +103,7 @@ namespace Sigma{
 
 			void FPSCamera::SetMover(BulletMover* m){
 				if (m) {
-					m->SetTransform(*this->Transform());
+                    ControllableMove::SetTransform(m->GetEntityID(), this->Transform());
 					this->mover = m;
 				}
 			}

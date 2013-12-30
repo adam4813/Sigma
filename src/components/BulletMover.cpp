@@ -5,7 +5,7 @@
 
 namespace Sigma {
 
-	BulletMover::BulletMover(const id_t entityID) : IBulletShape(entityID) {
+	BulletMover::BulletMover(const id_t entityID) : entityID(entityID) {
 	    CanMove::AddEntity(entityID);
         InterpolatedMovement::AddEntity(entityID);
         ControllableMove::AddEntity(entityID);
@@ -14,12 +14,11 @@ namespace Sigma {
 	BulletMover::~BulletMover() {}
 
 	void BulletMover::InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz) {
-		RigidBody::AddEntity(IBulletShape::GetEntityID(), x, y, z, rx, ry, rz);
-		SetCollisionShape(RigidBody::getBody(IBulletShape::GetEntityID())->getCollisionShape());
+		RigidBody::AddEntity(entityID, x, y, z, rx, ry, rz);
 	}
 
 	void BulletMover::InitializeRigidBody(btDiscreteDynamicsWorld* world) {
-	    auto transform = ControllableMove::GetTransform(IBulletShape::GetEntityID());
+	    auto transform = ControllableMove::GetTransform(entityID);
 		if(transform != nullptr) {
 			this->InitializeRigidBody(
 				transform->GetPosition().x,
@@ -33,7 +32,7 @@ namespace Sigma {
 		else {
 			this->InitializeRigidBody(0,1.5f,0,0,0,0);
 		}
-		world->addRigidBody(RigidBody::getBody(IBulletShape::GetEntityID()));
-        RigidBody::getBody(IBulletShape::GetEntityID())->setActivationState(DISABLE_DEACTIVATION);
+		world->addRigidBody(RigidBody::getBody(entityID));
+        RigidBody::getBody(entityID)->setActivationState(DISABLE_DEACTIVATION);
 	}
 }

@@ -9,13 +9,20 @@
 
 namespace Sigma {
 
-	class BulletMover : public IBulletShape {
+	class BulletMover {
 	public:
-		SET_COMPONENT_TYPENAME("BulletMover");
-		BulletMover() : IBulletShape(0) { }
 		BulletMover(const id_t entityID);
 		~BulletMover();
 
+		/**
+		 * \brief Initalize the rigid body using the current transform or defaults if none
+		 *
+		 * \return void
+		 */
+		void InitializeRigidBody(btDiscreteDynamicsWorld* world);
+
+		const id_t GetEntityID() const { return entityID; };
+	private:
 		/**
 		 * \brief Initialize the rigid body.
 		 *
@@ -25,15 +32,6 @@ namespace Sigma {
 		 */
 		void InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz);
 
-		/**
-		 * \brief Initalize the rigid body using the current transform or defaults if none
-		 *
-		 * \return void
-		 */
-		void InitializeRigidBody(btDiscreteDynamicsWorld* world);
-
-		void SetTransform(GLTransform& transform) {
-			ControllableMove::SetTransform(IBulletShape::GetEntityID(), &transform);
-		}
+        const id_t entityID;
 	};
 }

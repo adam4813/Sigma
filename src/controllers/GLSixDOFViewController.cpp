@@ -11,7 +11,7 @@ namespace handler{
     GLSixDOFViewController::GLSixDOFViewController(IGLView* view, BulletMover* mover) : mover(mover) {
         // Set the view mover's view pointer.
 		// Dereferencing possibly null pointer!
-        this->mover->SetTransform(*view->Transform());
+        ControllableMove::SetTransform(this->mover->GetEntityID(), view->Transform());
 
         // Clear out the internal key state buffers.
         memset(this->keys, 0, sizeof(this->keys));
@@ -46,9 +46,9 @@ namespace handler{
         if (this->keyState['C'] == KS_DOWN) // Move down
             rise -= speed;
         // remove previous force and add new one
-        CanMove::RemoveForce(this->mover->IBulletShape::GetEntityID(), this->_translate);
+        CanMove::RemoveForce(this->mover->GetEntityID(), this->_translate);
         this->_translate = glm::vec3(strafe, rise, fwd);
-        CanMove::AddForce(this->mover->IBulletShape::GetEntityID(), this->_translate);
+        CanMove::AddForce(this->mover->GetEntityID(), this->_translate);
 
         // Rotation Keys
         float pitch = 0.0f, yaw = 0.0f, roll = 0.0f;
@@ -66,9 +66,9 @@ namespace handler{
             roll += SPEED_ROTATE;
 
         // remove previous force and add new one
-        CanMove::RemoveRotationForce(this->mover->IBulletShape::GetEntityID(), this->_rotate);
+        CanMove::RemoveRotationForce(this->mover->GetEntityID(), this->_rotate);
         this->_rotate = glm::vec3(pitch, yaw, roll);
-        CanMove::AddRotationForce(this->mover->IBulletShape::GetEntityID(), this->_rotate);
+        CanMove::AddRotationForce(this->mover->GetEntityID(), this->_rotate);
 
     } // function KeyStateChange
 } } } // namespace Sigma::event::handler
