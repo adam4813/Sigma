@@ -186,7 +186,7 @@ int main(int argCount, char **argValues) {
 	glfwos.GetDeltaTime();
 
 	{
-		Sigma::ALSound *als = (Sigma::ALSound *)alsys.getComponent(30, Sigma::ALSound::getStaticComponentTypeName());
+		Sigma::ALSound *als = (Sigma::ALSound *)alsys.getComponent(200, Sigma::ALSound::getStaticComponentTypeName());
 		if(als) {
 			als->Play(Sigma::PLAYBACK_LOOP);
 		}
