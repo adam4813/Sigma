@@ -15,8 +15,6 @@ namespace Sigma {
 	void BulletMover::ApplyForces(const id_t id, const double delta) {
 	    auto transform = ControllableMove::GetTransform(IBulletShape::GetEntityID());
 	    if (transform != nullptr) {
-            IMoverComponent::ComputeInterpolatedForces(IBulletShape::GetEntityID(), delta, transform);
-
             // TODO : use the id parameter
             auto finalForce = IMoverComponent::GetTransformedForces(IBulletShape::GetEntityID(), transform);
 

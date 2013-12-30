@@ -11,6 +11,7 @@
 #include "glm/glm.hpp"
 #include "Sigma.h"
 #include "GLTransform.h"
+#include "components/ControllableMove.h"
 
 namespace Sigma{
     typedef std::list<glm::vec3> forces_list; // The list of forces for each entity
@@ -116,40 +117,42 @@ namespace Sigma{
 
         /** \brief Compute interpolated forces.
          *
-         * \param id const id_t the id of the entity
+         * This function will compute the interpolated position of all entities that have this component
+         * It will update the transformation matrix of the ControllableMove component
+         *
          * \param delta const double Change in time since the last call.
-         * \param transform GLTransform* The transformation matrix to modify
          */
-        static void ComputeInterpolatedForces(const id_t id, const double delta, GLTransform* transform) {
-            if (transform) {
-                glm::vec3 deltavec(delta);
-                glm::vec3 targetrvel;
+        static void ComputeInterpolatedForces(const double delta) {
+            glm::vec3 deltavec(delta);
+            for (auto it = rotationForces_map.begin(); it != rotationForces_map.end(); it++) {
+                auto transform = ControllableMove::GetTransform(it->first);
+                if (transform != nullptr) {
 
-                // TODO : use the id parameter
-                auto rotationForces = getRotationForces(id);
-                if (rotationForces == nullptr) {
-                    assert(0 && "id does not exist");
+                    // TODO : use the id parameter
+                    auto rotationForces = it->second;
+                    for (auto rotitr = rotationForces.begin(); rotitr != rotationForces.end(); ++rotitr) {
+                        transform->Rotate((*rotitr) * deltavec);
+                    }
+                    it->second.clear();
                 }
-
-                for (auto rotitr = rotationForces->begin(); rotitr != rotationForces->end(); ++rotitr) {
-                    transform->Rotate((*rotitr) * deltavec);
-                }
+            }
 
                 // Inertial rotation
-                auto _rotationtarget = getRotationTarget(id);
-                if (_rotationtarget == nullptr) {
-                    assert(0 && "id does not exist");
-                }
+            for (auto it2 = rotationtarget_map.begin(); it2 != rotationtarget_map.end(); it2++) {
+                auto transform = ControllableMove::GetTransform(it2->first);
+                if (transform != nullptr) {
+                    glm::vec3 targetrvel;
+                    auto _rotationtarget = it2->second;
 
-                targetrvel = *_rotationtarget * deltavec;
-                if(fabs(targetrvel.x) > 0.0001f || fabs(targetrvel.y) > 0.0001f || fabs(targetrvel.z) > 0.0001f) {
-                    targetrvel = transform->Restrict(targetrvel);
-                    transform->Rotate(targetrvel);
-                    *_rotationtarget -= targetrvel;
+                    targetrvel = _rotationtarget * deltavec;
+                    if(fabs(targetrvel.x) > 0.0001f || fabs(targetrvel.y) > 0.0001f || fabs(targetrvel.z) > 0.0001f) {
+                        targetrvel = transform->Restrict(targetrvel);
+                        transform->Rotate(targetrvel);
+                        _rotationtarget -= targetrvel;
+                        it2->second = _rotationtarget;
+                    }
                 }
-                targetrvel = transform->Restrict(targetrvel);
-                rotationForces->clear();
-                }
+            }
         };
 
         static void RotateTarget(const id_t id, float x, float y, float z) {
