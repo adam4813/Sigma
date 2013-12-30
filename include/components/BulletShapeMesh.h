@@ -13,7 +13,10 @@ namespace Sigma{
 			}
 		}
 
+		void SetMesh(const GLMesh* mesh, btVector3* scale);
+		void SetMesh(const GLMesh* mesh, float scale);
 		void SetMesh(const GLMesh* mesh);
+
 	private:
 		btTriangleMesh* btmesh;
 	};
