@@ -48,23 +48,6 @@ namespace Sigma {
 		 */
 		void UpdateTransform();
 
-		/**
-		 * \brief Rotates the transform now.
-		 *
-		 * Rotates the transform immediately instead of adding it to the list.
-		 * \param[in/out] float x, y, z The amount to rotate.
-		 * \return void
-		 */
-		void RotateNow(float x, float y, float z);
-		/**
-		 * \brief Sets the target rotation amount.
-		 *
-		 *
-		 * \param[in/out] float x, y, z The amount to rotate to.
-		 * \return void
-		 */
-		void RotateTarget(float x, float y, float z);
-
 		void SetTransform(GLTransform& transform) {
 			ControllableMove::SetTransform(IBulletShape::GetEntityID(), &transform);
 		}

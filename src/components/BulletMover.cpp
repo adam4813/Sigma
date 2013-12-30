@@ -59,15 +59,4 @@ namespace Sigma {
 		}
         GetRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	}
-
-	// immediate mode rotation (for mouse motion)
-	void BulletMover::RotateNow(float x, float y, float z) {
-	    auto transform = ControllableMove::GetTransform(IBulletShape::GetEntityID());
-		if (transform != nullptr) {
-			transform->Rotate(x,y,z);
-		}
-	}
-	void BulletMover::RotateTarget(float x, float y, float z) {
-		IMoverComponent::RotateTarget(IBulletShape::GetEntityID(), x, y, z);
-	}
 }
