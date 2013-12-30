@@ -2,7 +2,7 @@
 #include "resources/GLTexture.h"
 
 namespace Sigma {
-	GLScreenQuad::GLScreenQuad(int entityID) : GLMesh(entityID), texture(nullptr), x(0), y(0), w(0), h(0) {}
+	GLScreenQuad::GLScreenQuad(int entityID) : GLMesh(entityID), texture(nullptr), x(0), y(0), w(0), h(0), inverted(false) {}
 	GLScreenQuad::~GLScreenQuad() {}
 
 	void GLScreenQuad::InitializeBuffers() {
@@ -20,10 +20,18 @@ namespace Sigma {
 		this->AddFace(Face(0, 1, 2));
 		this->AddFace(Face(2, 1, 3));
 
-		this->texCoords.push_back(TexCoord(0.0f, 1.0f));
-		this->texCoords.push_back(TexCoord(1.0f, 1.0f));
-		this->texCoords.push_back(TexCoord(0.0f, 0.0f));
-		this->texCoords.push_back(TexCoord(1.0f, 0.0f));
+		if (!this->inverted) {
+			this->texCoords.push_back(TexCoord(0.0f, 0.0f));
+			this->texCoords.push_back(TexCoord(1.0f, 0.0f));
+			this->texCoords.push_back(TexCoord(0.0f, 1.0f));
+			this->texCoords.push_back(TexCoord(1.0f, 1.0f));
+		}
+		else {
+			this->texCoords.push_back(TexCoord(0.0f, 1.0f));
+			this->texCoords.push_back(TexCoord(1.0f, 1.0f));
+			this->texCoords.push_back(TexCoord(0.0f, 0.0f));
+			this->texCoords.push_back(TexCoord(1.0f, 0.0f));
+		}
 
 		// Add the mesh group
 		this->AddMeshGroupIndex(0);

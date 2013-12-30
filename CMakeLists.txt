@@ -42,7 +42,7 @@ source_group("Source Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_CPP})
 file(GLOB Sigma_SRC_RESOURCES_H "include/resources/*.h")
 source_group("Header Files\\resources" FILES ${Sigma_SRC_RESOURCES_H})
 
-# Outpit the compiler ID.
+# Output the compiler ID.
 message("Compiler ID: " ${CMAKE_CXX_COMPILER_ID})
 
 # check for gcc version to set c++11 or c++0x
@@ -85,7 +85,7 @@ add_definitions(
 
 ## Set the libraries
 
-# Link aganst OpenGL and GLEW
+# Link against OpenGL
 # We can use the find OpenGL package on windows
 find_package(OpenGL REQUIRED)
 if(NOT OPENGL_FOUND)
@@ -111,7 +111,6 @@ if(WIN32 AND NOT MINGW) # Windows
 	set(BULLET_DYNAMICS_LIBRARIES BulletDynamics)
 	SET(SOIL_LIBRARY SOIL)
 	SET(AWESOMIUM_LIBRARY Awesomium)
-
 endif(WIN32 AND NOT MINGW)
 
 SET(X11_LIBRARIES "")
