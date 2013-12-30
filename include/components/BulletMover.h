@@ -42,13 +42,6 @@ namespace Sigma {
 		 */
 		void InitializeRigidBody(btDiscreteDynamicsWorld* world);
 
-		/**
-		 * \brief Updates the transform to match its collision rigid body.
-		 *
-		 * \return void
-		 */
-		void UpdateTransform();
-
 		void SetTransform(GLTransform& transform) {
 			ControllableMove::SetTransform(IBulletShape::GetEntityID(), &transform);
 		}

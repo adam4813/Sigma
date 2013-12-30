@@ -22,15 +22,6 @@ namespace Sigma {
 	    }
 	}
 
-	void BulletMover::UpdateTransform() {
-	    auto transform = ControllableMove::GetTransform(IBulletShape::GetEntityID());
-		if (transform != nullptr) {
-			btTransform trans;
-			RigidBody::getBody(IBulletShape::GetEntityID())->getMotionState()->getWorldTransform(trans);
-			transform->TranslateTo(trans.getOrigin().x(),trans.getOrigin().y(), trans.getOrigin().z());
-		}
-	}
-
 	void BulletMover::InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz) {
 		RigidBody::AddEntity(IBulletShape::GetEntityID(), x, y, z, rx, ry, rz);
 		SetCollisionShape(RigidBody::getBody(IBulletShape::GetEntityID())->getCollisionShape());

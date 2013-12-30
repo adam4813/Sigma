@@ -3,9 +3,11 @@
 
 #include <unordered_map>
 
+#include <bullet/btBulletDynamicsCommon.h>
 #include "Sigma.h"
 #include "IComponent.h"
 #include "GLTransform.h"
+#include "components/RigidBody.h"
 
 namespace Sigma {
     class ControllableMove : IComponent {
@@ -26,6 +28,23 @@ namespace Sigma {
 
 		static void RemoveEntity(const id_t id) {
 		    transform_map.erase(id);
+		}
+
+        /** \brief Update the transform of all entities having this component
+         *
+         * The transform is updated from the model
+         *
+         */
+		static void UpdateTransform() {
+            btTransform trans;
+		    for (auto it = transform_map.begin(); it != transform_map.end(); it++) {
+                // TODO: Use a position component instead of RigidBody component to get the position
+                auto body = RigidBody::getBody(it->first);
+                if (body != nullptr) {
+                    body->getMotionState()->getWorldTransform(trans);
+                    it->second->TranslateTo(trans.getOrigin().x(),trans.getOrigin().y(), trans.getOrigin().z());
+                }
+		    }
 		}
 
 		static GLTransform* GetTransform(const id_t id) {

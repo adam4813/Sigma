@@ -149,7 +149,7 @@ namespace Sigma {
 
 		dynamicsWorld->stepSimulation(delta, 10);
 
-		this->mover.UpdateTransform();
+		ControllableMove::UpdateTransform();
 
 		return true;
 	}
