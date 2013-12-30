@@ -11,7 +11,6 @@
 #include "Sigma.h"
 #include "GLTransform.h"
 #include "components/ControllableMove.h"
-#include "components/CanMove.h"
 
 namespace Sigma{
     class InterpolatedMovement : IComponent {
@@ -44,7 +43,7 @@ namespace Sigma{
             glm::vec3 deltavec(delta);
             for (auto it2 = rotationtarget_map.begin(); it2 != rotationtarget_map.end(); it2++) {
                 auto transform = ControllableMove::GetTransform(it2->first);
-                auto rotationForces = CanMove::getRotationForces(it2->first);
+                auto rotationForces = ControllableMove::getRotationForces(it2->first);
 
                 if (transform != nullptr) {
 

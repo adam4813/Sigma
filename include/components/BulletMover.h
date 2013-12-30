@@ -23,15 +23,6 @@ namespace Sigma {
 
 		const id_t GetEntityID() const { return entityID; };
 	private:
-		/**
-		 * \brief Initialize the rigid body.
-		 *
-		 * \param[in] float x, y, z The initial position.
-		 * \param[in] float rx, ry, rz The initial rotation.
-		 * \return    void
-		 */
-		void InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz);
-
         const id_t entityID;
 	};
 }

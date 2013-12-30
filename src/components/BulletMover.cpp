@@ -6,21 +6,16 @@
 namespace Sigma {
 
 	BulletMover::BulletMover(const id_t entityID) : entityID(entityID) {
-	    CanMove::AddEntity(entityID);
         InterpolatedMovement::AddEntity(entityID);
         ControllableMove::AddEntity(entityID);
 	}
 
 	BulletMover::~BulletMover() {}
 
-	void BulletMover::InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz) {
-		RigidBody::AddEntity(entityID, x, y, z, rx, ry, rz);
-	}
-
 	void BulletMover::InitializeRigidBody(btDiscreteDynamicsWorld* world) {
 	    auto transform = ControllableMove::GetTransform(entityID);
 		if(transform != nullptr) {
-			this->InitializeRigidBody(
+		RigidBody::AddEntity(entityID,
 				transform->GetPosition().x,
 				transform->GetPosition().y,
 				transform->GetPosition().z,
@@ -30,7 +25,7 @@ namespace Sigma {
 			);
 		}
 		else {
-			this->InitializeRigidBody(0,1.5f,0,0,0,0);
+			RigidBody::AddEntity(entityID,0,1.5f,0,0,0,0);
 		}
 		world->addRigidBody(RigidBody::getBody(entityID));
         RigidBody::getBody(entityID)->setActivationState(DISABLE_DEACTIVATION);

@@ -46,9 +46,9 @@ namespace handler{
         if (this->keyState['C'] == KS_DOWN) // Move down
             rise -= speed;
         // remove previous force and add new one
-        CanMove::RemoveForce(this->mover->GetEntityID(), this->_translate);
+        ControllableMove::RemoveForce(this->mover->GetEntityID(), this->_translate);
         this->_translate = glm::vec3(strafe, rise, fwd);
-        CanMove::AddForce(this->mover->GetEntityID(), this->_translate);
+        ControllableMove::AddForce(this->mover->GetEntityID(), this->_translate);
 
         // Rotation Keys
         float pitch = 0.0f, yaw = 0.0f, roll = 0.0f;
@@ -66,9 +66,9 @@ namespace handler{
             roll += SPEED_ROTATE;
 
         // remove previous force and add new one
-        CanMove::RemoveRotationForce(this->mover->GetEntityID(), this->_rotate);
+        ControllableMove::RemoveRotationForce(this->mover->GetEntityID(), this->_rotate);
         this->_rotate = glm::vec3(pitch, yaw, roll);
-        CanMove::AddRotationForce(this->mover->GetEntityID(), this->_rotate);
+        ControllableMove::AddRotationForce(this->mover->GetEntityID(), this->_rotate);
 
     } // function KeyStateChange
 } } } // namespace Sigma::event::handler

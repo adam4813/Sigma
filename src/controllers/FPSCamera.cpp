@@ -47,16 +47,16 @@ namespace Sigma{
 
 				// remove previous force and add new one
 				if (this->mover) {
-					CanMove::RemoveForce(this->mover->GetEntityID(), this->translation);
+					ControllableMove::RemoveForce(this->mover->GetEntityID(), this->translation);
 					this->translation = translation;
-					CanMove::AddForce(this->mover->GetEntityID(), this->translation);
+					ControllableMove::AddForce(this->mover->GetEntityID(), this->translation);
 				}
 
 			} // function KeyStateChange
 
 			void FPSCamera::LostKeyboardFocus() {
 				if (this->mover) {
-					CanMove::ClearForces(this->mover->GetEntityID());
+					ControllableMove::ClearForces(this->mover->GetEntityID());
 				}
 			}
 

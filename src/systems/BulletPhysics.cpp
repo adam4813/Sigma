@@ -144,7 +144,7 @@ namespace Sigma {
 	bool BulletPhysics::Update(const double delta) {
         InterpolatedMovement::ComputeInterpolatedForces(delta);
 
-		CanMove::ApplyForces();
+		ControllableMove::ApplyForces();
 
 		dynamicsWorld->stepSimulation(delta, 10);
 
