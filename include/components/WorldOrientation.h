@@ -10,8 +10,6 @@
 
 
 namespace Sigma {
-    typedef unsigned int type_id;
-
     struct orientation_type {
         orientation_type() : alpha(0), beta(0), gamma(0) {};
         orientation_type(double alpha, double beta, double gamma) : alpha(alpha), beta(beta), gamma(gamma) {};
@@ -73,25 +71,25 @@ namespace Sigma {
              * \return a weak pointer on the orientation
              *
              */
-            const orientation_ptr euler(type_id entity_id) const;
+            const orientation_ptr euler(const id_t entity_id) const;
 
             /** \brief Set a orientation by reference
             *
             *
-            * \param entity_id type_id id of the entity
+            * \param entity_id id of the entity
             * \return SharedPointerMap<type_id, vec3>& a reference on the orientation
             *
             */
-            SharedPointerMap<type_id, orientation_type>& OrientationWrite(type_id entity_id);
+            SharedPointerMap<id_t, orientation_type>& OrientationWrite(const id_t entity_id);
 
 
             /** \brief Remove an orientation
             *
-            * \param entity_id type_id id of the entity
+            * \param entity_id id of the entity
             * \return void
             *
             */
-            void RemoveEntityOrientation(type_id entity_id);
+            void RemoveEntityOrientation(const id_t entity_id);
 
             /** \brief Get the internal orientations vector
             *
@@ -107,15 +105,15 @@ namespace Sigma {
              * \return std::vector<type_id>::const_iterator the iterator
              *
              */
-            std::vector<type_id>::const_iterator IteratorEntityId() const noexcept { return id_vector.cbegin(); }
+            std::vector<id_t>::const_iterator IteratorEntityId() const noexcept { return id_vector.cbegin(); }
 
         private:
-            SharedPointerMap<type_id, orientation_type> orientation_guard;
+            SharedPointerMap<id_t, orientation_type> orientation_guard;
 
             // the vector containing orientations
             std::vector<orientation_type> orientations;
             // the id of the objects of the vector
-            std::vector<type_id> id_vector;
+            std::vector<id_t> id_vector;
     };
 }
 #endif // WORLDORIENTATION_H

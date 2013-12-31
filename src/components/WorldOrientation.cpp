@@ -6,11 +6,11 @@ namespace Sigma {
 
     WorldOrientation::~WorldOrientation() {}
 
-    const orientation_ptr WorldOrientation::euler(type_id entity_id) const {
+    const orientation_ptr WorldOrientation::euler(const id_t entity_id) const {
         return orientation_guard.Read(entity_id);
     }
 
-    SharedPointerMap<type_id, orientation_type>& WorldOrientation::OrientationWrite(type_id entity_id) {
+    SharedPointerMap<type_id, orientation_type>& WorldOrientation::OrientationWrite(const id_t entity_id) {
         if (! orientation_guard.Exist(entity_id)) {
             // check if we will resize
             if (orientations.size() == orientations.capacity()) {
@@ -37,10 +37,10 @@ namespace Sigma {
         return orientation_guard.Write(entity_id);
     }
 
-    void WorldOrientation::RemoveEntityOrientation(type_id entity_id) {
+    void WorldOrientation::RemoveEntityOrientation(const id_t entity_id) {
         orientation_type* addr = orientation_guard.Remove(entity_id);
         size_t index = (addr - orientations.data()) / sizeof(Sigma::orientation_type);
-        type_id last_id = id_vector.back();
+        id_t last_id = id_vector.back();
         if (last_id != entity_id) {
                 // swap with last element
                 *addr = std::move(orientations.back());

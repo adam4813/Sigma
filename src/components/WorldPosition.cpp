@@ -1,35 +1,33 @@
 #include "components/WorldPosition.h"
 
 namespace Sigma {
-    typedef unsigned int type_id;
-
     WorldPosition::~WorldPosition() {}
 
-    const position_ptr WorldPosition::x(type_id entity_id) const {
+    const position_ptr WorldPosition::x(const id_t entity_id) const {
         return position_guard_x.Read(entity_id);
     }
 
-    const position_ptr WorldPosition::y(type_id entity_id) const {
+    const position_ptr WorldPosition::y(const id_t entity_id) const {
         return position_guard_y.Read(entity_id);
     }
 
-    const position_ptr WorldPosition::z(type_id entity_id) const {
+    const position_ptr WorldPosition::z(const id_t entity_id) const {
         return position_guard_z.Read(entity_id);
     }
 
-    SharedPointerMap<type_id, coordinate_type>& WorldPosition::PositionWrite_x(type_id entity_id) {
+    SharedPointerMap<id_t, coordinate_type>& WorldPosition::PositionWrite_x(const id_t entity_id) {
         return PositionWrite(entity_id, position_guard_x);
     }
 
-    SharedPointerMap<type_id, coordinate_type>& WorldPosition::PositionWrite_y(type_id entity_id) {
+    SharedPointerMap<id_t, coordinate_type>& WorldPosition::PositionWrite_y(const id_t entity_id) {
         return PositionWrite(entity_id, position_guard_y);
     }
 
-    SharedPointerMap<type_id, coordinate_type>& WorldPosition::PositionWrite_z(type_id entity_id) {
+    SharedPointerMap<id_t, coordinate_type>& WorldPosition::PositionWrite_z(const id_t entity_id) {
         return PositionWrite(entity_id, position_guard_z);
     }
 
-    SharedPointerMap<type_id, coordinate_type>& WorldPosition::PositionWrite(type_id entity_id, SharedPointerMap<type_id, coordinate_type>& gf) {
+    SharedPointerMap<id_t, coordinate_type>& WorldPosition::PositionWrite(const id_t entity_id, SharedPointerMap<id_t, coordinate_type>& gf) {
         if (! gf.Exist(entity_id) && (id_vector.empty() || id_vector.back() != entity_id)) {
             // check if we will resize
             if (positions_x.size() == positions_x.capacity()) {
@@ -53,13 +51,11 @@ namespace Sigma {
             id_vector.push_back(entity_id);
             translate.IncreaseLength();
         }
-        // mark the position as updated
-        MarkUpdated(entity_id);
         // return a callback containing unique_ptr
         return gf.Write(entity_id);
     }
 
-    void WorldPosition::Resize(aligned_vector_type& v, SharedPointerMap<type_id, coordinate_type>& gf) {
+    void WorldPosition::Resize(aligned_vector_type& v, SharedPointerMap<id_t, coordinate_type>& gf) {
         // make a copy of the vector with a double size capacity
         aligned_vector_type v_copy(v.size() << 1);
         v_copy = v;
@@ -72,12 +68,12 @@ namespace Sigma {
         std::swap(v, v_copy);
     }
 
-    void WorldPosition::RemoveEntityPosition(type_id entity_id) {
+    void WorldPosition::RemoveEntityPosition(const id_t entity_id) {
         coordinate_type* addr_x = position_guard_x.Remove(entity_id);
         coordinate_type* addr_y = position_guard_y.Remove(entity_id);
         coordinate_type* addr_z = position_guard_z.Remove(entity_id);
         size_t index = addr_x - positions_x.data();
-        type_id last_id = id_vector.back();
+        id_t last_id = id_vector.back();
         if (last_id != entity_id) {
                 // swap with last element
                 *addr_x = std::move(positions_x.back());

@@ -10,7 +10,7 @@
 namespace Sigma {
     class SigmaMotionState : public btMotionState {
     public:
-        SigmaMotionState(const type_id id, WorldPosition& wp, WorldOrientation& wo)
+        SigmaMotionState(const id_t id, WorldPosition& wp, WorldOrientation& wo)
         : id(id), wp(&wp), wo(&wo) {};
 
         virtual ~SigmaMotionState() {};
@@ -33,7 +33,7 @@ namespace Sigma {
         };
 
     private:
-        const type_id id;
+        const id_t id;
         WorldPosition* wp;
         WorldOrientation* wo;
     };

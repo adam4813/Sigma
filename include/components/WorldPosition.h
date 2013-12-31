@@ -30,7 +30,6 @@
 #endif // GCC
 
 namespace Sigma {
-    typedef unsigned int type_id;
     typedef double coordinate_type;
     typedef std::vector<coordinate_type, AlignedVectorAllocator<coordinate_type>> aligned_vector_type;
     typedef std::shared_ptr<float> coordinate_array;
@@ -119,7 +118,7 @@ namespace Sigma {
          * \return a weak pointer on the x coordinate
          *
          */
-        const position_ptr x(type_id entity_id) const;
+        const position_ptr x(const id_t entity_id) const;
 
         /** \brief Get the y coordinate for an entity
          *
@@ -127,7 +126,7 @@ namespace Sigma {
          * \return a weak pointer on the y coordinate
          *
          */
-        const position_ptr y(type_id entity_id) const;
+        const position_ptr y(const id_t entity_id) const;
 
         /** \brief Get the z coordinate for an entity
          *
@@ -135,42 +134,42 @@ namespace Sigma {
          * \return a weak pointer on the z coordinate
          *
          */
-        const position_ptr z(type_id entity_id) const;
+        const position_ptr z(const id_t entity_id) const;
 
         /** \brief Set a x coordinate by reference
         *
         *
-        * \param entity_id type_id id of the entity
+        * \param entity_id id of the entity
         * \return SharedPointerMap<type_id, coordinate_type>& a reference on the coordinate
         *
         */
-        SharedPointerMap<type_id, coordinate_type>& PositionWrite_x(type_id entity_id);
+        SharedPointerMap<id_t, coordinate_type>& PositionWrite_x(const id_t entity_id);
 
         /** \brief Set a y coordinate by reference
         *
         *
-        * \param entity_id type_id id of the entity
+        * \param entity_id id of the entity
         * \return SharedPointerMap<type_id, coordinate_type>& a reference on the coordinate
         *
         */
-        SharedPointerMap<type_id, coordinate_type>& PositionWrite_y(type_id entity_id);
+        SharedPointerMap<id_t, coordinate_type>& PositionWrite_y(const id_t entity_id);
 
         /** \brief Set a z coordinate by reference
         *
         *
-        * \param entity_id type_id id of the entity
+        * \param entity_id id of the entity
         * \return SharedPointerMap<type_id, coordinate_type>& a reference on the coordinate
         *
         */
-        SharedPointerMap<type_id, coordinate_type>& PositionWrite_z(type_id entity_id);
+        SharedPointerMap<id_t, coordinate_type>& PositionWrite_z(const id_t entity_id);
 
         /** \brief Remove a position
         *
-        * \param entity_id type_id id of the entity
+        * \param entity_id id of the entity
         * \return void
         *
         */
-        void RemoveEntityPosition(type_id entity_id);
+        void RemoveEntityPosition(const id_t entity_id);
 
         /** \brief Get the internal x coordinate vector
         *
@@ -197,10 +196,10 @@ namespace Sigma {
          *
          *  The iterator gives the id in the same order as the internal position vector
          *
-         * \return std::vector<type_id>::const_iterator the iterator
+         * \return std::vector<const id_t>::const_iterator the iterator
          *
          */
-        std::vector<type_id>::const_iterator IteratorEntityId() const noexcept { return id_vector.cbegin(); }
+        std::vector<id_t>::const_iterator IteratorEntityId() const noexcept { return id_vector.cbegin(); }
 
         /** \brief Get an array of all positions relative to (x, y, z) converted to float
          *
@@ -229,22 +228,14 @@ namespace Sigma {
                                                   const coordinate_type distance) const;
 
     private:
-        /** \brief Mark an entity as updated
-         *
-         * \param id type_id the id of the entity
-         * \return void
-         *
-         */
-        void MarkUpdated(type_id id) { auto i = FindIdElement(id); if (i>=0) (*updated)[i] = true; };
-
         /** \brief Resize the vector
          *
          * \param v aligned_vector_type& the vector to resize
-         * \param SharedPointerMap<type_id,coordinate_type>& gf the map impacted by the resize
+         * \param SharedPointerMap<id_t,coordinate_type>& gf the map impacted by the resize
          * \return void
          *
          */
-        void Resize(aligned_vector_type& v, SharedPointerMap<type_id, coordinate_type>& gf);
+        void Resize(aligned_vector_type& v, SharedPointerMap<id_t, coordinate_type>& gf);
 
         /** \brief Returns a rvalue to write a coordinate
          *
@@ -253,9 +244,9 @@ namespace Sigma {
          * \return SharedPointerMap<type_id, coordinate_type>& A rvalue
          *
          */
-        SharedPointerMap<type_id, coordinate_type>& PositionWrite(type_id entity_id, SharedPointerMap<type_id, coordinate_type>& gf);
+        SharedPointerMap<id_t, coordinate_type>& PositionWrite(const id_t entity_id, SharedPointerMap<id_t, coordinate_type>& gf);
 
-        type_id FindIdElement(type_id id) {
+        id_t FindIdElement(const id_t id) const {
             auto ptr = position_guard_x.Read(id);
             if (! ptr.expired()) {
                 auto p = ptr.lock().get();
@@ -265,9 +256,9 @@ namespace Sigma {
         };
 
         // the maps containing pointers to positions
-        SharedPointerMap<type_id, coordinate_type> position_guard_x;
-        SharedPointerMap<type_id, coordinate_type> position_guard_y;
-        SharedPointerMap<type_id, coordinate_type> position_guard_z;
+        SharedPointerMap<id_t, coordinate_type> position_guard_x;
+        SharedPointerMap<id_t, coordinate_type> position_guard_y;
+        SharedPointerMap<id_t, coordinate_type> position_guard_z;
 
         // the vectors containing positions
         aligned_vector_type positions_x;
@@ -275,13 +266,10 @@ namespace Sigma {
         aligned_vector_type positions_z;
 
         // the vector of ids of the objects
-        std::vector<type_id> id_vector;
+        std::vector<id_t> id_vector;
 
         // The translation class we will use (gcc inline/VS intrinsic/...)
         Translate translate;
-
-        // the bitset for updated positions
-        std::shared_ptr<BitArray<unsigned short>> updated = BitArray<unsigned short>::Create();
     };
 }
 
