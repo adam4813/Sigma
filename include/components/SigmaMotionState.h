@@ -1,7 +1,7 @@
 #ifndef SIGMAMOTIONSTATE_INCLUDED
 #define SIGMAMOTIONSTATE_INCLUDED
 
-#define BT_USE_DOUBLE_PRECISION
+//#define BT_USE_DOUBLE_PRECISION
 #include "bullet/btBulletDynamicsCommon.h"
 #include "components/WorldPosition.h"
 #include "components/WorldOrientation.h"
@@ -27,7 +27,7 @@ namespace Sigma {
             wp->PositionWrite_x(id) = vec.x();
             wp->PositionWrite_y(id) = vec.y();
             wp->PositionWrite_z(id) = vec.z();
-            double a, b, g;
+            float a, b, g;
             worldTrans.getBasis().getEulerZYX(a, b, g);
             wo->OrientationWrite(id) = orientation_type(a, b, g);
         };

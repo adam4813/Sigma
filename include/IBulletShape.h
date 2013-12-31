@@ -1,5 +1,5 @@
 #pragma once
-#define BT_USE_DOUBLE_PRECISION
+//#define BT_USE_DOUBLE_PRECISION
 #include <bullet/btBulletCollisionCommon.h>
 #include <bullet/btBulletDynamicsCommon.h>
 #include "IComponent.h"

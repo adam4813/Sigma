@@ -1,6 +1,6 @@
 #include <iostream>
 
-#define BT_USE_DOUBLE_PRECISION
+//#define BT_USE_DOUBLE_PRECISION
 #include "systems/OpenGLSystem.h"
 #include "systems/BulletPhysics.h"
 #include "systems/FactorySystem.h"
