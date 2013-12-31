@@ -5,7 +5,7 @@
 namespace Sigma {
     std::unordered_map<id_t, forces_list> ControllableMove::forces_map;
     std::unordered_map<id_t, rotationForces_list> ControllableMove::rotationForces_map;
-    std::unordered_map<id_t, glm::vec3> ControllableMove::cumulatedForces_map;
+    VectorMap<id_t, glm::vec3> ControllableMove::cumulatedForces_map;
     std::unordered_map<id_t, GLTransform*> ControllableMove::transform_map;
 
     void ControllableMove::UpdateTransform() {
@@ -18,16 +18,16 @@ namespace Sigma {
     }
 
     void ControllableMove::CumulateForces() {
-        // TODO: optimize the way to get the transform and the cumulated forces
-        for (auto itr = forces_map.begin(); itr != forces_map.end(); ++itr) {
+        // TODO: optimize the way to get the transform (we should host it !)
+        auto cf_it = cumulatedForces_map.getVector()->begin();
+        for (auto itr = forces_map.begin(); itr != forces_map.end(); ++itr, ++cf_it) {
             auto transform = ControllableMove::GetTransform(itr->first);
-            auto cumulatedForces = ControllableMove::getCumulatedForces(itr->first);
             if (transform != nullptr) {
                 glm::vec3 t;
                 for (auto forceitr = itr->second.begin(); forceitr != itr->second.end(); ++forceitr) {
                     t += *forceitr;
                 }
-                *cumulatedForces = (t.z * transform->GetForward()) +
+                *cf_it = (t.z * transform->GetForward()) +
                            (t.y * transform->GetUp()) +
                            (t.x * transform->GetRight());
             }
@@ -35,11 +35,12 @@ namespace Sigma {
     }
 
     void ControllableMove::ApplyForcesToBody() {
-        for (auto itr = cumulatedForces_map.begin(); itr != cumulatedForces_map.end(); ++itr) {
-            auto body = RigidBody::getBody(itr->first);
+        auto cf_it = cumulatedForces_map.getVector()->cbegin();
+        for (auto kitr = cumulatedForces_map.IteratorKeyBegin(); kitr != cumulatedForces_map.IteratorKeyEnd(); ++kitr, ++cf_it) {
+            auto body = RigidBody::getBody(*kitr);
             if (body != nullptr) {
-                auto finalForce = itr->second;
-                body->setLinearVelocity(btVector3(finalForce.x, body->getLinearVelocity().y() + 0.000000001f, finalForce.z));
+                auto finalForce = cf_it;
+                body->setLinearVelocity(btVector3(finalForce->x, body->getLinearVelocity().y() + 0.000000001f, finalForce->z));
             }
         }
     }

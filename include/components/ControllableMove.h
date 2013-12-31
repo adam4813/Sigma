@@ -9,6 +9,7 @@
 #include "Sigma.h"
 #include "IComponent.h"
 #include "GLTransform.h"
+#include "VectorMap.hpp"
 
 namespace Sigma {
     typedef std::list<glm::vec3> forces_list; // The list of forces for each entity
@@ -17,6 +18,8 @@ namespace Sigma {
     /** \brief A component for entities with movements under external control
      *
      * It stores a transformation matrix and a list of forces to apply.
+     *
+     * A function provides a way to apply the forces to the body of the entities
      *
      * NB: Movements are constrained in the horizontal plan
      */
@@ -32,7 +35,7 @@ namespace Sigma {
 		    if (GetTransform(id) == nullptr && getForces(id) == nullptr && getRotationForces(id) == nullptr) {
                 forces_map.emplace(id, forces_list());
                 rotationForces_map.emplace(id, rotationForces_list());
-                cumulatedForces_map.emplace(id, glm::vec3());
+                cumulatedForces_map.set(id) = glm::vec3();
                 transform_map.emplace(id, nullptr);
                 return true;
 		    }
@@ -42,7 +45,7 @@ namespace Sigma {
 		static void RemoveEntity(const id_t id) {
             forces_map.erase(id);
             rotationForces_map.erase(id);
-            cumulatedForces_map.erase(id);
+            cumulatedForces_map.RemoveElement(id);
 		    transform_map.erase(id);
 		}
 
@@ -171,18 +174,14 @@ namespace Sigma {
             return nullptr;
         }
 
-        static glm::vec3* getCumulatedForces(const id_t id) {
-            auto cumulatedForces = cumulatedForces_map.find(id);
-            if (cumulatedForces != cumulatedForces_map.end()) {
-                return &cumulatedForces->second;
-            }
-            return nullptr;
-        }
+        static std::shared_ptr<const glm::vec3> getCumulatedForces(const id_t id) {
+            return cumulatedForces_map.get(id).lock();
+         }
 
     private:
         static std::unordered_map<id_t, forces_list> forces_map; // The list of forces to apply each update loop.
         static std::unordered_map<id_t, rotationForces_list> rotationForces_map;
-        static std::unordered_map<id_t, glm::vec3> cumulatedForces_map;
+        static VectorMap<id_t, glm::vec3> cumulatedForces_map;
         static std::unordered_map<id_t, GLTransform*> transform_map;
     };
 }
