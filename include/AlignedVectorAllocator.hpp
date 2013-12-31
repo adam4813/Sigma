@@ -1,3 +1,6 @@
+#ifndef ALIGNEDVECTORALLOCATOR_H_INCLUDED
+#define ALIGNEDVECTORALLOCATOR_H_INCLUDED
+
 // Allocator for aligned vector
 // pasted from http://blogs.msdn.com/b/vcblog/archive/2008/08/28/the-mallocator.aspx
 // modified to update references of ProtectedPointerAccess
@@ -132,3 +135,4 @@ template <typename T>
 void AlignedVectorAllocator<T>::destroy(T * const p) const {
     p->~T();
 }
+#endif // ALIGNEDVECTORALLOCATOR_H_INCLUDED
