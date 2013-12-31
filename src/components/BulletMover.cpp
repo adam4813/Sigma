@@ -2,31 +2,21 @@
 
 #include <bullet/btBulletCollisionCommon.h>
 #include <bullet/btBulletDynamicsCommon.h>
+#include "components/PhysicalWorldLocation.h"
 
 namespace Sigma {
 
 	BulletMover::BulletMover(const id_t entityID) : entityID(entityID) {
         InterpolatedMovement::AddEntity(entityID);
         ControllableMove::AddEntity(entityID);
+        // position is hardcoded
+        PhysicalWorldLocation::AddEntity(entityID, 0, 1.5, 0, 0, 0, 0);
 	}
 
 	BulletMover::~BulletMover() {}
 
 	void BulletMover::InitializeRigidBody(btDiscreteDynamicsWorld* world) {
-	    auto transform = ControllableMove::GetTransform(entityID);
-		if(transform != nullptr) {
-		RigidBody::AddEntity(entityID,
-				transform->GetPosition().x,
-				transform->GetPosition().y,
-				transform->GetPosition().z,
-				transform->GetPitch(),
-				transform->GetYaw(),
-				transform->GetRoll()
-			);
-		}
-		else {
-			RigidBody::AddEntity(entityID,0,1.5f,0,0,0,0);
-		}
+		RigidBody::AddEntity(entityID);
 		world->addRigidBody(RigidBody::getBody(entityID));
         RigidBody::getBody(entityID)->setActivationState(DISABLE_DEACTIVATION);
 	}

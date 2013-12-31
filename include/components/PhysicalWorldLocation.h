@@ -39,8 +39,6 @@ namespace Sigma {
         void AddViewer(const id_t id, coordinate_type view_limit) {
             viewDistanceMap.insert({{id, view_limit}});
             viewBitsetMap.insert({{id, BitArray<unsigned short>::Create()}});
-            AddEntity(id, 0 , 1.5, 0, 0, 0, 0);
-//            this->bphys->initBulletMover(mover, 0, 1.5, 0, 0, 0, 0);
         };
 
         static inline SigmaMotionState* GetMotionState(const id_t id) {

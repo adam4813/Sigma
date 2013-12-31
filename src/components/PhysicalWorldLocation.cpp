@@ -10,6 +10,6 @@ namespace Sigma {
         pphysical.PositionWrite_y(id) = y;
         pphysical.PositionWrite_z(id) = z;
         ophysical.OrientationWrite(id) = orientation_type(rx, ry, rz);
-        std::cout << "adding entitiy " << id << " (" << x << ", " << y << ", " << z << ")" << std::endl;
+        std::cout << "adding entity " << id << " (" << x << ", " << y << ", " << z << ")" << std::endl;
     }
 }
