@@ -6,9 +6,6 @@
 #include <memory>
 
 #include "glm/glm.hpp"
-#include "components/ControllableMove.h"
-#include "components/RigidBody.h"
-#include <bullet/btBulletDynamicsCommon.h>
 #include "Sigma.h"
 #include "IComponent.h"
 #include "GLTransform.h"
@@ -46,17 +43,7 @@ namespace Sigma {
          * The transform is updated from the model
          *
          */
-		static void UpdateTransform() {
-            btTransform trans;
-		    for (auto it = transform_map.begin(); it != transform_map.end(); it++) {
-                // TODO: Use a position component instead of RigidBody component to get the position
-                auto body = RigidBody::getBody(it->first);
-                if (body != nullptr) {
-                    body->getMotionState()->getWorldTransform(trans);
-                    it->second->TranslateTo(trans.getOrigin().x(),trans.getOrigin().y(), trans.getOrigin().z());
-                }
-		    }
-		}
+		static void UpdateTransform();
 
         /** \brief Add a force to the list for a specific entity.
          *
@@ -138,23 +125,7 @@ namespace Sigma {
          *
          * Calculates the total force and sets the rigid body's linear force.
          */
-        static void ApplyForces() {
-            for (auto itr = forces_map.begin(); itr != forces_map.end(); ++itr) {
-                auto transform = ControllableMove::GetTransform(itr->first);
-                auto body = RigidBody::getBody(itr->first);
-                if (transform != nullptr) {
-                    glm::vec3 t;
-                    for (auto forceitr = itr->second.begin(); forceitr != itr->second.end(); ++forceitr) {
-                        t += *forceitr;
-                    }
-                    auto finalForce = (t.z * transform->GetForward()) +
-                               (t.y * transform->GetUp()) +
-                               (t.x * transform->GetRight());
-
-                    body->setLinearVelocity(btVector3(finalForce.x, body->getLinearVelocity().y() + 0.000000001f, finalForce.z));
-                }
-            }
-        }
+        static void ApplyForces();
 
 		static GLTransform* GetTransform(const id_t id) {
 		    auto itt = transform_map.find(id);
