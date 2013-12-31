@@ -1,6 +1,7 @@
 #ifndef WORLDPOSITION_H_INCLUDED
 #define WORLDPOSITION_H_INCLUDED
 
+// TODO: move this to a general inclusion file
 // 1000 km with dm precision at border
 #define VFAR_DISTANCE_MAX 1E+6d
 // 100 km with cm precision at border

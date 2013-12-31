@@ -7,6 +7,7 @@
 namespace Sigma {
 
 	BulletMover::BulletMover(const id_t entityID) : entityID(entityID) {
+	    // we create the components
         InterpolatedMovement::AddEntity(entityID);
         ControllableMove::AddEntity(entityID);
         // position is hardcoded

@@ -17,6 +17,8 @@ namespace Sigma {
 		/**
 		 * \brief Initalize the rigid body using the current transform or defaults if none
 		 *
+		 * it adds the body to the simulation
+		 *
 		 * \return void
 		 */
 		void InitializeRigidBody(btDiscreteDynamicsWorld* world);

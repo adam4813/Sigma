@@ -7,6 +7,14 @@
 #include "IComponent.h"
 
 namespace Sigma {
+    /** \brief A component for entities that have a rigid body
+     *
+     * It stores the body instance of each entity
+     *
+     * Entities having this component must also have the PhysicalWorldLocation component
+     *
+     * NB: The btCollisionShape is a btCapsuleShape.
+     */
     class RigidBody : IComponent {
     public:
 		SET_COMPONENT_TYPENAME("RigidBody");

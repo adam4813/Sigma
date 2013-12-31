@@ -14,6 +14,12 @@ namespace Sigma {
     typedef std::list<glm::vec3> forces_list; // The list of forces for each entity
     typedef std::list<glm::vec3> rotationForces_list;
 
+    /** \brief A component for entities with movements under external control
+     *
+     * It stores a transformation matrix and a list of forces to apply.
+     *
+     * NB: Movements are constrained in the horizontal plan
+     */
     class ControllableMove : IComponent {
     public:
 		SET_COMPONENT_TYPENAME("ControllableMove");
@@ -26,6 +32,7 @@ namespace Sigma {
 		    if (GetTransform(id) == nullptr && getForces(id) == nullptr && getRotationForces(id) == nullptr) {
                 forces_map.emplace(id, forces_list());
                 rotationForces_map.emplace(id, rotationForces_list());
+                cumulatedForces_map.emplace(id, glm::vec3());
                 transform_map.emplace(id, nullptr);
                 return true;
 		    }
@@ -35,6 +42,7 @@ namespace Sigma {
 		static void RemoveEntity(const id_t id) {
             forces_map.erase(id);
             rotationForces_map.erase(id);
+            cumulatedForces_map.erase(id);
 		    transform_map.erase(id);
 		}
 
@@ -121,11 +129,19 @@ namespace Sigma {
         }
 
         /**
-         * \brief Apply all forces of all entities that have this component.
+         * \brief Apply all forces to the body of all entities that have this component.
          *
-         * Calculates the total force and sets the rigid body's linear force.
+         * Sets the rigid body's linear force.
          */
-        static void ApplyForces();
+        static void ApplyForcesToBody();
+
+        /** \brief Compute the cumulated forces for all entities that have this component
+         *
+         * The cumulated force is stored in a map to be retrieved in order to be applied
+         * to a body, or to be broadcasted on the network
+         *
+         */
+        static void CumulateForces();
 
 		static GLTransform* GetTransform(const id_t id) {
 		    auto itt = transform_map.find(id);
@@ -155,9 +171,18 @@ namespace Sigma {
             return nullptr;
         }
 
+        static glm::vec3* getCumulatedForces(const id_t id) {
+            auto cumulatedForces = cumulatedForces_map.find(id);
+            if (cumulatedForces != cumulatedForces_map.end()) {
+                return &cumulatedForces->second;
+            }
+            return nullptr;
+        }
+
     private:
         static std::unordered_map<id_t, forces_list> forces_map; // The list of forces to apply each update loop.
         static std::unordered_map<id_t, rotationForces_list> rotationForces_map;
+        static std::unordered_map<id_t, glm::vec3> cumulatedForces_map;
         static std::unordered_map<id_t, GLTransform*> transform_map;
     };
 }

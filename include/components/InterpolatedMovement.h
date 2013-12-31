@@ -13,6 +13,12 @@
 #include "components/ControllableMove.h"
 
 namespace Sigma{
+    /** \brief A component for entities that have a linear interpolated movement
+     *
+     * Their target transformation matrix is stored and a function allows to compute
+     * the intermediary position by linear interpolation, and to substract
+     * the delta from the target transformation matrix for next iteration
+     */
     class InterpolatedMovement : IComponent {
     public:
 		SET_COMPONENT_TYPENAME("InterpolatedMovement");

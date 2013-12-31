@@ -39,6 +39,9 @@ namespace Sigma {
 
 		std::map<std::string,FactoryFunction> getFactoryFunctions();
 
+        /** \brief Gives a body to the mover and adds it to the world
+         *
+         */
 		void initViewMover();
 
 		BulletMover* getViewMover() {
