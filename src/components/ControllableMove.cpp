@@ -12,7 +12,7 @@ namespace Sigma {
     void ControllableMove::UpdateTransform() {
         for (auto it = transform_map.begin(); it != transform_map.end(); it++) {
             auto position = PhysicalWorldLocation::getPosition(it->first);
-            if (position != nullptr) {
+            if (position) {
                 it->second.TranslateTo(position->x, position->y, position->z);
             }
         }
@@ -35,13 +35,21 @@ namespace Sigma {
         }
     }
 
-    void ControllableMove::ApplyForcesToBody() {
+    void ControllableMove::ApplyForcesToBody(const double delta) {
         auto cf_it = cumulatedForces_map.getVector()->cbegin();
         for (auto kitr = cumulatedForces_map.IteratorKeyBegin(); kitr != cumulatedForces_map.IteratorKeyEnd(); ++kitr, ++cf_it) {
             auto body = RigidBody::getBody(*kitr);
+            auto finalForce = cf_it;
             if (body != nullptr) {
-                auto finalForce = cf_it;
                 body->setLinearVelocity(btVector3(finalForce->x, body->getLinearVelocity().y() + 0.000000001f, finalForce->z));
+            }
+            else {
+				auto position = PhysicalWorldLocation::getPosition(*kitr);
+				if (position) {
+					position->x += finalForce->x * delta;
+					position->z += finalForce->z * delta;
+					PhysicalWorldLocation::setPosition(*kitr, *position);
+				}
             }
         }
     }

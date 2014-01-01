@@ -42,7 +42,7 @@ namespace Sigma {
         /** \brief Gives a body to the mover and adds it to the world
          *
          */
-		void initViewMover();
+		void CreateMoverBody();
 
 		BulletMover* getViewMover() {
 			return &this->mover;

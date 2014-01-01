@@ -143,7 +143,7 @@ namespace Sigma {
 		 *
 		 * NB: You must call CumulateForces() before to refresh forces
 		 */
-		static void ApplyForcesToBody();
+		static void ApplyForcesToBody(const double delta);
 
 		/** \brief Compute the cumulated forces for all entities that have this component
 		 *

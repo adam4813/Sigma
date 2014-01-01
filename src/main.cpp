@@ -80,7 +80,7 @@ int main(int argCount, char **argValues) {
     std::cout << "Initializing OpenAL system." << std::endl;
     alsys.Start();
     alsys.test(); // try sound
-	
+
 	////////////////
 	// Load scene //
 	////////////////
@@ -159,8 +159,8 @@ int main(int argCount, char **argValues) {
 		glfwos.RegisterKeyboardEventHandler(&cameraController);
 	}
 
-	// Sync bullet physics object with gl camera
-	bphys.initViewMover();
+	// Give a body to the mover (comment this to simulate a camera)
+	bphys.CreateMoverBody();
 
 	///////////////////
 	// Configure GUI //

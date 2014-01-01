@@ -33,7 +33,7 @@ namespace Sigma {
 		return true;
 	}
 
-	void BulletPhysics::initViewMover() {
+	void BulletPhysics::CreateMoverBody() {
 		this->mover.InitializeRigidBody(dynamicsWorld);
 	}
 
@@ -148,7 +148,7 @@ namespace Sigma {
         InterpolatedMovement::ComputeInterpolatedForces(delta);
 
 		ControllableMove::CumulateForces();
-		ControllableMove::ApplyForcesToBody();
+		ControllableMove::ApplyForcesToBody(delta);
 
 		dynamicsWorld->stepSimulation(delta, 10);
 

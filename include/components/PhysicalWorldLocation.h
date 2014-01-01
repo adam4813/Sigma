@@ -35,6 +35,14 @@ namespace Sigma {
             return std::unique_ptr<position_type>(new position_type(pphysical.x(id), pphysical.y(id), pphysical.z(id)));
         };
 
+        /** \brief Helper function to set an entity position
+         *
+         * \param id const id_t the entity id
+         * \param position const position_type& the position to set
+         *
+         */
+        static void setPosition(const id_t id, const position_type& position);
+
         static std::unique_ptr<orientation_type> getOrientation(const id_t id) {
             return std::unique_ptr<orientation_type>(new orientation_type(ophysical.euler(id)));
         };
