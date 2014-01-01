@@ -3,6 +3,8 @@
 #ifndef SPATIALCOMPONENT_H
 #define SPATIALCOMPONENT_H
 
+#include <memory>
+
 #include "IComponent.h"
 #include "GLTransform.h"
 #include "Sigma.h"
@@ -10,7 +12,7 @@
 namespace Sigma {
 	class SpatialComponent : public IComponent {
 	public:
-		SpatialComponent(const id_t id = 0) : IComponent(id) {}
+		SpatialComponent(const id_t id = 0) : transform(new GLTransform()), IComponent(id) {}
 		virtual ~SpatialComponent() {}
 
 		SET_COMPONENT_TYPENAME("SpatialComponent");
@@ -20,10 +22,14 @@ namespace Sigma {
 		 *
 		 * \return GLTransform& The transform object.
 		 */
-		GLTransform* Transform() { return &transform; }
+		GLTransform* Transform() { return transform.get(); }
+
+		void SetTransform(std::shared_ptr<GLTransform> t) {
+			this->transform = t;
+		}
 
 	protected:
-		GLTransform transform; // The transform of this component.
+		std::shared_ptr<GLTransform> transform; // The transform of this component.
 	};
 };
 

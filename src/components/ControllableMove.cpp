@@ -6,13 +6,14 @@ namespace Sigma {
     std::unordered_map<id_t, forces_list> ControllableMove::forces_map;
     std::unordered_map<id_t, rotationForces_list> ControllableMove::rotationForces_map;
     VectorMap<id_t, glm::vec3> ControllableMove::cumulatedForces_map;
-    std::unordered_map<id_t, GLTransform*> ControllableMove::transform_map;
+    std::unordered_map<id_t, GLTransform> ControllableMove::transform_map;
+    std::unordered_map<id_t, std::shared_ptr<GLTransform>> ControllableMove::transform_ptr_map;
 
     void ControllableMove::UpdateTransform() {
         for (auto it = transform_map.begin(); it != transform_map.end(); it++) {
             auto position = PhysicalWorldLocation::getPosition(it->first);
             if (position != nullptr) {
-                it->second->TranslateTo(position->x, position->y, position->z);
+                it->second.TranslateTo(position->x, position->y, position->z);
             }
         }
     }

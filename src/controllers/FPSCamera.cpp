@@ -9,10 +9,6 @@ namespace Sigma{
 			const float FPSCamera::BOOST_MULTIPLIER  = 2.0f;
 
 			FPSCamera::FPSCamera(int entityID) : IGLView(entityID), mouseLook(false) {
-				// Set the view mover's view pointer.
-				this->transform.SetEuler(true);
-				this->transform.SetMaxRotation(glm::vec3(45.0f,0,0));
-
 				// Clear out the internal key state buffers.
 				memset(this->keys, 0, sizeof(this->keys));
 				memset(this->keyState, 0, sizeof(this->keyState));
@@ -93,9 +89,9 @@ namespace Sigma{
 				return viewMatrix;*/
 
 				// This is more precise
-				glm::mat4 view =  glm::lookAt(this->transform.GetPosition(),
-											  this->transform.GetPosition()+this->transform.GetForward(),
-											  this->transform.GetUp());
+				glm::mat4 view =  glm::lookAt(this->transform->GetPosition(),
+											  this->transform->GetPosition()+this->transform->GetForward(),
+											  this->transform->GetUp());
 
 				return view;
 				//return this->transform.GetMatrix();
@@ -103,7 +99,7 @@ namespace Sigma{
 
 			void FPSCamera::SetMover(BulletMover* m){
 				if (m) {
-                    ControllableMove::SetTransform(m->GetEntityID(), this->Transform());
+					SetTransform(ControllableMove::GetTransform(m->GetEntityID()));
 					this->mover = m;
 				}
 			}

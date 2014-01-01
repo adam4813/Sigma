@@ -59,7 +59,7 @@ int main(int argCount, char **argValues) {
 	unsigned int lightBuffer = glsys.createRenderTarget(glfwos.GetWindowWidth(), glfwos.GetWindowHeight());
 	glsys.createRTBuffer(lightBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE); // Light accumulation buffer
 
-	
+
 	///////////////////
 	// Setup physics //
 	///////////////////
@@ -117,6 +117,9 @@ int main(int argCount, char **argValues) {
 	// definition in scene file.  Currently entity ID for view must be 1
 	// for this to work.
 
+	// Create hard coded entity ID #1
+	Sigma::BulletMover* mover = bphys.getViewMover();
+
 	// No view provided, create a default FPS view
 	if(!glsys.GetView()) {
 		std::vector<Property> props;
@@ -128,13 +131,9 @@ int main(int argCount, char **argValues) {
 		props.push_back(p_x);
 		props.push_back(p_y);
 		props.push_back(p_z);
-
+		// we use hard coded entity ID #1
 		glsys.createGLView(1, props, "FPSCamera");
 	}
-
-	// Still hard coded to use entity ID #1
-	// Link the graphics view to the physics system's view mover
-	Sigma::BulletMover* mover = bphys.getViewMover();
 
 	//Create the controller
 	//Perhaps a little awkward currently, should create a generic
@@ -150,7 +149,7 @@ int main(int argCount, char **argValues) {
 		Sigma::event::handler::GLSixDOFViewController cameraController(glsys.GetView(), mover);
 		glfwos.RegisterKeyboardEventHandler(&cameraController);
 	}
-	
+
 	// Sync bullet physics object with gl camera
 	bphys.initViewMover();
 
@@ -173,7 +172,7 @@ int main(int argCount, char **argValues) {
 
 	glfwos.RegisterKeyboardEventHandler(&guicon3);
 	glfwos.RegisterMouseEventHandler(&guicon3);
-	
+
 	// Call now to clear the delta after startup.
 	glfwos.GetDeltaTime();
 
@@ -191,7 +190,7 @@ int main(int argCount, char **argValues) {
 		double deltaSec = glfwos.GetDeltaTime();
 
 		// Process input
-		if(glfwos.CheckKeyState(Sigma::event::KS_DOWN, GLFW_KEY_F)) {			
+		if(glfwos.CheckKeyState(Sigma::event::KS_DOWN, GLFW_KEY_F)) {
 			if(fs==FL_OFF) {
 				fs=FL_TURNING_ON;
 			} else if (fs==FL_ON) {

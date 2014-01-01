@@ -124,8 +124,8 @@ namespace Sigma{
 			}
 		}
 
-		this->views[this->views.size() - 1]->Transform()->TranslateTo(x,y,z);
-		this->views[this->views.size() - 1]->Transform()->Rotate(rx,ry,rz);
+		ControllableMove::GetTransform(entityID)->TranslateTo(x,y,z);
+		ControllableMove::GetTransform(entityID)->Rotate(rx,ry,rz);
 
 		this->addComponent(entityID, this->views[this->views.size() - 1]);
 
