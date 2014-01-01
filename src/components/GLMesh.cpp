@@ -126,6 +126,7 @@ namespace Sigma{
             glCullFace(this->cull_face);
         }
 
+        glActiveTexture(GL_TEXTURE0);
         size_t prev = 0;
         for (int i = 0, cur = this->MeshGroup_ElementCount(0); cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
             if (this->faceGroups.size() > 0) {

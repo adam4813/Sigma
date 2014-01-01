@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "systems/OpenGLSystem.h"
+#include "systems/OpenALSystem.h"
 #include "systems/BulletPhysics.h"
 #include "systems/FactorySystem.h"
 #include "controllers/GLSixDOFViewController.h"
@@ -16,15 +17,17 @@
 int main(int argCount, char **argValues) {
 	Sigma::OS glfwos;
 	Sigma::OpenGLSystem glsys;
+	Sigma::OpenALSystem alsys;
 	Sigma::BulletPhysics bphys;
 	Sigma::WebGUISystem webguisys;
 
 	Sigma::FactorySystem& factory = Sigma::FactorySystem::getInstance();
 	factory.register_Factory(glsys);
+	factory.register_Factory(alsys);
 	factory.register_Factory(bphys);
 	factory.register_Factory(webguisys);
 
-	if (!glfwos.InitializeWindow(1024,768, "Sigma GLFW Test Window")) {
+	if (!glfwos.InitializeWindow(1024, 768, "Sigma GLFW Test Window")) {
 		std::cerr << "Failed creating the window or context." << std::endl;
 		return -1;
 	}
@@ -51,14 +54,11 @@ int main(int argCount, char **argValues) {
 	//////////////////////////////
 
 	// Create render target for the GBuffer, Light Accumulation buffer, and final composite buffer
-	unsigned int geoBuffer = glsys.createRenderTarget(glfwos.GetWindowWidth(), glfwos.GetWindowHeight());
-	glsys.createRTBuffer(geoBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE); // Diffuse buffer
-	glsys.createRTBuffer(geoBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE); // Normal buffer
-	glsys.createRTBuffer(geoBuffer, GL_R32F, GL_RED, GL_FLOAT);			  // Depth buffer
-
-	unsigned int lightBuffer = glsys.createRenderTarget(glfwos.GetWindowWidth(), glfwos.GetWindowHeight());
-	glsys.createRTBuffer(lightBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE); // Light accumulation buffer
-
+	unsigned int geoBuffer = glsys.createRenderTarget(glfwos.GetWindowWidth(), glfwos.GetWindowHeight(), true);
+	glsys.createRTBuffer(geoBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE); // Diffuse texture
+	glsys.createRTBuffer(geoBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE); // Normal texture
+	glsys.createRTBuffer(geoBuffer, GL_R32F, GL_RED, GL_FLOAT);			  // Depth texture
+	glsys.initRenderTarget(geoBuffer); // Create the opengl assets
 
 	///////////////////
 	// Setup physics //
@@ -73,6 +73,14 @@ int main(int argCount, char **argValues) {
 	webguisys.Start();
 	webguisys.SetWindowSize(glfwos.GetWindowWidth(), glfwos.GetWindowHeight());
 
+    /////////////////
+    // Setup Sound //
+    /////////////////
+
+    std::cout << "Initializing OpenAL system." << std::endl;
+    alsys.Start();
+    alsys.test(); // try sound
+	
 	////////////////
 	// Load scene //
 	////////////////
@@ -143,6 +151,7 @@ int main(int argCount, char **argValues) {
 		FPSCamera* theCamera = static_cast<FPSCamera*>(glsys.GetView());
 		glfwos.RegisterKeyboardEventHandler(theCamera);
 		glfwos.RegisterMouseEventHandler(theCamera);
+		theCamera->os = &glfwos;
 		theCamera->SetMover(mover);
 		//mover->SetTransform(*theCamera->Transform());
 	} else if (glsys.GetViewMode() == "GLSixDOFView") {
@@ -175,6 +184,13 @@ int main(int argCount, char **argValues) {
 
 	// Call now to clear the delta after startup.
 	glfwos.GetDeltaTime();
+
+	{
+		Sigma::ALSound *als = (Sigma::ALSound *)alsys.getComponent(200, Sigma::ALSound::getStaticComponentTypeName());
+		if(als) {
+			als->Play(Sigma::PLAYBACK_LOOP);
+		}
+	}
 
 	enum FlashlightState {
 		FL_ON,
@@ -223,6 +239,8 @@ int main(int argCount, char **argValues) {
 		// Pass in delta time in seconds
 		bphys.Update(deltaSec);
 		webguisys.Update(deltaSec);
+
+		alsys.Update();
 
 		// Framebuffer(s) to draw
 		//int fbos[2];

@@ -2,6 +2,17 @@
 
 #include <iostream>
 
+#ifdef __APPLE__
+// Needed so we can disable retina support for our window.
+#define GLFW_EXPOSE_NATIVE_COCOA 1
+#define GLFW_EXPOSE_NATIVE_NSGL 1
+#include <GLFW/glfw3native.h>
+// We can't just include objc/runtime.h and objc/message.h because glfw is too forward thinking for its own good.
+typedef void* SEL;
+extern "C" id objc_msgSend(id self, SEL op, ...);
+extern "C" SEL sel_getUid(const char *str);
+#endif
+
 namespace Sigma {
 	bool OS::InitializeWindow(const int width, const int height, const std::string title, const unsigned int glMajor /*= 3*/, const unsigned int glMinor /*= 2*/) {
 		// Initialize the library.
@@ -20,7 +31,7 @@ namespace Sigma {
 #else
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 #endif
-		
+
 		// Create a windowed mode window and its OpenGL context.
 		this->window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
 			
@@ -31,6 +42,13 @@ namespace Sigma {
 
 		this->width = width;
 		this->height = height;
+        
+#ifdef __APPLE__
+        // Force retina displays to create a 1x framebuffer so we don't choke our fillrate.
+        id cocoaWindow = glfwGetCocoaWindow(this->window);
+        id cocoaGLView = ((id (*)(id, SEL)) objc_msgSend)(cocoaWindow, sel_getUid("contentView"));
+        ((void (*)(id, SEL, bool)) objc_msgSend)(cocoaGLView, sel_getUid("setWantsBestResolutionOpenGLSurface:"), false);
+#endif
 
 		// Make the window's context current.
 		glfwMakeContextCurrent(this->window);
@@ -223,7 +241,13 @@ namespace Sigma {
 			glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		}
 	}
-
+	
+	void OS::SetMousePosition(double x, double y)
+	{
+		glfwSetCursorPos(this->window, x, y);
+	}
+	
+	
 	bool OS::CheckKeyState(event::KEY_STATE state, const int key) {
 		if (state == event::KS_DOWN) {
 			if (glfwGetKey(this->window, key) == GLFW_PRESS) {

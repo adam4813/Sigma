@@ -39,11 +39,20 @@ public:
 
 		return dim;
 	}
+	/**
+	* \brief Set ti true if the texture is put in the buffer inverted (top to bottom), or false if it has already been flipped (botom to top).
+	*
+	 * \param[in] bool val Werther the Quad should have inverted UVs or not.
+	 * \return void 
+	 * \exception  
+	 */
+	void Inverted(bool val) { inverted = val; }
 
 protected:
 	resource::GLTexture* texture;
 	float x, y, w, h;
 	unsigned int texture_size;
+	bool inverted;
 };
 };
 

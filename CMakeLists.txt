@@ -42,7 +42,7 @@ source_group("Source Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_CPP})
 file(GLOB Sigma_SRC_RESOURCES_H "include/resources/*.h")
 source_group("Header Files\\resources" FILES ${Sigma_SRC_RESOURCES_H})
 
-# Outpit the compiler ID.
+# Output the compiler ID.
 message("Compiler ID: " ${CMAKE_CXX_COMPILER_ID})
 
 # check for gcc version to set c++11 or c++0x
@@ -85,7 +85,7 @@ add_definitions(
 
 ## Set the libraries
 
-# Link aganst OpenGL and GLEW
+# Link against OpenGL
 # We can use the find OpenGL package on windows
 find_package(OpenGL REQUIRED)
 if(NOT OPENGL_FOUND)
@@ -96,8 +96,13 @@ endif(NOT OPENGL_FOUND)
 if(WIN32 AND NOT MINGW) # Windows
 	set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${CMAKE_SOURCE_DIR}/include/libraries)
 	include_directories("${CMAKE_SOURCE_DIR}/include/libraries")
-	set(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x86)
+	if (CMAKE_CL_64)
+	link_directories("${CMAKE_SOURCE_DIR}/lib/x64")
+	set(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x64)
+	else (CMAKE_CL_64)
 	link_directories("${CMAKE_SOURCE_DIR}/lib/x86")
+	set(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x86)
+	endif (CMAKE_CL_64)
 
 	SET(GLFW3_LIBRARY glfw3)
 	set(GLEW_LIBRARY glew32s glew32)
@@ -109,6 +114,9 @@ if(WIN32 AND NOT MINGW) # Windows
 endif(WIN32 AND NOT MINGW)
 
 SET(X11_LIBRARIES "")
+
+find_package(OggVorbis REQUIRED)
+find_package(OpenAL REQUIRED)
 
 if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
 	if (NOT APPLE) # X11 and GLEW are not needed on OS X.
@@ -141,7 +149,7 @@ if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
 	endif(NOT ${AWESOMIUM_FOUND})
 endif(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
-SET(OSX_CF_LIBRARY "")
+SET(OSX_LIBRARIES "")
 
 if(APPLE) # Mac OSX
 	SET(GLEW_LIBRARY "")
@@ -169,8 +177,8 @@ if(APPLE) # Mac OSX
 	# Can deploy back to 10.7, the first OS X to support the GL Core.
 	set(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
 
-	# Need Core Foundation
-	set(OSX_CF_LIBRARY "-framework CoreFoundation")
+	# Need Core Foundation and libobjc.
+	set(OSX_LIBRARIES "-framework CoreFoundation /usr/lib/libobjc.dylib")
 
 	if(NOT XCODE_VERSION)
 		# Yuck. The Makefile generator is not emitting a -F/Path/To/Awesomium flag.
@@ -184,7 +192,7 @@ endif(APPLE)
 add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP} ${Sigma_SRC_CONTROLLERS_H} ${Sigma_SRC_CONTROLLERS_CPP} ${Sigma_SRC_RESOURCES_H})
 
 # Link the executable to all required libraries
-target_link_libraries (Sigma ${OPENGL_LIBRARIES} ${GLFW3_LIBRARY} ${X11_LIBRARIES} ${OSX_CF_LIBRARY} ${GLEW_LIBRARY} ${SOIL_LIBRARY} ${BULLET_LINEARMATH_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${AWESOMIUM_LIBRARY})
+target_link_libraries (Sigma ${OPENGL_LIBRARIES} ${GLFW3_LIBRARY} ${OGGVORBIS_LIBRARIES} ${OPENAL_LIBRARY} ${X11_LIBRARIES} ${OSX_LIBRARIES} ${GLEW_LIBRARY} ${SOIL_LIBRARY} ${BULLET_LINEARMATH_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${AWESOMIUM_LIBRARY})
 
 # build the Tests subproject
 #ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/tests")

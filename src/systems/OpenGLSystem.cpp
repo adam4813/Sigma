@@ -10,7 +10,11 @@
 #include "components/PointLight.h"
 #include "components/SpotLight.h"
 
-#ifndef __APPLE__
+#ifdef __APPLE__
+// Do not include <OpenGL/glu.h> because that will include gl.h which will mask all sorts of errors involving the use of deprecated GL APIs until runtime.
+// gluErrorString (and all of glu) is deprecated anyway (TODO).
+extern "C" const GLubyte * gluErrorString (GLenum error);
+#else
 #include "GL/glew.h"
 #endif
 
@@ -371,20 +375,9 @@ namespace Sigma{
 				mesh->SetLightingEnabled(p->Get<bool>());
 			}
 			else if (p->GetName() == "parent") {
-				/* Right now hacky, only GLMesh and FPSCamera are supported as parents */
-
-				int parentID = p->Get<int>();
-				SpatialComponent *comp = dynamic_cast<SpatialComponent *>(this->getComponent(parentID, Sigma::GLMesh::getStaticComponentTypeName()));
-
-				if(comp) {
-					mesh->Transform()->SetParentTransform(comp->Transform());
-				} else {
-					comp = dynamic_cast<SpatialComponent *>(this->getComponent(parentID, Sigma::event::handler::FPSCamera::getStaticComponentTypeName()));
-
-					if(comp) {
-						mesh->Transform()->SetParentTransform(comp->Transform());
-					}
-				}
+				/* Only entities that have ControllableMove component can be parent */
+				const id_t parentID = p->Get<int>();
+				mesh->Transform()->SetParentID(parentID);
 			}
 		}
 
@@ -556,19 +549,9 @@ namespace Sigma{
 				light->exponent = p->Get<float>();
 			}
 			else if (p->GetName() == "parent") {
-				/* Right now hacky, only GLMesh and FPSCamera are supported as parents */
-				int parentID = p->Get<int>();
-				SpatialComponent *comp = dynamic_cast<SpatialComponent *>(this->getComponent(parentID, Sigma::GLMesh::getStaticComponentTypeName()));
-
-				if(comp) {
-					light->transform.SetParentTransform(comp->Transform());
-				} else {
-					comp = dynamic_cast<SpatialComponent *>(this->getComponent(parentID, Sigma::event::handler::FPSCamera::getStaticComponentTypeName()));
-
-					if(comp) {
-						light->transform.SetParentTransform(comp->Transform());
-					}
-				}
+				/* Only entities that have ControllableMove component can be parent */
+				const id_t parentID = p->Get<int>();
+				light->transform.SetParentID(parentID);
 			}
 		}
 
@@ -580,35 +563,82 @@ namespace Sigma{
 		return light;
 	}
 
-	int OpenGLSystem::createRenderTarget(const unsigned int w, const unsigned int h) {
+	int OpenGLSystem::createRenderTarget(const unsigned int w, const unsigned int h, bool hasDepth) {
 		std::unique_ptr<RenderTarget> newRT(new RenderTarget());
-
-		// Create the frame buffer object
-		glGenFramebuffers(1, &newRT->fbo_id);
-		glBindFramebuffer(GL_FRAMEBUFFER, newRT->fbo_id);
-
-		printOpenGLError();
-
-		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
 
 		newRT->width = w;
 		newRT->height = h;
+		newRT->hasDepth = hasDepth;
 
-		glGenRenderbuffers(1, &newRT->depth_id);
-		glBindRenderbuffer(GL_RENDERBUFFER, newRT->depth_id);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, w, h);
+		this->renderTargets.push_back(std::move(newRT));
+		return (this->renderTargets.size() - 1);
+	}
 
+	void OpenGLSystem::initRenderTarget(unsigned int rtID) {
+		RenderTarget *rt = this->renderTargets[rtID].get();
+
+		// Make sure we're on the back buffer
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		// Get backbuffer depth bit width
+		int depthBits;
+#ifdef __APPLE__
+        // The modern way.
+        glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_DEPTH, GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE, &depthBits);
+#else
+        glGetIntegerv(GL_DEPTH_BITS, &depthBits);
+#endif
+		std::cout << "Depth buffer bits: " << depthBits << std::endl;
+
+		// Create the depth render buffer
+		if(rt->hasDepth) {
+			glGenRenderbuffers(1, &rt->depth_id);
+			glBindRenderbuffer(GL_RENDERBUFFER, rt->depth_id);
+
+			/*switch(depthBits) {
+			case 16:
+				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, rt->width, rt->height);
+				break;
+			case 24:
+				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, rt->width, rt->height);
+				break;
+			case 32:
+				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, rt->width, rt->height);
+				break;
+			default:
+				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, rt->width, rt->height);
+			}*/
+
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, rt->width, rt->height);
+			printOpenGLError();
+
+			glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		}
+
+		// Create the frame buffer object
+		glGenFramebuffers(1, &rt->fbo_id);
 		printOpenGLError();
 
-		//Attach depth buffer to FBO
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, newRT->depth_id);
+		glBindFramebuffer(GL_FRAMEBUFFER, rt->fbo_id);
 
-		printOpenGLError();
+		//glDrawBuffer(GL_NONE);
+		//glReadBuffer(GL_NONE);
+
+		for(unsigned int i=0; i < rt->texture_ids.size(); ++i) {
+			//Attach 2D texture to this FBO
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+i, GL_TEXTURE_2D, rt->texture_ids[i], 0);
+			printOpenGLError();
+		}
+
+		if(rt->hasDepth) {
+			//Attach depth buffer to FBO
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rt->depth_id);
+			printOpenGLError();
+		}
 
 		//Does the GPU support current FBO configuration?
 		GLenum status;
-		status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
 		switch(status) {
 			case GL_FRAMEBUFFER_COMPLETE:
@@ -619,17 +649,11 @@ namespace Sigma{
 		}
 
 		// Unbind objects
-		glBindRenderbuffer(GL_RENDERBUFFER, 0);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-
-		this->renderTargets.push_back(std::move(newRT));
-		return (this->renderTargets.size() - 1);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void OpenGLSystem::createRTBuffer(unsigned int rtID, GLint format, GLenum internalFormat, GLenum type) {
 		RenderTarget *rt = this->renderTargets[rtID].get();
-
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, rt->fbo_id);
 
 		// Create a texture for each requested target
 		GLuint texture_id;
@@ -638,8 +662,8 @@ namespace Sigma{
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 
 		// Texture params for full screen quad
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -649,25 +673,9 @@ namespace Sigma{
 					 (GLsizei)rt->height,
 					 0, internalFormat, type, NULL);
 
-		//Attach 2D texture to this FBO
-		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+rt->texture_ids.size(), GL_TEXTURE_2D, texture_id, 0);
-
 		this->renderTargets[rtID]->texture_ids.push_back(texture_id);
 
-		//Does the GPU support current FBO configuration?
-		GLenum status;
-		status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
-
-		switch(status) {
-			case GL_FRAMEBUFFER_COMPLETE:
-				std::cout << "Successfully created render target." << std::endl;
-				break;
-			default:
-				assert(0 && "Error: Framebuffer format is not compatible.");
-		}
-
 		glBindTexture(GL_TEXTURE_2D, 0);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	}
 
     bool OpenGLSystem::Update(const double delta) {
@@ -1022,6 +1030,7 @@ namespace Sigma{
 		this->pointQuad.SetSize(1.0f, 1.0f);
 		this->pointQuad.SetPosition(0.0f, 0.0f);
 		this->pointQuad.LoadShader("shaders/pointlight");
+		this->pointQuad.Inverted(true);
 		this->pointQuad.InitializeBuffers();
 		this->pointQuad.SetCullFace("none");
 
@@ -1039,6 +1048,7 @@ namespace Sigma{
 		this->spotQuad.SetSize(1.0f, 1.0f);
 		this->spotQuad.SetPosition(0.0f, 0.0f);
 		this->spotQuad.LoadShader("shaders/spotlight");
+		this->spotQuad.Inverted(true);
 		this->spotQuad.InitializeBuffers();
 		this->spotQuad.SetCullFace("none");
 
@@ -1058,6 +1068,7 @@ namespace Sigma{
 		this->ambientQuad.SetSize(1.0f, 1.0f);
 		this->ambientQuad.SetPosition(0.0f, 0.0f);
 		this->ambientQuad.LoadShader("shaders/ambient");
+		this->ambientQuad.Inverted(true);
 		this->ambientQuad.InitializeBuffers();
 		this->ambientQuad.SetCullFace("none");
 
@@ -1096,7 +1107,7 @@ namespace Sigma{
 // Returns 1 if an OpenGL error occurred, 0 otherwise.
 //
 
-int printOglError(char *file, int line)
+int printOglError(const std::string &file, int line)
 {
 
 	GLenum glErr;

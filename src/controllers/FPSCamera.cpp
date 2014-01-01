@@ -62,21 +62,19 @@ namespace Sigma{
 					//       for some reason, dx needs to be inverted as well, perhaps because
 					//       negative z is forward in opengl
 					InterpolatedMovement::RotateTarget(this->mover->GetEntityID(),\
-                                   -1.0f*dy*SPEED_ROTATE,-1.0f*dx*SPEED_ROTATE,0.0f);
+                                   -1.0f * dy *SPEED_ROTATE,-1.0f * dx * SPEED_ROTATE,0.0f);
 				}
 			}
 
 			void FPSCamera::MouseDown(BUTTON btn, float x, float y) {
 				if (btn == RIGHT) {
-					this->mouseLook = true;
+					this->mouseLook = !this->mouseLook;
+					os->ToggleMouseLock();
 				}
 			}
-
-			void FPSCamera::MouseUp(BUTTON btn, float x, float y) {
-				if (btn == RIGHT) {
-					this->mouseLook = false;
-				}
-			}
+			
+			//Does nothing, but has to be here because of IMouseEventHandler
+			void FPSCamera::MouseUp(BUTTON btn, float x, float y) {}
 
 			const glm::mat4 FPSCamera::GetViewMatrix() {
 				// Limit rotation to pitch and yaw, apply pitch first to ensure
