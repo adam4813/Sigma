@@ -61,7 +61,6 @@ namespace Sigma {
          * Adds the force to the list. Adding of a duplicate force is checked for and ignored.
          * \param id const id_t the id of the entity
          * \param force glm::vec3 The force to add to the list.
-         * \return void
          *
          */
         static void AddForce(const id_t id, glm::vec3 force) {
@@ -135,6 +134,8 @@ namespace Sigma {
          * \brief Apply all forces to the body of all entities that have this component.
          *
          * Sets the rigid body's linear force.
+         *
+         * NB: You must call CumulateForces() before to refresh forces
          */
         static void ApplyForcesToBody();
 
@@ -173,10 +174,6 @@ namespace Sigma {
             }
             return nullptr;
         }
-
-        static std::shared_ptr<const glm::vec3> getCumulatedForces(const id_t id) {
-            return cumulatedForces_map.get(id).lock();
-         }
 
     private:
         static std::unordered_map<id_t, forces_list> forces_map; // The list of forces to apply each update loop.
