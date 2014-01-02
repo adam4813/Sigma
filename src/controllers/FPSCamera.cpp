@@ -1,5 +1,5 @@
 #include "controllers/FPSCamera.h"
-#include "components/BulletMover.h"
+#include "entities/BulletMover.h"
 
 namespace Sigma{
 	namespace event{
@@ -72,7 +72,7 @@ namespace Sigma{
 					os->ToggleMouseLock();
 				}
 			}
-			
+
 			//Does nothing, but has to be here because of IMouseEventHandler
 			void FPSCamera::MouseUp(BUTTON btn, float x, float y) {}
 

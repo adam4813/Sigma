@@ -26,6 +26,12 @@ source_group("Header Files\\components" FILES ${Sigma_SRC_COMPONENT_H})
 file(GLOB Sigma_SRC_COMPONENT_CPP "src/components/*.cpp")
 source_group("Source Files\\components" FILES ${Sigma_SRC_COMPONENT_CPP})
 
+# Put all entity files into a filter
+file(GLOB Sigma_SRC_ENTITY_H "include/entities/*.h")
+source_group("Header Files\\entities" FILES ${Sigma_SRC_ENTITY_H})
+file(GLOB Sigma_SRC_ENTITY_CPP "src/entities/*.cpp")
+source_group("Source Files\\entities" FILES ${Sigma_SRC_ENTITY_CPP})
+
 # Put all Systems files into a filter
 file(GLOB Sigma_SRC_SYSTEM_H "include/systems/*.h")
 source_group("Header Files\\systems" FILES ${Sigma_SRC_SYSTEM_H})
@@ -58,7 +64,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 	endif (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-	# Clang 3.3 and up support c++11.  
+	# Clang 3.3 and up support c++11.
 	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE CLANG_VERSION)
 	if (NOT (CLANG_VERSION VERSION_GREATER 3.3 OR CLANG_VERSION VERSION_EQUAL 3.3))
 		# c++11 std only appears in clang 3.3 or higher. c++0x will work for lesser versions.
@@ -189,7 +195,7 @@ if(APPLE) # Mac OSX
 endif(APPLE)
 
 # add the executable
-add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP} ${Sigma_SRC_CONTROLLERS_H} ${Sigma_SRC_CONTROLLERS_CPP} ${Sigma_SRC_RESOURCES_H})
+add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_ENTITY_H} ${Sigma_SRC_ENTITY_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP} ${Sigma_SRC_CONTROLLERS_H} ${Sigma_SRC_CONTROLLERS_CPP} ${Sigma_SRC_RESOURCES_H})
 
 # Link the executable to all required libraries
 target_link_libraries (Sigma ${OPENGL_LIBRARIES} ${GLFW3_LIBRARY} ${OGGVORBIS_LIBRARIES} ${OPENAL_LIBRARY} ${X11_LIBRARIES} ${OSX_LIBRARIES} ${GLEW_LIBRARY} ${SOIL_LIBRARY} ${BULLET_LINEARMATH_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${AWESOMIUM_LIBRARY})

@@ -7,7 +7,7 @@
 #include "controllers/GLSixDOFViewController.h"
 #include "controllers/GUIController.h"
 #include "controllers/FPSCamera.h"
-#include "components/BulletMover.h"
+#include "entities/BulletMover.h"
 #include "components/GLScreenQuad.h"
 #include "SCParser.h"
 #include "systems/WebGUISystem.h"

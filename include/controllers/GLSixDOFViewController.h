@@ -4,7 +4,7 @@
 
 #include "systems/KeyboardInputSystem.h"
 #include "systems/IGLView.h"
-#include "components/BulletMover.h"
+#include "entities/BulletMover.h"
 
 namespace Sigma {
 	namespace event {

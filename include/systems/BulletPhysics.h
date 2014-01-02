@@ -5,7 +5,7 @@
 #include "bullet/btBulletDynamicsCommon.h"
 #include "components/InterpolatedMovement.h"
 #include "IBulletShape.h"
-#include "components/BulletMover.h"
+#include "entities/BulletMover.h"
 #include "Sigma.h"
 
 class Property;
