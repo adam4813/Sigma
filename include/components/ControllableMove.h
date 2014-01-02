@@ -21,16 +21,26 @@ namespace Sigma {
 	 *
 	 * A function provides a way to apply the forces to the body of the entities
 	 *
-	 * NB: Movements are constrained in the horizontal plan
+	 * NB: Currently movements are constrained in the horizontal plan
 	 */
 	class ControllableMove : IComponent {
 	public:
 		SET_COMPONENT_TYPENAME("ControllableMove");
 
-		ControllableMove() {};
+		/* All functions are static for convenience purpose (be accesssible from everywhere).
+		 * A component must be able to be pure static except special cases.
+		 * Making the component pure static is a good practice (I think...)
+		 */
 
-		virtual ~ControllableMove() {};
+		ControllableMove() = delete; // default ctor
+		virtual ~ControllableMove() {}; // default dtor
+		ControllableMove(ControllableMove& cm) = delete; // copy constructor
+		ControllableMove(ControllableMove&& cm) = delete; // move constructor
+		ControllableMove& operator=(ControllableMove& cm) = delete; // copy assignment
+		ControllableMove& operator=(ControllableMove&& cm) = delete; // move assignment
 
+		// Note that all data have the same lifecycle : created at once, deleted at once
+		// If this is not the case, split the component
 		static bool AddEntity(const id_t id) {
 			if (GetTransform(id) == nullptr && getForces(id) == nullptr && getRotationForces(id) == nullptr) {
 				forces_map.emplace(id, forces_list());
@@ -143,7 +153,7 @@ namespace Sigma {
 		 *
 		 * NB: You must call CumulateForces() before to refresh forces
 		 */
-		static void ApplyForcesToBody(const double delta);
+		static void ApplyForces(const double delta);
 
 		/** \brief Compute the cumulated forces for all entities that have this component
 		 *

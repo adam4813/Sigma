@@ -9,6 +9,7 @@ namespace Sigma {
     std::unordered_map<id_t, GLTransform> ControllableMove::transform_map;
     std::unordered_map<id_t, std::shared_ptr<GLTransform>> ControllableMove::transform_ptr_map;
 
+	// TODO: process only entities that have moved
     void ControllableMove::UpdateTransform() {
         for (auto it = transform_map.begin(); it != transform_map.end(); it++) {
             auto position = PhysicalWorldLocation::getPosition(it->first);
@@ -19,7 +20,7 @@ namespace Sigma {
     }
 
     void ControllableMove::CumulateForces() {
-        // TODO: optimize the way to get the transform (we should host it !)
+        // TODO: vectorize this
         auto cf_it = cumulatedForces_map.getVector()->begin();
         for (auto itr = forces_map.begin(); itr != forces_map.end(); ++itr, ++cf_it) {
             auto transform = ControllableMove::GetTransform(itr->first);
@@ -35,7 +36,8 @@ namespace Sigma {
         }
     }
 
-    void ControllableMove::ApplyForcesToBody(const double delta) {
+	// TODO: Optimize the creation of the btVector3
+    void ControllableMove::ApplyForces(const double delta) {
         auto cf_it = cumulatedForces_map.getVector()->cbegin();
         for (auto kitr = cumulatedForces_map.IteratorKeyBegin(); kitr != cumulatedForces_map.IteratorKeyEnd(); ++kitr, ++cf_it) {
             auto body = RigidBody::getBody(*kitr);

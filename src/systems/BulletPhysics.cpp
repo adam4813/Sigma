@@ -145,13 +145,15 @@ namespace Sigma {
 	}
 
 	bool BulletPhysics::Update(const double delta) {
+		// Make entities with target move a little
         InterpolatedMovement::ComputeInterpolatedForces(delta);
-
+		// It's time to sum all the forces
 		ControllableMove::CumulateForces();
-		ControllableMove::ApplyForcesToBody(delta);
-
+		// We inject the movement in the simulation or directly
+		ControllableMove::ApplyForces(delta);
+		// We step the simulation
 		dynamicsWorld->stepSimulation(delta, 10);
-
+		// We update the transform component with updated data of the PhysicalWorldLocation component
 		ControllableMove::UpdateTransform();
 
 		return true;

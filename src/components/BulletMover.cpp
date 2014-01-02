@@ -7,18 +7,25 @@
 namespace Sigma {
 
 	BulletMover::BulletMover(const id_t entityID) : entityID(entityID) {
-	    // we create the components
+	    // we add the components (if they already exist, nothing is done)
         InterpolatedMovement::AddEntity(entityID);
         ControllableMove::AddEntity(entityID);
-        // position is hardcoded
+        // TODO : the position should already exist
+        // We must check that this is the case
+        // position is currently hardcoded
         PhysicalWorldLocation::AddEntity(entityID, 0, 1.5, 0, 0, 0, 0);
 	}
 
-	BulletMover::~BulletMover() {}
-
+	// TODO : make the Bullet simulation static so that we can
+	// put this in the constructor without passing the world as argument
 	void BulletMover::InitializeRigidBody(btDiscreteDynamicsWorld* world) {
-		RigidBody::AddEntity(entityID);
-		world->addRigidBody(RigidBody::getBody(entityID));
+		// Add the body component
+		if (RigidBody::AddEntity(entityID)) {
+			// Add the body to the world
+			// TODO: move this to the RigidBody component
+			world->addRigidBody(RigidBody::getBody(entityID));
+		}
+		// TODO: move this. Is it really necessary anyway ?
         RigidBody::getBody(entityID)->setActivationState(DISABLE_DEACTIVATION);
 	}
 }
