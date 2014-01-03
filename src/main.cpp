@@ -4,7 +4,6 @@
 #include "systems/OpenALSystem.h"
 #include "systems/BulletPhysics.h"
 #include "systems/FactorySystem.h"
-#include "controllers/GLSixDOFViewController.h"
 #include "controllers/GUIController.h"
 #include "controllers/FPSCamera.h"
 #include "entities/BulletMover.h"
@@ -55,9 +54,9 @@ int main(int argCount, char **argValues) {
 
 	// Create render target for the GBuffer, Light Accumulation buffer, and final composite buffer
 	unsigned int geoBuffer = glsys.createRenderTarget(glfwos.GetWindowWidth(), glfwos.GetWindowHeight(), true);
-	glsys.createRTBuffer(geoBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE); // Diffuse texture
-	glsys.createRTBuffer(geoBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE); // Normal texture
-	glsys.createRTBuffer(geoBuffer, GL_R32F, GL_RED, GL_FLOAT);			  // Depth texture
+	glsys.createRTBuffer(geoBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE);	// Diffuse texture
+	glsys.createRTBuffer(geoBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE);	// Normal texture
+	glsys.createRTBuffer(geoBuffer, GL_R32F, GL_RED, GL_FLOAT);				// Depth texture
 	glsys.initRenderTarget(geoBuffer); // Create the opengl assets
 
 	///////////////////
@@ -73,13 +72,13 @@ int main(int argCount, char **argValues) {
 	webguisys.Start();
 	webguisys.SetWindowSize(glfwos.GetWindowWidth(), glfwos.GetWindowHeight());
 
-    /////////////////
-    // Setup Sound //
-    /////////////////
+	/////////////////
+	// Setup Sound //
+	/////////////////
 
-    std::cout << "Initializing OpenAL system." << std::endl;
-    alsys.Start();
-    alsys.test(); // try sound
+	std::cout << "Initializing OpenAL system." << std::endl;
+	alsys.Start();
+	alsys.test(); // try sound
 
 	////////////////
 	// Load scene //
@@ -112,7 +111,7 @@ int main(int argCount, char **argValues) {
 				}
 			}
 
-            factory.create(itr->type,e->id, const_cast<std::vector<Property>&>(itr->properties));
+			factory.create(itr->type,e->id, const_cast<std::vector<Property>&>(itr->properties));
 		}
 	}
 
@@ -121,8 +120,8 @@ int main(int argCount, char **argValues) {
 	//////////////////////
 
 	// View and ViewMover creation has been moved to test.sc, but for
-	// now provide sensible defaults.  Final engine should require
-	// definition in scene file.  Currently entity ID for view must be 1
+	// now provide sensible defaults. Final engine should require
+	// definition in scene file. Currently entity ID for view must be 1
 	// for this to work.
 
 	// Create hard coded entity ID #1
@@ -153,10 +152,6 @@ int main(int argCount, char **argValues) {
 		glfwos.RegisterMouseEventHandler(theCamera);
 		theCamera->os = &glfwos;
 		theCamera->SetMover(mover);
-		//mover->SetTransform(*theCamera->Transform());
-	} else if (glsys.GetViewMode() == "GLSixDOFView") {
-		Sigma::event::handler::GLSixDOFViewController cameraController(glsys.GetView(), mover);
-		glfwos.RegisterKeyboardEventHandler(&cameraController);
 	}
 
 	// Give a body to the mover (comment this to simulate a camera)
@@ -170,6 +165,7 @@ int main(int argCount, char **argValues) {
 	guicon.SetGUI(webguisys.getComponent(100, Sigma::WebGUIView::getStaticComponentTypeName()));
 	glfwos.RegisterKeyboardEventHandler(&guicon);
 	glfwos.RegisterMouseEventHandler(&guicon);
+<<<<<<< HEAD
 
 	Sigma::event::handler::GUIController guicon2;
 	guicon2.SetGUI(webguisys.getComponent(101, Sigma::WebGUIView::getStaticComponentTypeName()));
@@ -182,9 +178,11 @@ int main(int argCount, char **argValues) {
 	glfwos.RegisterKeyboardEventHandler(&guicon3);
 	glfwos.RegisterMouseEventHandler(&guicon3);
 
+=======
+	
+>>>>>>> refs/heads/develop
 	// Call now to clear the delta after startup.
 	glfwos.GetDeltaTime();
-
 	{
 		Sigma::ALSound *als = (Sigma::ALSound *)alsys.getComponent(200, Sigma::ALSound::getStaticComponentTypeName());
 		if(als) {
@@ -241,11 +239,6 @@ int main(int argCount, char **argValues) {
 		webguisys.Update(deltaSec);
 
 		alsys.Update();
-
-		// Framebuffer(s) to draw
-		//int fbos[2];
-		//fbos[0] = glsys.getRenderTarget(geoBuffer);
-		//fbos[1] = glsys.getRenderTarget(lightBuffer);
 
 		// Update the renderer and present
 		if (glsys.Update(deltaSec)) {
