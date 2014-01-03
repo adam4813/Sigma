@@ -165,22 +165,7 @@ int main(int argCount, char **argValues) {
 	guicon.SetGUI(webguisys.getComponent(100, Sigma::WebGUIView::getStaticComponentTypeName()));
 	glfwos.RegisterKeyboardEventHandler(&guicon);
 	glfwos.RegisterMouseEventHandler(&guicon);
-<<<<<<< HEAD
 
-	Sigma::event::handler::GUIController guicon2;
-	guicon2.SetGUI(webguisys.getComponent(101, Sigma::WebGUIView::getStaticComponentTypeName()));
-	glfwos.RegisterKeyboardEventHandler(&guicon2);
-	glfwos.RegisterMouseEventHandler(&guicon2);
-
-	Sigma::event::handler::GUIController guicon3;
-	guicon3.SetGUI(webguisys.getComponent(102, Sigma::WebGUIView::getStaticComponentTypeName()));
-
-	glfwos.RegisterKeyboardEventHandler(&guicon3);
-	glfwos.RegisterMouseEventHandler(&guicon3);
-
-=======
-	
->>>>>>> refs/heads/develop
 	// Call now to clear the delta after startup.
 	glfwos.GetDeltaTime();
 	{
