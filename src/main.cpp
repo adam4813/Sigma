@@ -157,15 +157,6 @@ int main(int argCount, char **argValues) {
 	
 	// Sync bullet physics object with gl camera
 	bphys.initViewMover();
-
-	///////////////////
-	// Configure GUI //
-	///////////////////
-
-	Sigma::event::handler::GUIController guicon;
-	guicon.SetGUI(webguisys.getComponent(100, Sigma::WebGUIView::getStaticComponentTypeName()));
-	glfwos.RegisterKeyboardEventHandler(&guicon);
-	glfwos.RegisterMouseEventHandler(&guicon);
 	
 	// Call now to clear the delta after startup.
 	glfwos.GetDeltaTime();
