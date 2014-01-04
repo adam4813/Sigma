@@ -9,12 +9,13 @@ namespace Sigma {
     std::unordered_map<id_t, GLTransform> ControllableMove::transform_map;
     std::unordered_map<id_t, std::shared_ptr<GLTransform>> ControllableMove::transform_ptr_map;
 
-	// TODO: process only entities that have moved
     void ControllableMove::UpdateTransform() {
-        for (auto it = transform_map.begin(); it != transform_map.end(); it++) {
-            auto position = PhysicalWorldLocation::getPosition(it->first);
-            if (position) {
-                it->second.TranslateTo(position->x, position->y, position->z);
+    	auto it = PhysicalWorldLocation::GetIteratorUpdatedID();
+        for (auto it = PhysicalWorldLocation::GetIteratorUpdatedID(); **it < PhysicalWorldLocation::GetUpdatedSize(); ++(*it)) {
+            auto position = PhysicalWorldLocation::getPosition(**it);
+            auto transform = ControllableMove::GetTransform(**it);
+            if (transform) {
+				transform->TranslateTo(position->x, position->y, position->z);
             }
         }
     }

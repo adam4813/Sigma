@@ -2,6 +2,7 @@
 #include "components/BulletShapeMesh.h"
 #include "components/GLMesh.h"
 #include "components/BulletShapeSphere.h"
+#include "components/PhysicalWorldLocation.h"
 
 namespace Sigma {
 	BulletPhysics::~BulletPhysics() {
@@ -155,6 +156,7 @@ namespace Sigma {
 		dynamicsWorld->stepSimulation(delta, 10);
 		// We update the transform component with updated data of the PhysicalWorldLocation component
 		ControllableMove::UpdateTransform();
+		PhysicalWorldLocation::ClearUpdatedSet();
 
 		return true;
 	}

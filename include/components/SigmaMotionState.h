@@ -22,15 +22,7 @@ namespace Sigma {
             worldTrans.getBasis().setEulerZYX(o.alpha, o.beta, o.gamma);
         };
 
-        virtual void setWorldTransform(const btTransform &worldTrans) {
-            auto vec = worldTrans.getOrigin();
-            wp->PositionWrite_x(id) = vec.x();
-            wp->PositionWrite_y(id) = vec.y();
-            wp->PositionWrite_z(id) = vec.z();
-            float a, b, g;
-            worldTrans.getBasis().getEulerZYX(a, b, g);
-            wo->OrientationWrite(id) = orientation_type(a, b, g);
-        };
+        virtual void setWorldTransform(const btTransform &worldTrans);
 
     private:
         const id_t id;
