@@ -1,5 +1,4 @@
 #include "gtest/gtest.h"
-#include "tests/EntityManagerTest.h"
 #include "tests/WorldOrientationTest.h"
 #include "tests/BitArrayTest.h"
 #include "tests/WorldPositionTest.h"
