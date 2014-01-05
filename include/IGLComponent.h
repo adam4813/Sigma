@@ -60,6 +60,7 @@ namespace Sigma {
         GLuint ambientMap;
         GLuint diffuseMap;
         GLuint specularMap;
+		GLuint normalMap;
     };
 
 	class IGLComponent : public SpatialComponent {

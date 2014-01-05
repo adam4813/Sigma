@@ -532,6 +532,31 @@ namespace Sigma{
 							std::cerr << "Error loading ambient texture: " << path + filename << std::endl;
 						}
                     }
+					else if (label == "map_Bump") {
+                        std::string filename;
+						s >> filename;
+						filename = trim(filename);
+						filename = convert_path(filename);
+						std::cerr << "Loading normal or bump texture: " << path + filename << std::endl;
+						// Add the path to the filename to load it relative to the mtl file
+						resource::GLTexture texture;
+						if (OpenGLSystem::textures.find(filename) == OpenGLSystem::textures.end()) {
+							texture.LoadDataFromFile(path + filename);
+							if (texture.GetID() != 0) {
+								OpenGLSystem::textures[filename] = texture;
+							}
+						}
+
+						// It should be loaded, but in case an error occurred double check for it.
+						if (OpenGLSystem::textures.find(filename) != OpenGLSystem::textures.end()) {
+							m.normalMap = Sigma::OpenGLSystem::textures[filename].GetID();
+						}
+
+						// Add the path to the filename to load it relative to the mtl file
+						if (m.normalMap == 0) {
+							std::cerr << "Error loading normal texture: " << path + filename << std::endl;
+						}
+                    }
 					else {
                         // Blank line
                     }

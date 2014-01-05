@@ -794,10 +794,6 @@ namespace Sigma{
 			// Lighting Pass //
 			///////////////////
 
-			// Turn on additive blending
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_ONE, GL_ONE);
-
 			// Disable depth testing
 			glDepthFunc(GL_NONE);
 			glDepthMask(GL_FALSE);
@@ -818,7 +814,7 @@ namespace Sigma{
 			// Ambient light pass
 
 			// Currently simple constant ambient light, could use SSAO here
-			glm::vec4 ambientLight(0.1f, 0.1f, 0.1f, 1.0f);
+			glm::vec4 ambientLight(0.05f, 0.05f, 0.05f, 1.0f);
 
 			GLSLShader &shader = (*this->ambientQuad.GetShader().get());
 			shader.Use();
@@ -835,6 +831,9 @@ namespace Sigma{
 			shader.UnUse();
 
 			// Dynamic light passes
+			// Turn on additive blending
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_ONE, GL_ONE);
 
 			// Loop through each light, render a fullscreen quad if it is visible
 
@@ -850,7 +849,7 @@ namespace Sigma{
 						shader.Use();
 
 						// Load variables
-						glUniform3fv(shader("viewPosW"), 3, &viewPosition[0]);
+						glUniform3fv(shader("viewPosW"), 1, &viewPosition[0]);
 						glUniformMatrix4fv(shader("viewProjInverse"), 1, false, &viewProjInv[0][0]);
 						glUniform3fv(shader("lightPosW"), 1, &light->position[0]);
 						glUniform1f(shader("lightRadius"), light->radius);
@@ -885,6 +884,7 @@ namespace Sigma{
 						glm::vec3 direction = spotLight->transform.GetForward();
 
 						// Load variables
+						glUniform3fv(shader("viewPosW"), 1, &viewPosition[0]);
 						glUniformMatrix4fv(shader("viewProjInverse"), 1, false, &viewProjInv[0][0]);
 						glUniform3fv(shader("lightPosW"), 1, &position[0]);
 						glUniform3fv(shader("lightDirW"), 1, &direction[0]);
@@ -967,9 +967,6 @@ namespace Sigma{
 
 			for (auto citr = this->screensSpaceComp.begin(); citr != this->screensSpaceComp.end(); ++citr) {
 					citr->get()->GetShader()->Use();
-
-					// Set view position
-					//glUniform3f(glGetUniformBlockIndex(citr->get()->GetShader()->GetProgram(), "viewPosW"), viewPosition.x, viewPosition.y, viewPosition.z);
 
 					// For now, turn on ambient intensity and turn off lighting
 					glUniform1f(glGetUniformLocation(citr->get()->GetShader()->GetProgram(), "ambLightIntensity"), 0.05f);
@@ -1074,11 +1071,13 @@ namespace Sigma{
 		this->spotQuad.SetCullFace("none");
 
 		this->spotQuad.GetShader()->Use();
+		this->spotQuad.GetShader()->AddUniform("viewPosW");
 		this->spotQuad.GetShader()->AddUniform("viewProjInverse");
 		this->spotQuad.GetShader()->AddUniform("lightPosW");
 		this->spotQuad.GetShader()->AddUniform("lightDirW");
 		this->spotQuad.GetShader()->AddUniform("lightColor");
-		this->spotQuad.GetShader()->AddUniform("lightAngle");
+		this->spotQuad.GetShader()->AddUniform("lightInnerAngle");
+		this->spotQuad.GetShader()->AddUniform("lightOuterAngle");
 		this->spotQuad.GetShader()->AddUniform("lightCosCutoff");
 		this->spotQuad.GetShader()->AddUniform("lightExponent");
 		this->spotQuad.GetShader()->AddUniform("diffuseBuffer");
