@@ -62,7 +62,10 @@ namespace Sigma {
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			const Property*  p = &*propitr;
 
-			if (p->GetName() == "x") {
+			if (p->GetName() == "scale") {
+				scale = p->Get<float>();
+			}
+			else if (p->GetName() == "x") {
 				x = p->Get<float>();
 			}
 			else if (p->GetName() == "y") {
@@ -84,7 +87,7 @@ namespace Sigma {
 				std::cerr << "Loading mesh: " << p->Get<std::string>() << std::endl;
 				GLMesh meshFile(0);
 				meshFile.LoadMesh(p->Get<std::string>());
-				mesh->SetMesh(&meshFile);
+				mesh->SetMesh(&meshFile, scale);
 			}
 		}
 		mesh->InitializeRigidBody(x, y, z, rx, ry, rz);
