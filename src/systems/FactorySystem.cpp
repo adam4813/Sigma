@@ -42,4 +42,11 @@ namespace Sigma{
         }
     }
 
+    void FactorySystem::register_ECSFactory(IECSFactory& Factory){
+		const auto& factoryfunctions = Factory.getECSFactoryFunctions();
+		for(auto FactoryFunc = factoryfunctions.begin(); FactoryFunc != factoryfunctions.end(); ++FactoryFunc){
+			std::cerr << "Registering ECS component factory of type: " << FactoryFunc->first << std::endl;
+            registeredECSFactoryFunctions[FactoryFunc->first]=FactoryFunc->second;
+        }
+    }
 } // namespace Sigma

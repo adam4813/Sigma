@@ -48,6 +48,18 @@ namespace Sigma {
 		return retval;
 	}
 
+	std::map<std::string,Sigma::IECSFactory::FactoryFunction>
+    BulletPhysics::getECSFactoryFunctions()
+	{
+		using namespace std::placeholders;
+		std::map<std::string,Sigma::IECSFactory::FactoryFunction> retval;
+		retval[ControllableMove::getComponentTypeName()] = std::bind(&ControllableMove::AddEntity,_1);
+		retval[InterpolatedMovement::getComponentTypeName()] = std::bind(&InterpolatedMovement::AddEntity,_1);
+		retval[PhysicalWorldLocation::getComponentTypeName()] = std::bind(&PhysicalWorldLocation::AddEntity,_1,_2);
+		retval[RigidBody::getComponentTypeName()] = std::bind(&RigidBody::AddEntity,_1,_2);
+		return retval;
+	}
+
 	IComponent* BulletPhysics::createBulletShapeMesh(const id_t entityID, const std::vector<Property> &properties) {
 		BulletShapeMesh* mesh = new BulletShapeMesh(entityID);
 

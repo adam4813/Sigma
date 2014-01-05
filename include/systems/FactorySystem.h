@@ -2,6 +2,7 @@
 #ifndef FACTORYSYSTEM_H
 #define FACTORYSYSTEM_H
 #include "IFactory.h"
+#include "IECSFactory.h"
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -35,6 +36,16 @@ namespace Sigma {
              * \param[in] IFactory& Factory the factory whose functions will be registered
              */
             void register_Factory(IFactory& Factory);
+
+            /**
+             * \brief add the given ECSFactory to the central list (ECS style)
+             *
+             *  All factory-functions returned by getFactoryFunctions() are
+             *  added (registered) to the central list of functions
+             * \param[in] IECSFactory& Factory the factory whose functions will be registered
+             */
+            void register_ECSFactory(IECSFactory& Factory);
+
         protected:
         private:
             // Hide all constructors and the assignment operator to enforce the singleton pattern
@@ -47,6 +58,9 @@ namespace Sigma {
             std::unordered_map<std::string,IFactory::FactoryFunction>
                     registeredFactoryFunctions;
 
+			// the map of name-->factory for the ECS style components
+            std::unordered_map<std::string,IECSFactory::FactoryFunction>
+                    registeredECSFactoryFunctions;
     }; // class FactorySystem
 
 } // namespace Sigma

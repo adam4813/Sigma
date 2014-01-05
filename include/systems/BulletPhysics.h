@@ -1,6 +1,7 @@
 #pragma  once
 
 #include "IFactory.h"
+#include "IECSFactory.h"
 #include "ISystem.h"
 #include "bullet/btBulletDynamicsCommon.h"
 #include "components/InterpolatedMovement.h"
@@ -14,7 +15,7 @@ struct GLFPSView;
 
 namespace Sigma {
 	class BulletPhysics
-		: public Sigma::IFactory, public Sigma::ISystem<IBulletShape> {
+		: public Sigma::IFactory, public Sigma::IECSFactory, public Sigma::ISystem<IBulletShape> {
 	public:
 		BulletPhysics() : mover(1) { }
 		~BulletPhysics();
@@ -37,7 +38,13 @@ namespace Sigma {
 		IComponent* createBulletShapeMesh(const id_t entityID, const std::vector<Property> &properties);
 		IComponent* createBulletShapeSphere(const id_t entityID, const std::vector<Property> &properties);
 
-		std::map<std::string,FactoryFunction> getFactoryFunctions();
+		bool addControllableMove(const id_t entityID, const std::vector<Property> &properties);
+		bool addInterpolatedMove(const id_t entityID, const std::vector<Property> &properties);
+		bool addPhysicalWorldLocation(const id_t entityID, const std::vector<Property> &properties);
+		bool addRigidBody(const id_t entityID, const std::vector<Property> &properties);
+
+		std::map<std::string,IFactory::FactoryFunction> getFactoryFunctions();
+		std::map<std::string,IECSFactory::FactoryFunction> getECSFactoryFunctions();
 
         /** \brief Gives a body to the mover and adds it to the world
          *

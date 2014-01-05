@@ -18,7 +18,7 @@ namespace Sigma {
         }
     }
 
-	void PhysicalWorldLocation::AddEntity(const id_t id, const coordinate_type x, const coordinate_type y,
+	bool PhysicalWorldLocation::AddEntityPosition(const id_t id, const coordinate_type x, const coordinate_type y,
 				   const coordinate_type z, const coordinate_type rx, const coordinate_type ry, const coordinate_type rz) {
 		pphysical.PositionWrite_x(id) = x;
 		pphysical.PositionWrite_y(id) = y;
@@ -32,7 +32,42 @@ namespace Sigma {
 		transform_ptr_map.emplace(id, std::shared_ptr<GLTransform>(&transform_map.at(id)));
 		(*updated_set)[id] = true;
 		std::cout << "adding entity " << id << " (" << x << ", " << y << ", " << z << ")" << std::endl;
+		return true;
 	}
+
+	bool PhysicalWorldLocation::AddEntity(const id_t id, const std::vector<Property> &properties) {
+		float x = 0.0f;
+		float y = 0.0f;
+		float z = 0.0f;
+		float rx = 0.0f;
+		float ry = 0.0f;
+		float rz = 0.0f;
+
+		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
+			const Property*  p = &*propitr;
+
+			if (p->GetName() == "x") {
+				x = p->Get<float>();
+			}
+			else if (p->GetName() == "y") {
+				y = p->Get<float>();
+			}
+			else if (p->GetName() == "z") {
+				z = p->Get<float>();
+			}
+			else if (p->GetName() == "rx") {
+				rx = p->Get<float>();
+			}
+			else if (p->GetName() == "ry") {
+				ry = p->Get<float>();
+			}
+			else if (p->GetName() == "rz") {
+				rz = p->Get<float>();
+			}
+		}
+		return AddEntityPosition(id, x, y, z, rx, ry, rz);
+	}
+
 
 	void PhysicalWorldLocation::setPosition(const id_t id, const position_type& position) {
 		pphysical.PositionWrite_x(id) = position.x;

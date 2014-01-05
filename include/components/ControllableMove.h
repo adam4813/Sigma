@@ -7,6 +7,7 @@
 
 #include "glm/glm.hpp"
 #include "Sigma.h"
+#include "Property.h"
 #include "IComponent.h"
 #include "GLTransform.h"
 #include "VectorMap.hpp"

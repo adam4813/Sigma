@@ -13,14 +13,14 @@ namespace Sigma {
         // TODO : the position should already exist
         // We must check that this is the case
         // position is currently hardcoded
-        PhysicalWorldLocation::AddEntity(entityID, 0, 1.5, 0, 0, 0, 0);
+        PhysicalWorldLocation::AddEntityPosition(entityID, 0, 1.5, 0, 0, 0, 0);
 	}
 
 	// TODO : make the Bullet simulation static so that we can
 	// put this in the constructor without passing the world as argument
 	void BulletMover::InitializeRigidBody(btDiscreteDynamicsWorld* world) {
 		// Add the body component
-		if (RigidBody::AddEntity(entityID)) {
+		if (RigidBody::AddEntity(entityID, std::vector<Property>())) {
 			// Add the body to the world
 			// TODO: move this to the RigidBody component
 			world->addRigidBody(RigidBody::getBody(entityID));

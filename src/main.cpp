@@ -24,6 +24,7 @@ int main(int argCount, char **argValues) {
 	factory.register_Factory(glsys);
 	factory.register_Factory(alsys);
 	factory.register_Factory(bphys);
+	factory.register_ECSFactory(bphys);
 	factory.register_Factory(webguisys);
 
 	if (!glfwos.InitializeWindow(1024, 768, "Sigma GLFW Test Window")) {
