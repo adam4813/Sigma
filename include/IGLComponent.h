@@ -43,18 +43,18 @@ namespace Sigma {
     // http://en.wikipedia.org/wiki/Wavefront_.obj_file#Basic_materials
     struct Material {
         Material() {
-            ka[0] = 0.2f; ka[1] = 0.2f; ka[2] = 0.2f;
-            kd[0] = 0.8f; kd[1] = 0.8f; kd[2] = 0.8f;
+            ka[0] = 1.0f; ka[1] = 1.0f; ka[2] = 1.0f;
+            kd[0] = 1.0f; kd[1] = 1.0f; kd[2] = 1.0f;
             ks[0] = 1.0f; ks[1] = 1.0f; ks[2] = 1.0f;
             tr = 1.0f;
-            ns = 0.0f;
+            hardness = 64.0f;
             illum = 1;
         }
         float ka[3];
         float kd[3];
         float ks[3];
         float tr; // Aka d
-        float ns;
+        float hardness;
         int illum;
         // TODO: Add maps
         GLuint ambientMap;
