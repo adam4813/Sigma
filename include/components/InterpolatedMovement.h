@@ -20,9 +20,9 @@ namespace Sigma{
      * the intermediary position by linear interpolation, and to substract
      * the delta from the target transformation matrix for next iteration
      */
-    class InterpolatedMovement : IComponent {
+    class InterpolatedMovement {
     public:
-		SET_COMPONENT_TYPENAME("InterpolatedMovement");
+		SET_STATIC_COMPONENT_TYPENAME("InterpolatedMovement");
         InterpolatedMovement() { } // Default ctor setting entity ID to 0.
 
         virtual ~InterpolatedMovement() {};

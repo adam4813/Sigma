@@ -17,9 +17,9 @@ namespace Sigma {
 	 * It provides a btMotionState instance for a specific entity upon request, to use the component
 	 * as a storage for the Bullet simulation.
 	 */
-	class PhysicalWorldLocation : IComponent {
+	class PhysicalWorldLocation {
 	public:
-		SET_COMPONENT_TYPENAME("PhysicalWorldLocation");
+		SET_STATIC_COMPONENT_TYPENAME("PhysicalWorldLocation");
 
 		PhysicalWorldLocation() {};
 

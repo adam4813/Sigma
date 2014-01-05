@@ -23,9 +23,9 @@ namespace Sigma {
 	 *
 	 * NB: Currently movements are constrained in the horizontal plan
 	 */
-	class ControllableMove : IComponent {
+	class ControllableMove {
 	public:
-		SET_COMPONENT_TYPENAME("ControllableMove");
+		SET_STATIC_COMPONENT_TYPENAME("ControllableMove");
 
 		/* All functions are static for convenience purpose (be accesssible from everywhere).
 		 * A component must be able to be pure static except special cases.

@@ -9,6 +9,9 @@
 static const Sigma::IComponent::ComponentID getStaticComponentTypeName() {return ID;}\
 virtual const Sigma::IComponent::ComponentID getComponentTypeName() override{return getStaticComponentTypeName();}
 
+#define SET_STATIC_COMPONENT_TYPENAME(ID)                                \
+static const Sigma::IComponent::ComponentID getComponentTypeName() {return ID;};
+
 namespace Sigma{
 
     class IComponent {

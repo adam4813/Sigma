@@ -15,9 +15,9 @@ namespace Sigma {
      *
      * NB: The btCollisionShape is a btCapsuleShape.
      */
-    class RigidBody : IComponent {
+    class RigidBody {
     public:
-		SET_COMPONENT_TYPENAME("RigidBody");
+		SET_STATIC_COMPONENT_TYPENAME("RigidBody");
 
         RigidBody() {};
 
