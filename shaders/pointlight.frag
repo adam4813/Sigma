@@ -7,7 +7,6 @@ uniform mat4 viewProjInverse;
 uniform vec3 lightPosW;
 uniform float lightRadius;
 uniform vec4 lightColor;
-uniform float specularHardness = 64.0;
 
 uniform sampler2D diffuseBuffer;
 uniform sampler2D normalBuffer;
@@ -28,7 +27,8 @@ void main(void) {
 	vec4 normalData = texture(normalBuffer,ex_UV);
 
 	// Transform normal back to [-1, 1] range
-	vec3 normal = decode(normalData.rgb);
+	vec3 normal = normalize(decode(normalData.rgb));
+	float specularHardness = normalData.a*1000.0f;
 	
 	// RECREATE POSITION
 	// Retrieve screen-space depth value
@@ -51,25 +51,29 @@ void main(void) {
 	vec3 lightVector = lightPosW - position.xyz;
 
 	// ATTENUATION ////////
+	
+	// Other methods of attenuation
 	//float d = length(lightVector); 
 	//float A = clamp(1.0 - (d/3)*d / lightRadius, 0.0, 1.0);
-	
 	//float A = 1.0f - sqrt(dot(lightVector, lightVector)) / lightRadius;	
+	
 	float A = 1.0 - (dot(lightVector, lightVector) / (lightRadius*lightRadius));
 
 	lightVector = normalize(lightVector);
 	
 	// DIFFUSE ////////////
-	float	NdL				= clamp(dot(normal, lightVector), 0.0, 1.0);
-	vec3	diffuseLight	= NdL * lightColor.rgb;
-
-	// SPECULAR ///////////
-	vec3 viewVector = normalize(viewPosW - position.xyz);
-	vec3 halfVector = normalize(lightVector + viewVector);
-	float NdH = dot(normal, halfVector);
-	float specularLight = pow(clamp(NdH, 0.0, 1.0), specularHardness);
+	float	NdL				= max(dot(normal, lightVector), 0.0);
+	vec3 diffuseLight 		= vec3(NdL, NdL, NdL);
 	
-	// Specular looks funny currently, viewPosW is not being updated
-	//out_Color = vec4(diffuse.rgb*clamp((diffuseLight + specularLight), 0.0f, 1.0)*A, 1.0);
-	out_Color = vec4(diffuse.rgb*diffuseLight*A, 1.0);
+	// SPECULAR ///////////
+	float specularLight = 0.0;
+	
+	if(NdL > 0.0) {
+		vec3 viewVector = normalize(viewPosW - position.xyz);
+		vec3 halfVector = normalize(lightVector + viewVector);
+		float NdH = dot(normal, halfVector);
+		specularLight = pow(clamp(NdH, 0.0, 1.0), specularHardness);
+	}
+	
+	out_Color = clamp(vec4(lightColor.rgb*diffuse.rgb*clamp(diffuseLight + specularLight, 0.0, 1.0)*A, 1.0), 0.0f, 1.0);
 }
