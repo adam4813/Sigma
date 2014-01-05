@@ -17,9 +17,9 @@ namespace Sigma {
 
 	/** \brief A component for entities with movements under external control
 	 *
-	 * It stores a transformation matrix and a list of forces to apply.
+	 * It stores a list of forces to apply.
 	 *
-	 * A function provides a way to apply the forces to the body of the entities
+	 * A function provides a way to apply the forces to entities
 	 *
 	 * NB: Currently movements are constrained in the horizontal plan
 	 */
@@ -42,16 +42,10 @@ namespace Sigma {
 		// Note that all data have the same lifecycle : created at once, deleted at once
 		// If this is not the case, split the component
 		static bool AddEntity(const id_t id) {
-			if (GetTransform(id) == nullptr && getForces(id) == nullptr && getRotationForces(id) == nullptr) {
+			if (getForces(id) == nullptr && getRotationForces(id) == nullptr) {
 				forces_map.emplace(id, forces_list());
 				rotationForces_map.emplace(id, rotationForces_list());
 				cumulatedForces_map.set(id) = glm::vec3();
-				GLTransform transform;
-				// Set the view mover's view pointer.
-				transform.SetEuler(true);
-				transform.SetMaxRotation(glm::vec3(45.0f,0,0));
-				transform_map.insert({{id, transform}});
-				transform_ptr_map.emplace(id, std::shared_ptr<GLTransform>(&transform_map.at(id)));
 				return true;
 			}
 			return false;
@@ -61,16 +55,7 @@ namespace Sigma {
 			forces_map.erase(id);
 			rotationForces_map.erase(id);
 			cumulatedForces_map.RemoveElement(id);
-			transform_map.erase(id);
-			transform_ptr_map.erase(id);
 		}
-
-		/** \brief Update the transform of all entities having this component
-		 *
-		 * The transform is updated from the model
-		 *
-		 */
-		static void UpdateTransform();
 
 		/** \brief Add a force to the list for a specific entity.
 		 *
@@ -163,14 +148,6 @@ namespace Sigma {
 		 */
 		static void CumulateForces();
 
-		static std::shared_ptr<GLTransform> GetTransform(const id_t id) {
-			auto itt = transform_ptr_map.find(id);
-			if (itt != transform_ptr_map.end()) {
-				return itt->second;
-			}
-			return nullptr;
-		}
-
 		static forces_list* getForces(const id_t id) {
 			auto forces = forces_map.find(id);
 			if (forces != forces_map.end()) {
@@ -191,11 +168,6 @@ namespace Sigma {
 		static std::unordered_map<id_t, forces_list> forces_map; // The list of forces to apply each update loop.
 		static std::unordered_map<id_t, rotationForces_list> rotationForces_map;
 		static VectorMap<id_t, glm::vec3> cumulatedForces_map;
-		static std::unordered_map<id_t, GLTransform> transform_map;
-		// we need this hack to keep a shared_ptr for each transform since SpatialComponent
-		// uses its own GLTransform or a shared one, so we must provide a shared_ptr
-		// TODO: SpatialComponent should be redefined (what is its purpose ?)
-		static std::unordered_map<id_t, std::shared_ptr<GLTransform>> transform_ptr_map;
 	};
 }
 

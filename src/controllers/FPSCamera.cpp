@@ -97,7 +97,7 @@ namespace Sigma{
 
 			void FPSCamera::SetMover(BulletMover* m){
 				if (m) {
-					SetTransform(ControllableMove::GetTransform(m->GetEntityID()));
+					SetTransform(PhysicalWorldLocation::GetTransform(m->GetEntityID()));
 					this->mover = m;
 				}
 			}

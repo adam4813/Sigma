@@ -6,25 +6,12 @@ namespace Sigma {
     std::unordered_map<id_t, forces_list> ControllableMove::forces_map;
     std::unordered_map<id_t, rotationForces_list> ControllableMove::rotationForces_map;
     VectorMap<id_t, glm::vec3> ControllableMove::cumulatedForces_map;
-    std::unordered_map<id_t, GLTransform> ControllableMove::transform_map;
-    std::unordered_map<id_t, std::shared_ptr<GLTransform>> ControllableMove::transform_ptr_map;
-
-    void ControllableMove::UpdateTransform() {
-    	auto it = PhysicalWorldLocation::GetIteratorUpdatedID();
-        for (auto it = PhysicalWorldLocation::GetIteratorUpdatedID(); **it < PhysicalWorldLocation::GetUpdatedSize(); ++(*it)) {
-            auto position = PhysicalWorldLocation::getPosition(**it);
-            auto transform = ControllableMove::GetTransform(**it);
-            if (transform) {
-				transform->TranslateTo(position->x, position->y, position->z);
-            }
-        }
-    }
 
     void ControllableMove::CumulateForces() {
         // TODO: vectorize this
         auto cf_it = cumulatedForces_map.getVector()->begin();
         for (auto itr = forces_map.begin(); itr != forces_map.end(); ++itr, ++cf_it) {
-            auto transform = ControllableMove::GetTransform(itr->first);
+            auto transform = PhysicalWorldLocation::GetTransform(itr->first);
             if (transform != nullptr) {
                 glm::vec3 t;
                 for (auto forceitr = itr->second.begin(); forceitr != itr->second.end(); ++forceitr) {

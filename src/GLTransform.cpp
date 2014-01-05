@@ -1,5 +1,5 @@
 #include "GLTransform.h"
-#include "components/ControllableMove.h"
+#include "components/PhysicalWorldLocation.h"
 
 const glm::vec3 GLTransform::FORWARD_VECTOR(0.0f,0.0f,-1.0f);
 const glm::vec3 GLTransform::UP_VECTOR(0.0f,1.0f,0.0f);
@@ -11,7 +11,7 @@ const glm::mat4 GLTransform::GetMatrix() {
 		this->MMhasChanged = false;
 	}
 
-	auto transform = Sigma::ControllableMove::GetTransform(this->parentID);
+	auto transform = Sigma::PhysicalWorldLocation::GetTransform(this->parentID);
 	if(transform) {
 		return transform->GetMatrix() * this->transformMatrix;
 	}

@@ -155,7 +155,7 @@ namespace Sigma {
 		// We step the simulation
 		dynamicsWorld->stepSimulation(delta, 10);
 		// We update the transform component with updated data of the PhysicalWorldLocation component
-		ControllableMove::UpdateTransform();
+		PhysicalWorldLocation::UpdateTransform();
 		PhysicalWorldLocation::ClearUpdatedSet();
 
 		return true;

@@ -11,6 +11,7 @@
 #include "Sigma.h"
 #include "GLTransform.h"
 #include "components/ControllableMove.h"
+#include "components/PhysicalWorldLocation.h"
 
 namespace Sigma{
     /** \brief A component for entities that have a linear interpolated movement
@@ -48,7 +49,7 @@ namespace Sigma{
         static void ComputeInterpolatedForces(const double delta) {
             glm::vec3 deltavec(delta);
             for (auto it2 = rotationtarget_map.begin(); it2 != rotationtarget_map.end(); it2++) {
-                auto transform = ControllableMove::GetTransform(it2->first);
+                auto transform = PhysicalWorldLocation::GetTransform(it2->first);
                 auto rotationForces = ControllableMove::getRotationForces(it2->first);
 
                 if (transform != nullptr) {

@@ -6,6 +6,7 @@
 #include "components/WorldOrientation.h"
 #include "components/SigmaMotionState.h"
 #include "SharedPointerMap.hpp"
+#include "GLTransform.h"
 #include "IComponent.h"
 #include <map>
 #include <memory>
@@ -30,7 +31,16 @@ namespace Sigma {
 		static void RemoveEntity(const id_t id) {
 			pphysical.RemoveEntityPosition(id);
 			ophysical.RemoveEntityOrientation(id);
+			transform_map.erase(id);
+			transform_ptr_map.erase(id);
 		};
+
+		/** \brief Update the transform of all entities having this component
+		 *
+		 * The transform is updated from the model
+		 *
+		 */
+		static void UpdateTransform();
 
 		static std::unique_ptr<position_type> getPosition(const id_t id) {
 			return std::unique_ptr<position_type>(new position_type(pphysical.x(id), pphysical.y(id), pphysical.z(id)));
@@ -74,6 +84,15 @@ namespace Sigma {
 		};
 
 		static inline id_t GetUpdatedSize() { return updated_set->size(); }
+
+		static std::shared_ptr<GLTransform> GetTransform(const id_t id) {
+			auto itt = transform_ptr_map.find(id);
+			if (itt != transform_ptr_map.end()) {
+				return itt->second;
+			}
+			return nullptr;
+		}
+
 
 		// TODO : move to UserView component
 		/** \brief A function adding a viewer, i.e an entity that will render the world
@@ -123,6 +142,12 @@ namespace Sigma {
 		static WorldPosition pphysical;
 		static WorldOrientation ophysical;
 		static std::shared_ptr<BitArray<unsigned int>> updated_set;
+		static std::unordered_map<id_t, GLTransform> transform_map;
+		// we need this hack to keep a shared_ptr for each transform since SpatialComponent
+		// uses its own GLTransform or a shared one, so we must provide a shared_ptr
+		// TODO: SpatialComponent should be redefined (what is its purpose ?)
+		static std::unordered_map<id_t, std::shared_ptr<GLTransform>> transform_ptr_map;
+
 
 		// TODO : move to UserViewSystem
 		std::map<id_t, std::shared_ptr<BitArray<unsigned short>>> viewBitsetMap;

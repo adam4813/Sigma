@@ -128,8 +128,8 @@ namespace Sigma{
 			}
 		}
 
-		ControllableMove::GetTransform(entityID)->TranslateTo(x,y,z);
-		ControllableMove::GetTransform(entityID)->Rotate(rx,ry,rz);
+		PhysicalWorldLocation::GetTransform(entityID)->TranslateTo(x,y,z);
+		PhysicalWorldLocation::GetTransform(entityID)->Rotate(rx,ry,rz);
 
 		this->addComponent(entityID, this->views[this->views.size() - 1]);
 
