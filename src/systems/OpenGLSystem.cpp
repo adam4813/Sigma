@@ -783,7 +783,7 @@ namespace Sigma{
 			glDisable(GL_BLEND);
 
 			// Currently simple constant ambient light, could use SSAO here
-			glm::vec4 ambientLight(0.3f, 0.3f, 0.3f, 1.0f);
+			glm::vec4 ambientLight(0.1f, 0.1f, 0.1f, 1.0f);
 
 			GLSLShader &shader = (*this->ambientQuad.GetShader().get());
 			shader.Use();
