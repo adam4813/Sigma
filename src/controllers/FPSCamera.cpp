@@ -1,5 +1,5 @@
 #include "controllers/FPSCamera.h"
-#include "components/BulletMover.h"
+#include "entities/BulletMover.h"
 
 namespace Sigma{
 	namespace event{
@@ -9,10 +9,6 @@ namespace Sigma{
 			const float FPSCamera::BOOST_MULTIPLIER  = 2.0f;
 
 			FPSCamera::FPSCamera(int entityID) : IGLView(entityID), mouseLook(false) {
-				// Set the view mover's view pointer.
-				this->transform.SetEuler(true);
-				this->transform.SetMaxRotation(glm::vec3(45.0f,0,0));
-
 				// Clear out the internal key state buffers.
 				memset(this->keys, 0, sizeof(this->keys));
 				memset(this->keyState, 0, sizeof(this->keyState));
@@ -47,16 +43,16 @@ namespace Sigma{
 
 				// remove previous force and add new one
 				if (this->mover) {
-					this->mover->RemoveForce(this->translation);
+					ControllableMove::RemoveForce(this->mover->GetEntityID(), this->translation);
 					this->translation = translation;
-					this->mover->AddForce(this->translation);
+					ControllableMove::AddForce(this->mover->GetEntityID(), this->translation);
 				}
 
 			} // function KeyStateChange
 
 			void FPSCamera::LostKeyboardFocus() {
 				if (this->mover) {
-					this->mover->ClearForces();
+					ControllableMove::ClearForces(this->mover->GetEntityID());
 				}
 			}
 
@@ -65,10 +61,8 @@ namespace Sigma{
 					// NOTE: dy is positive when the mouse is moved down, so it must be inverted
 					//       for some reason, dx needs to be inverted as well, perhaps because
 					//       negative z is forward in opengl
-					float xRot = dy * SPEED_ROTATE * -1.0f;
-					float yRot = dx * SPEED_ROTATE * -1.0f;
-					
-					this->mover->RotateNow(xRot, yRot, 0.0f);
+					InterpolatedMovement::RotateTarget(this->mover->GetEntityID(),\
+                                   -1.0f * dy *SPEED_ROTATE,-1.0f * dx * SPEED_ROTATE,0.0f);
 				}
 			}
 
@@ -78,7 +72,7 @@ namespace Sigma{
 					os->ToggleMouseLock();
 				}
 			}
-			
+
 			//Does nothing, but has to be here because of IMouseEventHandler
 			void FPSCamera::MouseUp(BUTTON btn, float x, float y) {}
 
@@ -93,9 +87,9 @@ namespace Sigma{
 				return viewMatrix;*/
 
 				// This is more precise
-				glm::mat4 view =  glm::lookAt(this->transform.GetPosition(),
-											  this->transform.GetPosition()+this->transform.GetForward(),
-											  this->transform.GetUp());
+				glm::mat4 view =  glm::lookAt(this->transform->GetPosition(),
+											  this->transform->GetPosition()+this->transform->GetForward(),
+											  this->transform->GetUp());
 
 				return view;
 				//return this->transform.GetMatrix();
@@ -103,7 +97,7 @@ namespace Sigma{
 
 			void FPSCamera::SetMover(BulletMover* m){
 				if (m) {
-					m->SetTransform(*this->Transform());
+					SetTransform(PhysicalWorldLocation::GetTransform(m->GetEntityID()));
 					this->mover = m;
 				}
 			}

@@ -7,6 +7,7 @@
 #include <Awesomium/BitmapSurface.h>
 #include <Awesomium/STLHelpers.h>
 #include "resources/GLTexture.h"
+#include "Sigma.h"
 
 using namespace Awesomium;
 
@@ -14,8 +15,8 @@ namespace Sigma {
 	class WebGUIView : public Sigma::IComponent {
 	public:
 		SET_COMPONENT_TYPENAME("WebGUIView");
-		WebGUIView() : IComponent(0), texture(nullptr), mouseDown(0) { }
-		WebGUIView(const int entityID) : IComponent(entityID), texture(nullptr), mouseDown(0) { };
+		WebGUIView() : texture(nullptr), entity_id(0), mouseDown(0) { }
+		WebGUIView(const id_t entityID) : texture(nullptr), entity_id(entityID), mouseDown(0) { };
 
 		void SetTexture(Sigma::resource::GLTexture* texture) {
 			this->texture = texture;
@@ -73,5 +74,7 @@ namespace Sigma {
 		float x, y, width, height; // The region in which to capture mouse inputs.
 		unsigned int windowWidth; // The width of the window
 		unsigned int windowHeight; // The height of the window
+
+		const id_t entity_id;
 	};
 }

@@ -10,15 +10,15 @@ public:
 	const static glm::vec3 UP_VECTOR;
 	const static glm::vec3 RIGHT_VECTOR;
 
-	GLTransform() : orientation(glm::quat(1,0,0,0)), 
-					position(glm::vec3(0,0,0)), 
-					rotation(glm::vec3(0,0,0)), 
+	GLTransform() : orientation(glm::quat(1,0,0,0)),
+					position(glm::vec3(0,0,0)),
+					rotation(glm::vec3(0,0,0)),
 					scale(glm::vec3(0,0,0)),
 					translateMatrix(glm::mat4(1.0f)),
 					rotateMatrix(glm::mat4(1.0f)),
 					scaleMatrix(glm::mat4(1.0f)),
 					Euler(false),
-					parentTransform(0) {}
+					parentID(0) {}
 
 	void Translate(float x, float y, float z) {
 		this->position += glm::vec3(x, y, z);
@@ -57,7 +57,7 @@ public:
 			this->orientation = glm::normalize(change * this->orientation);
 			this->rotateMatrix = glm::mat4_cast(this->orientation);
 		}
-		
+
 		this->MMhasChanged = true;
 	}
 
@@ -82,7 +82,7 @@ public:
 	 * \param[in] float right
 	 * \param[in] float up
 	 * \param[in] float forward
-	 * 
+	 *
 	 * \returns void
 	*/
 	void Move(float right, float up, float forward) {
@@ -95,7 +95,7 @@ public:
 		glm::vec3 right_vector(currTransform[0][0], currTransform[0][1], currTransform[0][2]);
 		return glm::normalize(right_vector);
 	}
-	
+
 	glm::vec3 GetUp() {
 		glm::mat4 currTransform = this->GetMatrix();
 		glm::vec3 up_vector(currTransform[1][0], currTransform[1][1], currTransform[1][2]);
@@ -125,18 +125,7 @@ public:
 		this->Move(vec.x, vec.y, vec.z);
 	}
 
-	const glm::mat4 GetMatrix() {
-		if (this->MMhasChanged) {
-			this->transformMatrix =  this->translateMatrix * this->rotateMatrix * this->scaleMatrix;
-			this->MMhasChanged = false;
-		}
-
-		if(this->parentTransform) {
-			return this->parentTransform->GetMatrix() * this->transformMatrix;
-		}
-
-		return this->transformMatrix;
-	}
+	const glm::mat4 GetMatrix();
 
 	const glm::mat4 GetMatrixInverse() {
 		return glm::inverse(this->GetMatrix());
@@ -180,7 +169,7 @@ public:
 	void SetMaxRotation(glm::vec3 maxrot) {
 		this->maxRotation = maxrot;
 	}
-	
+
 
 	/**
 	 * \brief Restricts the rotation to a defined value.
@@ -231,7 +220,7 @@ public:
 		return rot;
 	}
 
-	void SetParentTransform(GLTransform *trans) { this->parentTransform = trans; }
+	void SetParentID(id_t id) { this->parentID = id; }
 
 private:
 	glm::quat orientation;
@@ -246,7 +235,7 @@ private:
 
 	glm::vec3 maxRotation;
 
-	GLTransform *parentTransform;
+	id_t parentID;
 
 	bool MMhasChanged; // Set to true if the modelMatrix has changed and needs to be updated
 	bool Euler; // Set to true to toggle rotation matrix construction between quaternions and euler angles

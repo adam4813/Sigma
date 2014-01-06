@@ -3,6 +3,7 @@
 #define GLCUBESPHERE_H
 
 #include "GLMesh.h"
+#include "Sigma.h"
 
 #include <stdint.h>
 
@@ -11,7 +12,7 @@ namespace Sigma {
     public:
         SET_COMPONENT_TYPENAME("GLCubeSphere");
         // We have a private ctor so the factory method must be used.
-        GLCubeSphere(const int entityID = 0);
+        GLCubeSphere(const id_t entityID = 0);
         ~GLCubeSphere();
 
         /**

@@ -11,6 +11,7 @@
 #include <Awesomium/WebCore.h>
 #include <Awesomium/BitmapSurface.h>
 #include <Awesomium/STLHelpers.h>
+#include "Sigma.h"
 
 class Property;
 
@@ -44,7 +45,7 @@ namespace Sigma {
 
 		std::map<std::string,FactoryFunction> getFactoryFunctions();
 
-		IComponent* createWebGUIView(const unsigned int entityID, const std::vector<Property> &properties);
+		IComponent* createWebGUIView(const id_t entityID, const std::vector<Property> &properties);
 	private:
 		WebCore* web_core;
 		unsigned int windowWidth, windowHeight; // The width of the overall window for converting mouse coordinate normals.

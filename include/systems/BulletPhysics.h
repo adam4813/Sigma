@@ -1,11 +1,13 @@
 #pragma  once
 
 #include "IFactory.h"
+#include "IECSFactory.h"
 #include "ISystem.h"
 #include "bullet/btBulletDynamicsCommon.h"
-#include "IMoverComponent.h"
+#include "components/InterpolatedMovement.h"
 #include "IBulletShape.h"
-#include "components/BulletMover.h"
+#include "entities/BulletMover.h"
+#include "Sigma.h"
 
 class Property;
 class IMoverComponent;
@@ -13,7 +15,7 @@ struct GLFPSView;
 
 namespace Sigma {
 	class BulletPhysics
-		: public Sigma::IFactory, public Sigma::ISystem<IBulletShape> {
+		: public Sigma::IFactory, public Sigma::IECSFactory, public Sigma::ISystem<IBulletShape> {
 	public:
 		BulletPhysics() : mover(1) { }
 		~BulletPhysics();
@@ -33,12 +35,21 @@ namespace Sigma {
 		 */
 		bool Update(const double delta);
 
-		IComponent* createBulletShapeMesh(const unsigned int entityID, const std::vector<Property> &properties);
-		IComponent* createBulletShapeSphere(const unsigned int entityID, const std::vector<Property> &properties);
+		IComponent* createBulletShapeMesh(const id_t entityID, const std::vector<Property> &properties);
+		IComponent* createBulletShapeSphere(const id_t entityID, const std::vector<Property> &properties);
 
-		std::map<std::string,FactoryFunction> getFactoryFunctions();
+		bool addControllableMove(const id_t entityID, const std::vector<Property> &properties);
+		bool addInterpolatedMove(const id_t entityID, const std::vector<Property> &properties);
+		bool addPhysicalWorldLocation(const id_t entityID, const std::vector<Property> &properties);
+		bool addRigidBody(const id_t entityID, const std::vector<Property> &properties);
 
-		void initViewMover();
+		std::map<std::string,IFactory::FactoryFunction> getFactoryFunctions();
+		std::map<std::string,IECSFactory::FactoryFunction> getECSFactoryFunctions();
+
+        /** \brief Gives a body to the mover and adds it to the world
+         *
+         */
+		void CreateMoverBody();
 
 		BulletMover* getViewMover() {
 			return &this->mover;

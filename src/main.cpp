@@ -6,7 +6,7 @@
 #include "systems/FactorySystem.h"
 #include "controllers/GUIController.h"
 #include "controllers/FPSCamera.h"
-#include "components/BulletMover.h"
+#include "entities/BulletMover.h"
 #include "components/GLScreenQuad.h"
 #include "SCParser.h"
 #include "systems/WebGUISystem.h"
@@ -24,6 +24,7 @@ int main(int argCount, char **argValues) {
 	factory.register_Factory(glsys);
 	factory.register_Factory(alsys);
 	factory.register_Factory(bphys);
+	factory.register_ECSFactory(bphys);
 	factory.register_Factory(webguisys);
 
 	if (!glfwos.InitializeWindow(1024, 768, "Sigma GLFW Test Window")) {
@@ -79,7 +80,7 @@ int main(int argCount, char **argValues) {
 	std::cout << "Initializing OpenAL system." << std::endl;
 	alsys.Start();
 	alsys.test(); // try sound
-	
+
 	////////////////
 	// Load scene //
 	////////////////
@@ -111,7 +112,9 @@ int main(int argCount, char **argValues) {
 				}
 			}
 
-			factory.create(itr->type,e->id, const_cast<std::vector<Property>&>(itr->properties));
+			if (! factory.create(itr->type,e->id, const_cast<std::vector<Property>&>(itr->properties))) {
+				factory.createECS(itr->type,e->id, const_cast<std::vector<Property>&>(itr->properties));
+			};
 		}
 	}
 
@@ -124,6 +127,9 @@ int main(int argCount, char **argValues) {
 	// definition in scene file. Currently entity ID for view must be 1
 	// for this to work.
 
+	// Create hard coded entity ID #1
+	Sigma::BulletMover* mover = bphys.getViewMover();
+
 	// No view provided, create a default FPS view
 	if(!glsys.GetView()) {
 		std::vector<Property> props;
@@ -135,13 +141,9 @@ int main(int argCount, char **argValues) {
 		props.push_back(p_x);
 		props.push_back(p_y);
 		props.push_back(p_z);
-
+		// we use hard coded entity ID #1
 		glsys.createGLView(1, props, "FPSCamera");
 	}
-
-	// Still hard coded to use entity ID #1
-	// Link the graphics view to the physics system's view mover
-	Sigma::BulletMover* mover = bphys.getViewMover();
 
 	//Create the controller
 	//Perhaps a little awkward currently, should create a generic
@@ -154,9 +156,9 @@ int main(int argCount, char **argValues) {
 		theCamera->os = &glfwos;
 		theCamera->SetMover(mover);
 	}
-	
-	// Sync bullet physics object with gl camera
-	bphys.initViewMover();
+
+	// Give a body to the mover (comment this to simulate a camera)
+	bphys.CreateMoverBody();
 
 	///////////////////
 	// Configure GUI //
@@ -166,7 +168,7 @@ int main(int argCount, char **argValues) {
 	guicon.SetGUI(webguisys.getComponent(100, Sigma::WebGUIView::getStaticComponentTypeName()));
 	glfwos.RegisterKeyboardEventHandler(&guicon);
 	glfwos.RegisterMouseEventHandler(&guicon);
-	
+
 	// Call now to clear the delta after startup.
 	glfwos.GetDeltaTime();
 	{

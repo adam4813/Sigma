@@ -83,7 +83,7 @@ namespace Sigma{
         return retval;
     }
 
-	IComponent* OpenGLSystem::createGLView(const unsigned int entityID, const std::vector<Property> &properties, std::string mode) {
+	IComponent* OpenGLSystem::createGLView(const id_t entityID, const std::vector<Property> &properties, std::string mode) {
 		viewMode = mode;
 
 		if(mode=="FPSCamera") {
@@ -128,15 +128,15 @@ namespace Sigma{
 			}
 		}
 
-		this->views[this->views.size() - 1]->Transform()->TranslateTo(x,y,z);
-		this->views[this->views.size() - 1]->Transform()->Rotate(rx,ry,rz);
+		PhysicalWorldLocation::GetTransform(entityID)->TranslateTo(x,y,z);
+		PhysicalWorldLocation::GetTransform(entityID)->Rotate(rx,ry,rz);
 
 		this->addComponent(entityID, this->views[this->views.size() - 1]);
 
 		return this->views[this->views.size() - 1];
 	}
 
-	IComponent* OpenGLSystem::createGLSprite(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* OpenGLSystem::createGLSprite(const id_t entityID, const std::vector<Property> &properties) {
 		GLSprite* spr = new GLSprite(entityID);
 		float scale = 1.0f;
 		float x = 0.0f;
@@ -188,7 +188,7 @@ namespace Sigma{
 		return spr;
 	}
 
-	IComponent* OpenGLSystem::createGLIcoSphere(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* OpenGLSystem::createGLIcoSphere(const id_t entityID, const std::vector<Property> &properties) {
 		Sigma::GLIcoSphere* sphere = new Sigma::GLIcoSphere(entityID);
 		float scale = 1.0f;
 		float x = 0.0f;
@@ -235,7 +235,7 @@ namespace Sigma{
 		return sphere;
 	}
 
-	IComponent* OpenGLSystem::createGLCubeSphere(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* OpenGLSystem::createGLCubeSphere(const id_t entityID, const std::vector<Property> &properties) {
 		Sigma::GLCubeSphere* sphere = new Sigma::GLCubeSphere(entityID);
 
 		std::string texture_name = "";
@@ -314,7 +314,7 @@ namespace Sigma{
 		return sphere;
 	}
 
-	IComponent* OpenGLSystem::createGLMesh(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* OpenGLSystem::createGLMesh(const id_t entityID, const std::vector<Property> &properties) {
 		Sigma::GLMesh* mesh = new Sigma::GLMesh(entityID);
 
 		float scale = 1.0f;
@@ -375,20 +375,9 @@ namespace Sigma{
 				mesh->SetLightingEnabled(p->Get<bool>());
 			}
 			else if (p->GetName() == "parent") {
-				/* Right now hacky, only GLMesh and FPSCamera are supported as parents */
-
-				int parentID = p->Get<int>();
-				SpatialComponent *comp = dynamic_cast<SpatialComponent *>(this->getComponent(parentID, Sigma::GLMesh::getStaticComponentTypeName()));
-
-				if(comp) {
-					mesh->Transform()->SetParentTransform(comp->Transform());
-				} else {
-					comp = dynamic_cast<SpatialComponent *>(this->getComponent(parentID, Sigma::event::handler::FPSCamera::getStaticComponentTypeName()));
-
-					if(comp) {
-						mesh->Transform()->SetParentTransform(comp->Transform());
-					}
-				}
+				/* Only entities that have ControllableMove component can be parent */
+				const id_t parentID = p->Get<int>();
+				mesh->Transform()->SetParentID(parentID);
 			}
 		}
 
@@ -407,7 +396,7 @@ namespace Sigma{
         return mesh;
     }
 
-	IComponent* OpenGLSystem::createScreenQuad(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* OpenGLSystem::createScreenQuad(const id_t entityID, const std::vector<Property> &properties) {
 		Sigma::GLScreenQuad* quad = new Sigma::GLScreenQuad(entityID);
 
 		float x = 0.0f;
@@ -470,7 +459,7 @@ namespace Sigma{
 		return quad;
 	}
 
-	IComponent* OpenGLSystem::createPointLight(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* OpenGLSystem::createPointLight(const id_t entityID, const std::vector<Property> &properties) {
 		Sigma::PointLight *light = new Sigma::PointLight(entityID);
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
@@ -511,7 +500,7 @@ namespace Sigma{
 		return light;
 	}
 
-	IComponent* OpenGLSystem::createSpotLight(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* OpenGLSystem::createSpotLight(const id_t entityID, const std::vector<Property> &properties) {
 		Sigma::SpotLight *light = new Sigma::SpotLight(entityID);
 
 		float x=0.0f, y=0.0f, z=0.0f;
@@ -561,19 +550,9 @@ namespace Sigma{
 				light->cosOuterAngle = glm::cos(light->outerAngle);
 			}
 			else if (p->GetName() == "parent") {
-				/* Right now hacky, only GLMesh and FPSCamera are supported as parents */
-				int parentID = p->Get<int>();
-				SpatialComponent *comp = dynamic_cast<SpatialComponent *>(this->getComponent(parentID, Sigma::GLMesh::getStaticComponentTypeName()));
-
-				if(comp) {
-					light->transform.SetParentTransform(comp->Transform());
-				} else {
-					comp = dynamic_cast<SpatialComponent *>(this->getComponent(parentID, Sigma::event::handler::FPSCamera::getStaticComponentTypeName()));
-
-					if(comp) {
-						light->transform.SetParentTransform(comp->Transform());
-					}
-				}
+				/* Only entities that have ControllableMove component can be parent */
+				const id_t parentID = p->Get<int>();
+				light->transform.SetParentID(parentID);
 			}
 		}
 

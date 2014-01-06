@@ -4,6 +4,7 @@
 
 #include "../systems/GLSLShader.h"
 #include "../IGLComponent.h"
+#include "Sigma.h"
 
 namespace Sigma{
 	namespace resource {
@@ -14,7 +15,7 @@ namespace Sigma{
     public:
         SET_COMPONENT_TYPENAME("GLSprite");
         // We have a private ctor so the factory method must be used.
-        GLSprite(const int entityID = 0);
+        GLSprite(const id_t entityID = 0);
 
 		/**
 		 * \brief Initializes the sprite.
@@ -26,10 +27,10 @@ namespace Sigma{
         /**
          * \brief Renders a GLSprite.
          *
-         * 
+         *
          * \param[in/out] glm::mediump_float * view The current view matrix.
          * \param[in/out] glm::mediump_float * proj The current projection matrix.
-         * \exception  
+         * \exception
          */
         virtual void Render(glm::mediump_float *view, glm::mediump_float *proj);
 
@@ -37,7 +38,7 @@ namespace Sigma{
 		 * \brief Set the GLTexture resource
 		 *
 		 * \param[in/out] Sigma::resource::GLTexture * texture
-		 * \return    void 
+		 * \return    void
 		 */
 		void SetTexture(Sigma::resource::GLTexture* texture);
 

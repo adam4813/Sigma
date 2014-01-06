@@ -2,22 +2,25 @@
 #ifndef PHSYICS_MOVER_H
 #define PHSYICS_MOVER_H
 
-#include "../IMoverComponent.h"
+#include "components/ControllableMove.h"
+#include "Sigma.h"
+
 class GLTransform;
 
-class PhysicsMover : public Sigma::IMoverComponent {
+class PhysicsMover : public Sigma::IComponent {
 public:
     SET_COMPONENT_TYPENAME("PhysicsMover");
-	PhysicsMover() : Sigma::IMoverComponent(0) { }
-	PhysicsMover(const int entityID);
+	PhysicsMover() : Sigma::IComponent(0) { }
+	PhysicsMover(const id_t entityID);
 
-	/**
-	 * \brief Apply all forces in this mover's list.
-	 *
-	 * Physics movers apply forces on a transform object.
-	 * \param[in] const double delta Change in time since the last call.
-	 */
-	void ApplyForces(const double delta);
+    /**
+     * \brief Apply all forces in this mover's list.
+     *
+     * Physics movers apply forces on a transform object.
+     * \param id const id_t the id of the entity
+     * \param[in] const double delta Change in time since the last call.
+     */
+    void ApplyForces(const id_t id, const double delta);
 
 	/**
 	 * \brief Sets the transform this mover acts on.

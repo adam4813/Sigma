@@ -2,6 +2,7 @@
 #include "components/BulletShapeMesh.h"
 #include "components/GLMesh.h"
 #include "components/BulletShapeSphere.h"
+#include "components/PhysicalWorldLocation.h"
 
 namespace Sigma {
 	BulletPhysics::~BulletPhysics() {
@@ -33,9 +34,8 @@ namespace Sigma {
 		return true;
 	}
 
-	void BulletPhysics::initViewMover() {
-		this->mover.InitializeRigidBody();
-		this->dynamicsWorld->addRigidBody(this->mover.GetRigidBody());
+	void BulletPhysics::CreateMoverBody() {
+		this->mover.InitializeRigidBody(dynamicsWorld);
 	}
 
 	std::map<std::string,Sigma::IFactory::FactoryFunction>
@@ -48,7 +48,19 @@ namespace Sigma {
 		return retval;
 	}
 
-	IComponent* BulletPhysics::createBulletShapeMesh(const unsigned int entityID, const std::vector<Property> &properties) {
+	std::map<std::string,Sigma::IECSFactory::FactoryFunction>
+    BulletPhysics::getECSFactoryFunctions()
+	{
+		using namespace std::placeholders;
+		std::map<std::string,Sigma::IECSFactory::FactoryFunction> retval;
+		retval[ControllableMove::getComponentTypeName()] = std::bind(&ControllableMove::AddEntity,_1);
+		retval[InterpolatedMovement::getComponentTypeName()] = std::bind(&InterpolatedMovement::AddEntity,_1);
+		retval[PhysicalWorldLocation::getComponentTypeName()] = std::bind(&PhysicalWorldLocation::AddEntity,_1,_2);
+		retval[RigidBody::getComponentTypeName()] = std::bind(&RigidBody::AddEntity,_1,_2);
+		return retval;
+	}
+
+	IComponent* BulletPhysics::createBulletShapeMesh(const id_t entityID, const std::vector<Property> &properties) {
 		BulletShapeMesh* mesh = new BulletShapeMesh(entityID);
 
 		float scale = 1.0f;
@@ -99,7 +111,7 @@ namespace Sigma {
 		return mesh;
 	}
 
-	IComponent* BulletPhysics::createBulletShapeSphere(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* BulletPhysics::createBulletShapeSphere(const id_t entityID, const std::vector<Property> &properties) {
 		BulletShapeSphere* sphere = new BulletShapeSphere(entityID);
 
 		float scale = 1.0f;
@@ -146,11 +158,17 @@ namespace Sigma {
 	}
 
 	bool BulletPhysics::Update(const double delta) {
-		this->mover.ApplyForces(delta);
-
+		// Make entities with target move a little
+        InterpolatedMovement::ComputeInterpolatedForces(delta);
+		// It's time to sum all the forces
+		ControllableMove::CumulateForces();
+		// We inject the movement in the simulation or directly
+		ControllableMove::ApplyForces(delta);
+		// We step the simulation
 		dynamicsWorld->stepSimulation(delta, 10);
-
-		this->mover.UpdateTransform();
+		// We update the transform component with updated data of the PhysicalWorldLocation component
+		PhysicalWorldLocation::UpdateTransform();
+		PhysicalWorldLocation::ClearUpdatedSet();
 
 		return true;
 	}

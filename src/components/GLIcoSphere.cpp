@@ -3,7 +3,7 @@
 #include <vector>
 
 namespace Sigma{
-    GLIcoSphere::GLIcoSphere( const int entityID ) : GLMesh(entityID) {
+    GLIcoSphere::GLIcoSphere( const id_t entityID ) : GLMesh(entityID) {
         // all initialization handled by GLMesh
     }
 

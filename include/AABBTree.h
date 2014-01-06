@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IGLComponent.h"
+#include "Sigma.h"
 
 #include <vector>
 
@@ -35,7 +36,7 @@ namespace Sigma {
 
 	class AABBTree : public Sigma::IComponent {
 	public:
-		AABBTree(const int entityID);
+		AABBTree(const id_t entityID);
 		SET_COMPONENT_TYPENAME("AABBTree");
 		~AABBTree() { }
 
@@ -65,7 +66,7 @@ namespace Sigma {
 		 */
 		bool SAT( AABBTreeNode* n2b, const Sigma::Face& face );
 
-		Sigma::GLMesh* GenerateMesh(unsigned int entityID);
+		Sigma::GLMesh* GenerateMesh(const id_t entityID);
 
 		/**
 		 * \brief Check for a collision within the tree.

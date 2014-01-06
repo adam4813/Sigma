@@ -3,6 +3,7 @@
 #define GLICOSPHERE_H
 
 #include "GLMesh.h"
+#include "Sigma.h"
 
 #include <map>
 #include <stdint.h>
@@ -12,7 +13,7 @@ namespace Sigma{
     public:
         SET_COMPONENT_TYPENAME("GLIcoSphere");
         // We have a private ctor so the factory method must be used.
-        GLIcoSphere(const int entityID = 0);
+        GLIcoSphere(const id_t entityID = 0);
         ~GLIcoSphere(){}
 
         /**

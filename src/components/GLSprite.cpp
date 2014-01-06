@@ -8,7 +8,7 @@ namespace Sigma{
 
     const std::string GLSprite::DEFAULT_SHADER = "shaders/sprite";
 
-    GLSprite::GLSprite( const int entityID /*= 0*/ ) : Sigma::IGLComponent(entityID), texture(nullptr)  {
+    GLSprite::GLSprite( const id_t entityID /*= 0*/ ) : Sigma::IGLComponent(entityID), texture(nullptr)  {
         this->drawMode = GL_TRIANGLES;
         this->ElemBufIndex = 2;
         this->ColorBufIndex = 1;

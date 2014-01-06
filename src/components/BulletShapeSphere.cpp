@@ -3,6 +3,6 @@
 
 namespace Sigma {
 	void Sigma::BulletShapeSphere::SetRadius(float radius) {
-		this->shape = new btSphereShape(radius);
+		SetCollisionShape(new btSphereShape(radius));
 	}
 }

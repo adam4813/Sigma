@@ -19,6 +19,8 @@
 #include <vector>
 #include "resources/GLTexture.h"
 #include "components/GLScreenQuad.h"
+#include "Sigma.h"
+#include "components/PhysicalWorldLocation.h"
 
 struct IGLView;
 
@@ -93,17 +95,17 @@ namespace Sigma{
 
         std::map<std::string,FactoryFunction> getFactoryFunctions();
 
-		IComponent* createPointLight(const unsigned int entityID, const std::vector<Property> &properties);
-		IComponent* createSpotLight(const unsigned int entityID, const std::vector<Property> &properties);
-		IComponent* createScreenQuad(const unsigned int entityID, const std::vector<Property> &properties);
+		IComponent* createPointLight(const id_t entityID, const std::vector<Property> &properties);
+		IComponent* createSpotLight(const id_t entityID, const std::vector<Property> &properties);
+		IComponent* createScreenQuad(const id_t entityID, const std::vector<Property> &properties);
 
 		// TODO: Move these methods to the components themselves.
-        IComponent* createGLSprite(const unsigned int entityID, const std::vector<Property> &properties) ;
-        IComponent* createGLIcoSphere(const unsigned int entityID, const std::vector<Property> &properties) ;
-        IComponent* createGLCubeSphere(const unsigned int entityID, const std::vector<Property> &properties) ;
-        IComponent* createGLMesh(const unsigned int entityID, const std::vector<Property> &properties) ;
+        IComponent* createGLSprite(const id_t entityID, const std::vector<Property> &properties) ;
+        IComponent* createGLIcoSphere(const id_t entityID, const std::vector<Property> &properties) ;
+        IComponent* createGLCubeSphere(const id_t entityID, const std::vector<Property> &properties) ;
+        IComponent* createGLMesh(const id_t entityID, const std::vector<Property> &properties) ;
 		// Views are not technically components, but perhaps they should be
-		IComponent* createGLView(const unsigned int entityID, const std::vector<Property> &properties, std::string mode) ;
+		IComponent* createGLView(const id_t entityID, const std::vector<Property> &properties, std::string mode) ;
 
 		// Managing rendering internals
 		/*
