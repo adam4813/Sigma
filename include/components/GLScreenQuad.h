@@ -5,13 +5,14 @@
 
 #include "GLMesh.h"
 #include "resources/GLTexture.h"
+#include "Sigma.h"
 
 namespace Sigma {
 
 class GLScreenQuad : public GLMesh {
 public:
 	SET_COMPONENT_TYPENAME("GLScreenQuad");
-	GLScreenQuad(int entityID);
+	GLScreenQuad(const id_t entityID);
 	virtual ~GLScreenQuad();
 
 	virtual void InitializeBuffers();

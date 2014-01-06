@@ -3,6 +3,7 @@
 #include "IBulletShape.h"
 #include "IMoverComponent.h"
 #include "GLTransform.h"
+#include "Sigma.h"
 
 namespace Sigma {
 
@@ -10,7 +11,7 @@ namespace Sigma {
 	public:
 		SET_COMPONENT_TYPENAME("BulletMover");
 		BulletMover() : IBulletShape(0), transform(nullptr) { }
-		BulletMover(const int entityID);
+		BulletMover(const id_t entityID);
 		~BulletMover();
 
 		/**
@@ -27,7 +28,7 @@ namespace Sigma {
 		 *
 		 * \param[in] float x, y, z The initial position.
 		 * \param[in] float rx, ry, rz The initial rotation.
-		 * \return    void 
+		 * \return    void
 		 */
 		void InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz);
 
@@ -41,7 +42,7 @@ namespace Sigma {
 		/**
 		 * \brief Updates the transform to match its collision rigid body.
 		 *
-		 * \return void 
+		 * \return void
 		 */
 		void UpdateTransform();
 
@@ -56,7 +57,7 @@ namespace Sigma {
 		/**
 		 * \brief Sets the target rotation amount.
 		 *
-		 * 
+		 *
 		 * \param[in/out] float x, y, z The amount to rotate to.
 		 * \return void
 		 */

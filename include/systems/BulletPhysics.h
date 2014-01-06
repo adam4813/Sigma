@@ -6,6 +6,7 @@
 #include "IMoverComponent.h"
 #include "IBulletShape.h"
 #include "components/BulletMover.h"
+#include "Sigma.h"
 
 class Property;
 class IMoverComponent;
@@ -33,8 +34,8 @@ namespace Sigma {
 		 */
 		bool Update(const double delta);
 
-		IComponent* createBulletShapeMesh(const unsigned int entityID, const std::vector<Property> &properties);
-		IComponent* createBulletShapeSphere(const unsigned int entityID, const std::vector<Property> &properties);
+		IComponent* createBulletShapeMesh(const id_t entityID, const std::vector<Property> &properties);
+		IComponent* createBulletShapeSphere(const id_t entityID, const std::vector<Property> &properties);
 
 		std::map<std::string,FactoryFunction> getFactoryFunctions();
 

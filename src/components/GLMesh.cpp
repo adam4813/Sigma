@@ -19,7 +19,7 @@ namespace Sigma{
     // static member initialization
     const std::string GLMesh::DEFAULT_SHADER = "shaders/mesh_deferred";
 
-    GLMesh::GLMesh(const int entityID) : IGLComponent(entityID) {
+    GLMesh::GLMesh(const id_t entityID) : IGLComponent(entityID) {
         memset(&this->buffers, 0, sizeof(this->buffers));
         this->vao = 0;
         this->drawMode = GL_TRIANGLES;

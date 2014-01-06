@@ -23,7 +23,7 @@ namespace Sigma{
     }
 
     IComponent* FactorySystem::create(const std::string& type,
-                               const unsigned int entityID,
+                               const id_t entityID,
                                const std::vector<Property> &properties){
         if(registeredFactoryFunctions.find(type) != registeredFactoryFunctions.end()){
 			std::cerr << "Creating component of type: " << type << std::endl;

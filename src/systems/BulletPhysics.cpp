@@ -48,7 +48,7 @@ namespace Sigma {
 		return retval;
 	}
 
-	IComponent* BulletPhysics::createBulletShapeMesh(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* BulletPhysics::createBulletShapeMesh(const id_t entityID, const std::vector<Property> &properties) {
 		BulletShapeMesh* mesh = new BulletShapeMesh(entityID);
 
 		float scale = 1.0f;
@@ -99,7 +99,7 @@ namespace Sigma {
 		return mesh;
 	}
 
-	IComponent* BulletPhysics::createBulletShapeSphere(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* BulletPhysics::createBulletShapeSphere(const id_t entityID, const std::vector<Property> &properties) {
 		BulletShapeSphere* sphere = new BulletShapeSphere(entityID);
 
 		float scale = 1.0f;

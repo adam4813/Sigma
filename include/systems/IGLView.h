@@ -4,6 +4,7 @@
 
 #include "GLTransform.h"
 #include "components/SpatialComponent.h"
+#include "Sigma.h"
 
 namespace Sigma{
 
@@ -49,7 +50,7 @@ namespace Sigma{
 
     struct IGLView : public Sigma::SpatialComponent {
 
-        IGLView(int entityID) : SpatialComponent(entityID) {}
+        IGLView(const id_t entityID) : SpatialComponent(entityID) {}
 
 		Frustum CameraFrustum;
 

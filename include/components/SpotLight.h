@@ -7,11 +7,12 @@
 #include "IComponent.h"
 #include "systems/GLSLShader.h"
 #include "GLTransform.h"
+#include "Sigma.h"
 
 namespace Sigma {
 	class SpotLight : public IComponent {
 	public:
-		SpotLight(const unsigned int entityID);
+		SpotLight(const id_t entityID);
 		virtual ~SpotLight() {}
 
 		SET_COMPONENT_TYPENAME("SpotLight");
