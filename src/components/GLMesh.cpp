@@ -101,6 +101,7 @@ namespace Sigma{
 		this->shader->AddUniform("diffuseTexEnabled");
 		this->shader->AddUniform("texAmb");
 		this->shader->AddUniform("texDiff");
+		this->shader->AddUniform("specularHardness");
 		this->shader->UnUse();
     }
 
@@ -136,8 +137,8 @@ namespace Sigma{
 					glUniform1i((*this->shader)("texEnabled"), 1);
 					glUniform1i((*this->shader)("ambientTexEnabled"), 1);
 					glUniform1i((*this->shader)("texAmb"), 1);
-					glBindTexture(GL_TEXTURE_2D, mat.ambientMap);
 					glActiveTexture(GL_TEXTURE1);
+					glBindTexture(GL_TEXTURE_2D, mat.ambientMap);
 				} else {
 					glUniform1i((*this->shader)("ambientTexEnabled"), 0);
 				}
@@ -146,11 +147,13 @@ namespace Sigma{
 					glUniform1i((*this->shader)("texEnabled"), 1);
 					glUniform1i((*this->shader)("diffuseTexEnabled"), 1);
 					glUniform1i((*this->shader)("texDiff"), 0);
-					glBindTexture(GL_TEXTURE_2D, mat.diffuseMap);
 					glActiveTexture(GL_TEXTURE0);
+					glBindTexture(GL_TEXTURE_2D, mat.diffuseMap);
 				} else {
 					glUniform1i((*this->shader)("diffuseTexEnabled"), 0);
 				}
+
+				glUniform1f((*this->shader)("specularHardness"), mat.hardness);
             }
 			else {
 				glUniform1i((*this->shader)("texEnabled"), 0);
@@ -477,7 +480,7 @@ namespace Sigma{
 					else if (label == "Ns") {
                         float ns;
                         s >> ns;
-                        m.tr = ns;
+                        m.hardness = ns;
                     }
 					else if (label == "illum") {
                         int i;
@@ -530,6 +533,31 @@ namespace Sigma{
 						// Add the path to the filename to load it relative to the mtl file
 						if (m.ambientMap == 0) {
 							std::cerr << "Error loading ambient texture: " << path + filename << std::endl;
+						}
+                    }
+					else if (label == "map_Bump") {
+                        std::string filename;
+						s >> filename;
+						filename = trim(filename);
+						filename = convert_path(filename);
+						std::cerr << "Loading normal or bump texture: " << path + filename << std::endl;
+						// Add the path to the filename to load it relative to the mtl file
+						resource::GLTexture texture;
+						if (OpenGLSystem::textures.find(filename) == OpenGLSystem::textures.end()) {
+							texture.LoadDataFromFile(path + filename);
+							if (texture.GetID() != 0) {
+								OpenGLSystem::textures[filename] = texture;
+							}
+						}
+
+						// It should be loaded, but in case an error occurred double check for it.
+						if (OpenGLSystem::textures.find(filename) != OpenGLSystem::textures.end()) {
+							m.normalMap = Sigma::OpenGLSystem::textures[filename].GetID();
+						}
+
+						// Add the path to the filename to load it relative to the mtl file
+						if (m.normalMap == 0) {
+							std::cerr << "Error loading normal texture: " << path + filename << std::endl;
 						}
                     }
 					else {

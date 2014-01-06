@@ -552,12 +552,13 @@ namespace Sigma{
 			else if (p->GetName() == "ca") {
 				light->color.a = p->Get<float>();
 			}
-			else if (p->GetName() == "angle") {
-				light->angle = p->Get<float>();
-				light->cosCutoff = glm::cos(light->angle);
+			else if (p->GetName() == "innerAngle") {
+				light->innerAngle = p->Get<float>();
+				light->cosInnerAngle = glm::cos(light->innerAngle);
 			}
-			else if (p->GetName() == "exponent") {
-				light->exponent = p->Get<float>();
+			else if (p->GetName() == "outerAngle") {
+				light->outerAngle = p->Get<float>();
+				light->cosOuterAngle = glm::cos(light->outerAngle);
 			}
 			else if (p->GetName() == "parent") {
 				/* Right now hacky, only GLMesh and FPSCamera are supported as parents */
@@ -616,20 +617,6 @@ namespace Sigma{
 			glGenRenderbuffers(1, &rt->depth_id);
 			glBindRenderbuffer(GL_RENDERBUFFER, rt->depth_id);
 
-			/*switch(depthBits) {
-			case 16:
-				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, rt->width, rt->height);
-				break;
-			case 24:
-				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, rt->width, rt->height);
-				break;
-			case 32:
-				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, rt->width, rt->height);
-				break;
-			default:
-				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, rt->width, rt->height);
-			}*/
-
 			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, rt->width, rt->height);
 			printOpenGLError();
 
@@ -641,9 +628,6 @@ namespace Sigma{
 		printOpenGLError();
 
 		glBindFramebuffer(GL_FRAMEBUFFER, rt->fbo_id);
-
-		//glDrawBuffer(GL_NONE);
-		//glReadBuffer(GL_NONE);
 
 		for(unsigned int i=0; i < rt->texture_ids.size(); ++i) {
 			//Attach 2D texture to this FBO
@@ -755,16 +739,6 @@ namespace Sigma{
 					IGLComponent *glComp = dynamic_cast<IGLComponent *>(citr->second.get());
 
 					if(glComp && glComp->IsLightingEnabled()) {
-						glComp->GetShader()->Use();
-
-						// Set view position
-						//glUniform3f(glGetUniformBlockIndex(glComp->GetShader()->GetProgram(), "viewPosW"), viewPosition.x, viewPosition.y, viewPosition.z);
-
-						// For now, turn on ambient intensity and turn off lighting
-						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "ambLightIntensity"), 0.05f);
-						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "diffuseLightIntensity"), 0.0f);
-						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "specularLightIntensity"), 0.0f);
-
 						glComp->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 					}
 				}
@@ -794,21 +768,9 @@ namespace Sigma{
 			// Lighting Pass //
 			///////////////////
 
-			// Turn on additive blending
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_ONE, GL_ONE);
-
 			// Disable depth testing
 			glDepthFunc(GL_NONE);
 			glDepthMask(GL_FALSE);
-
-			// Bind the second buffer, which is the Light Accumulation Buffer
-			//if(this->renderTargets.size() > 1) {
-			//	this->renderTargets[1]->BindWrite();
-			//}
-
-			// Clear it
-            //glClear(GL_COLOR_BUFFER_BIT);
 
 			// Bind the Geometry buffer for reading
 			if(this->renderTargets.size() > 0) {
@@ -816,6 +778,9 @@ namespace Sigma{
 			}
 
 			// Ambient light pass
+
+			// Ensure that blending is disabled
+			glDisable(GL_BLEND);
 
 			// Currently simple constant ambient light, could use SSAO here
 			glm::vec4 ambientLight(0.1f, 0.1f, 0.1f, 1.0f);
@@ -825,7 +790,6 @@ namespace Sigma{
 
 			// Load variables
 			glUniform4f(shader("ambientColor"), ambientLight.r, ambientLight.g, ambientLight.b, ambientLight.a);
-
 			glUniform1i(shader("colorBuffer"), 0);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, this->renderTargets[0]->texture_ids[0]);
@@ -835,9 +799,11 @@ namespace Sigma{
 			shader.UnUse();
 
 			// Dynamic light passes
+			// Turn on additive blending
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_ONE, GL_ONE);
 
 			// Loop through each light, render a fullscreen quad if it is visible
-
 			for(auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
 				for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
 					// Check if this component is a point light
@@ -850,7 +816,7 @@ namespace Sigma{
 						shader.Use();
 
 						// Load variables
-						glUniform3fv(shader("viewPosW"), 3, &viewPosition[0]);
+						glUniform3fv(shader("viewPosW"), 1, &viewPosition[0]);
 						glUniformMatrix4fv(shader("viewProjInverse"), 1, false, &viewProjInv[0][0]);
 						glUniform3fv(shader("lightPosW"), 1, &light->position[0]);
 						glUniform1f(shader("lightRadius"), light->radius);
@@ -885,13 +851,13 @@ namespace Sigma{
 						glm::vec3 direction = spotLight->transform.GetForward();
 
 						// Load variables
+						glUniform3fv(shader("viewPosW"), 1, &viewPosition[0]);
 						glUniformMatrix4fv(shader("viewProjInverse"), 1, false, &viewProjInv[0][0]);
 						glUniform3fv(shader("lightPosW"), 1, &position[0]);
 						glUniform3fv(shader("lightDirW"), 1, &direction[0]);
 						glUniform4fv(shader("lightColor"), 1, &spotLight->color[0]);
-						glUniform1f(shader("lightAngle"), spotLight->angle);
-						glUniform1f(shader("lightCosCutoff"), spotLight->cosCutoff);
-						glUniform1f(shader("lightExponent"), spotLight->exponent);
+						glUniform1f(shader("lightCosInnerAngle"), spotLight->cosInnerAngle);
+						glUniform1f(shader("lightCosOuterAngle"), spotLight->cosOuterAngle);
 
 						glUniform1i(shader("diffuseBuffer"), 0);
 						glUniform1i(shader("normalBuffer"), 1);
@@ -918,11 +884,6 @@ namespace Sigma{
 			if(this->renderTargets.size() > 0) {
 				this->renderTargets[0]->UnbindRead();
 			}
-
-			// Unbind the second buffer, which is the Light Accumulation Buffer
-			//if(this->renderTargets.size() > 1) {
-			//	this->renderTargets[1]->UnbindWrite();
-			//}
 
 			// Remove blending
 			glDisable(GL_BLEND);
@@ -966,16 +927,7 @@ namespace Sigma{
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			for (auto citr = this->screensSpaceComp.begin(); citr != this->screensSpaceComp.end(); ++citr) {
-					citr->get()->GetShader()->Use();
-
-					// Set view position
-					//glUniform3f(glGetUniformBlockIndex(citr->get()->GetShader()->GetProgram(), "viewPosW"), viewPosition.x, viewPosition.y, viewPosition.z);
-
-					// For now, turn on ambient intensity and turn off lighting
-					glUniform1f(glGetUniformLocation(citr->get()->GetShader()->GetProgram(), "ambLightIntensity"), 0.05f);
-					glUniform1f(glGetUniformLocation(citr->get()->GetShader()->GetProgram(), "diffuseLightIntensity"), 0.0f);
-					glUniform1f(glGetUniformLocation(citr->get()->GetShader()->GetProgram(), "specularLightIntensity"), 0.0f);
-					citr->get()->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
+				citr->get()->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 			}
 
 			// Remove blending
@@ -1074,13 +1026,13 @@ namespace Sigma{
 		this->spotQuad.SetCullFace("none");
 
 		this->spotQuad.GetShader()->Use();
+		this->spotQuad.GetShader()->AddUniform("viewPosW");
 		this->spotQuad.GetShader()->AddUniform("viewProjInverse");
 		this->spotQuad.GetShader()->AddUniform("lightPosW");
 		this->spotQuad.GetShader()->AddUniform("lightDirW");
 		this->spotQuad.GetShader()->AddUniform("lightColor");
-		this->spotQuad.GetShader()->AddUniform("lightAngle");
-		this->spotQuad.GetShader()->AddUniform("lightCosCutoff");
-		this->spotQuad.GetShader()->AddUniform("lightExponent");
+		this->spotQuad.GetShader()->AddUniform("lightCosInnerAngle");
+		this->spotQuad.GetShader()->AddUniform("lightCosOuterAngle");
 		this->spotQuad.GetShader()->AddUniform("diffuseBuffer");
 		this->spotQuad.GetShader()->AddUniform("normalBuffer");
 		this->spotQuad.GetShader()->AddUniform("depthBuffer");

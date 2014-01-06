@@ -16,15 +16,14 @@ namespace Sigma {
 
 		SET_COMPONENT_TYPENAME("SpotLight");
 
-		//glm::vec3 position;
-		//glm::vec3 direction;
 		GLTransform transform;
 		glm::vec4 color;
 		float intensity;
 
-		float angle;
-		float cosCutoff;
-		float exponent;
+		float innerAngle;
+		float outerAngle;
+		float cosInnerAngle;
+		float cosOuterAngle;
 
 		bool enabled;
 
