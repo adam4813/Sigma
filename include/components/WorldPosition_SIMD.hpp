@@ -17,8 +17,8 @@ namespace Sigma {
         enum {BLOCK_SIZE = 8};
 
         build_bitmap_distance_view_kernel(const coordinate_type aa, const coordinate_type * const xx,
-                                        const coordinate_type distance_view, BitArray& bitmap) :
-                                        a(aa), x(xx), distance(distance_view), bitmap(bitmap) {
+                                        const coordinate_type distance_view, BitArray<unsigned short>& bitmap) :
+		a(aa), x(xx), distance(distance_view), bitmap(bitmap), bm(const_cast<unsigned short*>(bitmap.data())) {
             a_v = _mm_set1_pd(aa);
             distance_v = _mm_set1_pd(distance);
             mask = _mm_set1_pd(DABS_MASK);
@@ -84,8 +84,8 @@ namespace Sigma {
         __m128d distance_v;
         const coordinate_type distance;
         __m128d mask;
-        BitArray& bitmap;
-        unsigned short* bm = const_cast<unsigned short*>(bitmap.data());
+        BitArray<unsigned short>& bitmap;
+        unsigned short* bm;
     };
 
     /** \brief kernel to perform y = (float) (x + a) using intrinsics
@@ -169,7 +169,7 @@ namespace Sigma {
 
         static void InViewPositions(const coordinate_type x,  const aligned_vector_type& v,
                                                               const coordinate_type distance,
-                                                              BitArray& bitmap) {
+                                                              BitArray<unsigned short>& bitmap) {
             size_t length = v.size();
             if (has_SSE2()) {
                 transform_n_sse2(length, build_bitmap_distance_view_kernel(-x, v.data(), distance, bitmap));

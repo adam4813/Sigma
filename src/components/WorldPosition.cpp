@@ -104,7 +104,7 @@ namespace Sigma {
                                                              const coordinate_type y,
                                                              const coordinate_type z,
                                                              const coordinate_type distance) const {
-        auto bitmap = BitArray<unsigned short>::Create(positions_x.size(), true);
+        auto bitmap = BitArray<unsigned short>::Create(positions_x.size());
         translate.InViewPositions(x, positions_x, distance, *bitmap);
         translate.InViewPositions(y, positions_y, distance, *bitmap);
         translate.InViewPositions(z, positions_z, distance, *bitmap);

@@ -9,8 +9,9 @@
 #include <iterator>
 
 namespace Sigma {
-    template<class V>
-    using aligned_vector_t = std::vector<V, AlignedVectorAllocator<V>>;
+	// Visual Studio doesn't support template aliases until 2013
+    //template<class V>
+    //using aligned_vector_t = std::vector<V, AlignedVectorAllocator<V>>;
 
     template<class V>
     struct data_ptr {
@@ -106,21 +107,21 @@ namespace Sigma {
          * \return const aligned_vector_t<V>* the vector
          *
          */
-        aligned_vector_t<V>* getVector() { return &data_vector; }
+        std::vector<V, AlignedVectorAllocator<V>>* getVector() { return &data_vector; }
 
         /** \brief Get an iterator on the key
          *
          * \return std::vector<K>::const_iterator the iterator
          *
          */
-        typename std::vector<K>::const_iterator IteratorKeyBegin() const noexcept { return key_vector.cbegin(); }
+        typename std::vector<K>::const_iterator IteratorKeyBegin() const { return key_vector.cbegin(); }
 
         /** \brief Get an iterator on the key at the end
          *
          * \return std::vector<K>::const_iterator the iterator
          *
          */
-        typename std::vector<K>::const_iterator IteratorKeyEnd() const noexcept { return key_vector.cend(); }
+        typename std::vector<K>::const_iterator IteratorKeyEnd() const { return key_vector.cend(); }
 
     private:
 
@@ -131,7 +132,7 @@ namespace Sigma {
          */
         void Resize() {
             // make a copy of the vector with a double size capacity
-            aligned_vector_t<V> v_copy(data_vector.size() << 1);
+            std::vector<V, AlignedVectorAllocator<V>> v_copy(data_vector.size() << 1);
             v_copy = data_vector;
             // replace the pointers in the map
             auto it = key_vector.begin();
@@ -161,7 +162,7 @@ namespace Sigma {
         SharedPointerMap<K, V> data_map;
 
         // the vectors containing values
-        aligned_vector_t<V> data_vector;
+        std::vector<V, AlignedVectorAllocator<V>> data_vector;
 
         // the vector of keys
         std::vector<K> key_vector;

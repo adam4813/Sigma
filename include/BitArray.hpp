@@ -84,26 +84,26 @@ namespace Sigma {
 	template<class T>
 	class BitArray : public std::enable_shared_from_this<BitArray<T>> {
 	public:
-		template<class ...Args>
+		template<class Args>
 		/** \brief Call the constructor of a BitArray
 		 *
 		 * \param args Args&&... arguments to forward
 		 * \return std::shared_ptr<BitArray> a shared_ptr on the BitArray
 		 *
 		 */
-		static std::shared_ptr<BitArray<T>> Create(Args&&... args) {
-			return std::shared_ptr<BitArray<T>>(new BitArray<T>(std::forward<Args>(args)...));
+		static std::shared_ptr<BitArray<T>> Create(Args&& args) {
+			return std::shared_ptr<BitArray<T>>(new BitArray<T>(std::forward<Args>(args)));
 		}
 
 		// Default destructor
 		virtual ~BitArray() {};
 		// Copy constructor
-		BitArray(BitArray& ba) {
+		BitArray(BitArray& ba) : blocksize(sizeof(T) << 3) {
 			bitarray = ba.bitarray;
 			def_value = ba.def_value;
 		}
 		// Move Constructor
-		BitArray(BitArray&& ba) {
+		BitArray(BitArray&& ba) : blocksize(sizeof(T) << 3) {
 			bitarray = std::move(ba.bitarray);
 			def_value = std::move(ba.def_value);
 		}
@@ -268,16 +268,16 @@ namespace Sigma {
 
 	private:
 		// Default constructor
-		BitArray() : bsize(0), def_value(0) {};
+		BitArray() : bsize(0), def_value(0), blocksize(sizeof(T) << 3)  {};
 		// Constructor with default value
-		BitArray(const bool b) : bsize(0), def_value(b ? -1 : 0) {};
+		BitArray(const bool b) : bsize(0), def_value(b ? -1 : 0), blocksize(sizeof(T) << 3)  {};
 		// Constructor with initial size
-		BitArray(const size_t s) : bsize(s), def_value(0) {
+		BitArray(const size_t s) : bsize(s), def_value(0), blocksize(sizeof(T) << 3)  {
 			bitarray = std::vector<T, AlignedVectorAllocator<T>>((s / blocksize) + 1);
 			bitarray.assign(bitarray.size(), this->def_value);
 		};
 		// Constructor with initial size and default value
-		BitArray(const size_t s, const bool b) : bsize(s), def_value(b ? -1 : 0) {
+		BitArray(const size_t s, const bool b) : bsize(s), def_value(b ? -1 : 0), blocksize(sizeof(T) << 3)  {
 			bitarray = std::vector<T, AlignedVectorAllocator<T>>((s / blocksize) + 1);
 			bitarray.assign(bitarray.size(), this->def_value);
 		};
@@ -285,7 +285,7 @@ namespace Sigma {
 		std::vector<T, AlignedVectorAllocator<T>> bitarray;
 		size_t bsize;
 		T def_value;
-		const unsigned int blocksize = sizeof(T) << 3;
+		const unsigned int blocksize;
 	};
 
 #if defined(__GNUG__) // define BitArrayIterator per compiler
@@ -338,7 +338,7 @@ namespace Sigma {
 	class BitArrayIterator {
 	public:
 		BitArrayIterator(std::shared_ptr<BitArray<T>> bs) : bitarray(bs),\
-			current_long((unsigned long long*) bs->data()), last_bit(0), current_value(-1) { ++(*this); };
+			current_long((unsigned long long*) bs->data()), last_bit(0), current_value(-1), start(current_long) { ++(*this); };
 		virtual ~BitArrayIterator() {};
 
 		size_t& operator++() {
@@ -347,9 +347,9 @@ namespace Sigma {
 			for (current_value++; current_long < end; current_long++) {
 				if (*current_long && last_bit < 64) {
 					unsigned long long tmp = *current_long >> last_bit;
-					if (__popcnt64(tmp)) {
-						unsigned char ret;
-						_BitScanForward64(&ret, tmp);
+					if (__popcnt(tmp)) {
+						unsigned long ret;
+						_BitScanForward(&ret, tmp);
 						last_bit += ret;
 						current_value = last_bit++ + ((current_long - start) << 6);
 						return current_value;
@@ -375,7 +375,7 @@ namespace Sigma {
 	private:
 		unsigned char last_bit;
 		unsigned long long* current_long;
-		const unsigned long long* const start = current_long;
+		const unsigned long long* const start;
 		std::shared_ptr<BitArray<T>> bitarray;
 		size_t current_value;
 	};

@@ -2,6 +2,7 @@
 #define WORLDORIENTATION_H
 
 #include "SharedPointerMap.hpp"
+#include "Sigma.h"
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -105,7 +106,7 @@ namespace Sigma {
              * \return std::vector<type_id>::const_iterator the iterator
              *
              */
-            std::vector<id_t>::const_iterator IteratorEntityId() const noexcept { return id_vector.cbegin(); }
+            std::vector<id_t>::const_iterator IteratorEntityId() const { return id_vector.cbegin(); }
 
         private:
             SharedPointerMap<id_t, orientation_type> orientation_guard;

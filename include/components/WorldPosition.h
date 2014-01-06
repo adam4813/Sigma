@@ -18,6 +18,7 @@
 
 #include "SharedPointerMap.hpp"
 #include "BitArray.hpp"
+#include "Sigma.h"
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -200,7 +201,7 @@ namespace Sigma {
          * \return std::vector<const id_t>::const_iterator the iterator
          *
          */
-        std::vector<id_t>::const_iterator IteratorEntityId() const noexcept { return id_vector.cbegin(); }
+        std::vector<id_t>::const_iterator IteratorEntityId() const { return id_vector.cbegin(); }
 
         /** \brief Get an array of all positions relative to (x, y, z) converted to float
          *

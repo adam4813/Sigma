@@ -1,6 +1,7 @@
 #ifndef PHYSICALWORLDLOCATION_H_INCLUDED
 #define PHYSICALWORLDLOCATION_H_INCLUDED
 
+#include "Sigma.h"
 #include "BitArray.hpp"
 #include "Property.h"
 #include "components/WorldPosition.h"
@@ -80,7 +81,7 @@ namespace Sigma {
 		 * \return ClearUpdatedSet() { updated_set = BitArray<unsigned
 		 *
 		 */
-		static inline void ClearUpdatedSet() { updated_set = BitArray<unsigned int>::Create(); };
+		static inline void ClearUpdatedSet() { updated_set = BitArray<unsigned int>::Create(nullptr); };
 
 		static inline std::unique_ptr<BitArrayIterator<unsigned int>> GetIteratorUpdatedID() {
 			return updated_set->iterator();
@@ -105,8 +106,8 @@ namespace Sigma {
 		 *
 		 */
 		void AddViewer(const id_t id, coordinate_type view_limit) {
-			viewDistanceMap.insert({{id, view_limit}});
-			viewBitsetMap.insert({{id, BitArray<unsigned short>::Create()}});
+			viewDistanceMap.insert(std::make_pair(id, view_limit));
+			viewBitsetMap.insert(std::make_pair(id, BitArray<unsigned short>::Create(nullptr)));
 		};
 
 		// TODO : move to UserView component

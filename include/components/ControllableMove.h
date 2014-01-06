@@ -33,13 +33,14 @@ namespace Sigma {
 		 * Making the component pure static is a good practice (I think...)
 		 */
 
-		ControllableMove() = delete; // default ctor
 		virtual ~ControllableMove() {}; // default dtor
-		ControllableMove(ControllableMove& cm) = delete; // copy constructor
-		ControllableMove(ControllableMove&& cm) = delete; // move constructor
-		ControllableMove& operator=(ControllableMove& cm) = delete; // copy assignment
-		ControllableMove& operator=(ControllableMove&& cm) = delete; // move assignment
-
+	private:
+		ControllableMove(); // default ctor
+		ControllableMove(ControllableMove& cm); // copy constructor
+		ControllableMove(ControllableMove&& cm); // move constructor
+		ControllableMove& operator=(ControllableMove& cm); // copy assignment
+		ControllableMove& operator=(ControllableMove&& cm); // move assignment
+	public:
 		// Note that all data have the same lifecycle : created at once, deleted at once
 		// If this is not the case, split the component
 		static bool AddEntity(const id_t id) {

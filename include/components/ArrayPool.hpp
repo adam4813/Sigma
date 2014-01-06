@@ -14,7 +14,7 @@ namespace Sigma {
     template<class T>
     class ArrayPool {
     public:
-        ArrayPool() {};
+        ArrayPool() : length(0) {};
 
         virtual ~ArrayPool() {};
 
@@ -51,7 +51,7 @@ namespace Sigma {
             return ret;
         }
 
-        size_t length = 0;
+        size_t length;
         forward_list<shared_ptr<T>> pool;
     };
 }

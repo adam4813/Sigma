@@ -86,8 +86,8 @@ namespace Sigma {
         // copy assignment for V
         SharedPointerMap& operator=(const V& v) {
             *vec = v;
-            pointer_map.erase(id);
-            pointer_map.insert({{id, vec}});
+			pointer_map.erase(id);
+			pointer_map.insert(std::make_pair(id, vec));
             vec.reset();
             return *this;
         }
@@ -96,7 +96,7 @@ namespace Sigma {
         SharedPointerMap& operator=(V&& v) {
             *vec = std::move(v);
             pointer_map.erase(id);
-            pointer_map.insert({{id, vec}});
+            pointer_map.insert(std::make_pair(id, vec));
             vec.reset();
             return *this;
         }
@@ -136,7 +136,7 @@ namespace Sigma {
             if (pointer_map.count(entity_id)) {
                 pointer_map.erase(entity_id);
             }
-            pointer_map.insert({{entity_id, std::shared_ptr<const V>(pointer, SoftSharedPointerDelete<V>())}});
+            pointer_map.insert(std::make_pair(entity_id, std::shared_ptr<const V>(pointer, SoftSharedPointerDelete<V>())));
         }
 
         /** \brief Get a non-const reference to the data
@@ -171,13 +171,13 @@ namespace Sigma {
 
     private:
         // Move assignment
-        SharedPointerMap& operator=(SharedPointerMap&& p) = delete;
+        SharedPointerMap& operator=(SharedPointerMap&& p);
         // Move constructor
-        SharedPointerMap(SharedPointerMap&& p) = delete;
+        SharedPointerMap(SharedPointerMap&& p);
         // Copy assignment
-        SharedPointerMap& operator=(SharedPointerMap& p) = delete;
+        SharedPointerMap& operator=(SharedPointerMap& p);
         // Copy constructor
-        SharedPointerMap(SharedPointerMap& p) = delete;
+        SharedPointerMap(SharedPointerMap& p);
 
         // the map to store position pointers
         std::unordered_map<K,std::shared_ptr<const V>> pointer_map;
