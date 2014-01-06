@@ -13,7 +13,7 @@ Contributing
 ===
 The easiest way to contribute is to fork and experiment. To better understand the organization please refer to [this drawing](https://docs.google.com/drawings/d/1HFFiz1oJc3A8gyO-fMADAfW8PTWjCqhe5silYDXM1lo/edit).
 
-Coding standards and practices can be found [here](https://docs.google.com/document/d/1dN3cNUdn0HKb7lZXcBCIL2Tm216hQAQxbZnEuCpiYtc/edit).
+Coding standards and practices can be found [here](https://github.com/adam4813/Sigma/wiki/Coding-Standards).
 
 Installing
 ===
@@ -28,7 +28,7 @@ Sigma requires the following dependencies:
 * [libogg](https://www.xiph.org/ogg/);
 * [libvorbis](https://www.xiph.org/ogg/);
 
-You'll also need a [package of assets](https://www.dropbox.com/s/8gtm4bj0g9yjo54/assets12-27.zip).  Unpack it in the build/bin/ directory.
+You'll also need a [package of assets](http://wiki.trillek.org/wiki/Assets).  Unpack it in the build/bin/ directory.
 
 ## Building ##
 
