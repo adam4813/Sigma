@@ -102,7 +102,7 @@ int main(int argCount, char **argValues) {
 
 			// Currently, physicsmover components must come after gl* components
 			if((*itr).type == "PhysicsMover") {
-				GLTransform *transform = glsys.GetTransformFor(e->id);
+				Sigma::GLTransform *transform = glsys.GetTransformFor(e->id);
 				if(transform) {
 					Property p("transform", transform);
 					itr->properties.push_back(p);
