@@ -84,15 +84,26 @@ namespace Sigma {
 	template<class T>
 	class BitArray : public std::enable_shared_from_this<BitArray<T>> {
 	public:
-		template<class Args>
 		/** \brief Call the constructor of a BitArray
 		 *
-		 * \param args Args&&... arguments to forward
+		 * \param args are forwarded to constructor
 		 * \return std::shared_ptr<BitArray> a shared_ptr on the BitArray
 		 *
 		 */
-		static std::shared_ptr<BitArray<T>> Create(Args&& args) {
-			return std::shared_ptr<BitArray<T>>(new BitArray<T>(std::forward<Args>(args)));
+		static std::shared_ptr<BitArray<T>> Create() {
+			return std::shared_ptr<BitArray<T>>(new BitArray<T>());
+		}
+
+		static std::shared_ptr<BitArray<T>> Create(const size_t s, const bool b) {
+			return std::shared_ptr<BitArray<T>>(new BitArray<T>(s, b));
+		}
+
+		static std::shared_ptr<BitArray<T>> Create(const size_t s) {
+			return std::shared_ptr<BitArray<T>>(new BitArray<T>(s));
+		}
+
+		static std::shared_ptr<BitArray<T>> Create(const bool b) {
+			return std::shared_ptr<BitArray<T>>(new BitArray<T>(b));
 		}
 
 		// Default destructor
@@ -338,20 +349,20 @@ namespace Sigma {
 	class BitArrayIterator {
 	public:
 		BitArrayIterator(std::shared_ptr<BitArray<T>> bs) : bitarray(bs),\
-			current_long((unsigned long long*) bs->data()), last_bit(0), current_value(-1), start(current_long) { ++(*this); };
+			current_int((unsigned int*) bs->data()), last_bit(0), current_value(-1), start(current_int) { ++(*this); };
 		virtual ~BitArrayIterator() {};
 
 		size_t& operator++() {
 			auto length = bitarray->size();
-			auto end = (unsigned long long*) bitarray->data() + (ROUND_DOWN(bitarray->size(), 64) >> 6);
-			for (current_value++; current_long < end; current_long++) {
-				if (*current_long && last_bit < 64) {
-					unsigned long long tmp = *current_long >> last_bit;
+			auto end = (unsigned int*) bitarray->data() + (ROUND_DOWN(bitarray->size(), 32) >> 5);
+			for (current_value++; current_int < end; current_int++) {
+				if (*current_int && last_bit < 32) {
+					unsigned int tmp = *current_int >> last_bit;
 					if (__popcnt(tmp)) {
 						unsigned long ret;
 						_BitScanForward(&ret, tmp);
 						last_bit += ret;
-						current_value = last_bit++ + ((current_long - start) << 6);
+						current_value = last_bit++ + ((current_int - start) << 5);
 						return current_value;
 					}
 				}
@@ -374,8 +385,8 @@ namespace Sigma {
 
 	private:
 		unsigned char last_bit;
-		unsigned long long* current_long;
-		const unsigned long long* const start;
+		unsigned int* current_int;
+		const unsigned int* const start;
 		std::shared_ptr<BitArray<T>> bitarray;
 		size_t current_value;
 	};

@@ -81,7 +81,7 @@ namespace Sigma {
 		 * \return ClearUpdatedSet() { updated_set = BitArray<unsigned
 		 *
 		 */
-		static inline void ClearUpdatedSet() { updated_set = BitArray<unsigned int>::Create(nullptr); };
+		static inline void ClearUpdatedSet() { updated_set = BitArray<unsigned int>::Create(); };
 
 		static inline std::unique_ptr<BitArrayIterator<unsigned int>> GetIteratorUpdatedID() {
 			return updated_set->iterator();
@@ -107,7 +107,7 @@ namespace Sigma {
 		 */
 		void AddViewer(const id_t id, coordinate_type view_limit) {
 			viewDistanceMap.insert(std::make_pair(id, view_limit));
-			viewBitsetMap.insert(std::make_pair(id, BitArray<unsigned short>::Create(nullptr)));
+			viewBitsetMap.insert(std::make_pair(id, BitArray<unsigned short>::Create()));
 		};
 
 		// TODO : move to UserView component
