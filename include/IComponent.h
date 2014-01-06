@@ -13,7 +13,6 @@ virtual const Sigma::IComponent::ComponentID getComponentTypeName() override{ret
 static const Sigma::IComponent::ComponentID getComponentTypeName() {return ID;};
 
 namespace Sigma{
-
     class IComponent {
     public:
         typedef std::string ComponentID;

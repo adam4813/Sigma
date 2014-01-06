@@ -5,7 +5,6 @@
 #include "components/ControllableMove.h"
 #include "Sigma.h"
 
-class GLTransform;
 
 namespace Sigma {
 	class PhysicsMover : public Sigma::IComponent {

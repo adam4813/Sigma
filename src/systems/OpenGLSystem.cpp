@@ -657,6 +657,9 @@ namespace Sigma{
 					 (GLsizei)rt->height,
 					 0, internalFormat, type, NULL);
 
+		//Attach 2D texture to this FBO
+		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+rt->texture_ids.size(), GL_TEXTURE_2D, texture_id, 0);
+
 		this->renderTargets[rtID]->texture_ids.push_back(texture_id);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -718,6 +721,16 @@ namespace Sigma{
 					IGLComponent *glComp = dynamic_cast<IGLComponent *>(citr->second.get());
 
 					if(glComp && glComp->IsLightingEnabled()) {
+						glComp->GetShader()->Use();
+
+						// Set view position
+						//glUniform3f(glGetUniformBlockIndex(glComp->GetShader()->GetProgram(), "viewPosW"), viewPosition.x, viewPosition.y, viewPosition.z);
+
+						// For now, turn on ambient intensity and turn off lighting
+						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "ambLightIntensity"), 0.05f);
+						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "diffuseLightIntensity"), 0.0f);
+						glUniform1f(glGetUniformLocation(glComp->GetShader()->GetProgram(), "specularLightIntensity"), 0.0f);
+
 						glComp->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 					}
 				}
@@ -906,6 +919,7 @@ namespace Sigma{
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			for (auto citr = this->screensSpaceComp.begin(); citr != this->screensSpaceComp.end(); ++citr) {
+				citr->get()->GetShader()->Use();
 				citr->get()->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 			}
 
