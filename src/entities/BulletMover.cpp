@@ -19,8 +19,14 @@ namespace Sigma {
 	// TODO : make the Bullet simulation static so that we can
 	// put this in the constructor without passing the world as argument
 	void BulletMover::InitializeRigidBody(btDiscreteDynamicsWorld* world) {
+		// Hardcoded values
+		std::vector<Property> prop;
+		Property p("shape", std::string("capsule"));
+		prop.push_back(p);
+		prop.emplace_back(Property("radius", 0.3f));
+		prop.emplace_back(Property("height", 1.3f));
 		// Add the body component
-		if (RigidBody::AddEntity(entityID, std::vector<Property>())) {
+		if (RigidBody::AddEntity(entityID, prop)) {
 			// Add the body to the world
 			// TODO: move this to the RigidBody component
 			world->addRigidBody(RigidBody::getBody(entityID));

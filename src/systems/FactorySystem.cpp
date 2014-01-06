@@ -28,9 +28,22 @@ namespace Sigma{
         if(registeredFactoryFunctions.find(type) != registeredFactoryFunctions.end()){
 			std::cerr << "Creating component of type: " << type << std::endl;
             return registeredFactoryFunctions[type](entityID, properties);
-        } else{
-            std::cerr << "Error: Couldn't find component: " << type << std::endl;
+        }
+        else {
             return nullptr;
+        }
+    }
+
+    bool FactorySystem::createECS(const std::string& type,
+                               const id_t entityID,
+                               const std::vector<Property> &properties){
+		if(registeredECSFactoryFunctions.find(type) != registeredECSFactoryFunctions.end()){
+			std::cerr << "Creating ECS component of type: " << type << std::endl;
+            return registeredECSFactoryFunctions[type](entityID, properties);
+        }
+        else {
+            std::cerr << "Error: Couldn't find component: " << type << std::endl;
+            return false;
         }
     }
 

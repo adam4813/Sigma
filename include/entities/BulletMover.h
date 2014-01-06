@@ -1,6 +1,10 @@
 #pragma once
 
+#include <vector>
+#include <string>
+
 #include "IBulletShape.h"
+#include "Property.h"
 #include "components/InterpolatedMovement.h"
 #include "components/ControllableMove.h"
 #include "components/RigidBody.h"

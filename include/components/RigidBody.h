@@ -7,6 +7,8 @@
 #include <bullet/btBulletDynamicsCommon.h>
 #include "IComponent.h"
 #include "Property.h"
+#include "components/BulletShapeMesh.h"
+#include "components/GLMesh.h"
 
 namespace Sigma {
 	/** \brief A component for entities that have a rigid body

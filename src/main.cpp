@@ -112,7 +112,9 @@ int main(int argCount, char **argValues) {
 				}
 			}
 
-			factory.create(itr->type,e->id, const_cast<std::vector<Property>&>(itr->properties));
+			if (! factory.create(itr->type,e->id, const_cast<std::vector<Property>&>(itr->properties))) {
+				factory.createECS(itr->type,e->id, const_cast<std::vector<Property>&>(itr->properties));
+			};
 		}
 	}
 

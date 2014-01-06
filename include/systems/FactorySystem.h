@@ -28,7 +28,11 @@ namespace Sigma {
                         const id_t entityID,
                         const std::vector<Property> &properties);
 
-            /**
+			bool createECS(const std::string& type,
+                               const id_t entityID,
+                               const std::vector<Property> &properties);
+
+			/**
              * \brief add the given Factory to the central list
              *
              *  All factory-functions returned by getFactoryFunctions() are
