@@ -6,7 +6,8 @@
 #include <memory>
 #include <iostream>
 #include "SharedPointerMap.hpp"
-#include "AlignedVectorAllocator.hpp"
+// deactivated
+//#include "AlignedVectorAllocator.hpp"
 
 #if defined(_MSC_VER)
 #include <intrin.h>
@@ -284,16 +285,19 @@ namespace Sigma {
 		BitArray(const bool b) : bsize(0), def_value(b ? -1 : 0), blocksize(sizeof(T) << 3)  {};
 		// Constructor with initial size
 		BitArray(const size_t s) : bsize(s), def_value(0), blocksize(sizeof(T) << 3)  {
-			bitarray = std::vector<T, AlignedVectorAllocator<T>>((s / blocksize) + 1);
+			bitarray = std::vector<T>((s / blocksize) + 1);
+//			bitarray = std::vector<T, AlignedVectorAllocator<T>>((s / blocksize) + 1);
 			bitarray.assign(bitarray.size(), this->def_value);
 		};
 		// Constructor with initial size and default value
 		BitArray(const size_t s, const bool b) : bsize(s), def_value(b ? -1 : 0), blocksize(sizeof(T) << 3)  {
-			bitarray = std::vector<T, AlignedVectorAllocator<T>>((s / blocksize) + 1);
+			bitarray = std::vector<T>((s / blocksize) + 1);
+//			bitarray = std::vector<T, AlignedVectorAllocator<T>>((s / blocksize) + 1);
 			bitarray.assign(bitarray.size(), this->def_value);
 		};
 
-		std::vector<T, AlignedVectorAllocator<T>> bitarray;
+		std::vector<T> bitarray;
+//		std::vector<T, AlignedVectorAllocator<T>> bitarray;
 		size_t bsize;
 		T def_value;
 		const unsigned int blocksize;

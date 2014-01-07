@@ -2,7 +2,7 @@
 #define VECTORMAP_H_INCLUDED
 
 #include "SharedPointerMap.hpp"
-#include "AlignedVectorAllocator.hpp"
+//#include "AlignedVectorAllocator.hpp"
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -107,7 +107,8 @@ namespace Sigma {
          * \return const aligned_vector_t<V>* the vector
          *
          */
-        std::vector<V, AlignedVectorAllocator<V>>* getVector() { return &data_vector; }
+//        std::vector<V, AlignedVectorAllocator<V>>* getVector() { return &data_vector; }
+        std::vector<V>* getVector() { return &data_vector; }
 
         /** \brief Get an iterator on the key
          *
@@ -132,7 +133,8 @@ namespace Sigma {
          */
         void Resize() {
             // make a copy of the vector with a double size capacity
-            std::vector<V, AlignedVectorAllocator<V>> v_copy(data_vector.size() << 1);
+//            std::vector<V, AlignedVectorAllocator<V>> v_copy(data_vector.size() << 1);
+            std::vector<V> v_copy(data_vector.size() << 1);
             v_copy = data_vector;
             // replace the pointers in the map
             auto it = key_vector.begin();
@@ -162,7 +164,8 @@ namespace Sigma {
         SharedPointerMap<K, V> data_map;
 
         // the vectors containing values
-        std::vector<V, AlignedVectorAllocator<V>> data_vector;
+        std::vector<V> data_vector;
+//        std::vector<V, AlignedVectorAllocator<V>> data_vector;
 
         // the vector of keys
         std::vector<K> key_vector;

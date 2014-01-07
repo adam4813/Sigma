@@ -35,7 +35,8 @@
 */
 namespace Sigma {
     typedef double coordinate_type;
-    typedef std::vector<coordinate_type, AlignedVectorAllocator<coordinate_type>> aligned_vector_type;
+    typedef std::vector<coordinate_type> aligned_vector_type;
+//    typedef std::vector<coordinate_type, AlignedVectorAllocator<coordinate_type>> aligned_vector_type;
     typedef std::shared_ptr<float> coordinate_array;
 
     /** \brief A position
