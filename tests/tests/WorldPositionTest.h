@@ -148,6 +148,8 @@ namespace Sigma {
         ASSERT_EQ(x, 1.0) << "Failed to move element";
     }
 
+	// this function has been temporarily removed
+/*
     TEST_F(WorldPositionTest, WorldPositionRelative) {
         FillUntilResize(&wp4096);
         FillRandom(translation_x, 5000);
@@ -177,5 +179,6 @@ namespace Sigma {
         }
         std::cout << w->length * 5000 / time_span.count() << " entities/s." << std::endl;
     }
+*/
 }
 #endif // WORLDPOSITIONTEST_H_INCLUDED

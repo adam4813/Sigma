@@ -25,12 +25,14 @@
 #include <functional>
 #include <iterator>
 
+// SSE functions deactivated
+/*
 #if defined(__GNUG__)
 #include"components/WorldPosition_SIMD_gcc.hpp"
 #else
 #include"components/WorldPosition_SIMD.hpp"
 #endif // GCC
-
+*/
 namespace Sigma {
     typedef double coordinate_type;
     typedef std::vector<coordinate_type, AlignedVectorAllocator<coordinate_type>> aligned_vector_type;
@@ -203,6 +205,8 @@ namespace Sigma {
          */
         std::vector<id_t>::const_iterator IteratorEntityId() const { return id_vector.cbegin(); }
 
+        // Remove unused functions for the moment
+/*
         /** \brief Get an array of all positions relative to (x, y, z) converted to float
          *
          * This performs a translation of (-x, -y, -z) and a conversion to float.
@@ -213,9 +217,9 @@ namespace Sigma {
          * \return position_array a struct containing 3 pointers to arrays
          *
          */
-        std::unique_ptr<position_array> RelativeTo(const coordinate_type x, const coordinate_type y, const coordinate_type z);
+//        std::unique_ptr<position_array> RelativeTo(const coordinate_type x, const coordinate_type y, const coordinate_type z);
 
-        /** \brief Get the bitarray of the positions that are in view range
+/*        /** \brief Get the bitarray of the positions that are in view range
          *
          * \param x const coordinate_type x coordinate of the center
          * \param y const coordinate_type y coordinate of the center
@@ -224,11 +228,11 @@ namespace Sigma {
          * \return a bitarray of positions in the view range specified
          *
          */
-        std::shared_ptr<BitArray<unsigned short>> InViewPositions(const coordinate_type x,
+/*        std::shared_ptr<BitArray<unsigned short>> InViewPositions(const coordinate_type x,
                                                   const coordinate_type y,
                                                   const coordinate_type z,
                                                   const coordinate_type distance) const;
-
+*/
     private:
         /** \brief Resize the vector
          *
@@ -271,7 +275,8 @@ namespace Sigma {
         std::vector<id_t> id_vector;
 
         // The translation class we will use (gcc inline/VS intrinsic/...)
-        Translate translate;
+        // deactivated for the moment
+//        Translate translate;
     };
 }
 

@@ -110,6 +110,8 @@ namespace Sigma {
 			viewBitsetMap.insert(std::make_pair(id, BitArray<unsigned short>::Create()));
 		};
 
+		// These functions are not used for the moment
+/*
 		// TODO : move to UserView component
 		/** \brief A function providing all the cartesian positions with a translation
 		 * and a conversion in single precision
@@ -122,7 +124,7 @@ namespace Sigma {
 		 * \return std::unique_ptr<position_array> the entity positions translated
 		 *
 		 */
-		inline std::unique_ptr<position_array> TransformedPositions(const id_t id) {
+/*		inline std::unique_ptr<position_array> TransformedPositions(const id_t id) {
 			return pphysical.RelativeTo(pphysical.x(id), pphysical.y(id), pphysical.z(id));
 		};
 
@@ -135,13 +137,13 @@ namespace Sigma {
 		 * \return std::shared_ptr<BitArray<unsigned short>> the bitset
 		 *
 		 */
-		inline std::shared_ptr<BitArray<unsigned short>> InViewPositions(const id_t id) {
+/*		inline std::shared_ptr<BitArray<unsigned short>> InViewPositions(const id_t id) {
 			auto distance = viewDistanceMap.find(id);
 			if (distance != viewDistanceMap.end()) {
 				return pphysical.InViewPositions(pphysical.x(id), pphysical.y(id), pphysical.z(id), distance->second);
 			}
 		};
-
+*/
 	private:
 		static WorldPosition pphysical;
 		static WorldOrientation ophysical;

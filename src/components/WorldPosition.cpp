@@ -49,7 +49,8 @@ namespace Sigma {
             position_guard_z.SetElement(entity_id, &positions_z.back());
             // save id of last object
             id_vector.push_back(entity_id);
-            translate.IncreaseLength();
+		// deactivated
+//            translate.IncreaseLength();
         }
         // return a callback containing unique_ptr
         return gf.Write(entity_id);
@@ -89,10 +90,11 @@ namespace Sigma {
         positions_y.pop_back();
         positions_z.pop_back();
         id_vector.pop_back();
-        translate.DecreaseLength();
+		// deactivated
+//        translate.DecreaseLength();
     }
-
-    std::unique_ptr<position_array> WorldPosition::RelativeTo(const coordinate_type x, const coordinate_type y,
+	// Remove unused functions for the moment
+/*    std::unique_ptr<position_array> WorldPosition::RelativeTo(const coordinate_type x, const coordinate_type y,
                                               const coordinate_type z) {
         auto xa = translate.RelativeTo(x, positions_x);
         auto ya = translate.RelativeTo(y, positions_y);
@@ -110,6 +112,6 @@ namespace Sigma {
         translate.InViewPositions(z, positions_z, distance, *bitmap);
         return bitmap;
     }
-
+*/
 }
 
