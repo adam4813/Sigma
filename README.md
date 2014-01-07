@@ -18,7 +18,7 @@ Coding standards and practices can be found [here](https://github.com/adam4813/S
 Installing
 ===
 Sigma requires the following dependencies:
-* [GLEW](http://glew.sourceforge.net) 1.5.2 or newer;
+* [GLEW](http://glew.sourceforge.net) 1.5.2 or newer, not required on OS X;
 * [GLFW](http://www.glfw.org) 3.0.0 or newer;
 * [GLM](http://glm.g-truc.net);
 * [SOIL](http://www.lonesock.net/soil.html);
@@ -38,7 +38,7 @@ Use CMake to create makefiles or projects. The resulting executable will be save
 
 If you want to compile Sigma on OS X, your system must be running OS X 10.7 or later.  You will need to have installed Xcode and, unless your system is running 10.9, the Command Line Tools.  Both can be downloaded from the [Apple Developer Website](https://developer.apple.com/downloads).  
 
-Before you can build Sigma, you'll first need to install the dependencies separately.  Using a package manager, such as [MacPorts](http://macports.org), is recommended.
+Before you can build Sigma, you'll first need to install the dependencies separately.  Using a package manager, such as [MacPorts](http://macports.org), is recommended.  Sigma can only be built as a 32-bit executable under OS X.  All dependencies, except cmake, that you install must include a 32-bit slice.
 
 If MacPorts is present, you can use the following commands to install CMake, GLM, GLFW, libogg and libvorbis:
 
@@ -61,6 +61,8 @@ Sigma on OS X requires a [patched version](https://github.com/DeVaukz/SOIL) of S
 	cd SOIL
 	cmake . -G "Unix Makefiles"
 	make -j10 && sudo make install 
+
+Awesomium is only distributed in binary form.  Download and run the installer from the [Awesomium website](http://www.awesomium.com/). 
 
 Once all the dependencies are installed, you can build Sigma.
 
