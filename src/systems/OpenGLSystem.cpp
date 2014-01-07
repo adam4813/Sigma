@@ -61,12 +61,10 @@ namespace Sigma{
 	std::map<std::string, Sigma::resource::GLTexture> OpenGLSystem::textures;
 
 	OpenGLSystem::OpenGLSystem() : windowWidth(1024), windowHeight(768), deltaAccumulator(0.0),
-		framerate(60.0f), pointQuad(1000), ambientQuad(1001), spotQuad(1002), viewMode("") {}
+		framerate(60.0f), pointQuad(1000), ambientQuad(1001), spotQuad(1002) {}
 
-	//std::map<std::string, resource::GLTexture> OpenGLSystem::textures = std::map<std::string, resource::GLTexture>();
 
-	std::map<std::string, Sigma::IFactory::FactoryFunction>
-        OpenGLSystem::getFactoryFunctions() {
+	std::map<std::string, Sigma::IFactory::FactoryFunction> OpenGLSystem::getFactoryFunctions() {
 		using namespace std::placeholders;
 
 		std::map<std::string, Sigma::IFactory::FactoryFunction> retval;
@@ -74,28 +72,17 @@ namespace Sigma{
 		retval["GLIcoSphere"] = std::bind(&OpenGLSystem::createGLIcoSphere,this,_1,_2);
 		retval["GLCubeSphere"] = std::bind(&OpenGLSystem::createGLCubeSphere,this,_1,_2);
 		retval["GLMesh"] = std::bind(&OpenGLSystem::createGLMesh,this,_1,_2);
-		retval["FPSCamera"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2, "FPSCamera");
-		retval["GLSixDOFView"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2, "GLSixDOFView");
+		retval["FPSCamera"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2);
+		retval["GLSixDOFView"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2);
 		retval["PointLight"] = std::bind(&OpenGLSystem::createPointLight,this,_1,_2);
 		retval["SpotLight"] = std::bind(&OpenGLSystem::createSpotLight,this,_1,_2);
 		retval["GLScreenQuad"] = std::bind(&OpenGLSystem::createScreenQuad,this,_1,_2);
 
-        return retval;
-    }
+		return retval;
+	}
 
-	IComponent* OpenGLSystem::createGLView(const id_t entityID, const std::vector<Property> &properties, std::string mode) {
-		viewMode = mode;
-
-		if(mode=="FPSCamera") {
-			this->views.push_back(new Sigma::event::handler::FPSCamera(entityID));
-		}
-		else if(mode=="GLSixDOFView") {
-			this->views.push_back(new GLSixDOFView(entityID));
-		}
-		else {
-			std::cerr << "Invalid view type!" << std::endl;
-			return nullptr;
-		}
+	IComponent* OpenGLSystem::createGLView(const id_t entityID, const std::vector<Property> &properties) {
+		this->views.push_back(new IGLView(entityID));
 
 		float x=0.0f, y=0.0f, z=0.0f, rx=0.0f, ry=0.0f, rz=0.0f;
 
@@ -374,22 +361,6 @@ namespace Sigma{
 			else if (p->GetName() == "lightEnabled") {
 				mesh->SetLightingEnabled(p->Get<bool>());
 			}
-			else if (p->GetName() == "parent") {
-				/* Right now hacky, only GLMesh and FPSCamera are supported as parents */
-
-				int parentID = p->Get<int>();
-				SpatialComponent *comp = dynamic_cast<SpatialComponent *>(this->getComponent(parentID, Sigma::GLMesh::getStaticComponentTypeName()));
-
-				if(comp) {
-					mesh->Transform()->SetParentTransform(comp->Transform());
-				} else {
-					comp = dynamic_cast<SpatialComponent *>(this->getComponent(parentID, Sigma::event::handler::FPSCamera::getStaticComponentTypeName()));
-
-					if(comp) {
-						mesh->Transform()->SetParentTransform(comp->Transform());
-					}
-				}
-			}
 		}
 
 		mesh->SetCullFace(cull_face);
@@ -402,10 +373,10 @@ namespace Sigma{
 		else {
 			mesh->LoadShader(); // load default
 		}
-        mesh->InitializeBuffers();
-        this->addComponent(entityID,mesh);
-        return mesh;
-    }
+		mesh->InitializeBuffers();
+		this->addComponent(entityID,mesh);
+		return mesh;
+	}
 
 	IComponent* OpenGLSystem::createScreenQuad(const id_t entityID, const std::vector<Property> &properties) {
 		Sigma::GLScreenQuad* quad = new Sigma::GLScreenQuad(entityID);
@@ -560,21 +531,6 @@ namespace Sigma{
 				light->outerAngle = p->Get<float>();
 				light->cosOuterAngle = glm::cos(light->outerAngle);
 			}
-			else if (p->GetName() == "parent") {
-				/* Right now hacky, only GLMesh and FPSCamera are supported as parents */
-				int parentID = p->Get<int>();
-				SpatialComponent *comp = dynamic_cast<SpatialComponent *>(this->getComponent(parentID, Sigma::GLMesh::getStaticComponentTypeName()));
-
-				if(comp) {
-					light->transform.SetParentTransform(comp->Transform());
-				} else {
-					comp = dynamic_cast<SpatialComponent *>(this->getComponent(parentID, Sigma::event::handler::FPSCamera::getStaticComponentTypeName()));
-
-					if(comp) {
-						light->transform.SetParentTransform(comp->Transform());
-					}
-				}
-			}
 		}
 
 		light->transform.TranslateTo(x, y, z);
@@ -605,12 +561,11 @@ namespace Sigma{
 		// Get backbuffer depth bit width
 		int depthBits;
 #ifdef __APPLE__
-        // The modern way.
-        glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_DEPTH, GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE, &depthBits);
+		// The modern way.
+		glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_DEPTH, GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE, &depthBits);
 #else
-        glGetIntegerv(GL_DEPTH_BITS, &depthBits);
+		glGetIntegerv(GL_DEPTH_BITS, &depthBits);
 #endif
-		std::cout << "Depth buffer bits: " << depthBits << std::endl;
 
 		// Create the depth render buffer
 		if(rt->hasDepth) {
@@ -646,11 +601,11 @@ namespace Sigma{
 		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
 		switch(status) {
-			case GL_FRAMEBUFFER_COMPLETE:
-				std::cout << "Successfully created render target.";
-				break;
-			default:
-				assert(0 && "Error: Framebuffer format is not compatible.");
+		case GL_FRAMEBUFFER_COMPLETE:
+			std::cout << "Successfully created render target.";
+			break;
+		default:
+			assert(0 && "Error: Framebuffer format is not compatible.");
 		}
 
 		// Unbind objects
@@ -686,12 +641,12 @@ namespace Sigma{
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-    bool OpenGLSystem::Update(const double delta) {
-        this->deltaAccumulator += delta;
+	bool OpenGLSystem::Update(const double delta) {
+		this->deltaAccumulator += delta;
 
-        // Check if the deltaAccumulator is greater than 1/<framerate>th of a second.
-        //  ..if so, it's time to render a new frame
-        if (this->deltaAccumulator > (1.0 / this->framerate)) {
+		// Check if the deltaAccumulator is greater than 1/<framerate>th of a second.
+		//  ..if so, it's time to render a new frame
+		if (this->deltaAccumulator > (1.0 / this->framerate)) {
 
 			/////////////////////
 			// Rendering Setup //
@@ -717,8 +672,8 @@ namespace Sigma{
 
 			// Clear the backbuffer and primary depth/stencil buffer
 			glClearColor(0.0f,0.0f,0.0f,1.0f);
-            glViewport(0, 0, this->windowWidth, this->windowHeight); // Set the viewport size to fill the window
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
+			glViewport(0, 0, this->windowWidth, this->windowHeight); // Set the viewport size to fill the window
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
 			//////////////////
 			// GBuffer Pass //
@@ -733,8 +688,8 @@ namespace Sigma{
 			glDisable(GL_BLEND);
 
 			// Clear the GBuffer
-            glClearColor(0.0f,0.0f,0.0f,1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
+			glClearColor(0.0f,0.0f,0.0f,1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear required buffers
 
 			// Loop through and draw each GL Component component.
 			for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
@@ -770,8 +725,7 @@ namespace Sigma{
 			}
 
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-			glBlitFramebuffer(0, 0, this->windowWidth, this->windowHeight, 0, 0, this->windowWidth, this->windowHeight,
-                  GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+			glBlitFramebuffer(0, 0, this->windowWidth, this->windowHeight, 0, 0, this->windowWidth, this->windowHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
 			if(this->renderTargets.size() > 0) {
 				this->renderTargets[0]->UnbindRead();
@@ -823,7 +777,7 @@ namespace Sigma{
 					PointLight *light = dynamic_cast<PointLight*>(citr->second.get());
 
 					// If it is a point light, and it intersects the frustum, then render
-					if(light && this->GetView(0)->CameraFrustum.isectSphere(light->position, light->radius) ) {
+					if(light && this->GetView(0)->CameraFrustum.intersectsSphere(light->position, light->radius) ) {
 
 						GLSLShader &shader = (*this->pointQuad.GetShader().get());
 						shader.Use();
@@ -950,11 +904,11 @@ namespace Sigma{
 			// Unbind frame buffer
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-            this->deltaAccumulator = 0.0;
-            return true;
-        }
-        return false;
-    }
+			this->deltaAccumulator = 0.0;
+			return true;
+		}
+		return false;
+	}
 
 	GLTransform *OpenGLSystem::GetTransformFor(const unsigned int entityID) {
 		auto entity = &(_Components[entityID]);
@@ -973,10 +927,10 @@ namespace Sigma{
 		return 0;
 	}
 
-    const int* OpenGLSystem::Start() {
-        // Use the GL3 way to get the version number
-        glGetIntegerv(GL_MAJOR_VERSION, &OpenGLVersion[0]);
-        glGetIntegerv(GL_MINOR_VERSION, &OpenGLVersion[1]);
+	const int* OpenGLSystem::Start() {
+		// Use the GL3 way to get the version number
+		glGetIntegerv(GL_MAJOR_VERSION, &OpenGLVersion[0]);
+		glGetIntegerv(GL_MINOR_VERSION, &OpenGLVersion[1]);
 
 		// Sanity check to make sure we are at least in a good major version number.
 		assert((OpenGLVersion[0] > 1) && (OpenGLVersion[0] < 5));
@@ -988,30 +942,30 @@ namespace Sigma{
 		}
 
 		// Generate a projection matrix (the "view") based on basic window dimensions
-        this->ProjectionMatrix = glm::perspective(
-            45.0f, // field-of-view (height)
-            aspectRatio, // aspect ratio
-            0.1f, // near culling plane
-            10000.0f // far culling plane
-            );
+		this->ProjectionMatrix = glm::perspective(
+			45.0f, // field-of-view (height)
+			aspectRatio, // aspect ratio
+			0.1f, // near culling plane
+			10000.0f // far culling plane
+			);
 
-        // App specific global gl settings
-        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+		// App specific global gl settings
+		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 #if __APPLE__
-        // GL_TEXTURE_CUBE_MAP_SEAMLESS and GL_MULTISAMPLE are Core.
-        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // allows for cube-mapping without seams
-        glEnable(GL_MULTISAMPLE);
+		// GL_TEXTURE_CUBE_MAP_SEAMLESS and GL_MULTISAMPLE are Core.
+		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // allows for cube-mapping without seams
+		glEnable(GL_MULTISAMPLE);
 #else
-        if (GLEW_AMD_seamless_cubemap_per_texture) {
+		if (GLEW_AMD_seamless_cubemap_per_texture) {
 			glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // allows for cube-mapping without seams
 		}
 		if (GLEW_ARB_multisample) {
 			glEnable(GL_MULTISAMPLE_ARB);
 		}
 #endif
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-        glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+		glEnable(GL_DEPTH_TEST);
 
 		// Setup a screen quad for deferred rendering
 		this->pointQuad.SetSize(1.0f, 1.0f);
@@ -1064,11 +1018,11 @@ namespace Sigma{
 		this->ambientQuad.GetShader()->AddUniform("colorBuffer");
 		this->ambientQuad.GetShader()->UnUse();
 
-        return OpenGLVersion;
-    }
+		return OpenGLVersion;
+	}
 
-    void OpenGLSystem::SetViewportSize(const unsigned int width, const unsigned int height) {
-        this->windowHeight = height;
+	void OpenGLSystem::SetViewportSize(const unsigned int width, const unsigned int height) {
+		this->windowHeight = height;
 		this->windowWidth = width;
 
 		// Determine the aspect ratio and sanity check it to a safe ratio
@@ -1077,14 +1031,14 @@ namespace Sigma{
 			aspectRatio = 4.0f / 3.0f;
 		}
 
-        // update projection matrix based on new aspect ratio
-        this->ProjectionMatrix = glm::perspective(
-            45.0f,
-            aspectRatio,
-            0.1f,
-            10000.0f
-            );
-    }
+		// update projection matrix based on new aspect ratio
+		this->ProjectionMatrix = glm::perspective(
+			45.0f,
+			aspectRatio,
+			0.1f,
+			10000.0f
+			);
+	}
 
 } // namespace Sigma
 
@@ -1094,15 +1048,12 @@ namespace Sigma{
 // Returns 1 if an OpenGL error occurred, 0 otherwise.
 //
 
-int printOglError(const std::string &file, int line)
-{
-
+int printOglError(const std::string &file, int line) {
 	GLenum glErr;
-	int    retCode = 0;
+	int retCode = 0;
 
 	glErr = glGetError();
-	if (glErr != GL_NO_ERROR)
-	{
+	if (glErr != GL_NO_ERROR) {
 		std::cerr << "glError in file " << file << " @ line " << line << ": " << gluErrorString(glErr) << std::endl;
 		retCode = 1;
 	}

@@ -136,24 +136,22 @@ int main(int argCount, char **argValues) {
 		props.push_back(p_y);
 		props.push_back(p_z);
 
-		glsys.createGLView(1, props, "FPSCamera");
+		glsys.createGLView(1, props);
 	}
 
 	//Create the controller
 	//Perhaps a little awkward currently, should create a generic
 	//controller class ancestor
-	using Sigma::event::handler::FPSCamera;
-	FPSCamera* theCamera;
-	if(glsys.GetViewMode() == "FPSCamera") {
-		theCamera = static_cast<FPSCamera*>(glsys.GetView());
-		glfwos.RegisterKeyboardEventHandler(theCamera);
-		glfwos.RegisterMouseEventHandler(theCamera);
-		theCamera->os = &glfwos;
-	}
+	bphys.initViewMover(*glsys.GetView()->Transform());
+
+	Sigma::event::handler::FPSCamera theCamera(*bphys.getViewMover());
+	glsys.GetView()->Transform()->SetEuler(true);
+	glsys.GetView()->Transform()->SetMaxRotation(glm::vec3(45.0f,0,0));
+	glfwos.RegisterKeyboardEventHandler(&theCamera);
+	glfwos.RegisterMouseEventHandler(&theCamera);
+	theCamera.os = &glfwos;
 	
 	// Sync bullet physics object with gl camera
-	bphys.initViewMover(*theCamera->Transform());
-	theCamera->SetMover(bphys.getViewMover());
 
 	///////////////////
 	// Configure GUI //
