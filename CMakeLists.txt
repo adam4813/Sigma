@@ -1,8 +1,8 @@
-cmake_minimum_required (VERSION 2.8)
-project (Sigma)
+CMAKE_MINIMUM_REQUIRED (VERSION 2.8)
+PROJECT (Sigma)
 
 # Set the include directory
-include_directories("${CMAKE_SOURCE_DIR}/include")
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include")
 
 # Set the cmake search paths
 SET(CMAKE_INCLUDE_PATH ${CMAKE_SOURCE_DIR}/include)
@@ -10,189 +10,150 @@ SET(CMAKE_INCLUDE_PATH ${CMAKE_SOURCE_DIR}/include)
 # change output directory of executable so that relative paths in the code are correct
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 
-#Setup the core variables
-SET(Sigma_SRC "")
-
 # Set the directory of Find<Library>.cmake modules
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
 
 # find all source files in the src directory
-file(GLOB Sigma_SRC "include/*.h" "src/*.cpp")
+FILE(GLOB Sigma_SRC "include/*.h" "src/*.cpp")
 
-# Filter the source/header files for various groups of files
-# Put all component files into a filter
-file(GLOB Sigma_SRC_COMPONENT_H "include/components/*.h")
-source_group("Header Files\\components" FILES ${Sigma_SRC_COMPONENT_H})
-file(GLOB Sigma_SRC_COMPONENT_CPP "src/components/*.cpp")
-source_group("Source Files\\components" FILES ${Sigma_SRC_COMPONENT_CPP})
+## Filter the source/header files for various groups of files.
 
-# Put all Systems files into a filter
-file(GLOB Sigma_SRC_SYSTEM_H "include/systems/*.h")
-source_group("Header Files\\systems" FILES ${Sigma_SRC_SYSTEM_H})
-file(GLOB Sigma_SRC_SYSTEM_CPP "src/systems/*.cpp")
-source_group("Source Files\\systems" FILES ${Sigma_SRC_SYSTEM_CPP})
+# Put all component files into a filter.
+FILE(GLOB Sigma_SRC_COMPONENT_H "include/components/*.h")
+SOURCE_GROUP("Header Files\\components" FILES ${Sigma_SRC_COMPONENT_H})
+FILE(GLOB Sigma_SRC_COMPONENT_CPP "src/components/*.cpp")
+SOURCE_GROUP("Source Files\\components" FILES ${Sigma_SRC_COMPONENT_CPP})
 
-# Put all Controller files into a filter
-file(GLOB Sigma_SRC_CONTROLLERS_H "include/controllers/*.h")
-source_group("Header Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_H})
-file(GLOB Sigma_SRC_CONTROLLERS_CPP "src/controllers/*.cpp")
-source_group("Source Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_CPP})
+# Put all Systems files into a filter.
+FILE(GLOB Sigma_SRC_SYSTEM_H "include/systems/*.h")
+SOURCE_GROUP("Header Files\\systems" FILES ${Sigma_SRC_SYSTEM_H})
+FILE(GLOB Sigma_SRC_SYSTEM_CPP "src/systems/*.cpp")
+SOURCE_GROUP("Source Files\\systems" FILES ${Sigma_SRC_SYSTEM_CPP})
 
-# Put all Resource files into a filter
-file(GLOB Sigma_SRC_RESOURCES_H "include/resources/*.h")
-source_group("Header Files\\resources" FILES ${Sigma_SRC_RESOURCES_H})
+# Put all Controller files into a filter.
+FILE(GLOB Sigma_SRC_CONTROLLERS_H "include/controllers/*.h")
+SOURCE_GROUP("Header Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_H})
+FILE(GLOB Sigma_SRC_CONTROLLERS_CPP "src/controllers/*.cpp")
+SOURCE_GROUP("Source Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_CPP})
+
+# Put all Resource files into a filter.
+FILE(GLOB Sigma_SRC_RESOURCES_H "include/resources/*.h")
+SOURCE_GROUP("Header Files\\resources" FILES ${Sigma_SRC_RESOURCES_H})
 
 # Output the compiler ID.
-message("Compiler ID: " ${CMAKE_CXX_COMPILER_ID})
+MESSAGE("Compiler ID: " ${CMAKE_CXX_COMPILER_ID})
 
-# check for gcc version to set c++11 or c++0x
-# thanks to http://stackoverflow.com/questions/10984442/how-to-detect-c11-support-of-a-compiler-with-cmake
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+## Check that the compiler is compatible and new enough to build everything.
+
+# check for gcc version to set c++11 or c++0x.
+# thanks to http://stackoverflow.com/questions/10984442/how-to-detect-c11-support-of-a-compiler-with-cmake .
+IF ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
 	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-	if (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
+	IF (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
 		# c++11 std only appears in gcc 4.7 or higher. c++0x will work for lesser versions.
-		message("gcc ${GCC_VERSION} does not support c++11, only c++0x. This may cause some problems in the future. We recommend upgrading to gcc-4.7 or greater.")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-	else(NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
+		MESSAGE("gcc ${GCC_VERSION} does not support c++11, only c++0x. This may cause some problems in the future. We recommend upgrading to gcc-4.7 or greater.")
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+	ELSE (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
 		# compiler is gcc 4.7 or higher. Force c++11.
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-	endif (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
-elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+	ENDIF (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
+ELSEIF ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 	# Clang 3.3 and up support c++11.  
 	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE CLANG_VERSION)
-	if (NOT (CLANG_VERSION VERSION_GREATER 3.3 OR CLANG_VERSION VERSION_EQUAL 3.3))
+	IF (NOT (CLANG_VERSION VERSION_GREATER 3.3 OR CLANG_VERSION VERSION_EQUAL 3.3))
 		# c++11 std only appears in clang 3.3 or higher. c++0x will work for lesser versions.
-		message("clang ${CLANG_VERSION} does not support c++11, only c++0x. This may cause some problems in the future. We recommend upgrading to clang-3.3 or greater.")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-	else (NOT (CLANG_VERSION VERSION_GREATER 3.3 OR CLANG_VERSION VERSION_EQUAL 3.3))
+		MESSAGE("clang ${CLANG_VERSION} does not support c++11, only c++0x. This may cause some problems in the future. We recommend upgrading to clang-3.3 or greater.")
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+	ELSE (NOT (CLANG_VERSION VERSION_GREATER 3.3 OR CLANG_VERSION VERSION_EQUAL 3.3))
 		# compiler is clang 3.3 or higher. Force c++11 and use libc++.
-		if (XCODE_VERSION)
-			set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD c++11)
-    		set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY libc++)
-		else (XCODE_VERSION)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
-		endif (XCODE_VERSION)
-	endif (NOT (CLANG_VERSION VERSION_GREATER 3.3 OR CLANG_VERSION VERSION_EQUAL 3.3))
-elseif (MSVC AND (MSVC10 OR MSVC11))
-	message("Support Visual Studio!")
-else ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
-	message(FATAL_ERROR "Your C++ compiler does not support C++11.")
-endif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
-
-add_definitions(
-	-DGLEW_STATIC # Add a define to prevent GLEW linker warnings
-)
+		IF (XCODE_VERSION)
+			SET(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD c++11)
+			SET(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY libc++)
+		ELSE (XCODE_VERSION)
+			SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
+		ENDIF (XCODE_VERSION)
+	ENDIF (NOT (CLANG_VERSION VERSION_GREATER 3.3 OR CLANG_VERSION VERSION_EQUAL 3.3))
+ELSEIF (MSVC AND (MSVC10 OR MSVC11))
+	MESSAGE("Supported Visual Studio!")
+ELSE ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+	MESSAGE(FATAL_ERROR "Your C++ compiler does not support C++11.")
+ENDIF ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
 
 ## Set the libraries
 
-# Link against OpenGL
-# We can use the find OpenGL package on windows
-find_package(OpenGL REQUIRED)
-if(NOT OPENGL_FOUND)
-	message(FATAL_ERROR "OpenGL not found! Aborting!")
-endif(NOT OPENGL_FOUND)
+# If we are on windows add in the local search directories as well.
+IF (WIN32 AND NOT MINGW) # Windows
+	SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${CMAKE_SOURCE_DIR}/include/libraries)
+	INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include/libraries")
+	IF (CMAKE_CL_64)
+	LINK_DIRECTORIES("${CMAKE_SOURCE_DIR}/lib/x64/debug" "${CMAKE_SOURCE_DIR}/lib/x64/release")
+	SET(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x64/debug ${CMAKE_SOURCE_DIR}/lib/x64/release)
+	ELSE (CMAKE_CL_64)
+	LINK_DIRECTORIES("${CMAKE_SOURCE_DIR}/lib/x86/debug" "${CMAKE_SOURCE_DIR}/lib/x86/release")
+	SET(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x86/debug ${CMAKE_SOURCE_DIR}/lib/x86/release)
+	ENDIF (CMAKE_CL_64)
+ENDIF (WIN32 AND NOT MINGW)
 
-# Figure out what Operating System to compile against
-if(WIN32 AND NOT MINGW) # Windows
-	set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${CMAKE_SOURCE_DIR}/include/libraries)
-	include_directories("${CMAKE_SOURCE_DIR}/include/libraries")
-	if (CMAKE_CL_64)
-	link_directories("${CMAKE_SOURCE_DIR}/lib/x64")
-	set(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x64)
-	else (CMAKE_CL_64)
-	link_directories("${CMAKE_SOURCE_DIR}/lib/x86")
-	set(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x86)
-	endif (CMAKE_CL_64)
+# Find all the libraries except GLEW and platform specific.
+FIND_PACKAGE(OpenGL REQUIRED)
+FIND_PACKAGE(GLFW3 REQUIRED)
+FIND_PACKAGE(OggVorbis REQUIRED)
+FIND_PACKAGE(OpenAL REQUIRED)
+FIND_PACKAGE(Bullet REQUIRED)
+FIND_PACKAGE(SOIL REQUIRED)
+FIND_PACKAGE(Awesomium REQUIRED)
 
-	SET(GLFW3_LIBRARY glfw3)
-	set(GLEW_LIBRARY glew32s glew32)
-	set(BULLET_LINEARMATH_LIBRARIES LinearMath)
-	set(BULLET_COLLISION_LIBRARIES BulletCollision)
-	set(BULLET_DYNAMICS_LIBRARIES BulletDynamics)
-	SET(SOIL_LIBRARY SOIL)
-	SET(AWESOMIUM_LIBRARY Awesomium)
-endif(WIN32 AND NOT MINGW)
-
+# Give these some dummy values and if the platform is LINUX or OSX they will be set accordingly.
 SET(X11_LIBRARIES "")
-
-find_package(OggVorbis REQUIRED)
-find_package(OpenAL REQUIRED)
-
-if(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux") # *nix compliant
-	if (NOT APPLE) # X11 and GLEW are not needed on OS X.
-		find_package(X11)
-		find_package(GLEW REQUIRED)
-		if(NOT GLEW_FOUND)
-			message(FATAL_ERROR "GLEW not found! Aborting!")
-		endif(NOT GLEW_FOUND)
-	endif (NOT APPLE)
-
-	find_package(GLFW3 REQUIRED)
-	if(NOT GLFW3_FOUND)
-		message(FATAL_ERROR "GLFW3 not found! Aborting!")
-	endif(NOT GLFW3_FOUND)
-
-	find_package(Bullet REQUIRED)
-	if(NOT (BULLET_DYNAMICS_FOUND AND BULLET_COLLISION_FOUND AND BULLET_LINEARMATH_FOUND))
-		message(FATAL_ERROR "Bullet Physics was not found. Aborting!")
-	endif(NOT (BULLET_DYNAMICS_FOUND AND BULLET_COLLISION_FOUND AND BULLET_LINEARMATH_FOUND))
-
-	find_package(SOIL REQUIRED)
-	if(NOT ${SOIL_FOUND})
-		message(FATAL_ERROR "SOIL wasn't found!")
-		message(ERROR "Please install SOIL, or if you have it installed, make sure that modules/FindSOIL.cmake looks for it")
-	endif(NOT ${SOIL_FOUND})
-
-	find_package(Awesomium REQUIRED)
-	if(NOT ${AWESOMIUM_FOUND})
-		message(FATAL_ERROR "Awesomium wasn't found!")
-	endif(NOT ${AWESOMIUM_FOUND})
-endif(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-
 SET(OSX_LIBRARIES "")
 
-if(APPLE) # Mac OSX
-	SET(GLEW_LIBRARY "")
+IF (NOT APPLE) # X11 and GLEW are not needed on OSX.
+	FIND_PACKAGE(X11)
+	FIND_PACKAGE(GLEW REQUIRED) # We find GLEW here as OSX doesn't need it.
+	IF (NOT GLEW_FOUND)
+		MESSAGE(FATAL_ERROR "GLEW not found! Aborting!")
+	ENDIF (NOT GLEW_FOUND)
+ENDIF (NOT APPLE)
+
+IF (APPLE) # Mac OSX
+	SET(GLEW_LIBRARY "") # Set a dummy value for GLEW.
 
 	# Awesomium does not support 64-bit.
-	set(CMAKE_OSX_ARCHITECTURES i386)
-	set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS "i386")
-	set(CMAKE_XCODE_ATTRIBUTE_SUPPORTED_PLATFORMS macosx)
+	SET(CMAKE_OSX_ARCHITECTURES i386)
+	SET(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS "i386")
+	SET(CMAKE_XCODE_ATTRIBUTE_SUPPORTED_PLATFORMS macosx)
 
 	# Need the 10.7 SDK or later.
-	execute_process(COMMAND xcodebuild -sdk macosx -version SDKVersion OUTPUT_VARIABLE OSX_SDK_VERSION)
-	if(NOT (OSX_SDK_VERSION VERSION_GREATER 10.7 OR OSX_SDK_VERSION VERSION_EQUAL 10.7))
-		message(FATAL_ERROR "The installed version of Xcode does not support the 10.7 SDK or later.  Please upgrade Xcode and try again.")
-	endif(NOT (OSX_SDK_VERSION VERSION_GREATER 10.7 OR OSX_SDK_VERSION VERSION_EQUAL 10.7))
+	EXECUTE_PROCESS(COMMAND xcodebuild -sdk macosx -version SDKVersion OUTPUT_VARIABLE OSX_SDK_VERSION)
+	IF (NOT (OSX_SDK_VERSION VERSION_GREATER 10.7 OR OSX_SDK_VERSION VERSION_EQUAL 10.7))
+		MESSAGE(FATAL_ERROR "The installed version of Xcode does not support the 10.7 SDK or later.  Please upgrade Xcode and try again.")
+	ENDIF (NOT (OSX_SDK_VERSION VERSION_GREATER 10.7 OR OSX_SDK_VERSION VERSION_EQUAL 10.7))
 
 	# Configure the project to use the correct SDK.
-    if(XCODE_VERSION)
-        SET(CMAKE_OSX_SYSROOT macosx)
-    else(XCODE_VERSION)
-    	# Non-Xcode generators need the full path.
-        execute_process(COMMAND xcodebuild -sdk macosx -version Path | head -n 1 OUTPUT_VARIABLE CMAKE_OSX_SYSROOT)
-        string(REGEX REPLACE "(\r?\n)+$" "" CMAKE_OSX_SYSROOT "${CMAKE_OSX_SYSROOT}")
-    endif(XCODE_VERSION)
+	IF (XCODE_VERSION)
+		SET(CMAKE_OSX_SYSROOT macosx)
+	ELSE (XCODE_VERSION)
+		# Non-Xcode generators need the full path.
+		EXECUTE_PROCESS(COMMAND xcodebuild -sdk macosx -version Path | head -n 1 OUTPUT_VARIABLE CMAKE_OSX_SYSROOT)
+		STRING(REGEX REPLACE "(\r?\n)+$" "" CMAKE_OSX_SYSROOT "${CMAKE_OSX_SYSROOT}")
+	ENDIF (XCODE_VERSION)
 
 	# Can deploy back to 10.7, the first OS X to support the GL Core.
-	set(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
+	SET(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
 
 	# Need Core Foundation and libobjc.
-	set(OSX_LIBRARIES "-framework CoreFoundation /usr/lib/libobjc.dylib")
+	SET(OSX_LIBRARIES "-framework CoreFoundation /usr/lib/libobjc.dylib")
 
-	if(NOT XCODE_VERSION)
+	IF (NOT XCODE_VERSION)
 		# Yuck. The Makefile generator is not emitting a -F/Path/To/Awesomium flag.
 		# As a workaround, add the necessary flags ourself assuming the Awesomium was installed in its default location.
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -F/Library/Frameworks")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -F/Library/Frameworks")
-	endif(NOT XCODE_VERSION)
-endif(APPLE)
+		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -F/Library/Frameworks")
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -F/Library/Frameworks")
+	ENDIF (NOT XCODE_VERSION)
+ENDIF (APPLE)
 
 # add the executable
-add_executable(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP} ${Sigma_SRC_CONTROLLERS_H} ${Sigma_SRC_CONTROLLERS_CPP} ${Sigma_SRC_RESOURCES_H})
+ADD_EXECUTABLE(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP} ${Sigma_SRC_CONTROLLERS_H} ${Sigma_SRC_CONTROLLERS_CPP} ${Sigma_SRC_RESOURCES_H})
 
 # Link the executable to all required libraries
-target_link_libraries (Sigma ${OPENGL_LIBRARIES} ${GLFW3_LIBRARY} ${OGGVORBIS_LIBRARIES} ${OPENAL_LIBRARY} ${X11_LIBRARIES} ${OSX_LIBRARIES} ${GLEW_LIBRARY} ${SOIL_LIBRARY} ${BULLET_LINEARMATH_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${AWESOMIUM_LIBRARY})
-
-# build the Tests subproject
-#ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/tests")
+TARGET_LINK_LIBRARIES(Sigma ${OPENGL_LIBRARIES} ${GLFW3_LIBRARY} ${OGGVORBIS_LIBRARIES} ${OPENAL_LIBRARY} ${X11_LIBRARIES} ${OSX_LIBRARIES} ${GLEW_LIBRARY} ${SOIL_LIBRARY} ${BULLET_LINEARMATH_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${AWESOMIUM_LIBRARY})
