@@ -17,7 +17,7 @@
 namespace Sigma {
 	class OS {
 	public:
-		OS() : mouseLock(false) { event::KEY_ESCAPE = GLFW_KEY_ESCAPE; }
+		OS() : mouseLock(false) { }
 		~OS() { }
 
 		/**

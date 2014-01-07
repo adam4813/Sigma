@@ -55,7 +55,7 @@ namespace Sigma {
 				/**
 				 * \brief Currently does nothing.
 				 *
-				 * \param[in] BUTTON btn The button that was releaed.
+				 * \param[in] BUTTON btn The button that was released.
 				 * \param[in] float x, y Position of the cursor when the release occurred.
 				 * \return void
 				 */

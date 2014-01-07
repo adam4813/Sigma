@@ -1,15 +1,15 @@
 #include "controllers/GUIController.h"
 #include "components/WebGUIComponent.h"
 
-
 namespace Sigma {
 	namespace event {
 		namespace handler {
 			GUIController::GUIController() : hasFocus(false), gui(nullptr) {
-				// Clear out the internal key state buffers.
-				memset(this->keys, 1, sizeof(this->keys)); // We respond to every keypress
-				memset(this->keyState, 0, sizeof(this->keyState));
-				memset(this->chars, 1, sizeof(this->chars)); // We respond to every keypress
+				this->keys.reserve(512);
+				for (unsigned int i = 0; i < this->keys.capacity(); ++i) {
+					this->keys.push_back(i);
+				}
+				this->chars = this->keys;
 			}
 
 			void GUIController::KeyStateChange(const unsigned int key, const KEY_STATE state) {

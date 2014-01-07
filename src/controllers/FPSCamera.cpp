@@ -10,12 +10,11 @@ namespace Sigma{
 
 			FPSCamera::FPSCamera(PhysicsController& controller) : controller(controller), mouseLook(false) {
 				// Clear out the internal key state buffers.
-				memset(this->keys, 0, sizeof(this->keys));
-				memset(this->keyState, 0, sizeof(this->keyState));
-
-				// set to 1 all keys that should trigger an event in this class
-				this->keys['W'] = 1; this->keys['B'] = 1; this->keys['S'] = 1;
-				this->keys['A'] = 1; this->keys['D'] = 1;
+				this->keys.push_back('W');
+				this->keys.push_back('A');
+				this->keys.push_back('S');
+				this->keys.push_back('D');
+				this->keys.push_back('B');
 			}
 
 			void FPSCamera::KeyStateChange(const unsigned int key, const KEY_STATE state) {

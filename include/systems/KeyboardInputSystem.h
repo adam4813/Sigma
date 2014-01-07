@@ -7,17 +7,13 @@ namespace Sigma {
 	namespace event {
 		enum KEY_STATE {KS_UP, KS_DOWN};
 
-		static const unsigned int MAX_KEY = 348;
-
-		static int KEY_ESCAPE;
-
 		class KeyboardInputSystem;
 
 		// A keyboard event handler interface. Handlers can be controllers, loggers, etc.
 		struct IKeyboardEventHandler {
-			unsigned int keys[MAX_KEY]; // The keys this handler triggers off.
-			unsigned int chars[MAX_KEY]; // The keys this handler triggers off.
-			KEY_STATE keyState[MAX_KEY]; // State of the keys.
+			std::vector<unsigned int> keys;
+			std::vector<unsigned int> chars;
+			std::map<unsigned int, KEY_STATE> keyState; // State of the keys.
 			/**
 			 * \brief Called when on the keys reported during register has a state change.
 			 *
@@ -85,16 +81,16 @@ namespace Sigma {
 			 */
 			void Register(IKeyboardEventHandler* e) {
 				e->keyboardSystem = this;
-				for (unsigned int i = 0; i < MAX_KEY; i++) {
-					if (e->keys[i] > 0) {
-						this->eventHandlers[i].push_back(e);
-					}
+				for (auto itr = e->keys.begin(); itr != e->keys.end(); ++itr) {
+					this->eventHandlers[*itr].push_back(e);
 				}
-				for (unsigned int i = 0; i < MAX_KEY; i++) {
-					if (e->chars[i] > 0) {
-						this->charHandlers[i].push_back(e);
-					}
+				for (auto itr = e->chars.begin(); itr != e->chars.end(); ++itr) {
+					this->charHandlers[*itr].push_back(e);
 				}
+
+				 // Free up the memory now. We don't need to check which keys it is listening to any more.
+				e->keys.clear();
+				e->chars.clear();
 			}
 
 			/**
