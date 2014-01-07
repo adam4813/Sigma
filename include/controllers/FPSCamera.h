@@ -9,7 +9,7 @@
 #include "OS.h"
 
 namespace Sigma {
-	class BulletMover;
+	class PhysicsController;
 
 	namespace event {
 		namespace handler {
@@ -77,11 +77,11 @@ namespace Sigma {
 				 * \param[in/out] ViewMover * m The view mover.
 				 * \return void
 				 */
-				virtual void SetMover(BulletMover* m);
+				virtual void SetMover(PhysicsController* m);
 				
 				OS* os; //Very ugly, but there is no good way to do it right now
 			private:
-				BulletMover* mover; // The view mover component that applies the rotations and forces set in the trigger method.
+				PhysicsController* mover; // The view mover component that applies the rotations and forces set in the trigger method.
 				static const float SPEED_TRANSLATE, SPEED_ROTATE, BOOST_MULTIPLIER; // Speed variables
 				glm::vec3 translation; // Current translation.
 				bool mouseLook;

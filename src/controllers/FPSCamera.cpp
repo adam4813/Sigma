@@ -1,5 +1,5 @@
 #include "controllers/FPSCamera.h"
-#include "components/BulletMover.h"
+#include "components/PhysicsController.h"
 
 namespace Sigma{
 	namespace event{
@@ -68,7 +68,7 @@ namespace Sigma{
 					float xRot = dy * SPEED_ROTATE * -1.0f;
 					float yRot = dx * SPEED_ROTATE * -1.0f;
 					
-					this->mover->RotateNow(xRot, yRot, 0.0f);
+					this->mover->Rotate(xRot, yRot, 0.0f);
 				}
 			}
 
@@ -101,9 +101,8 @@ namespace Sigma{
 				//return this->transform.GetMatrix();
 			}
 
-			void FPSCamera::SetMover(BulletMover* m){
+			void FPSCamera::SetMover(PhysicsController* m){
 				if (m) {
-					m->SetTransform(*this->Transform());
 					this->mover = m;
 				}
 			}

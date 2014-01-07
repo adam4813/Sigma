@@ -6,7 +6,7 @@
 #include "systems/FactorySystem.h"
 #include "controllers/GUIController.h"
 #include "controllers/FPSCamera.h"
-#include "components/BulletMover.h"
+#include "components/PhysicsController.h"
 #include "components/GLScreenQuad.h"
 #include "SCParser.h"
 #include "systems/WebGUISystem.h"
@@ -139,24 +139,21 @@ int main(int argCount, char **argValues) {
 		glsys.createGLView(1, props, "FPSCamera");
 	}
 
-	// Still hard coded to use entity ID #1
-	// Link the graphics view to the physics system's view mover
-	Sigma::BulletMover* mover = bphys.getViewMover();
-
 	//Create the controller
 	//Perhaps a little awkward currently, should create a generic
 	//controller class ancestor
+	using Sigma::event::handler::FPSCamera;
+	FPSCamera* theCamera;
 	if(glsys.GetViewMode() == "FPSCamera") {
-		using Sigma::event::handler::FPSCamera;
-		FPSCamera* theCamera = static_cast<FPSCamera*>(glsys.GetView());
+		theCamera = static_cast<FPSCamera*>(glsys.GetView());
 		glfwos.RegisterKeyboardEventHandler(theCamera);
 		glfwos.RegisterMouseEventHandler(theCamera);
 		theCamera->os = &glfwos;
-		theCamera->SetMover(mover);
 	}
 	
 	// Sync bullet physics object with gl camera
-	bphys.initViewMover();
+	bphys.initViewMover(*theCamera->Transform());
+	theCamera->SetMover(bphys.getViewMover());
 
 	///////////////////
 	// Configure GUI //
