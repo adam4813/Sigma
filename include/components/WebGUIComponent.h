@@ -13,6 +13,7 @@ namespace Sigma {
 		SET_COMPONENT_TYPENAME("WebGUIView");
 		WebGUIView() : texture(nullptr), entity_id(0), mouseDown(0) { }
 		WebGUIView(const id_t entityID) : texture(nullptr), entity_id(entityID), mouseDown(0) { };
+		virtual ~WebGUIView() { this->browserHost->CloseBrowser(false); };
 
 		void SetTexture(Sigma::resource::GLTexture* texture) {
 			this->texture = texture;
@@ -50,6 +51,7 @@ namespace Sigma {
 		// CefLifeSpanHandler
 		void OnAfterCreated(CefRefPtr<CefBrowser> browser) OVERRIDE {
 			this->browserHost = browser->GetHost();
+			this->browserHost->SetMouseCursorChangeDisabled(true);
 		}
 
 		// CefRenderHandler
