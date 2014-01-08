@@ -87,6 +87,7 @@ namespace Sigma {
 
     struct position_ptr {
         position_ptr(const std::weak_ptr<const coordinate_type>& ptr) : ptr(ptr) {};
+        position_ptr() : ptr(std::weak_ptr<const coordinate_type>()) {};
         virtual ~position_ptr() {};
 
         operator const std::weak_ptr<const coordinate_type>() const { return ptr; };

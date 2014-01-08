@@ -4,15 +4,24 @@ namespace Sigma {
     WorldPosition::~WorldPosition() {}
 
     const position_ptr WorldPosition::x(const id_t entity_id) const {
-        return position_guard_x.Read(entity_id);
+    	if (position_guard_x.Exist(entity_id)) {
+			return position_guard_x.Read(entity_id);
+    	}
+    	return position_ptr();
     }
 
     const position_ptr WorldPosition::y(const id_t entity_id) const {
-        return position_guard_y.Read(entity_id);
+    	if (position_guard_y.Exist(entity_id)) {
+			return position_guard_y.Read(entity_id);
+    	}
+    	return position_ptr();
     }
 
     const position_ptr WorldPosition::z(const id_t entity_id) const {
-        return position_guard_z.Read(entity_id);
+    	if (position_guard_z.Exist(entity_id)) {
+			return position_guard_z.Read(entity_id);
+    	}
+    	return position_ptr();
     }
 
     SharedPointerMap<id_t, coordinate_type>& WorldPosition::PositionWrite_x(const id_t entity_id) {
