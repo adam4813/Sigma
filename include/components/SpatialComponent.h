@@ -8,11 +8,16 @@
 #include "IComponent.h"
 #include "GLTransform.h"
 #include "Sigma.h"
+#include "components/PhysicalWorldLocation.h"
 
 namespace Sigma {
 	class SpatialComponent : public IComponent {
 	public:
-		SpatialComponent(const id_t id = 0) : transform(new GLTransform()), IComponent(id) {}
+		SpatialComponent(const id_t id = 0) : transform(PhysicalWorldLocation::GetTransform(id)), IComponent(id) {
+			if (! transform) {
+				transform = std::make_shared<GLTransform>();
+			}
+		}
 		virtual ~SpatialComponent() {}
 
 		SET_COMPONENT_TYPENAME("SpatialComponent");
