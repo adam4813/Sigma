@@ -12,6 +12,7 @@
 #include "systems/GLSLShader.h"
 #include <unordered_map>
 #include <memory>
+#include "Sigma.h"
 
 namespace Sigma {
 	// A struct to store which index each of its verts are.
@@ -43,32 +44,33 @@ namespace Sigma {
     // http://en.wikipedia.org/wiki/Wavefront_.obj_file#Basic_materials
     struct Material {
         Material() {
-            ka[0] = 0.2f; ka[1] = 0.2f; ka[2] = 0.2f;
-            kd[0] = 0.8f; kd[1] = 0.8f; kd[2] = 0.8f;
+            ka[0] = 1.0f; ka[1] = 1.0f; ka[2] = 1.0f;
+            kd[0] = 1.0f; kd[1] = 1.0f; kd[2] = 1.0f;
             ks[0] = 1.0f; ks[1] = 1.0f; ks[2] = 1.0f;
             tr = 1.0f;
-            ns = 0.0f;
+            hardness = 64.0f;
             illum = 1;
         }
         float ka[3];
         float kd[3];
         float ks[3];
         float tr; // Aka d
-        float ns;
+        float hardness;
         int illum;
         // TODO: Add maps
         GLuint ambientMap;
         GLuint diffuseMap;
         GLuint specularMap;
+		GLuint normalMap;
     };
 
 	class IGLComponent : public SpatialComponent {
 	public:
 		SET_COMPONENT_TYPENAME("IGLComponent");
 
-		IGLComponent() 
+		IGLComponent()
 			: lightingEnabled(true), SpatialComponent(0) {} // Default ctor setting entity ID to 0.
-		IGLComponent(const int entityID)
+		IGLComponent(const id_t entityID)
 			: lightingEnabled(true), SpatialComponent(entityID) {} // Ctor that sets the entity ID.
 
         typedef std::unordered_map<std::string, std::shared_ptr<GLSLShader>> ShaderMap;

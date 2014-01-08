@@ -3,13 +3,13 @@
 precision highp float; // needed only for version 1.30
 
 uniform mat4 viewProjInverse;
+uniform vec3 viewPosW;
 uniform vec3 lightPosW;
 uniform vec3 lightDirW;
 uniform vec4 lightColor;
 
-uniform float lightAngle;
-uniform float lightCosCutoff;
-uniform float lightExponent;
+uniform float lightCosInnerAngle;
+uniform float lightCosOuterAngle;
 
 uniform sampler2D diffuseBuffer;
 uniform sampler2D normalBuffer;
@@ -30,7 +30,8 @@ void main(void) {
 	vec4 normalData = texture(normalBuffer,ex_UV);
 
 	// Transform normal back to [-1, 1] range
-	vec3 normal = decode(normalData.rgb);
+	vec3 normal = normalize(decode(normalData.rgb));
+	float specularHardness = normalData.a*1000.0f;
 	
 	// RECREATE POSITION
 	// Retrieve screen-space depth value
@@ -49,25 +50,44 @@ void main(void) {
 	position /= position.w;
 
 	// CALCULATE LIGHTING //
-
-	// DIFFUSE ////////////
+	
 	vec3 lightVector = lightPosW - position.xyz;
+	float distance = length(lightVector);
 	
-	float	NdL	= max(dot(normal, normalize(lightVector)), 0.0);
-	float   spotLight = 0.0;
+	// ATTENUATION ///////////////
 	
-	float cos_outer_cone_angle = lightCosCutoff;
-	float cos_inner_cone_angle = lightCosCutoff + 0.15;
-	float cos_inner_minus_outer_angle = cos_inner_cone_angle - cos_outer_cone_angle;
+	// distance based
+	float distAttenuation = 1.0 / (1.0 + 0.01*distance + 0.001*(distance*distance));
 	
-	if (NdL > 0.0) {
-		float spotEffect = dot(normalize(lightDirW), normalize(-lightVector));
-		
-		//if(spotEffect > lightCosCutoff) {
-		//	spotLight = pow(spotEffect, lightExponent);
-		//}
-		spotLight = clamp((spotEffect - cos_outer_cone_angle) / cos_inner_minus_outer_angle, 0.0, 1.0);
+	lightVector = normalize(lightVector);
+	
+	// SPOTLIGHT VALUE ///////////		
+	float   spotLight = dot(-lightVector, normalize(lightDirW));
+	
+	// angle based
+	float coneAttenuation = 0.0;
+	if(spotLight >= lightCosOuterAngle)
+		coneAttenuation = 0.5*smoothstep(lightCosOuterAngle, lightCosInnerAngle, spotLight);
+	if(spotLight >= lightCosInnerAngle)
+		coneAttenuation += 0.5*smoothstep(lightCosInnerAngle, 1.0, spotLight);
+	
+	coneAttenuation = clamp(coneAttenuation, 0.0, 1.0);
+	
+	
+	// DIFFUSE ////////////
+	float NdL = max(dot(normal, lightVector), 0.0);
+	
+	// SPECULAR ////////////
+	float specularLight = 0.0;
+	
+	// Only calculate specular if diffuse light is visible
+	if(NdL > 0.0) {
+		vec3 viewVector = normalize(viewPosW - position.xyz);
+		vec3 halfVector = normalize(lightVector + viewVector);
+		float NdH = dot(normal, halfVector);
+		specularLight = pow(clamp(NdH, 0.0, 1.0), specularHardness);
 	}
-
-	out_Color = vec4(diffuse.rgb*spotLight, 1.0);
+	
+	//out_Color = vec4(clamp(spotLight*diffuse.rgb*clamp(NdL + specularLight, 0.0, 1.0), 0.0, 1.0), 1.0);
+	out_Color = clamp(vec4(distAttenuation*coneAttenuation*diffuse.rgb*clamp(NdL + specularLight, 0.0, 1.0), 1.0), 0.0, 1.0);
 }

@@ -27,7 +27,7 @@ namespace Sigma {
 		return true;
 	}
 
-	IComponent* WebGUISystem::createWebGUIView(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* WebGUISystem::createWebGUIView(const id_t entityID, const std::vector<Property> &properties) {
 		float x, y, width, height;
 		bool transparent = false;
 		std::string textureName = "";

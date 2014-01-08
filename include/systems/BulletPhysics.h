@@ -3,9 +3,10 @@
 #include "IFactory.h"
 #include "ISystem.h"
 #include "bullet/btBulletDynamicsCommon.h"
-#include "IMoverComponent.h"
 #include "IBulletShape.h"
-#include "components/BulletMover.h"
+#include "components/PhysicsController.h"
+#include "Sigma.h"
+#include "components/BulletShapeCapsule.h"
 
 class Property;
 class IMoverComponent;
@@ -15,7 +16,7 @@ namespace Sigma {
 	class BulletPhysics
 		: public Sigma::IFactory, public Sigma::ISystem<IBulletShape> {
 	public:
-		BulletPhysics() : mover(1) { }
+		BulletPhysics() { }
 		~BulletPhysics();
 		/**
 		 * \brief Starts the Simple Physics system.
@@ -33,15 +34,14 @@ namespace Sigma {
 		 */
 		bool Update(const double delta);
 
-		IComponent* createBulletShapeMesh(const unsigned int entityID, const std::vector<Property> &properties);
-		IComponent* createBulletShapeSphere(const unsigned int entityID, const std::vector<Property> &properties);
+		IComponent* createBulletShapeMesh(const id_t entityID, const std::vector<Property> &properties);
+		IComponent* createBulletShapeSphere(const id_t entityID, const std::vector<Property> &properties);
 
 		std::map<std::string,FactoryFunction> getFactoryFunctions();
 
-		void initViewMover();
-
-		BulletMover* getViewMover() {
-			return &this->mover;
+		void initViewMover(GLTransform& t);
+		PhysicsController* getViewMover() {
+			return this->mover;
 		}
 	private:
 		btBroadphaseInterface* broadphase;
@@ -49,6 +49,7 @@ namespace Sigma {
 		btCollisionDispatcher* dispatcher;
 		btSequentialImpulseConstraintSolver* solver;
 		btDiscreteDynamicsWorld* dynamicsWorld;
-		BulletMover mover;
+		PhysicsController* mover;
+		BulletShapeCapsule* moverSphere;
 	};
 }

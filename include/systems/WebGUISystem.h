@@ -11,6 +11,7 @@
 #include "cef_app.h"
 #include "cef_client.h"
 #include "cef_render_process_handler.h"
+#include "Sigma.h"
 
 class Property;
 
@@ -43,7 +44,7 @@ namespace Sigma {
 
 		std::map<std::string,FactoryFunction> getFactoryFunctions();
 
-		IComponent* createWebGUIView(const unsigned int entityID, const std::vector<Property> &properties);
+		IComponent* createWebGUIView(const id_t entityID, const std::vector<Property> &properties);
 
 		// CefApp
 		virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() OVERRIDE {

@@ -4,6 +4,7 @@
 
 #include "../GLTransform.h"
 #include "../IGLComponent.h"
+#include "Sigma.h"
 
 #include <vector>
 #include <map>
@@ -29,7 +30,7 @@ namespace Sigma{
         using IGLComponent::LoadShader;
 
         SET_COMPONENT_TYPENAME("GLMesh");
-        GLMesh(const int entityID);
+        GLMesh(const id_t entityID);
         virtual ~GLMesh(){}
 
         /**

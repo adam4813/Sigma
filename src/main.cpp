@@ -4,10 +4,9 @@
 #include "systems/OpenALSystem.h"
 #include "systems/BulletPhysics.h"
 #include "systems/FactorySystem.h"
-#include "controllers/GLSixDOFViewController.h"
 #include "controllers/GUIController.h"
 #include "controllers/FPSCamera.h"
-#include "components/BulletMover.h"
+#include "components/PhysicsController.h"
 #include "components/GLScreenQuad.h"
 #include "SCParser.h"
 #include "systems/WebGUISystem.h"
@@ -44,7 +43,7 @@ int main(int argCount, char **argValues) {
 	factory.register_Factory(bphys);
 	factory.register_Factory(webguisys);
 
-	if (!glfwos.InitializeWindow(1024,768, "Sigma GLFW Test Window")) {
+	if (!glfwos.InitializeWindow(1024, 768, "Sigma GLFW Test Window")) {
 		std::cerr << "Failed creating the window or context." << std::endl;
 		return -1;
 	}
@@ -72,9 +71,9 @@ int main(int argCount, char **argValues) {
 
 	// Create render target for the GBuffer, Light Accumulation buffer, and final composite buffer
 	unsigned int geoBuffer = glsys.createRenderTarget(glfwos.GetWindowWidth(), glfwos.GetWindowHeight(), true);
-	glsys.createRTBuffer(geoBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE); // Diffuse texture
-	glsys.createRTBuffer(geoBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE); // Normal texture
-	glsys.createRTBuffer(geoBuffer, GL_R32F, GL_RED, GL_FLOAT);			  // Depth texture
+	glsys.createRTBuffer(geoBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE);	// Diffuse texture
+	glsys.createRTBuffer(geoBuffer, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE);	// Normal texture
+	glsys.createRTBuffer(geoBuffer, GL_R32F, GL_RED, GL_FLOAT);				// Depth texture
 	glsys.initRenderTarget(geoBuffer); // Create the opengl assets
 
 	///////////////////
@@ -90,13 +89,13 @@ int main(int argCount, char **argValues) {
 	webguisys.Start(mainArgs);
 	webguisys.SetWindowSize(glfwos.GetWindowWidth(), glfwos.GetWindowHeight());
 
-    /////////////////
-    // Setup Sound //
-    /////////////////
+	/////////////////
+	// Setup Sound //
+	/////////////////
 
-    std::cout << "Initializing OpenAL system." << std::endl;
-    alsys.Start();
-    alsys.test(); // try sound
+	std::cout << "Initializing OpenAL system." << std::endl;
+	alsys.Start();
+	alsys.test(); // try sound
 	
 	////////////////
 	// Load scene //
@@ -119,7 +118,7 @@ int main(int argCount, char **argValues) {
 
 			// Currently, physicsmover components must come after gl* components
 			if((*itr).type == "PhysicsMover") {
-				GLTransform *transform = glsys.GetTransformFor(e->id);
+				Sigma::GLTransform *transform = glsys.GetTransformFor(e->id);
 				if(transform) {
 					Property p("transform", transform);
 					itr->properties.push_back(p);
@@ -129,7 +128,7 @@ int main(int argCount, char **argValues) {
 				}
 			}
 
-            factory.create(itr->type,e->id, const_cast<std::vector<Property>&>(itr->properties));
+			factory.create(itr->type,e->id, const_cast<std::vector<Property>&>(itr->properties));
 		}
 	}
 
@@ -138,8 +137,8 @@ int main(int argCount, char **argValues) {
 	//////////////////////
 
 	// View and ViewMover creation has been moved to test.sc, but for
-	// now provide sensible defaults.  Final engine should require
-	// definition in scene file.  Currently entity ID for view must be 1
+	// now provide sensible defaults. Final engine should require
+	// definition in scene file. Currently entity ID for view must be 1
 	// for this to work.
 
 	// No view provided, create a default FPS view
@@ -154,30 +153,22 @@ int main(int argCount, char **argValues) {
 		props.push_back(p_y);
 		props.push_back(p_z);
 
-		glsys.createGLView(1, props, "FPSCamera");
+		glsys.createGLView(1, props);
 	}
-
-	// Still hard coded to use entity ID #1
-	// Link the graphics view to the physics system's view mover
-	Sigma::BulletMover* mover = bphys.getViewMover();
 
 	//Create the controller
 	//Perhaps a little awkward currently, should create a generic
 	//controller class ancestor
-	if(glsys.GetViewMode() == "FPSCamera") {
-		using Sigma::event::handler::FPSCamera;
-		FPSCamera* theCamera = static_cast<FPSCamera*>(glsys.GetView());
-		glfwos.RegisterKeyboardEventHandler(theCamera);
-		glfwos.RegisterMouseEventHandler(theCamera);
-		theCamera->SetMover(mover);
-		//mover->SetTransform(*theCamera->Transform());
-	} else if (glsys.GetViewMode() == "GLSixDOFView") {
-		Sigma::event::handler::GLSixDOFViewController cameraController(glsys.GetView(), mover);
-		glfwos.RegisterKeyboardEventHandler(&cameraController);
-	}
+	bphys.initViewMover(*glsys.GetView()->Transform());
+
+	Sigma::event::handler::FPSCamera theCamera(*bphys.getViewMover());
+	glsys.GetView()->Transform()->SetEuler(true);
+	glsys.GetView()->Transform()->SetMaxRotation(glm::vec3(45.0f,0,0));
+	glfwos.RegisterKeyboardEventHandler(&theCamera);
+	glfwos.RegisterMouseEventHandler(&theCamera);
+	theCamera.os = &glfwos;
 	
 	// Sync bullet physics object with gl camera
-	bphys.initViewMover();
 
 	///////////////////
 	// Configure GUI //
@@ -187,23 +178,11 @@ int main(int argCount, char **argValues) {
 	guicon.SetGUI(webguisys.getComponent(100, Sigma::WebGUIView::getStaticComponentTypeName()));
 	glfwos.RegisterKeyboardEventHandler(&guicon);
 	glfwos.RegisterMouseEventHandler(&guicon);
-
-	Sigma::event::handler::GUIController guicon2;
-	guicon2.SetGUI(webguisys.getComponent(101, Sigma::WebGUIView::getStaticComponentTypeName()));
-	glfwos.RegisterKeyboardEventHandler(&guicon2);
-	glfwos.RegisterMouseEventHandler(&guicon2);
-
-	Sigma::event::handler::GUIController guicon3;
-	guicon3.SetGUI(webguisys.getComponent(102, Sigma::WebGUIView::getStaticComponentTypeName()));
-
-	glfwos.RegisterKeyboardEventHandler(&guicon3);
-	glfwos.RegisterMouseEventHandler(&guicon3);
 	
 	// Call now to clear the delta after startup.
 	glfwos.GetDeltaTime();
-
 	{
-		Sigma::ALSound *als = (Sigma::ALSound *)alsys.getComponent(30, Sigma::ALSound::getStaticComponentTypeName());
+		Sigma::ALSound *als = (Sigma::ALSound *)alsys.getComponent(200, Sigma::ALSound::getStaticComponentTypeName());
 		if(als) {
 			als->Play(Sigma::PLAYBACK_LOOP);
 		}
@@ -223,7 +202,7 @@ int main(int argCount, char **argValues) {
 		double deltaSec = glfwos.GetDeltaTime();
 
 		// Process input
-		if(glfwos.CheckKeyState(Sigma::event::KS_DOWN, GLFW_KEY_F)) {			
+		if(glfwos.CheckKeyState(Sigma::event::KS_DOWN, GLFW_KEY_F)) {
 			if(fs==FL_OFF) {
 				fs=FL_TURNING_ON;
 			} else if (fs==FL_ON) {
@@ -258,11 +237,6 @@ int main(int argCount, char **argValues) {
 		webguisys.Update(deltaSec);
 
 		alsys.Update();
-
-		// Framebuffer(s) to draw
-		//int fbos[2];
-		//fbos[0] = glsys.getRenderTarget(geoBuffer);
-		//fbos[1] = glsys.getRenderTarget(lightBuffer);
 
 		// Update the renderer and present
 		if (glsys.Update(deltaSec)) {

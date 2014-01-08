@@ -2,12 +2,13 @@
 #include <bullet/btBulletCollisionCommon.h>
 #include <bullet/btBulletDynamicsCommon.h>
 #include "IComponent.h"
+#include "Sigma.h"
 
 
 namespace Sigma{
 	class IBulletShape : public IComponent {
 	public:
-		IBulletShape(const int entityID = 0) : IComponent(entityID) { }
+		IBulletShape(const id_t entityID = 0) : IComponent(entityID) { }
 		virtual ~IBulletShape() {
 			if (this->body != nullptr) {
 				delete this->body;

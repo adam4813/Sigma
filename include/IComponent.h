@@ -3,22 +3,22 @@
 #define ICOMPONENT_H
 
 #include <string>
+#include "Sigma.h"
 
 #define SET_COMPONENT_TYPENAME(ID)                                \
 static const Sigma::IComponent::ComponentID getStaticComponentTypeName() {return ID;}\
 virtual const Sigma::IComponent::ComponentID getComponentTypeName() override{return getStaticComponentTypeName();}
 
 namespace Sigma{
-
     class IComponent {
     public:
         typedef std::string ComponentID;
-        IComponent(const int id = 0) : entityID(id) {}
+        IComponent(const id_t id = 0) : entityID(id) {}
         virtual ~IComponent() {}
         int GetEntityID() { return this->entityID; }
         virtual const ComponentID getComponentTypeName()=0;
     private:
-        const int entityID; // The entity that owns this component.
+        const id_t entityID; // The entity that owns this component.
 
     }; // class IComponent
 } // namespace Sigma

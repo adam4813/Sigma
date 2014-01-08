@@ -7,11 +7,12 @@
 #include <map>
 #include "Property.h"
 #include "IComponent.h"
+#include "Sigma.h"
 
 namespace Sigma {
     class IFactory {
     public:
-        typedef std::function<IComponent*( const unsigned int,
+        typedef std::function<IComponent*(const id_t,
                                     const std::vector<Property>&)> FactoryFunction;
         IFactory(){};
         virtual ~IFactory(){};

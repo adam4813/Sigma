@@ -4,7 +4,7 @@
 
 #include "systems/KeyboardInputSystem.h"
 #include "systems/IGLView.h"
-#include "components/BulletMover.h"
+#include "components/PhysicsController.h"
 
 namespace Sigma {
 	namespace event {
@@ -14,7 +14,7 @@ namespace Sigma {
 			private:
 				GLSixDOFViewController() { }
 			public:
-				GLSixDOFViewController(IGLView* view, BulletMover* mover);
+				GLSixDOFViewController(IGLView* view, PhysicsController* mover);
 
 				/**
 				 * \brief Triggered whenever a key state change event happens
@@ -26,7 +26,7 @@ namespace Sigma {
 				 */
 				void KeyStateChange(const unsigned int key, const KEY_STATE state);
 			private:
-				BulletMover* mover; // The view mover component that applies the rotations and forces set in the trigger method.
+				PhysicsController* mover; // The view mover component that applies the rotations and forces set in the trigger method.
                 static const float SPEED_TRANSLATE, SPEED_ROTATE, BOOST_MULTIPLIER;
                 glm::vec3 _translate, _rotate;
 			};

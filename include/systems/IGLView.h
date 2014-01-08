@@ -4,9 +4,9 @@
 
 #include "GLTransform.h"
 #include "components/SpatialComponent.h"
+#include "Sigma.h"
 
 namespace Sigma{
-
 	struct Plane {
 		Plane() : distance(0), normal(0.0f, 1.0f, 0.0f) {}
 		Plane(glm::vec4 vec) : normal(glm::vec3(vec.x, vec.y, vec.z)), distance(vec.w) {}
@@ -24,22 +24,23 @@ namespace Sigma{
 	struct Frustum {
 		Plane planes[6];
 
-		bool isectSphere(glm::vec3 position, float radius) {
+		bool intersectsSphere(glm::vec3 position, float radius) {
 			float distToPlane;
 
 			// calculate our distances to each of the planes
 			for(int i = 0; i < 6; ++i) {
-
 				// find the distance to this plane
 				distToPlane = (float)fabs(glm::dot(this->planes[i].normal, position) + this->planes[i].distance);
 
 				// if this distance is < -sphere.radius, we are outside
-				if(distToPlane < -radius)
+				if(distToPlane < -radius) {
 					return false;
+				}
 
 				// else if the distance is between +- radius, then we intersect
-				if(distToPlane < radius)
+				if(distToPlane < radius) {
 					return true; // intersection
+				}
 			}
 
 			// otherwise we are fully in view
@@ -47,13 +48,19 @@ namespace Sigma{
 		}
 	};
 
-    struct IGLView : public Sigma::SpatialComponent {
-
-        IGLView(int entityID) : SpatialComponent(entityID) {}
+	struct IGLView : public Sigma::SpatialComponent {
+		IGLView(const id_t entityID) : SpatialComponent(entityID) {}
 
 		Frustum CameraFrustum;
 
-        virtual const glm::mat4 GetViewMatrix() = 0;
+		virtual const glm::mat4 GetViewMatrix() {
+				// This is more precise
+				glm::mat4 view =  glm::lookAt(this->transform.GetPosition(),
+					this->transform.GetPosition()+this->transform.GetForward(),
+					this->transform.GetUp());
+
+				return view;
+		}
 
 		/*
 		 * /brief Extracts frustum planes from a matrix
@@ -77,7 +84,7 @@ namespace Sigma{
 			this->CameraFrustum.planes[5].normalize();
 		}
 
-    }; // stuct IGLView
+	}; // stuct IGLView
 } // namespace Sigma
 
 #endif // IGL_VIEW_H

@@ -7,24 +7,24 @@
 #include "IComponent.h"
 #include "systems/GLSLShader.h"
 #include "GLTransform.h"
+#include "Sigma.h"
 
 namespace Sigma {
 	class SpotLight : public IComponent {
 	public:
-		SpotLight(const unsigned int entityID);
+		SpotLight(const id_t entityID);
 		virtual ~SpotLight() {}
 
 		SET_COMPONENT_TYPENAME("SpotLight");
 
-		//glm::vec3 position;
-		//glm::vec3 direction;
 		GLTransform transform;
 		glm::vec4 color;
 		float intensity;
 
-		float angle;
-		float cosCutoff;
-		float exponent;
+		float innerAngle;
+		float outerAngle;
+		float cosInnerAngle;
+		float cosOuterAngle;
 
 		bool enabled;
 
