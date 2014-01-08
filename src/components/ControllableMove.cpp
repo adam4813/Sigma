@@ -3,18 +3,19 @@
 #include "components/RigidBody.h"
 
 namespace Sigma {
-    std::unordered_map<id_t, forces_list> ControllableMove::forces_map;
+    VectorMap<id_t, forces_list> ControllableMove::forces_map;
     std::unordered_map<id_t, rotationForces_list> ControllableMove::rotationForces_map;
     VectorMap<id_t, glm::vec3> ControllableMove::cumulatedForces_map;
 
     void ControllableMove::CumulateForces() {
         // TODO: vectorize this
         auto cf_it = cumulatedForces_map.getVector()->begin();
-        for (auto itr = forces_map.begin(); itr != forces_map.end(); ++itr, ++cf_it) {
-            auto transform = PhysicalWorldLocation::GetTransform(itr->first);
+        auto f_it = forces_map.getVector()->begin();
+        for (auto kitr = forces_map.IteratorKeyBegin(); kitr != forces_map.IteratorKeyEnd(); ++kitr, ++cf_it, ++f_it) {
+            auto transform = PhysicalWorldLocation::GetTransform(*kitr);
             if (transform != nullptr) {
                 glm::vec3 t;
-                for (auto forceitr = itr->second.begin(); forceitr != itr->second.end(); ++forceitr) {
+                for (auto forceitr = f_it->begin(); forceitr != f_it->end(); ++forceitr) {
                     t += *forceitr;
                 }
                 *cf_it = (t.z * transform->GetForward()) +
