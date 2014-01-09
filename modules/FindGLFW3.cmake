@@ -8,23 +8,23 @@
 #
 
 IF(WIN32)
-    FIND_PATH( GLFW3_INCLUDE_PATH GLFW/glfw3.h
+	FIND_PATH( GLFW3_INCLUDE_PATH GLFW/glfw3.h
 		$ENV{PROGRAMFILES}/GLFW/include
 		${GLFW_ROOT_DIR}/include
 		DOC "The directory where GLFW/glfw3.h resides")
 
-    FIND_LIBRARY( GLFW3_LIBRARY
-        NAMES glfw3 GLFW
-        PATHS
-        $ENV{PROGRAMFILES}/GLFW/lib
+	FIND_LIBRARY( GLFW3_LIBRARY
+		NAMES glfw3 GLFW
+		PATHS
+		$ENV{PROGRAMFILES}/GLFW/lib
 		${GLFW_ROOT_DIR}/lib
-        DOC "The GLFW library")
+		DOC "The GLFW library")
 ELSE(WIN32)
 	FIND_PATH( GLFW3_INCLUDE_PATH GLFW/glfw3.h
 		/usr/include
 		/usr/local/include
 		/sw/include
-        /opt/local/include
+		/opt/local/include
 		${GLFW_ROOT_DIR}/include
 		DOC "The directory where GLFW/glfw3.h resides")
 	IF(APPLE)
@@ -33,7 +33,7 @@ ELSE(WIN32)
 	ENDIF(APPLE)
 
 	FIND_LIBRARY( GLFW3_LIBRARY
-        NAMES libglfw.so libglfw.so.3 libglfw.so.3.0 glfw.3 glfw3
+		NAMES libglfw.so libglfw.so.3 libglfw.so.3.0 glfw.3 glfw3
 		PATHS
 		/usr/lib64
 		/usr/lib
@@ -52,5 +52,5 @@ find_package_handle_standard_args(GLFW3 DEFAULT_MESSAGE GLFW3_LIBRARY GLFW3_INCL
 #IF(GLFW3_INCLUDE_PATH AND GLFW3_LIBRARY)
 #	SET(GLFW_LIBRARIES ${GLFW3_LIBRARY})
 #	SET(GLFW3_FOUND "YES")
-#    message(STATUS "Found GLFW")
+#	message(STATUS "Found GLFW")
 #ENDIF(GLFW3_INCLUDE_PATH AND GLFW3_LIBRARY)
