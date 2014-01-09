@@ -212,12 +212,10 @@ if(BUILD_STATIC_Sigma)
 	if(WIN32)
 	set_target_properties(libSigmas PROPERTIES
 		OUTPUT_NAME Sigma_static
-		PREFIX lib
 		)
 	else(WIN32)
 	set_target_properties(libSigmas PROPERTIES
 		OUTPUT_NAME Sigma
-		PREFIX lib
 		)
 	endif(WIN32)
 endif(BUILD_STATIC_Sigma)
@@ -231,7 +229,6 @@ if(BUILD_SHARED_Sigma)
 	TARGET_LINK_LIBRARIES(libSigma ${Sigma_ALL_LIBS})
 	set_target_properties(libSigma PROPERTIES
 		OUTPUT_NAME Sigma
-		PREFIX lib
 		)
 endif(BUILD_SHARED_Sigma)
 
