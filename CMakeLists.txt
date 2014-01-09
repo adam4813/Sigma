@@ -206,6 +206,11 @@ if(BUILD_STATIC_Sigma)
 		)
 	# Link the Sigma lib to all required external libraries
 	TARGET_LINK_LIBRARIES(libSigmas ${Sigma_ALL_LIBS})
+	if(WIN32)
+	set_target_properties(libSigmas PROPERTIES OUTPUT_NAME Sigma_static)
+	else(WIN32)
+	set_target_properties(libSigmas PROPERTIES OUTPUT_NAME Sigma)
+	endif(WIN32)
 endif(BUILD_STATIC_Sigma)
 
 if(BUILD_SHARED_Sigma)
@@ -215,6 +220,7 @@ if(BUILD_SHARED_Sigma)
 		)
 	# Link the Sigma lib to all required external libraries
 	TARGET_LINK_LIBRARIES(libSigma ${Sigma_ALL_LIBS})
+	set_target_properties(libSigma PROPERTIES OUTPUT_NAME Sigma)
 endif(BUILD_SHARED_Sigma)
 
 if(BUILD_EXE_Sigma)
