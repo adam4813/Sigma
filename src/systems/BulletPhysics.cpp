@@ -4,6 +4,8 @@
 #include "components/BulletShapeSphere.h"
 
 namespace Sigma {
+	// We need ctor and dstor to be exported to a dll even if they don't do anything
+	BulletPhysics::BulletPhysics() {}
 	BulletPhysics::~BulletPhysics() {
 		if (this->mover != nullptr) {
 			delete this->mover;

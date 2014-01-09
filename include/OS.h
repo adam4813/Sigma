@@ -11,6 +11,7 @@
 #include <GLFW/glfw3.h>
 #include <string>
 
+#include "Sigma.h"
 #include "systems/KeyboardInputSystem.h"
 #include "systems/MouseInputSystem.h"
 
@@ -27,39 +28,39 @@ namespace Sigma {
 		 * \param[in] const std::string title The title to show in the title bar and task manager.
 		 * \return bool If creation was successful or not.
 		 */
-		bool InitializeWindow(const int width, const int height, const std::string title, const unsigned int glMajor = 3, const unsigned int glMinor = 2);
+		DLL_EXPORT bool InitializeWindow(const int width, const int height, const std::string title, const unsigned int glMajor = 3, const unsigned int glMinor = 2);
 
 		/**
 		 * \brief Checks if the window is closing.
 		 *
 		 * \return bool True if the window is closing.
 		 */
-		bool Closing();
+		DLL_EXPORT bool Closing();
 
 		/**
 		 * \brief Swap the front and back buffers. Call after rendering.
 		 *
 		 * \return void
 		 */
-		void SwapBuffers();
+		DLL_EXPORT void SwapBuffers();
 
 		/**
 		 * \brief Processes events in the OS message event loop.
 		 *
 		 * \return void
 		 */
-		void OSMessageLoop();
+		DLL_EXPORT void OSMessageLoop();
 
-		int GetWindowWidth();
+		DLL_EXPORT int GetWindowWidth();
 
-		int GetWindowHeight();
+		DLL_EXPORT int GetWindowHeight();
 
 		/**
 		 * \brief Returns the time since this last call to GetDeltaTime().
 		 *
 		 * \return double The number of seconds (or fractions of a second) that has passed.
 		 */
-		double GetDeltaTime();
+		DLL_EXPORT double GetDeltaTime();
 
 		/**
 		 * \brief Callback for when the window is resized.
@@ -122,14 +123,14 @@ namespace Sigma {
 		 */
 		static void windowFocusChange(GLFWwindow* window, int focused);
 
-		void RegisterKeyboardEventHandler(event::IKeyboardEventHandler* handler);
-		void RegisterMouseEventHandler(event::IMouseEventHandler* handler);
+		DLL_EXPORT void RegisterKeyboardEventHandler(event::IKeyboardEventHandler* handler);
+		DLL_EXPORT void RegisterMouseEventHandler(event::IMouseEventHandler* handler);
 
-		void ToggleMouseLock();
+		DLL_EXPORT void ToggleMouseLock();
 		
-		void SetMousePosition(double x, double y);
+		DLL_EXPORT void SetMousePosition(double x, double y);
 
-		bool CheckKeyState(event::KEY_STATE state, const int key);
+		DLL_EXPORT bool CheckKeyState(event::KEY_STATE state, const int key);
 
 	private:
 		/**

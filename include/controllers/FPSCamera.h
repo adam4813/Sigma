@@ -7,6 +7,7 @@
 #include "systems/KeyboardInputSystem.h"
 #include "systems/MouseInputSystem.h"
 
+#include "Sigma.h"
 #include "OS.h"
 
 namespace Sigma {
@@ -16,7 +17,7 @@ namespace Sigma {
 		namespace handler {
 			class FPSCamera : public IKeyboardEventHandler, public IMouseEventHandler {
 			public:
-				FPSCamera(PhysicsController& controller);
+				DLL_EXPORT FPSCamera(PhysicsController& controller);
 
 				/**
 				 * \brief Triggered whenever a key state change event happens

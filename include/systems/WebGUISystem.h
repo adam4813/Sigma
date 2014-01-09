@@ -20,14 +20,14 @@ using namespace Awesomium;
 namespace Sigma {
 	class WebGUISystem : public IFactory, public ISystem<WebGUIView> {
 	public:
-		WebGUISystem() : web_core(nullptr) { }
-		~WebGUISystem() { };
+		DLL_EXPORT WebGUISystem();
+		DLL_EXPORT ~WebGUISystem();
 		/**
 		 * \brief Starts the Awesomium WebGUI system.
 		 *
 		 * \return bool Returns false on startup failure.
 		 */
-		bool Start();
+		DLL_EXPORT bool Start();
 
 		void SetWindowSize(unsigned int width, unsigned int height) {
 			this->windowWidth = width;
@@ -41,11 +41,11 @@ namespace Sigma {
 		 * \param[in] const float delta The change in time since the last update
 		 * \return bool Returns true if we had an update interval passed.
 		 */
-		bool Update(const double delta);
+		DLL_EXPORT bool Update(const double delta);
 
 		std::map<std::string,FactoryFunction> getFactoryFunctions();
 
-		IComponent* createWebGUIView(const id_t entityID, const std::vector<Property> &properties);
+		DLL_EXPORT IComponent* createWebGUIView(const id_t entityID, const std::vector<Property> &properties);
 	private:
 		WebCore* web_core;
 		unsigned int windowWidth, windowHeight; // The width of the overall window for converting mouse coordinate normals.
