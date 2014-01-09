@@ -199,6 +199,9 @@ set(Sigma_ALL_INCLUDES
 	${Sigma_SRC_RESOURCES_H}
 	)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
 if(BUILD_STATIC_Sigma)
 	add_library(libSigmas STATIC
 		${Sigma_ALL_SOURCE}
@@ -207,9 +210,15 @@ if(BUILD_STATIC_Sigma)
 	# Link the Sigma lib to all required external libraries
 	TARGET_LINK_LIBRARIES(libSigmas ${Sigma_ALL_LIBS})
 	if(WIN32)
-	set_target_properties(libSigmas PROPERTIES OUTPUT_NAME Sigma_static)
+	set_target_properties(libSigmas PROPERTIES
+		OUTPUT_NAME Sigma_static
+		PREFIX lib
+		)
 	else(WIN32)
-	set_target_properties(libSigmas PROPERTIES OUTPUT_NAME Sigma)
+	set_target_properties(libSigmas PROPERTIES
+		OUTPUT_NAME Sigma
+		PREFIX lib
+		)
 	endif(WIN32)
 endif(BUILD_STATIC_Sigma)
 
@@ -220,7 +229,10 @@ if(BUILD_SHARED_Sigma)
 		)
 	# Link the Sigma lib to all required external libraries
 	TARGET_LINK_LIBRARIES(libSigma ${Sigma_ALL_LIBS})
-	set_target_properties(libSigma PROPERTIES OUTPUT_NAME Sigma)
+	set_target_properties(libSigma PROPERTIES
+		OUTPUT_NAME Sigma
+		PREFIX lib
+		)
 endif(BUILD_SHARED_Sigma)
 
 if(BUILD_EXE_Sigma)
