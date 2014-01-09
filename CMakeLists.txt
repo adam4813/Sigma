@@ -163,8 +163,8 @@ ENDIF (APPLE)
 
 # We like having options
 set(BUILD_EXE_Sigma TRUE CACHE BOOL "Build the Sigma test executable")
-set(BUILD_STATIC_Sigma TRUE CACHE BOOL "Build Sigma as a static library")
-set(BUILD_SHARED_Sigma FALSE CACHE BOOL "Build Sigma as a shared library")
+set(BUILD_STATIC_Sigma FALSE CACHE BOOL "Build Sigma as a static library")
+set(BUILD_SHARED_Sigma TRUE CACHE BOOL "Build Sigma as a shared library")
 
 # define all required external libraries
 set(Sigma_ALL_LIBS
