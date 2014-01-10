@@ -1,5 +1,4 @@
 #include "systems/OpenALSystem.h"
-#include <iostream>
 
 namespace Sigma {
 
@@ -8,22 +7,28 @@ namespace Sigma {
 
 	bool OpenALSystem::Start() {
 		const char * alcx;
-		device = alcOpenDevice(nullptr);
-		if(device == nullptr) {
+		this->device = alcOpenDevice(nullptr);
+		if(this->device == nullptr) {
 			return false;
 		}
-		context = alcCreateContext(device, nullptr);
-		if(context == nullptr) {
+		this->context = alcCreateContext(device, nullptr);
+		if(this->context == nullptr) {
 			return false;
 		}
-		if(!alcMakeContextCurrent(context)) {
+		if(!alcMakeContextCurrent(this->context)) {
 			return false;
 		}
-		alcx = alcGetString(device, ALC_EXTENSIONS);
+		alcx = alcGetString(this->device, ALC_EXTENSIONS);
 		if( alcx != nullptr ) {
 			std::cerr << "OpenAL extentions: " << alcx << '\n';
 		}
 		return true;
+	}
+	void OpenALSystem::Shutdown() {
+		this->StopAll();
+		alcMakeContextCurrent(nullptr);
+		alcDestroyContext(this->context);
+		alcCloseDevice(this->device);
 	}
 	long OpenALSystem::CreateSoundFile() {
 		std::shared_ptr<resource::SoundFile> sound(new resource::SoundFile);

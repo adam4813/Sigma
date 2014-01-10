@@ -229,5 +229,8 @@ int main(int argCount, char **argValues) {
 		glfwos.OSMessageLoop();
 	}
 
+	// do a proper clean up
+	alsys.Shutdown();
+
 	return 0;
 }

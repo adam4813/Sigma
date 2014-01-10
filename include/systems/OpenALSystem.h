@@ -15,11 +15,19 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <iostream>
 #include "resources/ALBuffer.h"
 #include "resources/SoundFile.h"
 #include "components/ALSound.h"
 #include "IFactory.h"
 #include "ISystem.h"
+
+#define OPENAL_DEBUG
+#if defined(OPENAL_DEBUG)
+#define ALDEBUG(a) a
+#else
+#define ALDEBUG(a)
+#endif
 
 namespace Sigma {
 	class OpenALSystem
@@ -36,6 +44,13 @@ namespace Sigma {
 		 * \return false on failure, true otherwise.
 		 */
 		bool Start();
+
+		/**
+		 * \brief Shuts off the OpenAL audio system.
+		 *
+		 * Stops all sounds on the OpenAL system and cleans up the audio context.
+		 */
+		void Shutdown();
 
 		/**
 		 * \brief Update listener position and handle queuing.
