@@ -5,7 +5,6 @@
 #include "BitArray.hpp"
 #include "VectorMap.hpp"
 #include "Property.h"
-#include "components/WorldPosition.h"
 #include "SharedPointerMap.hpp"
 #include "GLTransform.h"
 #include "IComponent.h"
@@ -14,6 +13,8 @@
 #include <memory>
 
 namespace Sigma {
+    typedef double coordinate_type;
+
 	struct orientation_type {
         orientation_type() : alpha(0), beta(0), gamma(0) {};
         orientation_type(double alpha, double beta, double gamma) : alpha(alpha), beta(beta), gamma(gamma) {};
@@ -24,6 +25,21 @@ namespace Sigma {
 
         bool operator==(const orientation_type& v) const {
             return this->alpha == v.alpha && this->beta == v.beta && this->gamma == v.gamma;
+        }
+    };
+
+    /** \brief A position
+     */
+    struct position_type {
+        position_type() : x(0), y(0), z(0) {};
+        position_type(coordinate_type x, coordinate_type y, coordinate_type z) : x(x), y(y), z(z) {};
+
+        coordinate_type x;
+        coordinate_type y;
+        coordinate_type z;
+
+        bool operator==(const position_type& v) const {
+            return this->x == v.x && this->y == v.y && this->z == v.z;
         }
     };
 
@@ -46,7 +62,9 @@ namespace Sigma {
 		static bool AddEntity(const id_t id, const std::vector<Property> &properties);
 
 		static void RemoveEntity(const id_t id) {
-			pphysical.RemoveEntityPosition(id);
+			pphysical_x.clear(id);
+			pphysical_y.clear(id);
+			pphysical_z.clear(id);
 			ophysical.clear(id);
 			transform_map.erase(id);
 			transform_ptr_map.erase(id);
@@ -60,23 +78,23 @@ namespace Sigma {
 		static void UpdateTransform();
 
 		static std::unique_ptr<position_type> getPosition(const id_t id) {
-			return std::unique_ptr<position_type>(new position_type(pphysical.x(id), pphysical.y(id), pphysical.z(id)));
+			return std::unique_ptr<position_type>(new position_type(pphysical_x.at(id),\
+													pphysical_y.at(id), pphysical_z.at(id)));
 		};
 
-		/** \brief Helper function to set an entity position
-		 *
-		 * \param id const id_t the entity id
-		 * \param position position_type& the position to set
-		 *
-		 */
-		static void setPosition(const id_t id, position_type& position);
+		static void setPosition(const id_t id, const position_type& vec) {
+			pphysical_x.at(id) = vec.x;
+            pphysical_y.at(id) = vec.y;
+            pphysical_z.at(id) = vec.z;
+		}
+
 
 		static std::unique_ptr<orientation_type> getOrientation(const id_t id) {
 			return std::unique_ptr<orientation_type>(new orientation_type(ophysical.at(id)));
 		};
 
 		static inline SigmaMotionState* GetMotionState(const id_t id) {
-			return new SigmaMotionState(id, pphysical, ophysical);
+			return new SigmaMotionState(id, pphysical_x, pphysical_y, pphysical_z, ophysical);
 		};
 
 		/** \brief Fore the position of an entity to be marked as updated
@@ -158,7 +176,9 @@ namespace Sigma {
 		};
 */
 	private:
-		static WorldPosition pphysical;
+		static VectorMap<id_t, coordinate_type> pphysical_x;
+		static VectorMap<id_t, coordinate_type> pphysical_y;
+		static VectorMap<id_t, coordinate_type> pphysical_z;
 		static VectorMap<id_t, orientation_type> ophysical;
 		static std::shared_ptr<BitArray<unsigned int>> updated_set;
 		static std::unordered_map<id_t, GLTransform> transform_map;

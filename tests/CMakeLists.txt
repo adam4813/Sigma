@@ -15,7 +15,6 @@ set(SigmaTests_SRC "${CMAKE_SOURCE_DIR}")
 file(GLOB SigmaTests_SRC "tests/*.h" "main.cpp")
 file(GLOB SigmaTests_SRC_CPP
     "${CMAKE_SOURCE_DIR}/src/EntityManager.cpp" 
-    "${CMAKE_SOURCE_DIR}/src/components/WorldPosition.cpp"
     "${CMAKE_SOURCE_DIR}/src/components/BitArray.cpp"
     "${CMAKE_SOURCE_DIR}/src/systems/FactorySystem.cpp" 
     # add other cpp dependencies here

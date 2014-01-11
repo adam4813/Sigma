@@ -2,7 +2,9 @@
 #include "components/SigmaMotionState.h"
 
 namespace Sigma {
-	WorldPosition PhysicalWorldLocation::pphysical;
+	VectorMap<id_t, coordinate_type> PhysicalWorldLocation::pphysical_x;
+	VectorMap<id_t, coordinate_type> PhysicalWorldLocation::pphysical_y;
+	VectorMap<id_t, coordinate_type> PhysicalWorldLocation::pphysical_z;
 	VectorMap<id_t, orientation_type> PhysicalWorldLocation::ophysical;
 	std::shared_ptr<BitArray<unsigned int>> PhysicalWorldLocation::updated_set = BitArray<unsigned int>::Create();
     std::unordered_map<id_t, GLTransform> PhysicalWorldLocation::transform_map;
@@ -21,9 +23,9 @@ namespace Sigma {
 
 	bool PhysicalWorldLocation::AddEntityPosition(const id_t id, coordinate_type x, coordinate_type y,
 				   coordinate_type z, const coordinate_type rx, const coordinate_type ry, const coordinate_type rz) {
-		pphysical.PositionWrite_x(id) = x;
-		pphysical.PositionWrite_y(id) = y;
-		pphysical.PositionWrite_z(id) = z;
+		pphysical_x[id] = x;
+		pphysical_y[id] = y;
+		pphysical_z[id] = z;
 		ophysical[id] = orientation_type(rx, ry, rz);
 		GLTransform transform;
 		// Set the view mover's view pointer.
@@ -67,14 +69,5 @@ namespace Sigma {
 			}
 		}
 		return AddEntityPosition(id, x, y, z, rx, ry, rz);
-	}
-
-
-	void PhysicalWorldLocation::setPosition(const id_t id, position_type& position) {
-		pphysical.PositionWrite_x(id) = position.x;
-		pphysical.PositionWrite_y(id) = position.y;
-		pphysical.PositionWrite_z(id) = position.z;
-		(*updated_set)[id] = true;
-		std::cout << "Modifying entity " << id << " (" << position.x << ", " << position.y << ", " << position.z << ")" << std::endl;
 	}
 }
