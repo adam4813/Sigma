@@ -17,7 +17,7 @@ public:
 	WeakPtrWrapper& operator=(std::shared_ptr<V>&& p) { ptr = std::move(p); };
 
 	// copy assignment for V
-	WeakPtrWrapper& operator=(V& v) {
+	WeakPtrWrapper& operator=(const V& v) {
 		if (! this->expired()) {
 			*this->lock() = v;
 		};
