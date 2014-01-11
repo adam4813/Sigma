@@ -74,7 +74,7 @@ namespace Sigma {
 					delete buf;
 				}
 			}
-			else if(param == 0 && stream) {
+			else if(param == this->buffercount && stream) {
 				ALDEBUG(std::cerr << "ALSound: Playback underrun\n";)
 				alSourcei(this->sourceid, AL_LOOPING, AL_FALSE);
 			}
