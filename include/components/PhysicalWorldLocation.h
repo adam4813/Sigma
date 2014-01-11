@@ -3,17 +3,30 @@
 
 #include "Sigma.h"
 #include "BitArray.hpp"
+#include "VectorMap.hpp"
 #include "Property.h"
 #include "components/WorldPosition.h"
-#include "components/WorldOrientation.h"
-#include "components/SigmaMotionState.h"
 #include "SharedPointerMap.hpp"
 #include "GLTransform.h"
 #include "IComponent.h"
+#include "components/SigmaMotionState.h"
 #include <map>
 #include <memory>
 
 namespace Sigma {
+	struct orientation_type {
+        orientation_type() : alpha(0), beta(0), gamma(0) {};
+        orientation_type(double alpha, double beta, double gamma) : alpha(alpha), beta(beta), gamma(gamma) {};
+
+        double alpha;
+        double beta;
+        double gamma;
+
+        bool operator==(const orientation_type& v) const {
+            return this->alpha == v.alpha && this->beta == v.beta && this->gamma == v.gamma;
+        }
+    };
+
 	/** \brief A component to store the location of an entity
 	 *
 	 * It provides a btMotionState instance for a specific entity upon request, to use the component
@@ -34,7 +47,7 @@ namespace Sigma {
 
 		static void RemoveEntity(const id_t id) {
 			pphysical.RemoveEntityPosition(id);
-			ophysical.RemoveEntityOrientation(id);
+			ophysical.clear(id);
 			transform_map.erase(id);
 			transform_ptr_map.erase(id);
 		};
@@ -146,7 +159,7 @@ namespace Sigma {
 */
 	private:
 		static WorldPosition pphysical;
-		static WorldOrientation ophysical;
+		static VectorMap<id_t, orientation_type> ophysical;
 		static std::shared_ptr<BitArray<unsigned int>> updated_set;
 		static std::unordered_map<id_t, GLTransform> transform_map;
 		// we need this hack to keep a shared_ptr for each transform since SpatialComponent

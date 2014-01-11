@@ -1,8 +1,9 @@
 #include "components/PhysicalWorldLocation.h"
+#include "components/SigmaMotionState.h"
 
 namespace Sigma {
 	WorldPosition PhysicalWorldLocation::pphysical;
-	WorldOrientation PhysicalWorldLocation::ophysical;
+	VectorMap<id_t, orientation_type> PhysicalWorldLocation::ophysical;
 	std::shared_ptr<BitArray<unsigned int>> PhysicalWorldLocation::updated_set = BitArray<unsigned int>::Create();
     std::unordered_map<id_t, GLTransform> PhysicalWorldLocation::transform_map;
     std::unordered_map<id_t, std::shared_ptr<GLTransform>> PhysicalWorldLocation::transform_ptr_map;

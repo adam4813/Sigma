@@ -13,4 +13,12 @@ namespace Sigma {
             PhysicalWorldLocation::MarkUpdated(id);
         }
 
+		void SigmaMotionState::getWorldTransform(btTransform &worldTrans) const {
+            worldTrans.setIdentity();
+            worldTrans.setOrigin(btVector3(wp->x(id), wp->y(id), wp->z(id)));
+            orientation_type o = wo->at(id);
+            worldTrans.getBasis().setEulerZYX(o.alpha, o.beta, o.gamma);
+        };
+
+
 }
