@@ -25,9 +25,9 @@ namespace Sigma {
 		std::shared_ptr<resource::SoundFile> sfp;
 
 		if(playing) {
-			alGetSourcei(this->sourceid, AL_BUFFER, &param);
+			alGetSourcei(this->sourceid, AL_BUFFERS_PROCESSED, &param);
 			albuf = master->buffers[this->buffers[this->bufferindex]]->GetID();
-			if(param != 0 && albuf != param && playlist.size() > 0) {
+			if(param != 0 && playlist.size() > 0) {
 				sfi = playlist[playindex];
 				sfp = std::shared_ptr<resource::SoundFile>(master->GetSoundFile(sfi));
 				if(stream) {
