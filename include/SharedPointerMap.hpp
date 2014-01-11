@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <stdexcept>
 
+#include "WeakPtrWrapper.hpp"
 
 namespace Sigma {
 
@@ -27,38 +28,15 @@ namespace Sigma {
 	template <class V>
 	// A "do nothing" deletor for smart pointers
 	struct SoftSharedPointerDelete {
-		void operator()(V* value) {}
+		void operator()(V* value) {};
 	} ;
 
-	/** \brief A secured access exposer to owned resources
+	/** \brief A map for shared_ptr with access to data
 	 *
-	 * This template provides secured CRUD (Create, Read, Update, Delete) functions
-	 * on a resource data repository.
+	 * Data is not stored in this class and will not be deleted when
+	 * removing elements from the map.
 	 *
-	 * The resource data owner must forward its own CRUD methods to an instance
-	 * of this template. This template does not store the data itself, it only
-	 * stores pointers to the data provided by the resource data owner.
-	 *
-	 * CRUD functions are exposed in the following manner:
-	 * - Read operations provide a weak_ptr mapped to the data related to an entity
-	 * - Create and Update operations provide a non-const reference to the data
-	 *   related to an entity
-	 *
-	 * The properties of the exposed objects are:
-	 * - weak pointers are persistent and expire when data is updated. Data users must call expired()
-	 *   before reading data.
-	 * - an expired weak pointer does not mean that data was actually updated, it is
-	 *   only meaning that the pointer is no longer valid and a new pointer is available.
-	 * - non-const references are non-movable, non-copiable, non-assignable. It means
-	 *   that users can only use the write functions as the left argument of a instruction,
-	 *   i.e Write(id) = ...
-	 * - the data is only modifiable through the dedicated functions
-	 *
-	 * Usage:
-	 * - resources data owners store the resource data on their side
-	 * - resource data owners must store a private instance of this template
-	 * - owner-side CRUD implementations should forward pointers to the template-side CRUD functions
-	 * - owners must update pointers when necessary, for example after a vector resize operation
+	 * Users must store the data and provide pointers to provision the map.
 	 *
 	 * \param K type of the unique key for the resource repository
 	 * \param V type of the data stored in the repository
@@ -69,89 +47,66 @@ namespace Sigma {
 	public:
 		/** \brief Default constructor
 		 *
-		 * \param callback a data validation instance
-		 *
 		 */
 		SharedPointerMap() {};
 		virtual ~SharedPointerMap() {};
 
-		// enable WriteObject(K a) = ReadObject(K b);
-		SharedPointerMap& operator=(const std::weak_ptr<V>& p) {
-			if(! p.expired()) {
-				return *p.lock();
-			}
-			throw ExpiredWeakPtrException<K>(id);
-		}
-
-		// copy assignment for V
-		SharedPointerMap& operator=(const V& v) {
-			*vec = v;
-			pointer_map.erase(id);
-			pointer_map.insert(std::make_pair(id, vec));
-			vec.reset();
-			return *this;
-		}
-
-		// move assignment for V
-		SharedPointerMap& operator=(V&& v) {
-			*vec = std::move(v);
-			pointer_map.erase(id);
-			pointer_map.insert(std::make_pair(id, vec));
-			vec.reset();
-			return *this;
-		}
-
-		/** \brief Tells if an entity has record in the internal storage
+		/** \brief Tells the numbers of records for a specific key
 		 *
 		 * \param entity_id const K the id of the entity
-		 * \return const bool true if data exists
+		 * \return const size_t the numbers of records
 		 *
 		 */
-		const bool Exist(const K entity_id) const {
+		const size_t count(const K entity_id) const {
 			return pointer_map.count(entity_id);
 		}
 
-		/** \brief Get a weak_ptr pointing on data
+		/** \brief Get a const reference on data
 		 *
 		 * \param entity_id const K the id of the entity
-		 * \return const std::weak_ptr<V> a weak_ptr pointing on data, or empty
+		 * \return const WeakPtrWrapper<V> a reference object
 		 *
 		 */
-		const std::weak_ptr<const V> Read(const K entity_id) const {
-			if (pointer_map.count(entity_id)) {
-				return pointer_map.find(entity_id)->second;
+		const WeakPtrWrapper<V> at(const K entity_id) const {
+			try {
+				return WeakPtrWrapper<V>(pointer_map.at(entity_id));
 			}
-			throw std::out_of_range("entity " + std::to_string(entity_id) + " does not exist.");
-			return std::shared_ptr<const V>();
+			catch (std::out_of_range& e) {
+				throw std::out_of_range("entity " + std::to_string(entity_id) + " does not exist.");
+			}
+			return WeakPtrWrapper<V>();
 		}
 
-		/** \brief Add an element to the map
+		/** \brief Get a reference on data
 		 *
 		 * \param entity_id const K the id of the entity
-		 * \param pointer V* const the pointer to add
-		 * \return void
+		 * \return WeakPtrWrapper<V> a reference object
 		 *
 		 */
-		void SetElement(const K entity_id, V* const pointer) {
-			if (pointer_map.count(entity_id)) {
-				pointer_map.erase(entity_id);
+		WeakPtrWrapper<V> at(const K entity_id) {
+			try {
+				return WeakPtrWrapper<V>(pointer_map.at(entity_id));
 			}
-			pointer_map.insert(std::make_pair(entity_id, std::shared_ptr<const V>(pointer, SoftSharedPointerDelete<V>())));
+			catch (std::out_of_range& e) {
+				throw std::out_of_range("entity " + std::to_string(entity_id) + " does not exist.");
+			}
+			return WeakPtrWrapper<V>();
 		}
 
-		/** \brief Get a non-const reference to the data
+		/** \brief Add an element and return a reference
 		 *
-		 * \param entity_id const K
-		 * \return SharedPointerMap& non-const reference to the data
+		 * \param entity_id const K the id of the entity
+		 * \param V* value the pointer to add
+		 * \return WeakPtrWrapper<V> a reference
 		 *
 		 */
-		SharedPointerMap& Write(const K entity_id) {
-			// prepare the context before writing
-			id = entity_id;
-			V* ptr = const_cast<V*>(pointer_map.find(entity_id)->second.get());
-			pointer_map.find(entity_id)->second.reset();
-			vec.reset(ptr, SoftSharedPointerDelete<V>());
-			return *this;
+		WeakPtrWrapper<V> add(const K& key, V* value) {
+			if (pointer_map.count(key)) {
+				pointer_map.erase(key);
+			}
+			auto p = std::make_pair(key, std::shared_ptr<V>(value, SoftSharedPointerDelete<V>()));
+			pointer_map.insert(p);
+			return WeakPtrWrapper<V>(p.second);
 		}
 
 		/** \brief Unmanage an entity.
@@ -163,9 +118,9 @@ namespace Sigma {
 		 * \return V* the removed pointer to the entity data
 		 *
 		 */
-		V* Remove(const K entity_id) {
+		V* clear(const K entity_id) {
 			V* ptr = const_cast<V*>(pointer_map.find(entity_id)->second.get());
-			pointer_map.erase(id);
+			pointer_map.erase(entity_id);
 			return ptr;
 		}
 
@@ -180,10 +135,7 @@ namespace Sigma {
 		SharedPointerMap(SharedPointerMap& p);
 
 		// the map to store position pointers
-		std::unordered_map<K,std::shared_ptr<const V>> pointer_map;
-
-		std::shared_ptr<V> vec;
-		K id;
+		std::unordered_map<K,std::shared_ptr<V>> pointer_map;
 	};
 }
 

@@ -45,18 +45,18 @@ namespace Sigma {
 		// If this is not the case, split the component
 		static bool AddEntity(const id_t id) {
 			if (getForces(id) == nullptr && getRotationForces(id) == nullptr) {
-				forces_map.set(id) = forces_list();
+				forces_map[id] = forces_list();
 				rotationForces_map.emplace(id, rotationForces_list());
-				cumulatedForces_map.set(id) = glm::vec3();
+				cumulatedForces_map[id] = glm::vec3();
 				return true;
 			}
 			return false;
 		}
 
 		static void RemoveEntity(const id_t id) {
-			forces_map.RemoveElement(id);
+			forces_map.clear(id);
 			rotationForces_map.erase(id);
-			cumulatedForces_map.RemoveElement(id);
+			cumulatedForces_map.clear(id);
 		}
 
 		/** \brief Add a force to the list for a specific entity.
@@ -151,8 +151,8 @@ namespace Sigma {
 		static void CumulateForces();
 
 		static forces_list* getForces(const id_t id) {
-			if (forces_map.Exist(id)) {
-				auto forces = forces_map.get(id);
+			if (forces_map.count(id)) {
+				auto forces = forces_map.at(id);
 				return const_cast<forces_list*>(forces.lock().get());
 			}
 			return nullptr;

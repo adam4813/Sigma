@@ -124,7 +124,7 @@ namespace Sigma {
          * \return a weak pointer on the x coordinate
          *
          */
-        const position_ptr x(const id_t entity_id) const;
+        const WeakPtrWrapper<coordinate_type> x(const id_t entity_id);
 
         /** \brief Get the y coordinate for an entity
          *
@@ -132,7 +132,7 @@ namespace Sigma {
          * \return a weak pointer on the y coordinate
          *
          */
-        const position_ptr y(const id_t entity_id) const;
+        const WeakPtrWrapper<coordinate_type> y(const id_t entity_id);
 
         /** \brief Get the z coordinate for an entity
          *
@@ -140,7 +140,7 @@ namespace Sigma {
          * \return a weak pointer on the z coordinate
          *
          */
-        const position_ptr z(const id_t entity_id) const;
+        const WeakPtrWrapper<coordinate_type> z(const id_t entity_id);
 
         /** \brief Set a x coordinate by reference
         *
@@ -149,7 +149,7 @@ namespace Sigma {
         * \return SharedPointerMap<type_id, coordinate_type>& a reference on the coordinate
         *
         */
-        SharedPointerMap<id_t, coordinate_type>& PositionWrite_x(const id_t entity_id);
+        WeakPtrWrapper<coordinate_type> PositionWrite_x(const id_t entity_id);
 
         /** \brief Set a y coordinate by reference
         *
@@ -158,7 +158,7 @@ namespace Sigma {
         * \return SharedPointerMap<type_id, coordinate_type>& a reference on the coordinate
         *
         */
-        SharedPointerMap<id_t, coordinate_type>& PositionWrite_y(const id_t entity_id);
+        WeakPtrWrapper<coordinate_type> PositionWrite_y(const id_t entity_id);
 
         /** \brief Set a z coordinate by reference
         *
@@ -167,7 +167,7 @@ namespace Sigma {
         * \return SharedPointerMap<type_id, coordinate_type>& a reference on the coordinate
         *
         */
-        SharedPointerMap<id_t, coordinate_type>& PositionWrite_z(const id_t entity_id);
+        WeakPtrWrapper<coordinate_type> PositionWrite_z(const id_t entity_id);
 
         /** \brief Remove a position
         *
@@ -252,10 +252,10 @@ namespace Sigma {
          * \return SharedPointerMap<type_id, coordinate_type>& A rvalue
          *
          */
-        SharedPointerMap<id_t, coordinate_type>& PositionWrite(const id_t entity_id, SharedPointerMap<id_t, coordinate_type>& gf);
+        WeakPtrWrapper<coordinate_type> PositionWrite(const id_t entity_id, SharedPointerMap<id_t, coordinate_type>& gf);
 
-        id_t FindIdElement(const id_t id) const {
-            auto ptr = position_guard_x.Read(id);
+        id_t FindIdElement(const id_t id) {
+            auto ptr = position_guard_x.at(id);
             if (! ptr.expired()) {
                 auto p = ptr.lock().get();
                 return (p - positions_x.data());

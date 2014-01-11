@@ -9,7 +9,7 @@ namespace Sigma {
             wp->PositionWrite_z(id) = vec.z();
             float a, b, g;
             worldTrans.getBasis().getEulerZYX(a, b, g);
-            wo->OrientationWrite(id) = orientation_type(a, b, g);
+            (*wo)[id] = orientation_type(a, b, g);
             PhysicalWorldLocation::MarkUpdated(id);
         }
 

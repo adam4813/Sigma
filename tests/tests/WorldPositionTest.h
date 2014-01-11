@@ -62,9 +62,9 @@
         Sigma::position_type original = Sigma::position_type(1.0, 2.0, 3.0);
         Sigma::WorldPosition wp16{16}; // initial capacity of 16 elements
         std::vector<Sigma::position_type> witness;
-        std::vector<std::weak_ptr<const Sigma::coordinate_type>> stored_x;
-        std::vector<std::weak_ptr<const Sigma::coordinate_type>> stored_y;
-        std::vector<std::weak_ptr<const Sigma::coordinate_type>> stored_z;
+        std::vector<std::weak_ptr<Sigma::coordinate_type>> stored_x;
+        std::vector<std::weak_ptr<Sigma::coordinate_type>> stored_y;
+        std::vector<std::weak_ptr<Sigma::coordinate_type>> stored_z;
         unsigned long int seed = (unsigned long int) std::chrono::system_clock::now().time_since_epoch().count();
         std::default_random_engine random{seed};
         std::vector<Sigma::coordinate_type> translation_x;
@@ -100,9 +100,9 @@ namespace Sigma {
             ASSERT_TRUE(stored_x[i].expired() || stored_x[i].lock().get() == wp16.x(i).lock().get()) << "Stored weak_ptr x " << i << " has not expired";
             ASSERT_TRUE(stored_y[i].expired() || stored_y[i].lock().get() == wp16.y(i).lock().get()) << "Stored weak_ptr y " << i << " has not expired";
             ASSERT_TRUE(stored_z[i].expired() || stored_z[i].lock().get() == wp16.z(i).lock().get()) << "Stored weak_ptr z " << i << " has not expired";
-            EXPECT_EQ(wp16.x(i), witness[i].x) << "Element x " << i << " is not equal after resize";
-            EXPECT_EQ(wp16.y(i), witness[i].y) << "Element y " << i << " is not equal after resize";
-            EXPECT_EQ(wp16.z(i), witness[i].z) << "Element z " << i << " is not equal after resize";
+            EXPECT_EQ((coordinate_type) wp16.x(i), witness[i].x) << "Element x " << i << " is not equal after resize";
+            EXPECT_EQ((coordinate_type) wp16.y(i), witness[i].y) << "Element y " << i << " is not equal after resize";
+            EXPECT_EQ((coordinate_type) wp16.z(i), witness[i].z) << "Element z " << i << " is not equal after resize";
         }
     }
 
@@ -115,9 +115,9 @@ namespace Sigma {
         ASSERT_FALSE(wp256.x(index).expired()) << "Failed to fetch x element created";
         ASSERT_FALSE(wp256.y(index).expired()) << "Failed to fetch y element created";
         ASSERT_FALSE(wp256.z(index).expired()) << "Failed to fetch z element created";
-        EXPECT_EQ(wp256.x(index), original.x) << "x Position retrieved is different";
-        EXPECT_EQ(wp256.y(index), original.y) << "y Position retrieved is different";
-        EXPECT_EQ(wp256.z(index), original.z) << "z Position retrieved is different";
+        EXPECT_EQ((coordinate_type) wp256.x(index), original.x) << "x Position retrieved is different";
+        EXPECT_EQ((coordinate_type) wp256.y(index), original.y) << "y Position retrieved is different";
+        EXPECT_EQ((coordinate_type) wp256.z(index), original.z) << "z Position retrieved is different";
         auto ptr_x = wp256.x(index);
         auto ptr_y = wp256.y(index);
         auto ptr_z = wp256.z(index);
@@ -137,7 +137,7 @@ namespace Sigma {
         auto index = FillUntilResize(&wp256, 32);
         index++;
         wp256.PositionWrite_x(index) = wp256.x(12);
-        ASSERT_EQ(wp256.x(index), wp256.x(12)) << "Failed to copy element";
+        ASSERT_EQ((coordinate_type) wp256.x(index), (coordinate_type) wp256.x(12)) << "Failed to copy element";
     }
 
     TEST_F(WorldPositionTest, WorldPositionMoveElement) {

@@ -18,7 +18,7 @@ namespace Sigma {
         virtual void getWorldTransform(btTransform &worldTrans) const {
             worldTrans.setIdentity();
             worldTrans.setOrigin(btVector3(wp->x(id), wp->y(id), wp->z(id)));
-            orientation_type o = wo->euler(id);
+            orientation_type o = wo->at(id);
             worldTrans.getBasis().setEulerZYX(o.alpha, o.beta, o.gamma);
         };
 

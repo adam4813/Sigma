@@ -21,8 +21,8 @@
             stored.clear();
             while (wp->getVector()->data() == start) {
                 auto x = next();
-                wp->set(++index) = x;
-                stored.push_back(wp->get(index));
+                (*wp)[++index] = x;
+                stored.push_back(wp->at(index));
                 witness.push_back(x);
             }
             return index;
@@ -42,7 +42,7 @@
         double original = 1.0;
         Sigma::VectorMap<unsigned int, double> wp16{16}; // initial capacity of 16 elements
         std::vector<double> witness;
-        std::vector<std::weak_ptr<const double>> stored;
+        std::vector<std::weak_ptr<double>> stored;
         unsigned long int seed = (unsigned long int) std::chrono::system_clock::now().time_since_epoch().count();
         std::default_random_engine random{seed};
     };
@@ -51,13 +51,13 @@ using Sigma::VectorMap;
 
 namespace Sigma {
     TEST_F(VectorMapTest, VectorMapBasic) {
-        EXPECT_THROW(wp256.get(0).expired(), std::out_of_range) << "Element with key 0 should not exist";
-        ASSERT_NO_THROW(wp256.set(0) = original) << "Failed to create element";
-        ASSERT_FALSE(wp256.get(0).expired()) << "Failed to fetch element created";
-        EXPECT_EQ((size_t) wp256.get(0).lock().get() & (size_t)0xF, 0) << "Vector is not 16-byte aligned";
-        EXPECT_EQ(wp256.get(0), original) << "Element retrieved is different";
-        EXPECT_NO_THROW(wp256.RemoveElement(0)) << "Could not remove element";
-        EXPECT_THROW(wp256.get(0).expired(), std::out_of_range) << "Fail to remove element";
+        EXPECT_THROW(wp256.at(0).expired(), std::out_of_range) << "Element with key 0 should not exist";
+        ASSERT_NO_THROW(wp256[0] = original) << "Failed to create element";
+        ASSERT_FALSE(wp256.at(0).expired()) << "Failed to fetch element created";
+        EXPECT_EQ((size_t) wp256.at(0).lock().get() & (size_t)0xF, 0) << "Vector is not 16-byte aligned";
+        EXPECT_EQ(wp256.at(0), original) << "Element retrieved is different";
+        EXPECT_NO_THROW(wp256.clear(0)) << "Could not remove element";
+        EXPECT_THROW(wp256.at(0).expired(), std::out_of_range) << "Fail to remove element";
     }
 
     TEST_F(VectorMapTest, VectorMapFill) {
@@ -66,37 +66,37 @@ namespace Sigma {
         index = FillUntilResize(&wp16);
         EXPECT_EQ(index, 16) << "Resizing occurred before insertion of the 16th element";
         for (unsigned int i = 0; i <= index ; i++) {
-            ASSERT_FALSE(wp16.get(i).expired()) << "Element " << i << " has expired";
-            ASSERT_TRUE(stored[i].expired() || stored[i].lock().get() == wp16.get(i).lock().get()) << "Stored weak_ptr " << i << " has not expired";
-            EXPECT_EQ(wp16.get(i), witness[i]) << "Element " << i << " is not equal after resize";
+            ASSERT_FALSE(wp16.at(i).expired()) << "Element " << i << " has expired";
+            ASSERT_TRUE(stored[i].expired() || stored[i].lock().get() == wp16.at(i).lock().get()) << "Stored weak_ptr " << i << " has not expired";
+            EXPECT_EQ(wp16.at(i), witness[i]) << "Element " << i << " is not equal after resize";
         }
     }
 
     TEST_F(VectorMapTest, VectorMapOperations) {
         auto index = FillUntilResize(&wp256);
         index++;
-        ASSERT_NO_THROW(wp256.set(index) = original) << "Failed to create element";
-        ASSERT_FALSE(wp256.get(index).expired()) << "Failed to fetch element created";
-        EXPECT_EQ(wp256.get(index), original) << "Element retrieved is different";
-        auto ptr = wp256.get(index);
+        ASSERT_NO_THROW(wp256[index] = original) << "Failed to create element";
+        ASSERT_FALSE(wp256.at(index).expired()) << "Failed to fetch element created";
+        EXPECT_EQ(wp256.at(index), original) << "Element retrieved is different";
+        auto ptr = wp256.at(index);
         EXPECT_FALSE(ptr.expired()) << "stored weak_ptr has yet expired, should be still valid";
-        EXPECT_NO_THROW(wp256.RemoveElement(index)) << "Could not remove element";
-        EXPECT_THROW(wp256.get(index).expired(), std::out_of_range) << "Failed to remove element";
+        EXPECT_NO_THROW(wp256.clear(index)) << "Could not remove element";
+        EXPECT_THROW(wp256.at(index).expired(), std::out_of_range) << "Failed to remove element";
         EXPECT_TRUE(ptr.expired()) << "stored weak_ptr has not expired";
     }
 
     TEST_F(VectorMapTest, VectorMapCopyElement) {
         auto index = FillUntilResize(&wp256, 32);
         index++;
-        wp256.set(index) = wp256.get(12);
-        ASSERT_EQ(wp256.get(index), wp256.get(12)) << "Failed to copy element";
+        wp256[index] = wp256.at(12);
+        ASSERT_EQ(wp256.at(index), wp256.at(12)) << "Failed to copy element";
     }
 
     TEST_F(VectorMapTest, VectorMapMoveElement) {
         auto index = FillUntilResize(&wp256, 32);
         index++;
-        wp256.set(index) = 1.0;
-        const double x = wp256.get(index);
+        wp256[index] = 1.0;
+        const double x = wp256.at(index);
         ASSERT_EQ(x, 1.0) << "Failed to move element";
     }
 }

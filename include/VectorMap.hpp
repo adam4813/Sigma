@@ -13,21 +13,6 @@ namespace Sigma {
     //template<class V>
     //using aligned_vector_t = std::vector<V, AlignedVectorAllocator<V>>;
 
-    template<class V>
-    struct data_ptr {
-        data_ptr(const std::weak_ptr<const V>& ptr) : ptr(ptr) {};
-        virtual ~data_ptr() {};
-
-        operator const std::weak_ptr<const V>() const { return ptr; };
-        operator const V() const { return *ptr.lock(); }
-
-        bool expired() const { return ptr.expired(); };
-
-        std::shared_ptr<const V> lock() const { return ptr.lock(); };
-
-        std::weak_ptr<const V> ptr;
-    };
-
     /** \brief A map whose elements are stored in a vector
      *
      */
@@ -42,22 +27,36 @@ namespace Sigma {
         /** Default destructor */
         virtual ~VectorMap() {};
 
-        /** \brief Get the value for a specific key
+        /** \brief Get a const reference for a specific key
+         *
+         * throw an exception is key does not exist
          *
          * \param key the key
          * \return a weak pointer on the value
          *
          */
-        const data_ptr<V> get(K key) const { return data_map.Read(key); };
+        const WeakPtrWrapper<V> at(const K& key) const { return data_map.at(key); };
 
-        /** \brief Get a reference on a value for a specific key
+        /** \brief Get a reference for a specific key
          *
-         * \param key K key of the element
-         * \return SharedPointerMap<K, V>& a reference on the value
+         * throw an exception is key does not exist
+         *
+         * \param key the key
+         * \return a weak pointer on the value
          *
          */
-        SharedPointerMap<K, V>& set(K key) {
-            if (! data_map.Exist(key) && (key_vector.empty() || key_vector.back() != key)) {
+        WeakPtrWrapper<V> at(const K& key) { return data_map.at(key); };
+
+        /** \brief Get a reference for a specific key
+         *
+         * Insert the element if it does not exist
+         *
+         * \param key K key of the element
+         * \return a reference on the value
+         *
+         */
+        WeakPtrWrapper<V> operator[](const K& key) {
+            if (! data_map.count(key) && (key_vector.empty() || key_vector.back() != key)) {
                 // check if we will resize
                 if (data_vector.size() == data_vector.capacity()) {
                     Resize();
@@ -65,12 +64,12 @@ namespace Sigma {
                 // if this is a new entity, create its position in the storage vector
                 V my_vec;
                 data_vector.emplace_back(my_vec);
-                data_map.SetElement(key, &data_vector.back());
                 // save id of last object
                 key_vector.push_back(key);
+                return data_map.add(key, &data_vector.back());
             }
             // return a callback containing unique_ptr
-            return data_map.Write(key);
+            return data_map.at(key);
         };
 
         /** \brief Tell if a key exist
@@ -79,7 +78,7 @@ namespace Sigma {
          * \return bool true if the key exist
          *
          */
-        bool Exist(K key) const { return data_map.Exist(key); }
+        size_t count(K key) const { return data_map.count(key); }
 
         /** \brief Remove an element
         *
@@ -87,14 +86,14 @@ namespace Sigma {
         * \return void
         *
         */
-        void RemoveElement(K key) {
-            V* addr = data_map.Remove(key);
+        void clear(K key) {
+            V* addr = data_map.clear(key);
             size_t index = addr - data_vector.data();
             K last_key = key_vector.back();
             if (last_key != key) {
                     // swap with last element
                     *addr = std::move(data_vector.back());
-                    data_map.SetElement(last_key, addr);
+                    data_map.add(last_key, addr);
                     key_vector[index] = std::move(last_key);
             }
             // remove last element
@@ -139,7 +138,7 @@ namespace Sigma {
             // replace the pointers in the map
             auto it = key_vector.begin();
             for (V& element : v_copy) {
-                data_map.SetElement(*(it++), &element);
+                data_map.add(*(it++), &element);
             }
             // swap the original and the copy
             std::swap(data_vector, v_copy);
@@ -151,8 +150,8 @@ namespace Sigma {
          * \return size_t the index of the element in the vector
          *
          */
-        size_t FindIdElement(K key) {
-            auto ptr = data_map.Read(key);
+        const size_t FindIdElement(const K& key) const {
+            auto ptr = data_map.at(key);
             if (! ptr.expired()) {
                 auto p = ptr.lock().get();
                 return (p - data_vector.data());

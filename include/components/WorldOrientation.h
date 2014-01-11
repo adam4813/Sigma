@@ -72,16 +72,16 @@ namespace Sigma {
              * \return a weak pointer on the orientation
              *
              */
-            const orientation_ptr euler(const id_t entity_id) const;
+            const WeakPtrWrapper<orientation_type> at(const id_t entity_id);
 
             /** \brief Set a orientation by reference
             *
             *
             * \param entity_id id of the entity
-            * \return SharedPointerMap<type_id, vec3>& a reference on the orientation
+            * \return data_ptr<orientation_type> a reference on the orientation
             *
             */
-            SharedPointerMap<id_t, orientation_type>& OrientationWrite(const id_t entity_id);
+            WeakPtrWrapper<orientation_type> operator[](const id_t entity_id);
 
 
             /** \brief Remove an orientation
