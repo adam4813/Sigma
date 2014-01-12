@@ -3,8 +3,10 @@
 
 namespace Sigma {
 
-	OpenALSystem::OpenALSystem() : nextindex(1), device(nullptr), context(nullptr) {
-	}
+	// We need ctor and dstor to be exported to a dll even if they don't do anything
+	// this avoids needing to export getFactoryFunctions() which is only used by Sigma
+	OpenALSystem::OpenALSystem() : nextindex(1), device(nullptr), context(nullptr) { }
+	OpenALSystem::~OpenALSystem() { }
 
 	bool OpenALSystem::Start() {
 		const char * alcx;

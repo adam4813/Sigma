@@ -2,6 +2,7 @@
 #ifndef GUICONTROLLER_H
 #define GUICONTROLLER_H
 
+#include "Sigma.h"
 #include "systems/KeyboardInputSystem.h"
 #include "systems/MouseInputSystem.h"
 
@@ -12,7 +13,7 @@ namespace Sigma {
 			// A type of handler. This handler controls an OpenGL 6 DOF view.
 			class GUIController : public IKeyboardEventHandler, public IMouseEventHandler{
 			public:
-				GUIController();
+				DLL_EXPORT GUIController();
 				void SetGUI(WebGUIView* gui) {
 					this->gui = gui;
 				}
@@ -25,9 +26,9 @@ namespace Sigma {
 				 * \param state The new state of the key (KS_UP or KS_DOWN)
 				 * \return void
 				 */
-				void KeyStateChange(const unsigned int key, const KEY_STATE state);
+				DLL_EXPORT void KeyStateChange(const unsigned int key, const KEY_STATE state);
 
-				void CharDown(const unsigned int c);
+				DLL_EXPORT void CharDown(const unsigned int c);
 
 				/**
 				 * \brief Handles a change in mouse position.
@@ -35,11 +36,11 @@ namespace Sigma {
 				 * \param[in/out] float dx, dy The change in mouse position.
 				 * \param[in/out] float dy
 				 */
-				virtual void MouseMove(float x, float y, float dx, float dy);
+				DLL_EXPORT virtual void MouseMove(float x, float y, float dx, float dy);
 
 				// Not used but required to implement.
-				virtual void MouseDown(Sigma::event::BUTTON btn, float x, float y);
-				virtual void MouseUp(Sigma::event::BUTTON btn, float x, float y);
+				DLL_EXPORT virtual void MouseDown(Sigma::event::BUTTON btn, float x, float y);
+				DLL_EXPORT virtual void MouseUp(Sigma::event::BUTTON btn, float x, float y);
 			private:
 				WebGUIView* gui;
 				bool hasFocus;

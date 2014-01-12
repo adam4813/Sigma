@@ -21,7 +21,7 @@ before_install:
     - sudo apt-get install xorg-dev libglu1-mesa-dev
     - git clone https://github.com/glfw/glfw.git
     - cd glfw
-    - cmake -DCMAKE_INSTALL_PREFIX=/usr .
+    - CMAKE_CXX_FLAGS=-fPIC CMAKE_C_FLAGS=-fPIC cmake -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS:bool=true .
     - sudo make install
     - cd ..
 install:

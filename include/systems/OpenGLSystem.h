@@ -49,7 +49,7 @@ namespace Sigma{
 		: public Sigma::IFactory, public ISystem<IComponent> {
 	public:
 
-		OpenGLSystem();
+		DLL_EXPORT OpenGLSystem();
 
 		/**
 		 * \brief Starts the OpenGL rendering system.
@@ -57,7 +57,7 @@ namespace Sigma{
 		 * Starts the OpenGL rendering system and creates a rendering context. It will also attempt to create a newer rendering context (>3) if available.
 		 * \return -1 in the 0 index on failure, else the major and minor version in index 0 and 1 respectively.
 		 */
-		const int* Start();
+		DLL_EXPORT const int* Start();
 
 		/**
 		 * \brief Causes an update in the system based on the change in time.
@@ -66,7 +66,7 @@ namespace Sigma{
 		 * \param delta the time (in seconds) since the last update
 		 * \return true if rendering was performed
 		 */
-		bool Update(const double delta);
+		DLL_EXPORT bool Update(const double delta);
 
 		/**
 		 * \brief Sets the window width and height for glViewport
@@ -75,7 +75,7 @@ namespace Sigma{
 		 * \param height new height for the window
 		 * \return void
 		 */
-		void SetWindowDim(int width, int height) { this->windowWidth = width; this->windowHeight = height; }
+		DLL_EXPORT void SetWindowDim(int width, int height) { this->windowWidth = width; this->windowHeight = height; }
 
 		/**
 		 * \brief Sets the viewport width and height.
@@ -83,45 +83,45 @@ namespace Sigma{
 		 * \param width new viewport width
 		 * \param height new viewport height
 		 */
-		void SetViewportSize(const unsigned int width, const unsigned int height);
+		DLL_EXPORT void SetViewportSize(const unsigned int width, const unsigned int height);
 
 		/**
 		 * \brief set the framerate at runtime
 		 *
 		 *  Note that the constructor sets a default of 60fps
 		 */
-		void SetFrameRate(double fr) { this->framerate = fr; }
+		DLL_EXPORT void SetFrameRate(double fr) { this->framerate = fr; }
 
 		std::map<std::string,FactoryFunction> getFactoryFunctions();
 
-		IComponent* createPointLight(const id_t entityID, const std::vector<Property> &properties);
-		IComponent* createSpotLight(const id_t entityID, const std::vector<Property> &properties);
-		IComponent* createScreenQuad(const id_t entityID, const std::vector<Property> &properties);
+		DLL_EXPORT IComponent* createPointLight(const id_t entityID, const std::vector<Property> &properties);
+		DLL_EXPORT IComponent* createSpotLight(const id_t entityID, const std::vector<Property> &properties);
+		DLL_EXPORT IComponent* createScreenQuad(const id_t entityID, const std::vector<Property> &properties);
 
 		// TODO: Move these methods to the components themselves.
-		IComponent* createGLSprite(const id_t entityID, const std::vector<Property> &properties) ;
-		IComponent* createGLIcoSphere(const id_t entityID, const std::vector<Property> &properties) ;
-		IComponent* createGLCubeSphere(const id_t entityID, const std::vector<Property> &properties) ;
-		IComponent* createGLMesh(const id_t entityID, const std::vector<Property> &properties) ;
+		DLL_EXPORT IComponent* createGLSprite(const id_t entityID, const std::vector<Property> &properties) ;
+		DLL_EXPORT IComponent* createGLIcoSphere(const id_t entityID, const std::vector<Property> &properties) ;
+		DLL_EXPORT IComponent* createGLCubeSphere(const id_t entityID, const std::vector<Property> &properties) ;
+		DLL_EXPORT IComponent* createGLMesh(const id_t entityID, const std::vector<Property> &properties) ;
 		// Views are not technically components, but perhaps they should be
-		IComponent* createGLView(const id_t entityID, const std::vector<Property> &properties) ;
+		DLL_EXPORT IComponent* createGLView(const id_t entityID, const std::vector<Property> &properties) ;
 
 		// Managing rendering internals
 		/*
 		 * \brief creates a new render target of desired size
 		 */
-		int createRenderTarget(const unsigned int w, const unsigned int h, bool hasDepth);
+		DLL_EXPORT int createRenderTarget(const unsigned int w, const unsigned int h, bool hasDepth);
 
 		/*
 		 * \brief returns the fbo_id of primary render target (index 0)
 		 */
-		int getRenderTarget(unsigned int rtID) { return (this->renderTargets.size() > rtID) ? this->renderTargets[rtID]->fbo_id : -1; }
-		int getRenderTexture(const unsigned int target=0) { return (this->renderTargets.size() > 0) ? this->renderTargets[0]->texture_ids[target] : -1; }
-		void createRTBuffer(unsigned int rtID, GLint format, GLenum internalFormat, GLenum type);
-		void initRenderTarget(unsigned int rtID);
+		DLL_EXPORT int getRenderTarget(unsigned int rtID) { return (this->renderTargets.size() > rtID) ? this->renderTargets[rtID]->fbo_id : -1; }
+		DLL_EXPORT int getRenderTexture(const unsigned int target=0) { return (this->renderTargets.size() > 0) ? this->renderTargets[0]->texture_ids[target] : -1; }
+		DLL_EXPORT void createRTBuffer(unsigned int rtID, GLint format, GLenum internalFormat, GLenum type);
+		DLL_EXPORT void initRenderTarget(unsigned int rtID);
 
 		// Rendering methods
-		void RenderTexture(GLuint texture_id);
+		DLL_EXPORT void RenderTexture(GLuint texture_id);
 
 		/**
 		 * \brief Gets the specified view.
@@ -129,7 +129,7 @@ namespace Sigma{
 		 * \param unsigned int index The index of the view to retrieve.
 		 * \return IGLView* The specified view.
 		 */
-		IGLView* GetView(unsigned int index = 0) const {
+		DLL_EXPORT IGLView* GetView(unsigned int index = 0) const {
 			if (index >= this->views.size()) {
 				//return this->views[this->views.size() - 1];
 				return 0;
@@ -143,7 +143,7 @@ namespace Sigma{
 		 * \param[in] IGLView * view The view to add to the stack.
 		 * \return void
 		 */
-		void PushView(IGLView* view) {
+		DLL_EXPORT void PushView(IGLView* view) {
 			this->views.push_back(view);
 		}
 
@@ -153,14 +153,14 @@ namespace Sigma{
 		 * Pops a view from the stack and deletes it.
 		 * \return void
 		 */
-		void PopView() {
+		DLL_EXPORT void PopView() {
 			if (this->views.size() > 0) {
 				delete this->views[this->views.size() - 1];
 				this->views.pop_back();
 			}
 		}
 
-		GLTransform* GetTransformFor(const unsigned int entityID);
+		DLL_EXPORT GLTransform* GetTransformFor(const unsigned int entityID);
 
 		static std::map<std::string, Sigma::resource::GLTexture> textures;
 	private:

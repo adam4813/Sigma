@@ -4,6 +4,12 @@
 #include "systems/OpenGLSystem.h"
 
 namespace Sigma {
+
+	// We need ctor and dstor to be exported to a dll even if they don't do anything
+	// this avoids needing to export getFactoryFunctions() which is only used by Sigma
+	WebGUISystem::WebGUISystem() : web_core(nullptr) { }
+	WebGUISystem::~WebGUISystem() { }
+
 	std::map<std::string,Sigma::IFactory::FactoryFunction> WebGUISystem::getFactoryFunctions() {
 		using namespace std::placeholders;
 		std::map<std::string,Sigma::IFactory::FactoryFunction> retval;

@@ -12,7 +12,7 @@ namespace Sigma {
 
     class FactorySystem {
         public:
-            static FactorySystem& getInstance();
+            DLL_EXPORT static FactorySystem& getInstance();
             ~FactorySystem();
             /**
              * \brief Create a new components of a given type.
@@ -23,7 +23,7 @@ namespace Sigma {
              * \param[in] std::vector<Property> &properties A vector containing the properties to apply to the created component.
              * \return a pointer to the newly created component
              */
-            IComponent* create(const std::string& type,
+            DLL_EXPORT IComponent* create(const std::string& type,
                         const id_t entityID,
                         const std::vector<Property> &properties);
 
@@ -34,7 +34,7 @@ namespace Sigma {
              *  added (registered) to the central list of functions
              * \param[in] IFactory& Factory the factory whose functions will be registered
              */
-            void register_Factory(IFactory& Factory);
+            DLL_EXPORT void register_Factory(IFactory& Factory);
         protected:
         private:
             // Hide all constructors and the assignment operator to enforce the singleton pattern

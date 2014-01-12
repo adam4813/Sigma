@@ -16,14 +16,14 @@ namespace Sigma {
 	class BulletPhysics
 		: public Sigma::IFactory, public Sigma::ISystem<IBulletShape> {
 	public:
-		BulletPhysics() { }
-		~BulletPhysics();
+		DLL_EXPORT BulletPhysics();
+		DLL_EXPORT ~BulletPhysics();
 		/**
 		 * \brief Starts the Simple Physics system.
 		 *
 		 * \return bool Returns false on startup failure.
 		 */
-		bool Start();
+		DLL_EXPORT bool Start();
 
 		/**
 		 * \brief Causes an update in the system based on the change in time.
@@ -32,14 +32,14 @@ namespace Sigma {
 		 * \param[in] const float delta The change in time since the last update
 		 * \return bool Returns true if we had an update interval passed.
 		 */
-		bool Update(const double delta);
+		DLL_EXPORT bool Update(const double delta);
 
-		IComponent* createBulletShapeMesh(const id_t entityID, const std::vector<Property> &properties);
-		IComponent* createBulletShapeSphere(const id_t entityID, const std::vector<Property> &properties);
+		DLL_EXPORT IComponent* createBulletShapeMesh(const id_t entityID, const std::vector<Property> &properties);
+		DLL_EXPORT IComponent* createBulletShapeSphere(const id_t entityID, const std::vector<Property> &properties);
 
 		std::map<std::string,FactoryFunction> getFactoryFunctions();
 
-		void initViewMover(GLTransform& t);
+		DLL_EXPORT void initViewMover(GLTransform& t);
 		PhysicsController* getViewMover() {
 			return this->mover;
 		}

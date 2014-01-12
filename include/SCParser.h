@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
-
+#include "Sigma.h"
 // SC files contain data for Sigma Component creation
 // Each line begins with a key. These keys describe the rest of the line.
 // There is no whitespace allowed between the key and the rest of the line
@@ -73,14 +73,14 @@ namespace Sigma {
 			 * \param[in] const std::string & fname Name of the file to parse.
 			 * \return   bool false if there was a file opening issue.
 			 */
-			bool Parse(const std::string& fname);
+			DLL_EXPORT bool Parse(const std::string& fname);
 
 			/**
 			 * \brief The number of entities parsed.
 			 *
 			 * \return   unsigned int The number of entities parsed.
 			 */
-			unsigned int EntityCount();
+			DLL_EXPORT unsigned int EntityCount();
 
 			/**
 			 * \brief Gets an entity at the specific index.
@@ -90,7 +90,7 @@ namespace Sigma {
 			 * \return   const Entity* The entity from the list or nullptr if the index is OOB.
 			 * \exception
 			 */
-			Entity* GetEntity(const unsigned int index);
+			DLL_EXPORT Entity* GetEntity(const unsigned int index);
 		private:
 			std::vector<Entity> entities;
 			std::string fname;
