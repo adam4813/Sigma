@@ -20,6 +20,9 @@ namespace Sigma {
 	}
 
 	bool WebGUIView::InjectMouseMove(float x, float y) {
+		if (!this->browserHost) {
+			return false;
+		}
 		CefMouseEvent mouse_event;
 		mouse_event.x = (x - this->x) * this->windowWidth;
 		mouse_event.y = (y - this->y) * this->windowHeight;
