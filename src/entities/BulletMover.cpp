@@ -18,6 +18,6 @@ namespace Sigma {
 		// Add the body component
 		IEntity::entitySystem->addFeature(this, FeatureID("RigidBody"), properties);
 		// TODO: move this. Is it really necessary anyway ?
-        RigidBody::getBody(entityID)->setActivationState(DISABLE_DEACTIVATION);
+        RigidBody::getBody(entityID).lock()->setActivationState(DISABLE_DEACTIVATION);
 	}
 }

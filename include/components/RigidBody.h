@@ -36,12 +36,12 @@ namespace Sigma {
 			body_map.erase(id);
 		};
 
-		static btRigidBody* getBody(const id_t id) {
+		static std::weak_ptr<btRigidBody> getBody(const id_t id) {
 			auto body = body_map.find(id);
 			if (body != body_map.end()) {
 				return body->second;
 			}
-			return nullptr;
+			return std::shared_ptr<btRigidBody>();
 		};
 
 		static void setWorld(btDiscreteDynamicsWorld* world) {
@@ -49,7 +49,7 @@ namespace Sigma {
 		}
 
 	private:
-		static std::unordered_map<id_t, btRigidBody*> body_map;
+		static std::unordered_map<id_t, std::shared_ptr<btRigidBody>> body_map;
 		static btDiscreteDynamicsWorld* dynamicsWorld;
 	};
 }

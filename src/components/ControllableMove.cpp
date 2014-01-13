@@ -31,8 +31,8 @@ namespace Sigma {
         for (auto kitr = cumulatedForces_map.IteratorKeyBegin(); kitr != cumulatedForces_map.IteratorKeyEnd(); ++kitr, ++cf_it) {
             auto body = RigidBody::getBody(*kitr);
             auto finalForce = cf_it;
-            if (body != nullptr) {
-                body->setLinearVelocity(btVector3(finalForce->x, body->getLinearVelocity().y() + 0.000000001f, finalForce->z));
+            if (! body.expired()) {
+                body.lock()->setLinearVelocity(btVector3(finalForce->x, body.lock()->getLinearVelocity().y() + 0.000000001f, finalForce->z));
             }
             else {
 				auto position = PhysicalWorldLocation::getPosition(*kitr);
