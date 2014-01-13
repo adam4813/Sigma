@@ -29,7 +29,7 @@ int main () {
 	LOG_ERROR << "404!";
 
 	Log::Level(Log::LogLevel::WARN);	
-	LOG_DEBUG << "You should see this";
+	LOG_DEBUG << "You shouldn't see this";
 	LOG				<< "Too verbose...";
 	LOG_WARN	<< "Alarm!";
 	LOG_ERROR << "Dave, don't do that";
