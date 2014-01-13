@@ -3,6 +3,7 @@ PROJECT (Sigma)
 
 # Set the include directory
 INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include")
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}")
 
 # Set the cmake search paths
 SET(CMAKE_INCLUDE_PATH ${CMAKE_SOURCE_DIR}/include)
@@ -108,7 +109,6 @@ FIND_PACKAGE(OggVorbis REQUIRED)
 FIND_PACKAGE(OpenAL REQUIRED)
 FIND_PACKAGE(Bullet REQUIRED)
 FIND_PACKAGE(SOIL REQUIRED)
-FIND_PACKAGE(Awesomium REQUIRED)
 
 # Give these some dummy values and if the platform is LINUX or OSX they will be set accordingly.
 SET(X11_LIBRARIES "")
@@ -124,12 +124,18 @@ IF (NOT APPLE) # X11 and GLEW are not needed on OSX.
 	ENDIF (NOT GLEW_FOUND)
 ENDIF (NOT APPLE)
 
+IF (UNIX AND NOT APPLE)
+	FIND_PACKAGE(GTK2 REQUIRED)
+	INCLUDE_DIRECTORIES("${GTK2_INCLUDE_DIRS}")
+ENDIF (UNIX AND NOT APPLE)
+
+LINK_DIRECTORIES("${EXECUTABLE_OUTPUT_PATH}")
+
 IF (APPLE) # Mac OSX
 	SET(GLEW_LIBRARY "") # Set a dummy value for GLEW.
 
-	# Awesomium does not support 64-bit.
-	SET(CMAKE_OSX_ARCHITECTURES i386)
-	SET(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS "i386")
+	SET(CMAKE_OSX_ARCHITECTURES i386;x86_64)
+	SET(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS "i386 x86_64")
 	SET(CMAKE_XCODE_ATTRIBUTE_SUPPORTED_PLATFORMS macosx)
 
 	# Need the 10.7 SDK or later.
@@ -152,13 +158,6 @@ IF (APPLE) # Mac OSX
 
 	# Need Core Foundation and libobjc.
 	SET(OSX_LIBRARIES "-framework CoreFoundation /usr/lib/libobjc.dylib")
-
-	IF (NOT XCODE_VERSION)
-		# Yuck. The Makefile generator is not emitting a -F/Path/To/Awesomium flag.
-		# As a workaround, add the necessary flags ourself assuming the Awesomium was installed in its default location.
-		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -F/Library/Frameworks")
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -F/Library/Frameworks")
-	ENDIF (NOT XCODE_VERSION)
 ENDIF (APPLE)
 
 # We like having options
@@ -179,7 +178,8 @@ set(Sigma_ALL_LIBS
 	${BULLET_LINEARMATH_LIBRARIES}
 	${BULLET_COLLISION_LIBRARIES}
 	${BULLET_DYNAMICS_LIBRARIES}
-	${AWESOMIUM_LIBRARY}
+	cef_dll_wrapper
+	cef
 	)
 
 # all source common to the library and test exe
