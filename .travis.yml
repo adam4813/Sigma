@@ -28,8 +28,8 @@ install:
     - sudo apt-get -qq install libstdc++-4.8-dev clang-3.3
     - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
     - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
-    - sudo apt-get -qq install libglew-dev libsoil-dev libglm-dev
-    - sudo apt-get -qq install libogg-dev libvorbis-dev libopenal-dev
+    - sudo apt-get -q install libglew-dev libsoil-dev libglm-dev
+    - sudo apt-get -q install libogg-dev libvorbis-dev libopenal-dev
     - sudo apt-get install libgtest-dev
     - BUILD_PATH=$(pwd)
     - cd /usr/src/gtest
@@ -55,10 +55,10 @@ script:
     - cp test.sc.complex test.sc
     - "sudo ln -s /usr/include/SOIL/SOIL.h /usr/include/SOIL.h"
     - make clean
-    - make
+    - CXXFLAGS=$(pkg-config --cflags gtk+-2.0) make
 notifications:
     email: false
     # I can also set up Glitch to output build results as well if we don't want the travis bot join/part spam
     irc:
-        - "chat.freenode.net#sigma-gcf"
-        - "chat.freenode.net#project-trillek"
+        # "chat.freenode.net#sigma-gcf"
+        # "chat.freenode.net#project-trillek"
