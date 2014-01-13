@@ -1,6 +1,8 @@
 #ifndef WEAKPTRWRAPPER_HPP_INCLUDED
 #define WEAKPTRWRAPPER_HPP_INCLUDED
 
+#include <memory>
+
 template<class V>
 /** \brief A reference object returned to modify data
  */
