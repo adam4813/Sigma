@@ -87,9 +87,11 @@ namespace Sigma {
 		auto p = std::make_pair(id, std::shared_ptr<btRigidBody>(body));
 		body_map.insert(p);
 		// add the body to the world
-		dynamicsWorld->addRigidBody(getBody(id).lock().get());
+		dynamicsWorld->addRigidBody(p.second.get());
 
-		// TODO: return the components
-		return std::vector<std::unique_ptr<IECSComponent>>();
+		// return the component
+		auto v = std::vector<std::unique_ptr<IECSComponent>>();
+		v.emplace_back(std::unique_ptr<IECSComponent>(new Body(WeakPtrWrapper<btRigidBody>(p.second))));
+		return v;
 	}
 }

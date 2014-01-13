@@ -9,6 +9,7 @@
 #include "Property.h"
 #include "components/BulletShapeMesh.h"
 #include "components/GLMesh.h"
+#include "components/Body.h"
 
 namespace Sigma {
 	/** \brief A component for entities that have a rigid body
