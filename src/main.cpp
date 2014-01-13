@@ -4,6 +4,7 @@
 #include "systems/OpenALSystem.h"
 #include "systems/BulletPhysics.h"
 #include "systems/FactorySystem.h"
+#include "systems/EntitySystem.h"
 #include "controllers/GUIController.h"
 #include "controllers/FPSCamera.h"
 #include "entities/BulletMover.h"
@@ -21,6 +22,10 @@ int main(int argCount, char **argValues) {
 	Sigma::WebGUISystem webguisys;
 
 	Sigma::FactorySystem& factory = Sigma::FactorySystem::getInstance();
+
+	// EntitySystem can add components
+	Sigma::EntitySystem entitySystem(&factory);
+
 	factory.register_Factory(glsys);
 	factory.register_Factory(alsys);
 	factory.register_Factory(bphys);
@@ -65,6 +70,22 @@ int main(int argCount, char **argValues) {
 	///////////////////
 
 	bphys.Start();
+
+	// Create hard coded entity ID #1
+	// position is hardcoded
+	std::vector<Property> properties;
+	properties.emplace_back(Property("x", 0.0f));
+	properties.emplace_back(Property("y", 0.0f));
+	properties.emplace_back(Property("z", 0.0f));
+	properties.emplace_back(Property("rx", 0.0f));
+	properties.emplace_back(Property("ry", 0.0f));
+	properties.emplace_back(Property("rz", 0.0f));
+	Property v("shape", std::string("capsule"));
+	properties.push_back(v);
+	properties.emplace_back(Property("radius", 0.3f));
+	properties.emplace_back(Property("height", 1.3f));
+	Sigma::BulletMover mover(1, properties);
+	mover.InitializeRigidBody(properties);
 
 	///////////////
 	// Setup GUI //
@@ -127,9 +148,6 @@ int main(int argCount, char **argValues) {
 	// definition in scene file. Currently entity ID for view must be 1
 	// for this to work.
 
-	// Create hard coded entity ID #1
-	Sigma::BulletMover* mover = bphys.getViewMover();
-
 	// No view provided, create a default FPS view
 	if(!glsys.GetView()) {
 		std::vector<Property> props;
@@ -154,11 +172,8 @@ int main(int argCount, char **argValues) {
 		glfwos.RegisterKeyboardEventHandler(theCamera);
 		glfwos.RegisterMouseEventHandler(theCamera);
 		theCamera->os = &glfwos;
-		theCamera->SetMover(mover);
+		theCamera->SetMover(&mover);
 	}
-
-	// Give a body to the mover (comment this to simulate a camera)
-	bphys.CreateMoverBody();
 
 	///////////////////
 	// Configure GUI //

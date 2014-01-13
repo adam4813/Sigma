@@ -8,6 +8,9 @@
 namespace Sigma {
     typedef uint32_t id_t;
     typedef std::string ComponentID;
+    // A feature is a set of predefined components that are strongly dependant
+    // for example the rotational and directional forces are grouped in ControllableMove
+    typedef std::string FeatureID;
 }
 
 #endif // SIGMA_H_INCLUDED

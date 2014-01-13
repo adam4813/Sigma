@@ -34,7 +34,7 @@ namespace Sigma{
         }
     }
 
-    bool FactorySystem::createECS(const std::string& type,
+    std::vector<std::unique_ptr<IECSComponent>> FactorySystem::createECS(const std::string& type,
                                const id_t entityID,
                                const std::vector<Property> &properties){
 		if(registeredECSFactoryFunctions.find(type) != registeredECSFactoryFunctions.end()){
@@ -43,7 +43,7 @@ namespace Sigma{
         }
         else {
             std::cerr << "Error: Couldn't find component: " << type << std::endl;
-            return false;
+            return std::vector<std::unique_ptr<IECSComponent>>();
         }
     }
 

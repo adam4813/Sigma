@@ -27,10 +27,10 @@ namespace Sigma {
 
 		virtual ~RigidBody() {};
 
-		static bool AddEntity(const id_t id, const std::vector<Property> &properties);
+		static std::vector<std::unique_ptr<IECSComponent>> AddEntity(const id_t id, const std::vector<Property> &properties);
 
 		// TODO : read properties
-//		static bool AddEntity(const id_t id, const std::vector<Property> &properties) { return AddEntity(id); };
+//		static std::vector<std::unique_ptr<IECSComponent>> AddEntity(const id_t id, const std::vector<Property> &properties) { return AddEntity(id); };
 
 		static void RemoveEntity(const id_t id) {
 			body_map.erase(id);
@@ -39,13 +39,18 @@ namespace Sigma {
 		static btRigidBody* getBody(const id_t id) {
 			auto body = body_map.find(id);
 			if (body != body_map.end()) {
-				return &body->second;
+				return body->second;
 			}
 			return nullptr;
 		};
 
+		static void setWorld(btDiscreteDynamicsWorld* world) {
+			dynamicsWorld = world;
+		}
+
 	private:
-	   static std::unordered_map<id_t, btRigidBody> body_map;
+		static std::unordered_map<id_t, btRigidBody*> body_map;
+		static btDiscreteDynamicsWorld* dynamicsWorld;
 	};
 }
 

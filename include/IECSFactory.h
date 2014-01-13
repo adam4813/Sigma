@@ -4,13 +4,15 @@
 #include <functional>
 #include <vector>
 #include <map>
+#include <memory>
 #include "Property.h"
 #include "Sigma.h"
+#include "IECSComponent.h"
 
 namespace Sigma {
     class IECSFactory {
     public:
-        typedef std::function<bool(const id_t,
+        typedef std::function<std::vector<std::unique_ptr<IECSComponent>>(const id_t,
                                     const std::vector<Property>&)> FactoryFunction;
         IECSFactory(){};
         virtual ~IECSFactory(){};

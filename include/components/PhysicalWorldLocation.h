@@ -9,6 +9,7 @@
 #include "GLTransform.h"
 #include "IComponent.h"
 #include "components/SigmaMotionState.h"
+#include "components/Orientation.h"
 #include <map>
 #include <memory>
 
@@ -56,10 +57,10 @@ namespace Sigma {
 
 		virtual ~PhysicalWorldLocation() {};
 
-		static bool AddEntityPosition(const id_t id, const coordinate_type x, const coordinate_type y,
+		static std::vector<std::unique_ptr<IECSComponent>> AddEntityPosition(const id_t id, const coordinate_type x, const coordinate_type y,
 				   const coordinate_type z, const coordinate_type rx, const coordinate_type ry, const coordinate_type rz);
 
-		static bool AddEntity(const id_t id, const std::vector<Property> &properties);
+		static std::vector<std::unique_ptr<IECSComponent>> AddEntity(const id_t id, const std::vector<Property> &properties);
 
 		static void RemoveEntity(const id_t id) {
 			pphysical_x.clear(id);
@@ -89,8 +90,8 @@ namespace Sigma {
 		}
 
 
-		static std::unique_ptr<orientation_type> getOrientation(const id_t id) {
-			return std::unique_ptr<orientation_type>(new orientation_type(ophysical.at(id)));
+		static std::unique_ptr<IECSComponent> getOrientation(const id_t id) {
+			return std::unique_ptr<IECSComponent>(new Orientation(ophysical.at(id)));
 		};
 
 		static inline SigmaMotionState* GetMotionState(const id_t id) {

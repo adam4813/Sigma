@@ -5,8 +5,8 @@
 #include "ISystem.h"
 #include "bullet/btBulletDynamicsCommon.h"
 #include "components/InterpolatedMovement.h"
+#include "components/RigidBody.h"
 #include "IBulletShape.h"
-#include "entities/BulletMover.h"
 #include "Sigma.h"
 
 class Property;
@@ -17,7 +17,8 @@ namespace Sigma {
 	class BulletPhysics
 		: public Sigma::IFactory, public Sigma::IECSFactory, public Sigma::ISystem<IBulletShape> {
 	public:
-		BulletPhysics() : mover(1) { }
+		BulletPhysics() {};
+
 		~BulletPhysics();
 		/**
 		 * \brief Starts the Simple Physics system.
@@ -38,28 +39,19 @@ namespace Sigma {
 		IComponent* createBulletShapeMesh(const id_t entityID, const std::vector<Property> &properties);
 		IComponent* createBulletShapeSphere(const id_t entityID, const std::vector<Property> &properties);
 
-		bool addControllableMove(const id_t entityID, const std::vector<Property> &properties);
-		bool addInterpolatedMove(const id_t entityID, const std::vector<Property> &properties);
-		bool addPhysicalWorldLocation(const id_t entityID, const std::vector<Property> &properties);
-		bool addRigidBody(const id_t entityID, const std::vector<Property> &properties);
+		std::unique_ptr<IECSComponent> addControllableMove(const id_t entityID, const std::vector<Property> &properties);
+		std::unique_ptr<IECSComponent> addInterpolatedMove(const id_t entityID, const std::vector<Property> &properties);
+		std::unique_ptr<IECSComponent> addPhysicalWorldLocation(const id_t entityID, const std::vector<Property> &properties);
+		std::unique_ptr<IECSComponent> addRigidBody(const id_t entityID, const std::vector<Property> &properties);
 
 		std::map<std::string,IFactory::FactoryFunction> getFactoryFunctions();
 		std::map<std::string,IECSFactory::FactoryFunction> getECSFactoryFunctions();
 
-        /** \brief Gives a body to the mover and adds it to the world
-         *
-         */
-		void CreateMoverBody();
-
-		BulletMover* getViewMover() {
-			return &this->mover;
-		}
 	private:
 		btBroadphaseInterface* broadphase;
 		btDefaultCollisionConfiguration* collisionConfiguration;
 		btCollisionDispatcher* dispatcher;
 		btSequentialImpulseConstraintSolver* solver;
 		btDiscreteDynamicsWorld* dynamicsWorld;
-		BulletMover mover;
 	};
 }

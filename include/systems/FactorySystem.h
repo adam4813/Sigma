@@ -28,7 +28,7 @@ namespace Sigma {
                         const id_t entityID,
                         const std::vector<Property> &properties);
 
-			bool createECS(const std::string& type,
+			std::vector<std::unique_ptr<IECSComponent>> createECS(const std::string& type,
                                const id_t entityID,
                                const std::vector<Property> &properties);
 

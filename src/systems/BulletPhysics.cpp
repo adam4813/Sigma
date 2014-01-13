@@ -30,12 +30,8 @@ namespace Sigma {
 		this->solver = new btSequentialImpulseConstraintSolver();
 		this->dynamicsWorld = new btDiscreteDynamicsWorld(this->dispatcher, this->broadphase, this->solver, this->collisionConfiguration);
 		this->dynamicsWorld->setGravity(btVector3(0,-10,0));
-
+		RigidBody::setWorld(dynamicsWorld);
 		return true;
-	}
-
-	void BulletPhysics::CreateMoverBody() {
-		this->mover.InitializeRigidBody(dynamicsWorld);
 	}
 
 	std::map<std::string,Sigma::IFactory::FactoryFunction>

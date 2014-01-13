@@ -10,16 +10,18 @@
 #include "components/RigidBody.h"
 #include "GLTransform.h"
 #include "Sigma.h"
+#include "Property.h"
+#include "IEntity.h"
 
 namespace Sigma {
 
     /** \brief BulletMover is an helper class for an entity that represents a local player
      */
-	class BulletMover {
+	class BulletMover : public IEntity{
 	public:
 
 		/* An entity is not defined by the instanciation of its class, but by the components
-		 * that it owns. An entity has no data or code except create and delete functions.
+		 * that it owns.
 		 *
 		 * If you manually add all the components that define an entity, then you must have created
 		 * an entity strictly equivalent to the one created through instanciation. This class is just an helper to
@@ -31,7 +33,7 @@ namespace Sigma {
 		 *
 		 */
 
-		BulletMover(const id_t entityID);
+		BulletMover(const id_t entityID, const std::vector<Property>& properties);
 		virtual ~BulletMover() {};
 
 		/**
@@ -41,10 +43,7 @@ namespace Sigma {
 		 *
 		 * \return void
 		 */
-		void InitializeRigidBody(btDiscreteDynamicsWorld* world);
+		void InitializeRigidBody(const std::vector<Property>& properties);
 
-		const id_t GetEntityID() const { return entityID; };
-	private:
-        const id_t entityID;
 	};
 }
