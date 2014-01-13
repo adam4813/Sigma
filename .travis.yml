@@ -42,9 +42,9 @@ install:
     - wget http://eciv.net/m/cef_compact_latestmirror_linux64.tar.xz
     - xz -dc cef_compact_latestmirror_linux64.tar.xz | tar -x
     - cd cef_binary_*_linux64
+    # We don't actually need to build the wrapper, just copy the includes
     # CXXFLAGS=$(pkg-config --cflags gtk+-2.0) make libcef_dll_wrapper BUILDTYPE=Release
     # mv out/Release/obj.target/libcef_dll_wrapper* $BUILD_PATH/build/bin
-    - ls
     # mv out/Release/* Resources/* $BUILD_PATH/build/bin
     - cp -rf include/* $BUILD_PATH/include
     - cd $BUILD_PATH
@@ -60,5 +60,5 @@ notifications:
     email: false
     # I can also set up Glitch to output build results as well if we don't want the travis bot join/part spam
     irc:
-        # "chat.freenode.net#sigma-gcf"
-        # "chat.freenode.net#project-trillek"
+        - "chat.freenode.net#sigma-gcf"
+        - "chat.freenode.net#project-trillek"
