@@ -3,6 +3,7 @@
 #include "SOIL/SOIL.h"
 
 #include <vector>
+#include <iostream>
 #include <sstream>
 
 const float epsilon = 0.0001f;
