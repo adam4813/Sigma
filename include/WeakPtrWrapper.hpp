@@ -8,37 +8,31 @@ template<class V>
  */
 class WeakPtrWrapper {
 public:
-	WeakPtrWrapper() : ptr(std::make_shared<V>()) {};
+	WeakPtrWrapper() : ptr(std::shared_ptr<V>()) {};
 	WeakPtrWrapper(const std::shared_ptr<V>& ptr) : ptr(ptr) {};
 	WeakPtrWrapper(std::shared_ptr<V>&& ptr) : ptr(std::move(ptr)) {};
 	virtual ~WeakPtrWrapper() {};
 
 	// copy assignment for shared_ptr
-	WeakPtrWrapper& operator=(std::shared_ptr<V>& p) { ptr = p; };
+	WeakPtrWrapper<V>& operator=(std::shared_ptr<V>& p) { ptr = p; };
 	// move assignment for shared_ptr
-	WeakPtrWrapper& operator=(std::shared_ptr<V>&& p) { ptr = std::move(p); };
+	WeakPtrWrapper<V>& operator=(std::shared_ptr<V>&& p) { ptr = std::move(p); };
 
 	// copy assignment for V
-	WeakPtrWrapper& operator=(const V& v) {
-		if (! this->expired()) {
-			*this->lock() = v;
-		};
+	WeakPtrWrapper<V>& operator=(const V& v) {
+		*this->lock() = v;
 		return *this;
 	}
 
 	// move assignment for V
-	WeakPtrWrapper& operator=(V&& v) {
-		if (! this->expired()) {
-			*this->lock() = std::move(v);
-		};
+	WeakPtrWrapper<V>& operator=(V&& v) {
+		*this->lock() = std::move(v);
 		return *this;
 	}
 
 	// copy assignment
-	WeakPtrWrapper& operator=(const WeakPtrWrapper<V>& p) {
-		if (! this->expired() && ! p.expired()) {
-			*this->lock() = *p.lock();
-		};
+	WeakPtrWrapper<V>& operator=(WeakPtrWrapper<V>& p) {
+		this->ptr = p.ptr;
 		return *this;
 	}
 
