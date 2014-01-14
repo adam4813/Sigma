@@ -4,7 +4,6 @@
 #include "systems/OpenALSystem.h"
 #include "systems/BulletPhysics.h"
 #include "systems/FactorySystem.h"
-#include "systems/EntitySystem.h"
 #include "controllers/GUIController.h"
 #include "controllers/FPSCamera.h"
 #include "entities/BulletMover.h"

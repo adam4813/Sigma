@@ -1,6 +1,7 @@
 #ifndef BODY_H_INCLUDED
 #define BODY_H_INCLUDED
 
+#include <bullet/btBulletDynamicsCommon.h>
 #include "IECSComponentData.h"
 #include "IECSComponent.h"
 

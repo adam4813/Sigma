@@ -6,7 +6,7 @@
 #include "WeakPtrWrapper.hpp"
 
 #define SET_GETTER(type)								\
-WeakPtrWrapper<type> get() { return data;};
+WeakPtrWrapper<type>* get() { return &data;};
 
 namespace Sigma{
 	template<class ComponentType>

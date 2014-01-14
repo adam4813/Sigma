@@ -9,8 +9,28 @@
 #include "systems/FactorySystem.h"
 
 namespace Sigma {
-	class IEntity;
 	class FactorySystem;
+	class EntitySystem;
+
+	/** \brief An interface for entities
+     */
+	class IEntity {
+	public:
+		IEntity(const id_t entityID) : entityID(entityID) {};
+		virtual ~IEntity() {};
+
+		template<class T>
+		T* GetAs();
+
+		const id_t GetEntityID() const { return entityID; };
+
+		static EntitySystem* entitySystem;
+		std::unordered_map<ComponentID,std::unique_ptr<IECSComponent>> Componentmap;
+
+	protected:
+		const id_t entityID;
+	};
+
 
     /** \brief A system that manage the components of entities
      */
@@ -39,6 +59,26 @@ namespace Sigma {
 	private:
 		FactorySystem* componentFactory;
 	};
+
+	template<class T>
+	T* IEntity::GetAs() {
+		return entitySystem->getComponent<T>(this);
+	}
+
+	// EntitySystem implementation
+
+	template<class T>
+	T* EntitySystem::getComponent(IEntity* e) {
+		auto component = static_cast<T*>(e->Componentmap[T::getStaticComponentTypeName()].get());
+		//if (component->expired()) {
+			// TODO: query the ECS for the updated component
+			// for replacement in the map
+			//component = ....
+			// TODO: register update functions in factory ?
+		//}
+		return component;
+	}
+
 }
 
 #endif // ENTITYSYSTEM_H_INCLUDED

@@ -11,7 +11,7 @@
 #include "GLTransform.h"
 #include "Sigma.h"
 #include "Property.h"
-#include "IEntity.h"
+#include "systems/EntitySystem.h"
 
 namespace Sigma {
 
@@ -45,5 +45,7 @@ namespace Sigma {
 		 */
 		void InitializeRigidBody(const std::vector<Property>& properties);
 
+	private:
+		WeakPtrWrapper<btRigidBody>* body;
 	};
 }

@@ -1,21 +1,10 @@
 #include "systems/EntitySystem.h"
-#include "IEntity.h"
 
 namespace Sigma {
+	// IEntity implementation
+	EntitySystem* IEntity::entitySystem = 0;
+
 	EntitySystem::EntitySystem(FactorySystem* factory) : componentFactory(factory) { IEntity::entitySystem = this; }
-
-
-	template<class T>
-	T* EntitySystem::getComponent(IEntity* e) {
-		auto component = (T*) e->Componentmap[T::getStaticComponentTypeName()].get();
-		if (component->expired()) {
-			// TODO: query the ECS for the updated component
-			// for replacement in the map
-			//component = ....
-			// TODO: register update functions in factory ?
-		}
-		return component;
-	}
 
 	void EntitySystem::addFeature(IEntity* e, const FeatureID& fid, const std::vector<Property>& properties) {
 		// create feature in ECS and receive a vector of unique_ptr<IECSComponent>
