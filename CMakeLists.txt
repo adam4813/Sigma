@@ -201,6 +201,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 LINK_DIRECTORIES("${CMAKE_SOURCE_DIR}/cef")
+# For CEF these may or may not work depending on the platform/build config, including anyway
+LINK_DIRECTORIES("${CMAKE_BINARY_DIR}/bin")
+LINK_DIRECTORIES("${EXECUTABLE_OUTPUT_PATH}")
 
 if(BUILD_STATIC_Sigma)
 	add_library(libSigmas STATIC
