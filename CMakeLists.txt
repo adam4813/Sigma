@@ -240,28 +240,39 @@ if(BUILD_EXE_Sigma)
 	# add the test executable, include the test app source containing main()
 
 	# if we are building a library of Sigma just link that and the includes
-	if(BUILD_STATIC_Sigma)
-		ADD_EXECUTABLE(Sigma
-			${Sigma_ALL_INCLUDES}
-			${Sigma_SRC_TESTS_CPP}
-			)
-		TARGET_LINK_LIBRARIES(Sigma libSigmas)
-	elseif(BUILD_SHARED_Sigma)
-		ADD_EXECUTABLE(Sigma
-			${Sigma_ALL_INCLUDES}
-			${Sigma_SRC_TESTS_CPP}
-			)
-		TARGET_LINK_LIBRARIES(Sigma libSigma)
-	else(BUILD_STATIC_Sigma)
-		# if just building an exe use all the source and libraries
-		ADD_EXECUTABLE(Sigma
-			${Sigma_ALL_SOURCE}
-			${Sigma_ALL_INCLUDES}
-			${Sigma_SRC_TESTS_CPP}
-			)
-		# Link the executable to all required libraries
-		TARGET_LINK_LIBRARIES(Sigma ${Sigma_ALL_LIBS})
-	endif(BUILD_STATIC_Sigma)
+	FOREACH(TEST_CPP ${Sigma_SRC_TESTS_CPP})
+		GET_FILENAME_COMPONENT(TEST_NAME ${TEST_CPP} NAME_WE)
+		if(TEST_NAME STREQUAL "main")
+			SET(TEST_NAME "Sigma")
+		endif(TEST_NAME STREQUAL "main")
+
+		MESSAGE(STATUS "Processing: ${TEST_NAME}")
+
+		if(BUILD_STATIC_Sigma)
+			ADD_EXECUTABLE(${TEST_NAME}
+				${Sigma_ALL_INCLUDES}
+				${TEST_CPP}
+				)
+			TARGET_LINK_LIBRARIES(${TEST_NAME} libSigmas)
+
+		elseif(BUILD_SHARED_Sigma)
+			ADD_EXECUTABLE(${TEST_NAME}
+				${Sigma_ALL_INCLUDES}
+				${TEST_CPP}
+				)
+			TARGET_LINK_LIBRARIES(${TEST_NAME} libSigma)
+
+		else(BUILD_STATIC_Sigma)
+			# if just building an exe use all the source and libraries
+			ADD_EXECUTABLE(${TEST_NAME}
+				${Sigma_ALL_SOURCE}
+				${Sigma_ALL_INCLUDES}
+				${TEST_CPP}
+				)
+			# Link the executable to all required libraries
+			TARGET_LINK_LIBRARIES(${TEST_NAME} ${Sigma_ALL_LIBS})
+		endif(BUILD_STATIC_Sigma)
 	
+		ENDFOREACH(TEST_CPP)
 endif(BUILD_EXE_Sigma)
 
