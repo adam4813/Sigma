@@ -87,7 +87,7 @@ namespace Sigma {
 			try {
 				return WeakPtrWrapper<V>(pointer_map.at(entity_id));
 			}
-			catch (std::out_of_range& e) {
+			catch (std::out_of_range&) {
 				throw std::out_of_range("entity " + std::to_string(entity_id) + " does not exist.");
 			}
 			return WeakPtrWrapper<V>();

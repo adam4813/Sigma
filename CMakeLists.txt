@@ -49,6 +49,10 @@ source_group("Source Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_CPP})
 file(GLOB Sigma_SRC_RESOURCES_H "include/resources/*.h")
 source_group("Header Files\\resources" FILES ${Sigma_SRC_RESOURCES_H})
 
+# Put the Test files into a filter
+FILE(GLOB Sigma_SRC_TESTS_CPP "src/tests/*.cpp")
+SOURCE_GROUP("Source Files\\tests" FILES ${Sigma_SRC_TESTS_CPP})
+
 # Output the compiler ID.
 MESSAGE("Compiler ID: " ${CMAKE_CXX_COMPILER_ID})
 
@@ -188,6 +192,7 @@ set(Sigma_ALL_SOURCE
 	${Sigma_SRC_COMPONENT_CPP}
 	${Sigma_SRC_SYSTEM_CPP}
 	${Sigma_SRC_CONTROLLERS_CPP}
+	${Sigma_SRC_ENTITY_CPP}
 	)
 
 # all source common to the library and test exe
@@ -197,6 +202,7 @@ set(Sigma_ALL_INCLUDES
 	${Sigma_SRC_SYSTEM_H}
 	${Sigma_SRC_CONTROLLERS_H}
 	${Sigma_SRC_RESOURCES_H}
+	${Sigma_SRC_ENTITY_H}
 	)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")

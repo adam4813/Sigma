@@ -37,7 +37,7 @@ namespace Sigma {
 	class EntitySystem {
 		typedef std::pair<ComponentID, std::unique_ptr<IECSComponent>> element_t;
 	public:
-		EntitySystem(FactorySystem* factory);
+		DLL_EXPORT EntitySystem(FactorySystem* factory);
 		virtual ~EntitySystem() {};
 
 		template<class T>

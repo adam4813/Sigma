@@ -33,7 +33,7 @@ namespace Sigma {
 		 *
 		 */
 
-		BulletMover(const id_t entityID, const std::vector<Property>& properties);
+		DLL_EXPORT BulletMover(const id_t entityID, const std::vector<Property>& properties);
 		virtual ~BulletMover() {};
 
 		/**
@@ -43,7 +43,7 @@ namespace Sigma {
 		 *
 		 * \return void
 		 */
-		void InitializeRigidBody(const std::vector<Property>& properties);
+		DLL_EXPORT void InitializeRigidBody(const std::vector<Property>& properties);
 
 	private:
 		std::weak_ptr<btRigidBody>* body;

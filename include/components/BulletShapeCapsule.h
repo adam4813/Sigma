@@ -8,7 +8,11 @@ namespace Sigma{
 	public:
 		SET_COMPONENT_TYPENAME("BulletShapeCapsule");
 		BulletShapeCapsule(const id_t entityID = 0) : IBulletShape(entityID) { }
-		~BulletShapeCapsule() { }
+		~BulletShapeCapsule() {
+			if (this->motionState) {
+				delete this->motionState;
+			}
+		}
 
 		void SetCapsuleSize(float radius, float height) {
 			this->radius = radius;
@@ -19,5 +23,6 @@ namespace Sigma{
 	private:
 		float radius;
 		float height;
+		btMotionState* motionState;
 	};
 }

@@ -9,6 +9,7 @@
 #include "IBulletShape.h"
 #include "Sigma.h"
 #include "components/BulletShapeCapsule.h"
+#include "components/PhysicsController.h"
 
 class Property;
 class IMoverComponent;

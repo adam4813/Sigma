@@ -55,9 +55,9 @@ namespace Sigma{
 
 		virtual const glm::mat4 GetViewMatrix() {
 				// This is more precise
-				glm::mat4 view =  glm::lookAt(this->transform.GetPosition(),
-					this->transform.GetPosition()+this->transform.GetForward(),
-					this->transform.GetUp());
+				glm::mat4 view =  glm::lookAt(this->transform->GetPosition(),
+					this->transform->GetPosition()+this->transform->GetForward(),
+					this->transform->GetUp());
 
 				return view;
 		}
