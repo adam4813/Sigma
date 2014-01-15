@@ -28,9 +28,22 @@ namespace Sigma{
         if(registeredFactoryFunctions.find(type) != registeredFactoryFunctions.end()){
 			std::cerr << "Creating component of type: " << type << std::endl;
             return registeredFactoryFunctions[type](entityID, properties);
-        } else{
-            std::cerr << "Error: Couldn't find component: " << type << std::endl;
+        }
+        else {
             return nullptr;
+        }
+    }
+
+    std::vector<std::unique_ptr<IECSComponent>> FactorySystem::createECS(const std::string& type,
+                               const id_t entityID,
+                               const std::vector<Property> &properties){
+		if(registeredECSFactoryFunctions.find(type) != registeredECSFactoryFunctions.end()){
+			std::cerr << "Creating ECS component of type: " << type << std::endl;
+            return registeredECSFactoryFunctions[type](entityID, properties);
+        }
+        else {
+            std::cerr << "Error: Couldn't find component: " << type << std::endl;
+            return std::vector<std::unique_ptr<IECSComponent>>();
         }
     }
 
@@ -42,4 +55,11 @@ namespace Sigma{
         }
     }
 
+    void FactorySystem::register_ECSFactory(IECSFactory& Factory){
+		const auto& factoryfunctions = Factory.getECSFactoryFunctions();
+		for(auto FactoryFunc = factoryfunctions.begin(); FactoryFunc != factoryfunctions.end(); ++FactoryFunc){
+			std::cerr << "Registering ECS component factory of type: " << FactoryFunc->first << std::endl;
+            registeredECSFactoryFunctions[FactoryFunc->first]=FactoryFunc->second;
+        }
+    }
 } // namespace Sigma

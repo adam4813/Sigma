@@ -1,5 +1,6 @@
 #include "controllers/FPSCamera.h"
 #include "components/PhysicsController.h"
+#include "entities/BulletMover.h"
 
 namespace Sigma{
 	namespace event{
@@ -58,6 +59,8 @@ namespace Sigma{
 					float yRot = dx * SPEED_ROTATE * -1.0f;
 					
 					this->controller.Rotate(xRot, yRot, 0.0f);
+					InterpolatedMovement::RotateTarget(this->mover->GetEntityID(),\
+									-1.0f * dy *SPEED_ROTATE,-1.0f * dx * SPEED_ROTATE,0.0f);
 				}
 			}
 
@@ -67,9 +70,35 @@ namespace Sigma{
 					os->ToggleMouseLock();
 				}
 			}
-			
+
 			//Does nothing, but has to be here because of IMouseEventHandler
 			void FPSCamera::MouseUp(BUTTON btn, float x, float y) {}
+
+			const glm::mat4 FPSCamera::GetViewMatrix() {
+				// Limit rotation to pitch and yaw, apply pitch first to ensure
+				// yaw rotation happens correctly
+				/*glm::mat4 viewMatrix = glm::rotate(glm::mat4(1.0f), this->transform.GetPitch(), GLTransform::RIGHT_VECTOR);
+				viewMatrix = glm::rotate(viewMatrix, this->transform.GetYaw(), GLTransform::UP_VECTOR);
+
+				viewMatrix = glm::translate(viewMatrix, -1.0f * this->transform.GetPosition());
+
+				return viewMatrix;*/
+
+				// This is more precise
+				glm::mat4 view =  glm::lookAt(this->transform->GetPosition(),
+											  this->transform->GetPosition()+this->transform->GetForward(),
+											  this->transform->GetUp());
+
+				return view;
+				//return this->transform.GetMatrix();
+			}
+
+			void FPSCamera::SetMover(BulletMover* m){
+				if (m) {
+					SetTransform(PhysicalWorldLocation::GetTransform(m->GetEntityID()));
+					this->mover = m;
+				}
+			}
 		}
 	}
 } // namespace Sigma::event::handler

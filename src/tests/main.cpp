@@ -7,6 +7,7 @@
 #include "controllers/GUIController.h"
 #include "controllers/FPSCamera.h"
 #include "components/PhysicsController.h"
+#include "entities/BulletMover.h"
 #include "components/GLScreenQuad.h"
 #include "SCParser.h"
 #include "systems/WebGUISystem.h"
@@ -39,9 +40,14 @@ int main(int argCount, char **argValues) {
 	Sigma::BulletPhysics bphys;
 
 	Sigma::FactorySystem& factory = Sigma::FactorySystem::getInstance();
+
+	// EntitySystem can add components
+	Sigma::EntitySystem entitySystem(&factory);
+
 	factory.register_Factory(glsys);
 	factory.register_Factory(alsys);
 	factory.register_Factory(bphys);
+	factory.register_ECSFactory(bphys);
 	factory.register_Factory(webguisys);
 
 	if (!glfwos.InitializeWindow(1024, 768, "Sigma GLFW Test Window")) {
@@ -83,6 +89,22 @@ int main(int argCount, char **argValues) {
 
 	bphys.Start();
 
+	// Create hard coded entity ID #1
+	// position is hardcoded
+	std::vector<Property> properties;
+	properties.emplace_back(Property("x", 0.0f));
+	properties.emplace_back(Property("y", 0.0f));
+	properties.emplace_back(Property("z", 0.0f));
+	properties.emplace_back(Property("rx", 0.0f));
+	properties.emplace_back(Property("ry", 0.0f));
+	properties.emplace_back(Property("rz", 0.0f));
+	Property v("shape", std::string("capsule"));
+	properties.push_back(v);
+	properties.emplace_back(Property("radius", 0.3f));
+	properties.emplace_back(Property("height", 1.3f));
+	Sigma::BulletMover mover(1, properties);
+	mover.InitializeRigidBody(properties);
+
 	///////////////
 	// Setup GUI //
 	///////////////
@@ -97,7 +119,7 @@ int main(int argCount, char **argValues) {
 	std::cout << "Initializing OpenAL system." << std::endl;
 	alsys.Start();
 	alsys.test(); // try sound
-	
+
 	////////////////
 	// Load scene //
 	////////////////
@@ -129,7 +151,9 @@ int main(int argCount, char **argValues) {
 				}
 			}
 
-			factory.create(itr->type,e->id, const_cast<std::vector<Property>&>(itr->properties));
+			if (! factory.create(itr->type,e->id, const_cast<std::vector<Property>&>(itr->properties))) {
+				factory.createECS(itr->type,e->id, const_cast<std::vector<Property>&>(itr->properties));
+			};
 		}
 	}
 
@@ -153,7 +177,6 @@ int main(int argCount, char **argValues) {
 		props.push_back(p_x);
 		props.push_back(p_y);
 		props.push_back(p_z);
-
 		glsys.createGLView(1, props);
 	}
 
@@ -169,7 +192,6 @@ int main(int argCount, char **argValues) {
 	glfwos.RegisterMouseEventHandler(&theCamera);
 	theCamera.os = &glfwos;
 	
-	// Sync bullet physics object with gl camera
 
 	///////////////////
 	// Configure GUI //
@@ -179,7 +201,7 @@ int main(int argCount, char **argValues) {
 	guicon.SetGUI(webguisys.getComponent(100, Sigma::WebGUIView::getStaticComponentTypeName()));
 	glfwos.RegisterKeyboardEventHandler(&guicon);
 	glfwos.RegisterMouseEventHandler(&guicon);
-	
+
 	// Call now to clear the delta after startup.
 	glfwos.GetDeltaTime();
 	{
