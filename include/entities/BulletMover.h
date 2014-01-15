@@ -46,6 +46,6 @@ namespace Sigma {
 		void InitializeRigidBody(const std::vector<Property>& properties);
 
 	private:
-		WeakPtrWrapper<btRigidBody>* body;
+		std::weak_ptr<btRigidBody>* body;
 	};
 }

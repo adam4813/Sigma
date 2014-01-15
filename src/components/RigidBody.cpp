@@ -91,7 +91,7 @@ namespace Sigma {
 
 		// return the component
 		auto v = std::vector<std::unique_ptr<IECSComponent>>();
-		v.emplace_back(std::unique_ptr<IECSComponent>(new Body(WeakPtrWrapper<btRigidBody>(p.second))));
+		v.emplace_back(std::unique_ptr<IECSComponent>(new Body(p.second)));
 		return v;
 	}
 }

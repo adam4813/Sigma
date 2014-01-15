@@ -1,12 +1,12 @@
-#ifndef IECSCOMPONENTGETTER_H_INCLUDED
-#define IECSCOMPONENTGETTER_H_INCLUDED
+#ifndef IECSCOMPONENTDATA_H_INCLUDED
+#define IECSCOMPONENTDATA_H_INCLUDED
 
 #include <string>
+#include <memory>
 #include "Sigma.h"
-#include "WeakPtrWrapper.hpp"
 
 #define SET_GETTER(type)								\
-WeakPtrWrapper<type>* get() { return &data;};
+std::weak_ptr<type>* get() { return &data;};
 
 namespace Sigma{
 	template<class ComponentType>
@@ -14,16 +14,16 @@ namespace Sigma{
      */
     class IECSComponentData {
     public:
-        IECSComponentData(const WeakPtrWrapper<ComponentType>& ptr) : data(ptr) {}
+        IECSComponentData(const std::weak_ptr<ComponentType>& ptr) : data(ptr) {}
         virtual ~IECSComponentData() {}
 
-        WeakPtrWrapper<ComponentType> get() { return data; };
+        std::weak_ptr<ComponentType> get() { return data; };
 
    		bool expired() { return data.expired(); };
 
 	protected:
-		WeakPtrWrapper<ComponentType> data;
-    }; // class IECSComponentGetter
+		std::weak_ptr<ComponentType> data;
+    }; // class IECSComponentData
 } // namespace Sigma
 
-#endif // IECSCOMPONENTGETTER_H_INCLUDED
+#endif // IECSCOMPONENTDATA_H_INCLUDED
