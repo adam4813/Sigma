@@ -63,9 +63,7 @@ namespace Sigma {
 		static std::vector<std::unique_ptr<IECSComponent>> AddEntity(const id_t id, const std::vector<Property> &properties);
 
 		static void RemoveEntity(const id_t id) {
-			pphysical_x.clear(id);
-			pphysical_y.clear(id);
-			pphysical_z.clear(id);
+			pphysical.clear(id);
 			ophysical.clear(id);
 			transform_map.erase(id);
 			transform_ptr_map.erase(id);
@@ -79,14 +77,12 @@ namespace Sigma {
 		static void UpdateTransform();
 
 		static std::unique_ptr<position_type> getPosition(const id_t id) {
-			return std::unique_ptr<position_type>(new position_type(pphysical_x.at(id),\
-													pphysical_y.at(id), pphysical_z.at(id)));
+			return std::unique_ptr<position_type>(new position_type(pphysical.at(id)));
 		};
 
 		static void setPosition(const id_t id, const position_type& vec) {
-			pphysical_x.at(id) = vec.x;
-            pphysical_y.at(id) = vec.y;
-            pphysical_z.at(id) = vec.z;
+			// TODO : get the value directly instead of WeakPtrWrapper
+			pphysical.at(id) = vec;
 		}
 
 
@@ -95,7 +91,7 @@ namespace Sigma {
 		};
 
 		static inline SigmaMotionState* GetMotionState(const id_t id) {
-			return new SigmaMotionState(id, pphysical_x, pphysical_y, pphysical_z, ophysical);
+			return new SigmaMotionState(id, pphysical, ophysical);
 		};
 
 		/** \brief Fore the position of an entity to be marked as updated
@@ -177,9 +173,7 @@ namespace Sigma {
 		};
 */
 	private:
-		static VectorMap<id_t, coordinate_type> pphysical_x;
-		static VectorMap<id_t, coordinate_type> pphysical_y;
-		static VectorMap<id_t, coordinate_type> pphysical_z;
+		static VectorMap<id_t, position_type> pphysical;
 		static VectorMap<id_t, orientation_type> ophysical;
 		static std::shared_ptr<BitArray<unsigned int>> updated_set;
 		static std::unordered_map<id_t, GLTransform> transform_map;

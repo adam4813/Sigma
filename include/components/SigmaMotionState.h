@@ -8,15 +8,12 @@
 
 namespace Sigma {
 	struct orientation_type;
-	typedef double coordinate_type;
+	struct position_type;
 
     class SigmaMotionState : public btMotionState {
     public:
-        SigmaMotionState(const id_t id, VectorMap<id_t, coordinate_type>& wp_x,\
-							VectorMap<id_t, coordinate_type>& wp_y,\
-							VectorMap<id_t, coordinate_type>& wp_z,\
-							VectorMap<id_t, orientation_type>& wo)
-        : id(id), wp_x(&wp_x), wp_y(&wp_y), wp_z(&wp_z), wo(&wo) {};
+        SigmaMotionState(const id_t id, VectorMap<id_t, position_type>& wp, VectorMap<id_t, orientation_type>& wo)
+        : id(id), wp(&wp), wo(&wo) {};
 
         virtual ~SigmaMotionState() {};
 
@@ -26,9 +23,7 @@ namespace Sigma {
 
     private:
         const id_t id;
-        VectorMap<id_t, coordinate_type>* wp_x;
-        VectorMap<id_t, coordinate_type>* wp_y;
-        VectorMap<id_t, coordinate_type>* wp_z;
+        VectorMap<id_t, position_type>* wp;
         VectorMap<id_t, orientation_type>* wo;
     };
 }

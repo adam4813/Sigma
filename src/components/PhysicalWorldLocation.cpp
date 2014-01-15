@@ -2,9 +2,7 @@
 #include "components/SigmaMotionState.h"
 
 namespace Sigma {
-	VectorMap<id_t, coordinate_type> PhysicalWorldLocation::pphysical_x;
-	VectorMap<id_t, coordinate_type> PhysicalWorldLocation::pphysical_y;
-	VectorMap<id_t, coordinate_type> PhysicalWorldLocation::pphysical_z;
+	VectorMap<id_t, position_type> PhysicalWorldLocation::pphysical;
 	VectorMap<id_t, orientation_type> PhysicalWorldLocation::ophysical;
 	std::shared_ptr<BitArray<unsigned int>> PhysicalWorldLocation::updated_set = BitArray<unsigned int>::Create();
     std::unordered_map<id_t, GLTransform> PhysicalWorldLocation::transform_map;
@@ -23,9 +21,7 @@ namespace Sigma {
 
 	std::vector<std::unique_ptr<IECSComponent>> PhysicalWorldLocation::AddEntityPosition(const id_t id, coordinate_type x, coordinate_type y,
 				   coordinate_type z, const coordinate_type rx, const coordinate_type ry, const coordinate_type rz) {
-		pphysical_x[id] = x;
-		pphysical_y[id] = y;
-		pphysical_z[id] = z;
+		pphysical[id] = position_type(x, y, z);
 		ophysical[id] = orientation_type(rx, ry, rz);
 		GLTransform transform;
 		// Set the view mover's view pointer.

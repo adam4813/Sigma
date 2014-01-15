@@ -4,9 +4,7 @@
 namespace Sigma {
 		void SigmaMotionState::setWorldTransform(const btTransform &worldTrans) {
             auto vec = worldTrans.getOrigin();
-            wp_x->at(id) = vec.x();
-            wp_y->at(id) = vec.y();
-            wp_z->at(id) = vec.z();
+            wp->at(id) = position_type(vec.x(), vec.y(), vec.z());
             float a, b, g;
             worldTrans.getBasis().getEulerZYX(a, b, g);
             wo->at(id) = orientation_type(a, b, g);
@@ -15,7 +13,8 @@ namespace Sigma {
 
 		void SigmaMotionState::getWorldTransform(btTransform &worldTrans) const {
             worldTrans.setIdentity();
-            worldTrans.setOrigin(btVector3(wp_x->at(id), wp_y->at(id), wp_z->at(id)));
+            auto xyz = wp->at(id).lock();
+            worldTrans.setOrigin(btVector3(xyz->x, xyz->y, xyz->z));
             orientation_type o = wo->at(id);
             worldTrans.getBasis().setEulerZYX(o.alpha, o.beta, o.gamma);
         };
