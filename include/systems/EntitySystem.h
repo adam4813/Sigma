@@ -43,16 +43,16 @@ namespace Sigma {
 		template<class T>
 		T* getComponent(IEntity* e);
 
-        /** \brief Add a feature, i.e a set of predefined components, to an entity
+        /** \brief Add a composite, i.e a set of predefined components, to an entity
          *
          * \param e IEntity* the entity
-         * \param fid const FeatureID& the feature ID
-         * \param properties const Property& the property object to initialize the feature
+         * \param fid const CompositeID& the composite ID
+         * \param properties const Property& the property object to initialize the composite
          *
          */
-		void addFeature(IEntity* e, const FeatureID& fid, const std::vector<Property>& properties);
+		void addComposite(IEntity* e, const CompositeID& fid, const std::vector<Property>& properties);
 
-		void RemoveFeature(IEntity *e, const FeatureID& cid);
+		void RemoveComposite(IEntity *e, const CompositeID& cid);
 			// TODO : add method to remove component in factory ?
 			//componentFactory.remove(FeatureID, e->GetEntityID());
 			// get a list of components to remove in entity map
