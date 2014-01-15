@@ -20,29 +20,34 @@ FILE(GLOB Sigma_SRC "src/*.cpp")
 # find all the files in the includes directory
 FILE(GLOB Sigma_INCLUDES "include/*.h" "include/*.hpp")
 
-## Filter the source/header files for various groups of files.
+# Filter the source/header files for various groups of files
+# Put all component files into a filter
+file(GLOB Sigma_SRC_COMPONENT_H "include/components/*.h")
+source_group("Header Files\\components" FILES ${Sigma_SRC_COMPONENT_H})
+file(GLOB Sigma_SRC_COMPONENT_CPP "src/components/*.cpp")
+source_group("Source Files\\components" FILES ${Sigma_SRC_COMPONENT_CPP})
 
-# Put all component files into a filter.
-FILE(GLOB Sigma_SRC_COMPONENT_H "include/components/*.h")
-SOURCE_GROUP("Header Files\\components" FILES ${Sigma_SRC_COMPONENT_H})
-FILE(GLOB Sigma_SRC_COMPONENT_CPP "src/components/*.cpp")
-SOURCE_GROUP("Source Files\\components" FILES ${Sigma_SRC_COMPONENT_CPP})
+# Put all entity files into a filter
+file(GLOB Sigma_SRC_ENTITY_H "include/entities/*.h")
+source_group("Header Files\\entities" FILES ${Sigma_SRC_ENTITY_H})
+file(GLOB Sigma_SRC_ENTITY_CPP "src/entities/*.cpp")
+source_group("Source Files\\entities" FILES ${Sigma_SRC_ENTITY_CPP})
 
-# Put all Systems files into a filter.
-FILE(GLOB Sigma_SRC_SYSTEM_H "include/systems/*.h")
-SOURCE_GROUP("Header Files\\systems" FILES ${Sigma_SRC_SYSTEM_H})
-FILE(GLOB Sigma_SRC_SYSTEM_CPP "src/systems/*.cpp")
-SOURCE_GROUP("Source Files\\systems" FILES ${Sigma_SRC_SYSTEM_CPP})
+# Put all Systems files into a filter
+file(GLOB Sigma_SRC_SYSTEM_H "include/systems/*.h")
+source_group("Header Files\\systems" FILES ${Sigma_SRC_SYSTEM_H})
+file(GLOB Sigma_SRC_SYSTEM_CPP "src/systems/*.cpp")
+source_group("Source Files\\systems" FILES ${Sigma_SRC_SYSTEM_CPP})
 
-# Put all Controller files into a filter.
-FILE(GLOB Sigma_SRC_CONTROLLERS_H "include/controllers/*.h")
-SOURCE_GROUP("Header Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_H})
-FILE(GLOB Sigma_SRC_CONTROLLERS_CPP "src/controllers/*.cpp")
-SOURCE_GROUP("Source Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_CPP})
+# Put all Controller files into a filter
+file(GLOB Sigma_SRC_CONTROLLERS_H "include/controllers/*.h")
+source_group("Header Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_H})
+file(GLOB Sigma_SRC_CONTROLLERS_CPP "src/controllers/*.cpp")
+source_group("Source Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_CPP})
 
-# Put all Resource files into a filter.
-FILE(GLOB Sigma_SRC_RESOURCES_H "include/resources/*.h")
-SOURCE_GROUP("Header Files\\resources" FILES ${Sigma_SRC_RESOURCES_H})
+# Put all Resource files into a filter
+file(GLOB Sigma_SRC_RESOURCES_H "include/resources/*.h")
+source_group("Header Files\\resources" FILES ${Sigma_SRC_RESOURCES_H})
 
 # Put the Test files into a filter
 FILE(GLOB Sigma_SRC_TESTS_CPP "src/tests/*.cpp")
@@ -187,6 +192,7 @@ set(Sigma_ALL_SOURCE
 	${Sigma_SRC_COMPONENT_CPP}
 	${Sigma_SRC_SYSTEM_CPP}
 	${Sigma_SRC_CONTROLLERS_CPP}
+	${Sigma_SRC_ENTITY_CPP}
 	)
 
 # all source common to the library and test exe
@@ -196,6 +202,7 @@ set(Sigma_ALL_INCLUDES
 	${Sigma_SRC_SYSTEM_H}
 	${Sigma_SRC_CONTROLLERS_H}
 	${Sigma_SRC_RESOURCES_H}
+	${Sigma_SRC_ENTITY_H}
 	)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")

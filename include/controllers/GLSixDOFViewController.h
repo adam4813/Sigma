@@ -27,8 +27,8 @@ namespace Sigma {
 				void KeyStateChange(const unsigned int key, const KEY_STATE state);
 			private:
 				PhysicsController* mover; // The view mover component that applies the rotations and forces set in the trigger method.
-                static const float SPEED_TRANSLATE, SPEED_ROTATE, BOOST_MULTIPLIER;
-                glm::vec3 _translate, _rotate;
+				static const float SPEED_TRANSLATE, SPEED_ROTATE, BOOST_MULTIPLIER;
+				glm::vec3 _translate, _rotate;
 			};
 		}
 	}

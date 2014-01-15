@@ -67,7 +67,7 @@ namespace Sigma{
 					os->ToggleMouseLock();
 				}
 			}
-			
+
 			//Does nothing, but has to be here because of IMouseEventHandler
 			void FPSCamera::MouseUp(BUTTON btn, float x, float y) {}
 		}

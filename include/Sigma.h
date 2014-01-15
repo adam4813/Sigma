@@ -8,6 +8,9 @@
 namespace Sigma {
 	typedef uint32_t id_t;
 	typedef std::string ComponentID;
+	// A composite is a set of predefined components that are strongly dependent
+	// for example the rotational and directional forces are grouped in ControllableMove
+	typedef std::string CompositeID;
 }
 
 #ifdef libSigma_EXPORTS

@@ -85,3 +85,4 @@ namespace Sigma{
 		}
 	}
 } // namespace Sigma::event::handler
+

@@ -115,8 +115,8 @@ namespace Sigma{
 			}
 		}
 
-		this->views[this->views.size() - 1]->Transform()->TranslateTo(x,y,z);
-		this->views[this->views.size() - 1]->Transform()->Rotate(rx,ry,rz);
+		PhysicalWorldLocation::GetTransform(entityID)->TranslateTo(x,y,z);
+		PhysicalWorldLocation::GetTransform(entityID)->Rotate(rx,ry,rz);
 
 		this->addComponent(entityID, this->views[this->views.size() - 1]);
 
@@ -361,6 +361,11 @@ namespace Sigma{
 			else if (p->GetName() == "lightEnabled") {
 				mesh->SetLightingEnabled(p->Get<bool>());
 			}
+			else if (p->GetName() == "parent") {
+				/* Only entities that have ControllableMove component can be parent */
+				const id_t parentID = p->Get<int>();
+				mesh->Transform()->SetParentID(parentID);
+			}
 		}
 
 		mesh->SetCullFace(cull_face);
@@ -530,6 +535,11 @@ namespace Sigma{
 			else if (p->GetName() == "outerAngle") {
 				light->outerAngle = p->Get<float>();
 				light->cosOuterAngle = glm::cos(light->outerAngle);
+			}
+			else if (p->GetName() == "parent") {
+				/* Only entities that have ControllableMove component can be parent */
+				const id_t parentID = p->Get<int>();
+				light->transform.SetParentID(parentID);
 			}
 		}
 

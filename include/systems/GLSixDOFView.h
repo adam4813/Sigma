@@ -4,7 +4,7 @@
 #include "Sigma.h"
 
 namespace Sigma {
-	struct GLSixDOFView : public Sigma::IGLView {
+	struct GLSixDOFView : public IGLView {
 
 		SET_COMPONENT_TYPENAME("SIX_DOF_VIEW");
 

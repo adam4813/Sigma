@@ -2,6 +2,7 @@
 #include "components/BulletShapeMesh.h"
 #include "components/GLMesh.h"
 #include "components/BulletShapeSphere.h"
+#include "components/PhysicalWorldLocation.h"
 
 namespace Sigma {
 	// We need ctor and dstor to be exported to a dll even if they don't do anything
@@ -34,7 +35,7 @@ namespace Sigma {
 		this->solver = new btSequentialImpulseConstraintSolver();
 		this->dynamicsWorld = new btDiscreteDynamicsWorld(this->dispatcher, this->broadphase, this->solver, this->collisionConfiguration);
 		this->dynamicsWorld->setGravity(btVector3(0,-10,0));
-
+		RigidBody::setWorld(dynamicsWorld);
 		return true;
 	}
 
@@ -53,12 +54,22 @@ namespace Sigma {
 	}
 
 	std::map<std::string,Sigma::IFactory::FactoryFunction>
-    BulletPhysics::getFactoryFunctions()
-	{
+    BulletPhysics::getFactoryFunctions() {
 		using namespace std::placeholders;
 		std::map<std::string,Sigma::IFactory::FactoryFunction> retval;
 		retval["BulletShapeMesh"] = std::bind(&BulletPhysics::createBulletShapeMesh,this,_1,_2);
 		retval["BulletShapeSphere"] = std::bind(&BulletPhysics::createBulletShapeSphere,this,_1,_2);
+		return retval;
+	}
+
+	std::map<std::string,Sigma::IECSFactory::FactoryFunction>
+    BulletPhysics::getECSFactoryFunctions() {
+		using namespace std::placeholders;
+		std::map<std::string,Sigma::IECSFactory::FactoryFunction> retval;
+		retval[ControllableMove::getComponentTypeName()] = std::bind(&ControllableMove::AddEntity,_1);
+		retval[InterpolatedMovement::getComponentTypeName()] = std::bind(&InterpolatedMovement::AddEntity,_1);
+		retval[PhysicalWorldLocation::getComponentTypeName()] = std::bind(&PhysicalWorldLocation::AddEntity,_1,_2);
+		retval[RigidBody::getComponentTypeName()] = std::bind(&RigidBody::AddEntity,_1,_2);
 		return retval;
 	}
 
@@ -161,9 +172,17 @@ namespace Sigma {
 
 	bool BulletPhysics::Update(const double delta) {
 		this->mover->UpdateForces(delta);
-
+		// Make entities with target move a little
+		InterpolatedMovement::ComputeInterpolatedForces(delta);
+		// It's time to sum all the forces
+		ControllableMove::CumulateForces();
+		// We inject the movement in the simulation or directly
+		ControllableMove::ApplyForces(delta);
+		// We step the simulation
 		dynamicsWorld->stepSimulation(delta, 10);
-
+		// We update the transform component with updated data of the PhysicalWorldLocation component
+		PhysicalWorldLocation::UpdateTransform();
+		PhysicalWorldLocation::ClearUpdatedSet();
 		this->mover->UpdateTransform();
 
 		return true;
