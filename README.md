@@ -40,7 +40,9 @@ Make sure you use a binary release from [Adobe](http://www.cefbuilds.com). **Use
 3. Copy `out/Release/obj.target/libcef_dll_wrapper` directory, if any, and the contents of `Resources/` directories into Sigma's build/bin/.
 4. Copy the contents of include/ directory into Sigma's include/.
 5. Copy `out/Release/obj.target/libcef_dll_wrapper.a` (or .lib) to a `cef/` directory in the Sigma root (create the `cef/` directory if it does not exist)
-6. This step also depends on your platform. On Windows copy all the .dll files in `Release/` to Sigma's build/bin/, then copy the .lib file into Sigma's `cef/` directory. On Linux or OS X copy the entire contents of `Release/` into Sigma's build/bin/, then make a symlink of the libcef.so (or .dylib) in the `cef/` directory.
+6. This step also depends on your platform. On Windows copy all the .dll files in `Release/` to Sigma's build/bin/, then copy the .lib file into Sigma's `cef/` directory. On Linux or OS X copy the entire contents of `Release/` into Sigma's build/bin/.
+7. On Linux and OSX, make a symlink pointing to libcef.so (or .dylib) in the `cef/` directory.
+8. If you get the error "malformed archive" when building, make a symlink pointing to libcef_dll_wrapper directory in the `cef/` directory.
 
 ## Building ##
 
