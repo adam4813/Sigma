@@ -3,6 +3,7 @@
 #include "GL/glew.h"
 #include "SDL_opengl.h"
 
+#include "Sigma.h"
 
 Sigma::event::KeyboardInputSystem IOpSys::KeyboardEventSystem;
 Sigma::event::MouseInputSystem IOpSys::MouseEventSystem;
@@ -10,7 +11,7 @@ Sigma::event::MouseInputSystem IOpSys::MouseEventSystem;
 //double IOpSys::curDelta;
 
 void* SDLSys::CreateGraphicsWindow(const unsigned int width, const unsigned int height) {
-    std::cout << "Creating Window using SDL..." << std::endl;
+    LOG << "Creating Window using SDL...";
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
@@ -27,8 +28,8 @@ void* SDLSys::CreateGraphicsWindow(const unsigned int width, const unsigned int 
 
     GLenum glew_err = glewInit();
     if (glew_err != GLEW_OK) {
-        fprintf(stderr, "GLEW Error: %s\n", glewGetErrorString(glew_err));
-        return 0;
+			LOG_ERROR << "GLEW Error: " << glewGetErrorString(glew_err);
+      return 0;
     }
 
     this->Fullscreen = false;
@@ -38,11 +39,11 @@ void* SDLSys::CreateGraphicsWindow(const unsigned int width, const unsigned int 
     // Set the relative mouse state (hide mouse)
     /*
     if(SDL_SetRelativeMouseMode(SDL_FALSE) < 0){
-        std::cerr << "ERROR: SDL could not grab mouse\n" << SDL_GetError() << std::endl;
+        LOG_ERROR << "ERROR: SDL could not grab mouse\n" << SDL_GetError();
     } */
     // relative mode was breaking things, just hide mouse.
     if(SDL_ShowCursor(SDL_DISABLE) < 0) {
-        std::cerr << "ERROR: SDL could not hide mouse\n" << SDL_GetError() << std::endl;
+      LOG_ERROR << "ERROR: SDL could not hide mouse\n" << SDL_GetError();
     }
 
     return &this->_Context;
@@ -227,7 +228,7 @@ void SDLSys::LoadFont(std::string file, unsigned int ptSize) {
 	this->font = TTF_OpenFont(file.c_str(), ptSize);
 
 	if(!this->font) {
-		std::cerr << "Error loading font: " << TTF_GetError() << std::endl;
+		LOG_ERROR << "Error loading font: " << TTF_GetError();
 	}
 
 	TTF_SetFontKerning(this->font, 0);
@@ -247,7 +248,7 @@ void SDLSys::RenderText(std::string text, float x, float y, unsigned int texture
 		textSurface = TTF_RenderText_Blended(this->font, text.c_str(), color);
 
 		if(!textSurface) {
-			std::cerr << "TTF Error: " << TTF_GetError();
+			LOG_ERROR << "TTF Error: " << TTF_GetError();
 			return;
 		} else {
 			// Note: width should not exceed the texture's size,
@@ -271,7 +272,7 @@ void SDLSys::RenderText(std::string text, float x, float y, unsigned int texture
 				// Copy it over
 				glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, convertSurface->w, convertSurface->h, GL_BGRA, GL_UNSIGNED_BYTE, convertSurface->pixels);
 			} else {
-				std::cerr << SDL_GetError() << std::endl;
+				LOG_ERROR << SDL_GetError();
 			}
 
 		

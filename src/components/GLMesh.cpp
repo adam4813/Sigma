@@ -207,7 +207,7 @@ namespace Sigma{
         std::ifstream in(fname, std::ios::in);
 
         if (!in) {
-            std::cerr << "Cannot open mesh " << fname << std::endl;
+            LOG_WARN << "Cannot open mesh " << fname;
             return false;
         }
 
@@ -330,7 +330,7 @@ namespace Sigma{
 			else { // Unknown
                 /* ignoring this line */
                 std::string test = line.substr(0, line.find(' '));
-                std::cerr << "Unrecognized line " << line << std::endl;
+                LOG_WARN << "Unrecognized line " << line;
             }
         }
 
@@ -437,7 +437,7 @@ namespace Sigma{
 		std::ifstream in(fname, std::ios::in);
 
         if (!in) {
-            std::cerr << "Cannot open material " << fname << std::endl;
+            LOG_WARN << "Cannot open material " << fname;
             return;
         }
 
@@ -492,7 +492,7 @@ namespace Sigma{
 						s >> filename;
 						filename = trim(filename);
 						filename = convert_path(filename);
-						std::cerr << "Loading diffuse texture: " << path + filename << std::endl;
+						LOG << "Loading diffuse texture: " << path + filename;
 						resource::GLTexture texture;
 						if (OpenGLSystem::textures.find(filename) == OpenGLSystem::textures.end()) {
 							texture.LoadDataFromFile(path + filename);
@@ -507,7 +507,7 @@ namespace Sigma{
 						}
 
 						if (m.diffuseMap == 0) {
-							std::cerr << "Error loading diffuse texture: " << path + filename << std::endl;
+							LOG_WARN << "Error loading diffuse texture: " << path + filename;
 						}
                     }
 					else if (label == "map_Ka") {
@@ -515,7 +515,7 @@ namespace Sigma{
 						s >> filename;
 						filename = trim(filename);
 						filename = convert_path(filename);
-						std::cerr << "Loading ambient texture: " << path + filename << std::endl;
+						LOG << "Loading ambient texture: " << path + filename;
 						// Add the path to the filename to load it relative to the mtl file
 						resource::GLTexture texture;
 						if (OpenGLSystem::textures.find(filename) == OpenGLSystem::textures.end()) {
@@ -532,7 +532,7 @@ namespace Sigma{
 
 						// Add the path to the filename to load it relative to the mtl file
 						if (m.ambientMap == 0) {
-							std::cerr << "Error loading ambient texture: " << path + filename << std::endl;
+							LOG_WARN << "Error loading ambient texture: " << path + filename;
 						}
                     }
 					else if (label == "map_Bump") {
@@ -540,7 +540,7 @@ namespace Sigma{
 						s >> filename;
 						filename = trim(filename);
 						filename = convert_path(filename);
-						std::cerr << "Loading normal or bump texture: " << path + filename << std::endl;
+						LOG << "Loading normal or bump texture: " << path + filename;
 						// Add the path to the filename to load it relative to the mtl file
 						resource::GLTexture texture;
 						if (OpenGLSystem::textures.find(filename) == OpenGLSystem::textures.end()) {
@@ -557,7 +557,7 @@ namespace Sigma{
 
 						// Add the path to the filename to load it relative to the mtl file
 						if (m.normalMap == 0) {
-							std::cerr << "Error loading normal texture: " << path + filename << std::endl;
+							LOG_WARN << "Error loading normal texture: " << path + filename;
 						}
                     }
 					else {

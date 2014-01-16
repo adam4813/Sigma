@@ -1,4 +1,5 @@
 #include "systems/FactorySystem.h"
+#include "Sigma.h"
 
 namespace Sigma{
 
@@ -26,20 +27,20 @@ namespace Sigma{
                                const id_t entityID,
                                const std::vector<Property> &properties){
         if(registeredFactoryFunctions.find(type) != registeredFactoryFunctions.end()){
-			std::cerr << "Creating component of type: " << type << std::endl;
+						LOG << "Creating component of type: " << type;
             return registeredFactoryFunctions[type](entityID, properties);
         } else{
-            std::cerr << "Error: Couldn't find component: " << type << std::endl;
+            LOG_DEBUG << "Error: Couldn't find component: " << type;
             return nullptr;
         }
     }
 
     void FactorySystem::register_Factory(IFactory& Factory){
-		const auto& factoryfunctions = Factory.getFactoryFunctions();
-		for(auto FactoryFunc = factoryfunctions.begin(); FactoryFunc != factoryfunctions.end(); ++FactoryFunc){
-			std::cerr << "Registering component factory of type: " << FactoryFunc->first << std::endl;
-            registeredFactoryFunctions[FactoryFunc->first]=FactoryFunc->second;
-        }
-    }
+			const auto& factoryfunctions = Factory.getFactoryFunctions();
+			for(auto FactoryFunc = factoryfunctions.begin(); FactoryFunc != factoryfunctions.end(); ++FactoryFunc){
+				LOG << "Registering component factory of type: " << FactoryFunc->first ;
+				registeredFactoryFunctions[FactoryFunc->first]=FactoryFunc->second;
+			}
+		}
 
 } // namespace Sigma
