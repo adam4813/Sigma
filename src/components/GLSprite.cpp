@@ -8,13 +8,13 @@ namespace Sigma{
 
     const std::string GLSprite::DEFAULT_SHADER = "shaders/sprite";
 
-    GLSprite::GLSprite( const id_t entityID /*= 0*/ ) : Sigma::IGLComponent(entityID), texture(nullptr)  {
+    GLSprite::GLSprite( const id_t entityID /*= 0*/ ) : Sigma::Renderable(entityID), texture(nullptr)  {
         this->drawMode = GL_TRIANGLES;
         this->ElemBufIndex = 2;
         this->ColorBufIndex = 1;
         this->VertBufIndex = 0;
 		this->UVBufIndex = 3;
-		IGLComponent::LoadShader(GLSprite::DEFAULT_SHADER); // Load the default shader
+		Renderable::LoadShader(GLSprite::DEFAULT_SHADER); // Load the default shader
     }
 
     void GLSprite::InitializeBuffers() {
@@ -86,7 +86,7 @@ namespace Sigma{
 
 	void GLSprite::LoadShader() {
 		// Just load the default shader
-		IGLComponent::LoadShader(GLSprite::DEFAULT_SHADER);
+		Renderable::LoadShader(GLSprite::DEFAULT_SHADER);
     }
 
     void GLSprite::Render(glm::mediump_float *view, glm::mediump_float *proj) {

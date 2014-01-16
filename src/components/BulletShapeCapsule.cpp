@@ -1,5 +1,5 @@
 #include "components/BulletShapeCapsule.h"
-#include "components/GLMesh.h"
+#include "resources/Mesh.h"
 
 namespace Sigma {
 	void BulletShapeCapsule::InitializeRigidBody(float x, float y, float z, float rx, float ry, float rz) {

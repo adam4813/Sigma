@@ -48,7 +48,7 @@ namespace Sigma {
 		}
 		else if (shape_type == "mesh") {
 			float scale = 1.0f;
-			GLMesh glmesh(0);
+			Mesh glmesh;
 
 			for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 				const Property*  p = &*propitr;
@@ -57,13 +57,12 @@ namespace Sigma {
 				}
 				else if (p->GetName() == "meshFile") {
 					std::cerr << "Loading mesh: " << p->Get<std::string>() << std::endl;
-					GLMesh glmesh(0);
-					glmesh.LoadMesh(p->Get<std::string>());
+					glmesh.LoadObjMesh(p->Get<std::string>());
 				}
 			}
 
 			auto btmesh = new btTriangleMesh();
-			for (unsigned int i = 0; i < glmesh.GetFaceCount(); ++i) {
+			for (unsigned int i = 0; i < glmesh.FaceCount(); ++i) {
 				const Sigma::Face* f = glmesh.GetFace(i);
 				const Sigma::Vertex* v1 = glmesh.GetVertex(f->v1);
 				const Sigma::Vertex* v2 = glmesh.GetVertex(f->v2);

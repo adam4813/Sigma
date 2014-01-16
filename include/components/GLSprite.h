@@ -11,7 +11,7 @@ namespace Sigma{
 		class GLTexture;
 	}
 
-    class GLSprite : public IGLComponent {
+    class GLSprite : public Renderable {
     public:
         SET_COMPONENT_TYPENAME("GLSprite");
         // We have a private ctor so the factory method must be used.

@@ -8,7 +8,7 @@
 #include "IComponent.h"
 #include "Property.h"
 #include "components/BulletShapeMesh.h"
-#include "components/GLMesh.h"
+#include "resources/Mesh.h"
 #include "components/Body.h"
 
 namespace Sigma {

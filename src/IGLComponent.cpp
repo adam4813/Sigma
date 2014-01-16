@@ -2,12 +2,12 @@
 
 namespace Sigma{
 	// static member initialization
-    IGLComponent::ShaderMap IGLComponent::loadedShaders;
+    Renderable::ShaderMap Renderable::loadedShaders;
 
-    void IGLComponent::LoadShader(const std::string& filename) {
+    void Renderable::LoadShader(const std::string& filename) {
         // look up shader that is already loaded
-        ShaderMap::iterator existingShader = IGLComponent::loadedShaders.find(filename.c_str());
-        if(existingShader != IGLComponent::loadedShaders.end()) {
+        ShaderMap::iterator existingShader = Renderable::loadedShaders.find(filename.c_str());
+        if(existingShader != Renderable::loadedShaders.end()) {
             // shader already exists!
 			this->shader = existingShader->second;
         }
@@ -25,7 +25,7 @@ namespace Sigma{
 				// assign it to this instance
 				this->shader = std::shared_ptr<GLSLShader>(theShader);
 				// save it in the static map
-				IGLComponent::loadedShaders[filename] = this->shader;
+				Renderable::loadedShaders[filename] = this->shader;
 			}
         }
     }

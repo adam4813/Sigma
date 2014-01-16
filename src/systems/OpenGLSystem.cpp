@@ -5,7 +5,7 @@
 #include "components/GLSprite.h"
 #include "components/GLIcoSphere.h"
 #include "components/GLCubeSphere.h"
-#include "components/GLMesh.h"
+#include "resources/Mesh.h"
 #include "components/GLScreenQuad.h"
 #include "components/PointLight.h"
 #include "components/SpotLight.h"
@@ -71,7 +71,7 @@ namespace Sigma{
 		retval["GLSprite"] = std::bind(&OpenGLSystem::createGLSprite,this,_1,_2);
 		retval["GLIcoSphere"] = std::bind(&OpenGLSystem::createGLIcoSphere,this,_1,_2);
 		retval["GLCubeSphere"] = std::bind(&OpenGLSystem::createGLCubeSphere,this,_1,_2);
-		retval["GLMesh"] = std::bind(&OpenGLSystem::createGLMesh,this,_1,_2);
+		retval["Mesh"] = std::bind(&OpenGLSystem::createGLMesh,this,_1,_2);
 		retval["FPSCamera"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2);
 		retval["GLSixDOFView"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2);
 		retval["PointLight"] = std::bind(&OpenGLSystem::createPointLight,this,_1,_2);
@@ -302,7 +302,7 @@ namespace Sigma{
 	}
 
 	IComponent* OpenGLSystem::createGLMesh(const id_t entityID, const std::vector<Property> &properties) {
-		Sigma::GLMesh* mesh = new Sigma::GLMesh(entityID);
+		Sigma::Mesh* mesh = new Sigma::Mesh(entityID);
 
 		float scale = 1.0f;
 		float x = 0.0f;
@@ -347,7 +347,7 @@ namespace Sigma{
 			}
 			else if (p->GetName() == "meshFile") {
 				std::cerr << "Loading mesh: " << p->Get<std::string>() << std::endl;
-				mesh->LoadMesh(p->Get<std::string>());
+				mesh->LoadObjMesh(p->Get<std::string>());
 			}
 			else if (p->GetName() == "shader") {
 				shaderfile = p->Get<std::string>();
@@ -441,7 +441,7 @@ namespace Sigma{
 		quad->SetSize(w, h);
 		quad->LoadShader("shaders/quad");
 		quad->InitializeBuffers();
-		this->screensSpaceComp.push_back(std::unique_ptr<IGLComponent>(quad));
+		this->screensSpaceComp.push_back(std::unique_ptr<Renderable>(quad));
 
 		return quad;
 	}
@@ -704,7 +704,7 @@ namespace Sigma{
 			// Loop through and draw each GL Component component.
 			for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
 				for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
-					IGLComponent *glComp = dynamic_cast<IGLComponent *>(citr->second.get());
+					Renderable *glComp = dynamic_cast<Renderable *>(citr->second.get());
 
 					if(glComp && glComp->IsLightingEnabled()) {
 						glComp->GetShader()->Use();
@@ -882,7 +882,7 @@ namespace Sigma{
 			// Loop through and draw each GL Component component.
 			for (auto eitr = this->_Components.begin(); eitr != this->_Components.end(); ++eitr) {
 				for (auto citr = eitr->second.begin(); citr != eitr->second.end(); ++citr) {
-					IGLComponent *glComp = dynamic_cast<IGLComponent *>(citr->second.get());
+					Renderable *glComp = dynamic_cast<Renderable *>(citr->second.get());
 
 					if(glComp && !glComp->IsLightingEnabled()) {
 						glComp->GetShader()->Use();
@@ -926,7 +926,7 @@ namespace Sigma{
 		// for now, just returns the first component's transform
 		// bigger question: should entities be able to have multiple GLComponents?
 		for(auto compItr = entity->begin(); compItr != entity->end(); compItr++) {
-			IGLComponent *glComp = dynamic_cast<IGLComponent *>((*compItr).second.get());
+			Renderable *glComp = dynamic_cast<Renderable *>((*compItr).second.get());
 			if(glComp) {
 				GLTransform *transform = glComp->Transform();
 				return transform;

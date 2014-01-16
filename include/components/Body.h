@@ -4,6 +4,7 @@
 #include <bullet/btBulletDynamicsCommon.h>
 #include "IECSComponentData.h"
 #include "IECSComponent.h"
+#include "WeakPtrWrapper.hpp"
 
 namespace Sigma {
     /** \brief A component for Bullet body

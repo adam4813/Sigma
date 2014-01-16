@@ -13,74 +13,39 @@
 #include <unordered_map>
 #include <memory>
 #include "Sigma.h"
+#include "resources/Mesh.h"
 
 namespace Sigma {
-	// A struct to store which index each of its verts are.
-	struct Face {
-		Face(unsigned int v1, unsigned int v2, unsigned int v3) : v1(v1), v2(v2), v3(v3) { }
-		unsigned int v1, v2, v3;
-	};
-
-	// A struct to store the location for each vertex.
-	struct Vertex {
-		Vertex(float x, float y, float z) : x(x), y(y), z(z) { }
-		float x,y,z;
-	};
-
-	// A struct to store the color value for each vertex
-	struct Color {
-		Color(float r, float g, float b) : r(r), g(g), b(b) { }
-		float r,g,b;
-	};
-
-	// A struct to store 2D or 1D texture coordinates for each vertex
-	struct TexCoord {
-        TexCoord(float u, float v = 0.0f) : u(u), v(v) { }
-        float u, v;
-    };
-
-    // A struct to store material information for each vertex.
-    // Wikipedia explains what's going on:
-    // http://en.wikipedia.org/wiki/Wavefront_.obj_file#Basic_materials
-    struct Material {
-        Material() {
-            ka[0] = 1.0f; ka[1] = 1.0f; ka[2] = 1.0f;
-            kd[0] = 1.0f; kd[1] = 1.0f; kd[2] = 1.0f;
-            ks[0] = 1.0f; ks[1] = 1.0f; ks[2] = 1.0f;
-            tr = 1.0f;
-            hardness = 64.0f;
-            illum = 1;
-        }
-        float ka[3];
-        float kd[3];
-        float ks[3];
-        float tr; // Aka d
-        float hardness;
-        int illum;
-        // TODO: Add maps
-        GLuint ambientMap;
-        GLuint diffuseMap;
-        GLuint specularMap;
-		GLuint normalMap;
-    };
-
-	class IGLComponent : public SpatialComponent {
+	class Renderable : public SpatialComponent {
 	public:
-		SET_COMPONENT_TYPENAME("IGLComponent");
+		SET_COMPONENT_TYPENAME("Renderable");
 
-		IGLComponent()
-			: lightingEnabled(true), SpatialComponent(0) {} // Default ctor setting entity ID to 0.
-		IGLComponent(const id_t entityID)
-			: lightingEnabled(true), SpatialComponent(entityID) {} // Ctor that sets the entity ID.
+		Renderable() : lightingEnabled(true), SpatialComponent(0) {
+			memset(&this->buffers, 0, sizeof(this->buffers));
+			this->vao = 0;
+			this->drawMode = GL_TRIANGLES;
+			this->ElemBufIndex = 2;
+			this->ColorBufIndex = 1;
+			this->VertBufIndex = 0;
+			this->NormalBufIndex = 3;
+			this->UVBufIndex = 4;
+		}
+		Renderable(const id_t entityID) : lightingEnabled(true), SpatialComponent(entityID) {
+			memset(&this->buffers, 0, sizeof(this->buffers));
+			this->vao = 0;
+			this->drawMode = GL_TRIANGLES;
+			this->ElemBufIndex = 2;
+			this->ColorBufIndex = 1;
+			this->VertBufIndex = 0;
+			this->NormalBufIndex = 3;
+			this->UVBufIndex = 4;
+		} // Ctor that sets the entity ID.
 
-        typedef std::unordered_map<std::string, std::shared_ptr<GLSLShader>> ShaderMap;
+		void SetMesh(Mesh* mesh) {
+			this->meshResource = mesh;
+		}
 
-		/**
-		 * \brief Initializes the IGLComponent.
-		 *
-		 * \param entityID The entity this component belongs to.
-		 */
-		virtual void InitializeBuffers() = 0;
+		typedef std::unordered_map<std::string, std::shared_ptr<GLSLShader>> ShaderMap;
 
 		/**
 		 * \brief Retrieves the specified buffer.
@@ -93,13 +58,6 @@ namespace Sigma {
 		}
 
 		/**
-		 * \brief Returns the number of elements to draw for this component.
-		 *
-		 * \return unsigned int The number of elements to draw.
-		 */
-		virtual unsigned int MeshGroup_ElementCount(const unsigned int group = 0) const = 0;
-
-		/**
 		 * \brief Returns the draw mode for this component.
 		 *
 		 * \return unsigned int The draw mode (ex. GL_TRIANGLES, GL_TRIANGLE_STRIP).
@@ -107,12 +65,156 @@ namespace Sigma {
 		unsigned int DrawMode() const { return this->drawMode; }
 
 		/**
+		 * \brief Initializes the Renderable.
+		 *
+		 * \param entityID The entity this component belongs to.
+		 */
+		void InitializeBuffers() {
+			if(!this->shader) {
+				assert(0 && "Shader must be loaded before buffers can be initialized.");
+			}
+
+			// We must create a vao and then store it in our Mesh.
+			if (this->vao == 0) {
+				glGenVertexArrays(1, &this->vao); // Generate the VAO
+			}
+			glBindVertexArray(this->vao); // Bind the VAO
+
+			if (this->meshResource->VertexCount() > 0) {
+				if (this->buffers[this->VertBufIndex] == 0) {
+					glGenBuffers(1, &this->buffers[this->VertBufIndex]); 	// Generate the vertex buffer.
+				}
+				glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->VertBufIndex]); // Bind the vertex buffer.
+				glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * this->meshResource->VertexCount(), &this->meshResource->GetVertexBuffer(), GL_STATIC_DRAW); // Stores the verts in the vertex buffer.
+				GLint posLocation = glGetAttribLocation((*shader).GetProgram(), "in_Position"); // Find the location in the shader where the vertex buffer data will be placed.
+				glVertexAttribPointer(posLocation, 3, GL_FLOAT, GL_FALSE, 0, 0); // Tell the VAO the vertex data will be stored at the location we just found.
+				glEnableVertexAttribArray(posLocation); // Enable the VAO line for vertex data.
+			}
+			if (this->meshResource->GetTexCoordCount() > 0) {
+				if (this->buffers[this->UVBufIndex] == 0) {
+					glGenBuffers(1, &this->buffers[this->UVBufIndex]); 	// Generate the vertex buffer.
+				}
+				glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->UVBufIndex]); // Bind the vertex buffer.
+				glBufferData(GL_ARRAY_BUFFER, sizeof(TexCoord) * this->meshResource->GetTexCoordCount(), &this->meshResource->GetTexCoordBuffer(), GL_STATIC_DRAW); // Stores the verts in the vertex buffer.
+				GLint uvLocation = glGetAttribLocation((*shader).GetProgram(), "in_UV"); // Find the location in the shader where the vertex buffer data will be placed.
+				glVertexAttribPointer(uvLocation, 2, GL_FLOAT, GL_FALSE, 0, 0); // Tell the VAO the vertex data will be stored at the location we just found.
+				glEnableVertexAttribArray(uvLocation); // Enable the VAO line for vertex data.
+			}
+			if (this->meshResource->VertexColorCount() > 0) {
+				if (this->buffers[this->ColorBufIndex] == 0) {
+					glGenBuffers(1, &this->buffers[this->ColorBufIndex]);
+				}
+				glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->ColorBufIndex]);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(Color) * this->meshResource->VertexColorCount(), &this->meshResource->GetVertexColorBuffer(), GL_STATIC_DRAW);
+				GLint colLocation = glGetAttribLocation((*shader).GetProgram(), "in_Color");
+				glVertexAttribPointer(colLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+				glEnableVertexAttribArray(colLocation);
+			}
+			if (this->meshResource->FaceCount() > 0) {
+				if (this->buffers[this->ElemBufIndex] == 0) {
+					glGenBuffers(1, &this->buffers[this->ElemBufIndex]); // Generate the element buffer.
+				}
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buffers[this->ElemBufIndex]); // Bind the element buffer.
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Face) * this->meshResource->FaceCount(), &this->meshResource->GetFaceBuffer(), GL_STATIC_DRAW); // Store the faces in the element buffer.
+			}
+			if (this->meshResource->VertexNormalCount() > 0) {
+				if (this->buffers[this->NormalBufIndex] == 0) {
+					glGenBuffers(1, &this->buffers[this->NormalBufIndex]);
+				}
+				glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->NormalBufIndex]);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*this->meshResource->VertexNormalCount(), &this->meshResource->GetVertexNormalBuffer(), GL_STATIC_DRAW);
+				GLint normalLocation = glGetAttribLocation((*shader).GetProgram(), "in_Normal");
+				glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+				glEnableVertexAttribArray(normalLocation);
+			}
+
+			glBindVertexArray(0); // Reset the buffer binding because we are good programmers.
+
+			this->shader->Use();
+			this->shader->AddUniform("in_Model");
+			this->shader->AddUniform("in_View");
+			this->shader->AddUniform("in_Proj");
+			this->shader->AddUniform("texEnabled");
+			this->shader->AddUniform("ambientTexEnabled");
+			this->shader->AddUniform("diffuseTexEnabled");
+			this->shader->AddUniform("texAmb");
+			this->shader->AddUniform("texDiff");
+			this->shader->AddUniform("specularHardness");
+			this->shader->UnUse();
+		}
+
+		/**
 		 * \brief Renders the component.
 		 *
 		 * \param view The current view matrix
 		 * \param proj The current project matrix
 		 */
-		virtual void Render(glm::mediump_float *view, glm::mediump_float *proj)=0;
+		void Render(glm::mediump_float *view, glm::mediump_float *proj) {
+			glm::mat4 modelMatrix = this->Transform()->GetMatrix();
+
+			//if(this->parentTransform != 0) {
+			//	modelMatrix = this->parentTransform->GetMatrix() * modelMatrix;
+			//}
+
+			this->shader->Use();
+			glUniformMatrix4fv((*this->shader)("in_Model"), 1, GL_FALSE, &modelMatrix[0][0]);
+			glUniformMatrix4fv((*this->shader)("in_View"), 1, GL_FALSE, view);
+			glUniformMatrix4fv((*this->shader)("in_Proj"), 1, GL_FALSE, proj);
+
+			glBindVertexArray(this->Vao());
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->GetBuffer(this->ElemBufIndex));
+
+			if(this->cull_face == 0) {
+				glDisable(GL_CULL_FACE);
+			}
+			else {
+				glCullFace(this->cull_face);
+			}
+
+			glActiveTexture(GL_TEXTURE0);
+			size_t prev = 0;
+			for (int i = 0, cur = this->meshResource->MeshGroup_ElementCount(0); cur != 0; prev = cur, cur = this->meshResource->MeshGroup_ElementCount(++i)) {
+				if (this->meshResource->MaterialGroupsCount() > 0) {
+					Material& mat = this->meshResource->GetMaterialName(this->meshResource->GetMaterialName(prev));
+
+					if (mat.ambientMap) {
+						glUniform1i((*this->shader)("texEnabled"), 1);
+						glUniform1i((*this->shader)("ambientTexEnabled"), 1);
+						glUniform1i((*this->shader)("texAmb"), 1);
+						glActiveTexture(GL_TEXTURE1);
+						glBindTexture(GL_TEXTURE_2D, mat.ambientMap);
+					} else {
+						glUniform1i((*this->shader)("ambientTexEnabled"), 0);
+					}
+
+					if (mat.diffuseMap) {
+						glUniform1i((*this->shader)("texEnabled"), 1);
+						glUniform1i((*this->shader)("diffuseTexEnabled"), 1);
+						glUniform1i((*this->shader)("texDiff"), 0);
+						glActiveTexture(GL_TEXTURE0);
+						glBindTexture(GL_TEXTURE_2D, mat.diffuseMap);
+					} else {
+						glUniform1i((*this->shader)("diffuseTexEnabled"), 0);
+					}
+
+					glUniform1f((*this->shader)("specularHardness"), mat.hardness);
+				}
+				else {
+					glUniform1i((*this->shader)("texEnabled"), 0);
+					glUniform1i((*this->shader)("diffuseTexEnabled"), 0);
+					glUniform1i((*this->shader)("ambientTexEnabled"), 0);
+				}
+				glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_INT, (void*)prev);
+			}
+
+			// reset defaults
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+			glBindVertexArray(0);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			this->shader->UnUse();
+		} // function Render
 
 		/**
 		 * \brief Return the VAO ID of this component.
@@ -140,13 +242,13 @@ namespace Sigma {
 			}
 		};
 
-        /** \brief load the given shader
-         *
-         * \param filename the base name of the shader. loads filename.vert and filename.frag.
-         *  filename should be a relative path, like "shaders/mesh"
-         * \return void
-         */
-        void LoadShader(const std::string& filename);
+		/** \brief load the given shader
+		 *
+		 * \param filename the base name of the shader. loads filename.vert and filename.frag.
+		 *  filename should be a relative path, like "shaders/mesh"
+		 * \return void
+		 */
+		void LoadShader(const std::string& filename);
 		std::shared_ptr<GLSLShader> GetShader() { return this->shader; }
 
 		void SetLightingEnabled(bool enabled) { this->lightingEnabled = enabled; }
@@ -165,12 +267,13 @@ namespace Sigma {
 		unsigned int drawMode; // The current draw mode (ex. GL_TRIANGLES, GL_TRIANGLE_STRIP).
 		GLuint cull_face; // The current culling method for this component.
 
-        std::shared_ptr<GLSLShader> shader; // shaders are shared among components
-        // name-->shader map to look up already-loaded shaders (so each can be loaded only once)
-        static ShaderMap loadedShaders;
+		std::shared_ptr<GLSLShader> shader; // shaders are shared among components
+		// name-->shader map to look up already-loaded shaders (so each can be loaded only once)
+		static ShaderMap loadedShaders;
+		Mesh* meshResource;
 
 		bool lightingEnabled;
-	}; // class IGLComponent
+	}; // class Renderable
 } // namespace Sigma
 
 #endif // IGLCOMPONENT_H

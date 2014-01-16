@@ -3,7 +3,7 @@
 #include "Sigma.h"
 
 namespace Sigma{
-	class GLMesh;
+	class Mesh;
 	class BulletShapeCapsule : public IBulletShape {
 	public:
 		SET_COMPONENT_TYPENAME("BulletShapeCapsule");
