@@ -10,8 +10,8 @@
 #include "glm/glm.hpp"
 #include "Sigma.h"
 #include "GLTransform.h"
-#include "components/ControllableMove.h"
-#include "components/PhysicalWorldLocation.h"
+#include "composites/ControllableMove.h"
+#include "composites/PhysicalWorldLocation.h"
 
 namespace Sigma{
     /** \brief A component for entities that have a linear interpolated movement
