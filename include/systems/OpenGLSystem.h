@@ -20,7 +20,7 @@
 #include "resources/GLTexture.h"
 #include "components/GLScreenQuad.h"
 #include "Sigma.h"
-#include "components/PhysicalWorldLocation.h"
+#include "composites/PhysicalWorldLocation.h"
 
 struct IGLView;
 

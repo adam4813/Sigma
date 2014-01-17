@@ -27,6 +27,12 @@ source_group("Header Files\\components" FILES ${Sigma_SRC_COMPONENT_H})
 file(GLOB Sigma_SRC_COMPONENT_CPP "src/components/*.cpp")
 source_group("Source Files\\components" FILES ${Sigma_SRC_COMPONENT_CPP})
 
+# Put all composite files into a filter
+file(GLOB Sigma_SRC_COMPOSITE_H "include/composites/*.h")
+source_group("Header Files\\composites" FILES ${Sigma_SRC_COMPOSITE_H})
+file(GLOB Sigma_SRC_COMPOSITE_CPP "src/composites/*.cpp")
+source_group("Source Files\\composites" FILES ${Sigma_SRC_COMPOSITE_CPP})
+
 # Put all entity files into a filter
 file(GLOB Sigma_SRC_ENTITY_H "include/entities/*.h")
 source_group("Header Files\\entities" FILES ${Sigma_SRC_ENTITY_H})
@@ -71,7 +77,7 @@ IF ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 	ENDIF (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
 ELSEIF ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-	# Clang 3.3 and up support c++11.  
+	# Clang 3.3 and up support c++11.
 	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE CLANG_VERSION)
 	IF (NOT (CLANG_VERSION VERSION_GREATER 3.3 OR CLANG_VERSION VERSION_EQUAL 3.3))
 		# c++11 std only appears in clang 3.3 or higher. c++0x will work for lesser versions.
@@ -190,6 +196,7 @@ set(Sigma_ALL_LIBS
 set(Sigma_ALL_SOURCE
 	${Sigma_SRC}
 	${Sigma_SRC_COMPONENT_CPP}
+	${Sigma_SRC_COMPOSITE_CPP}
 	${Sigma_SRC_SYSTEM_CPP}
 	${Sigma_SRC_CONTROLLERS_CPP}
 	${Sigma_SRC_ENTITY_CPP}
@@ -199,6 +206,7 @@ set(Sigma_ALL_SOURCE
 set(Sigma_ALL_INCLUDES
 	${Sigma_INCLUDES}
 	${Sigma_SRC_COMPONENT_H}
+	${Sigma_SRC_COMPOSITE_H}
 	${Sigma_SRC_SYSTEM_H}
 	${Sigma_SRC_CONTROLLERS_H}
 	${Sigma_SRC_RESOURCES_H}
@@ -279,7 +287,7 @@ if(BUILD_EXE_Sigma)
 			# Link the executable to all required libraries
 			TARGET_LINK_LIBRARIES(${TEST_NAME} ${Sigma_ALL_LIBS})
 		endif(BUILD_STATIC_Sigma)
-	
+
 		ENDFOREACH(TEST_CPP)
 endif(BUILD_EXE_Sigma)
 

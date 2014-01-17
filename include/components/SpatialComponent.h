@@ -8,7 +8,7 @@
 #include "IComponent.h"
 #include "GLTransform.h"
 #include "Sigma.h"
-#include "components/PhysicalWorldLocation.h"
+#include "composites/PhysicalWorldLocation.h"
 
 namespace Sigma {
 	class SpatialComponent : public IComponent {

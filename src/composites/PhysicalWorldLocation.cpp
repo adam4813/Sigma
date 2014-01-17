@@ -1,4 +1,4 @@
-#include "components/PhysicalWorldLocation.h"
+#include "composites/PhysicalWorldLocation.h"
 #include "components/SigmaMotionState.h"
 
 namespace Sigma {

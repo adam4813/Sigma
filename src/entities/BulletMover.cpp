@@ -1,7 +1,7 @@
 #include "entities/BulletMover.h"
 
 #include <bullet/btBulletDynamicsCommon.h>
-#include "components/PhysicalWorldLocation.h"
+#include "composites/PhysicalWorldLocation.h"
 
 namespace Sigma {
 
