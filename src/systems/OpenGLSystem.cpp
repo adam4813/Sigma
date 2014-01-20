@@ -663,7 +663,7 @@ namespace Sigma{
 			}
 
 			// Setup the projection matrix
-			glm::mat4 viewProj = glm::mul(this->ProjectionMatrix, viewMatrix);
+			glm::mat4 viewProj = this->ProjectionMatrix * viewMatrix;
 
 			viewProjInv = glm::inverse(viewProj);
 

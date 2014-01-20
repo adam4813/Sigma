@@ -18,24 +18,35 @@ before_install:
     - cd ..
     - sudo apt-get -qq update
     # No ppa for glfw3 at this time. Compiling by hand!
-    - sudo apt-get install xorg-dev libglu1-mesa-dev
+    - sudo apt-get -qq install xorg-dev libglu1-mesa-dev
     - git clone https://github.com/glfw/glfw.git
     - cd glfw
-    - cmake -DCMAKE_INSTALL_PREFIX=/usr .
+    - CMAKE_CXX_FLAGS=-fPIC CMAKE_C_FLAGS=-fPIC cmake -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS:bool=true .
     - sudo make install
     - cd ..
 install:
     - sudo apt-get -qq install libstdc++-4.8-dev clang-3.3
     - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
     - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
-    - sudo apt-get -qq install libglew-dev libsoil-dev libglm-dev
-    - sudo apt-get -qq install libogg-dev libvorbis-dev libopenal-dev
+    - sudo apt-get -q install libglew-dev libsoil-dev libglm-dev
+    - sudo apt-get -q install libogg-dev libvorbis-dev libopenal-dev
     - sudo apt-get install libgtest-dev
     - BUILD_PATH=$(pwd)
     - cd /usr/src/gtest
     - sudo cmake CMakeLists.txt
     - sudo make
     - sudo cp *.a /usr/lib
+    - cd $BUILD_PATH
+    - mkdir -p cef
+    # Fetch a copy of CEF (wrapper source only)
+    - wget http://eciv.net/m/cef_compact_latestmirror_linux64.tar.xz
+    - xz -dc cef_compact_latestmirror_linux64.tar.xz | tar -x
+    - cd cef_binary_*_linux64
+    - CXXFLAGS=$(pkg-config --cflags gtk+-2.0) make libcef_dll_wrapper BUILDTYPE=Release -j 4
+    - mv out/Release/obj.target/libcef_dll_wrapper* $BUILD_PATH/cef
+    - mv out/Release/* Resources/* $BUILD_PATH/cef
+    - mv Release/* $BUILD_PATH/cef
+    - cp -rf include/* $BUILD_PATH/include
     - cd $BUILD_PATH
     - sudo apt-get -y install automake libtool cmake freeglut3-dev libbullet-dev
 script:
@@ -44,7 +55,7 @@ script:
     - cp test.sc.complex test.sc
     - "sudo ln -s /usr/include/SOIL/SOIL.h /usr/include/SOIL.h"
     - make clean
-    - make
+    - CXXFLAGS=$(pkg-config --cflags gtk+-2.0) make
 notifications:
     email: false
     # I can also set up Glitch to output build results as well if we don't want the travis bot join/part spam

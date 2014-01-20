@@ -3,6 +3,7 @@ PROJECT (Sigma)
 
 # Set the include directory
 INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include")
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}")
 
 # Set the cmake search paths
 SET(CMAKE_INCLUDE_PATH ${CMAKE_SOURCE_DIR}/include)
@@ -14,7 +15,10 @@ SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
 
 # find all source files in the src directory
-FILE(GLOB Sigma_SRC "include/*.h" "src/*.cpp")
+FILE(GLOB Sigma_SRC "src/*.cpp")
+
+# find all the files in the includes directory
+FILE(GLOB Sigma_INCLUDES "include/*.h" "include/*.hpp")
 
 ## Filter the source/header files for various groups of files.
 
@@ -39,6 +43,10 @@ SOURCE_GROUP("Source Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_CPP})
 # Put all Resource files into a filter.
 FILE(GLOB Sigma_SRC_RESOURCES_H "include/resources/*.h")
 SOURCE_GROUP("Header Files\\resources" FILES ${Sigma_SRC_RESOURCES_H})
+
+# Put the Test files into a filter
+FILE(GLOB Sigma_SRC_TESTS_CPP "src/tests/*.cpp")
+SOURCE_GROUP("Source Files\\tests" FILES ${Sigma_SRC_TESTS_CPP})
 
 # Output the compiler ID.
 MESSAGE("Compiler ID: " ${CMAKE_CXX_COMPILER_ID})
@@ -101,7 +109,7 @@ FIND_PACKAGE(OggVorbis REQUIRED)
 FIND_PACKAGE(OpenAL REQUIRED)
 FIND_PACKAGE(Bullet REQUIRED)
 FIND_PACKAGE(SOIL REQUIRED)
-FIND_PACKAGE(Awesomium REQUIRED)
+FIND_PACKAGE(GLM REQUIRED)
 
 # Give these some dummy values and if the platform is LINUX or OSX they will be set accordingly.
 SET(X11_LIBRARIES "")
@@ -109,18 +117,24 @@ SET(OSX_LIBRARIES "")
 
 IF (NOT APPLE) # X11 and GLEW are not needed on OSX.
 	FIND_PACKAGE(X11)
+	set(USE_STATIC_GLEW FALSE CACHE BOOL "Build against GLEW static (default no)")
+
 	FIND_PACKAGE(GLEW REQUIRED) # We find GLEW here as OSX doesn't need it.
 	IF (NOT GLEW_FOUND)
 		MESSAGE(FATAL_ERROR "GLEW not found! Aborting!")
 	ENDIF (NOT GLEW_FOUND)
 ENDIF (NOT APPLE)
 
+IF (UNIX AND NOT APPLE)
+	FIND_PACKAGE(GTK2 REQUIRED)
+	INCLUDE_DIRECTORIES("${GTK2_INCLUDE_DIRS}")
+ENDIF (UNIX AND NOT APPLE)
+
 IF (APPLE) # Mac OSX
 	SET(GLEW_LIBRARY "") # Set a dummy value for GLEW.
 
-	# Awesomium does not support 64-bit.
-	SET(CMAKE_OSX_ARCHITECTURES i386)
-	SET(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS "i386")
+	SET(CMAKE_OSX_ARCHITECTURES i386;x86_64)
+	SET(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS "i386 x86_64")
 	SET(CMAKE_XCODE_ATTRIBUTE_SUPPORTED_PLATFORMS macosx)
 
 	# Need the 10.7 SDK or later.
@@ -143,17 +157,122 @@ IF (APPLE) # Mac OSX
 
 	# Need Core Foundation and libobjc.
 	SET(OSX_LIBRARIES "-framework CoreFoundation /usr/lib/libobjc.dylib")
-
-	IF (NOT XCODE_VERSION)
-		# Yuck. The Makefile generator is not emitting a -F/Path/To/Awesomium flag.
-		# As a workaround, add the necessary flags ourself assuming the Awesomium was installed in its default location.
-		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -F/Library/Frameworks")
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -F/Library/Frameworks")
-	ENDIF (NOT XCODE_VERSION)
 ENDIF (APPLE)
 
-# add the executable
-ADD_EXECUTABLE(Sigma ${Sigma_SRC} ${Sigma_SRC_COMPONENT_H} ${Sigma_SRC_COMPONENT_CPP} ${Sigma_SRC_SYSTEM_H} ${Sigma_SRC_SYSTEM_CPP} ${Sigma_SRC_CONTROLLERS_H} ${Sigma_SRC_CONTROLLERS_CPP} ${Sigma_SRC_RESOURCES_H})
+# We like having options
+set(BUILD_EXE_Sigma TRUE CACHE BOOL "Build the Sigma test executable")
+set(BUILD_STATIC_Sigma FALSE CACHE BOOL "Build Sigma as a static library")
+set(BUILD_SHARED_Sigma TRUE CACHE BOOL "Build Sigma as a shared library")
 
-# Link the executable to all required libraries
-TARGET_LINK_LIBRARIES(Sigma ${OPENGL_LIBRARIES} ${GLFW3_LIBRARY} ${OGGVORBIS_LIBRARIES} ${OPENAL_LIBRARY} ${X11_LIBRARIES} ${OSX_LIBRARIES} ${GLEW_LIBRARY} ${SOIL_LIBRARY} ${BULLET_LINEARMATH_LIBRARIES} ${BULLET_COLLISION_LIBRARIES} ${BULLET_DYNAMICS_LIBRARIES} ${AWESOMIUM_LIBRARY})
+# define all required external libraries
+set(Sigma_ALL_LIBS
+	${OPENGL_LIBRARIES}
+	${GLFW3_LIBRARY}
+	${OGGVORBIS_LIBRARIES}
+	${OPENAL_LIBRARY}
+	${X11_LIBRARIES}
+	${OSX_LIBRARIES}
+	${GLEW_LIBRARY}
+	${SOIL_LIBRARY}
+	${BULLET_LINEARMATH_LIBRARIES}
+	${BULLET_COLLISION_LIBRARIES}
+	${BULLET_DYNAMICS_LIBRARIES}
+	cef_dll_wrapper
+	cef
+	)
+
+# all source common to the library and test exe
+set(Sigma_ALL_SOURCE
+	${Sigma_SRC}
+	${Sigma_SRC_COMPONENT_CPP}
+	${Sigma_SRC_SYSTEM_CPP}
+	${Sigma_SRC_CONTROLLERS_CPP}
+	)
+
+# all source common to the library and test exe
+set(Sigma_ALL_INCLUDES
+	${Sigma_INCLUDES}
+	${Sigma_SRC_COMPONENT_H}
+	${Sigma_SRC_SYSTEM_H}
+	${Sigma_SRC_CONTROLLERS_H}
+	${Sigma_SRC_RESOURCES_H}
+	)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
+LINK_DIRECTORIES("${CMAKE_SOURCE_DIR}/cef")
+# For CEF these may or may not work depending on the platform/build config, including anyway
+LINK_DIRECTORIES("${CMAKE_BINARY_DIR}/bin")
+LINK_DIRECTORIES("${EXECUTABLE_OUTPUT_PATH}")
+
+if(BUILD_STATIC_Sigma)
+	add_library(libSigmas STATIC
+		${Sigma_ALL_SOURCE}
+		${Sigma_ALL_INCLUDES}
+		)
+	# Link the Sigma lib to all required external libraries
+	TARGET_LINK_LIBRARIES(libSigmas ${Sigma_ALL_LIBS})
+	if(WIN32)
+	set_target_properties(libSigmas PROPERTIES
+		OUTPUT_NAME Sigma_static
+		)
+	else(WIN32)
+	set_target_properties(libSigmas PROPERTIES
+		OUTPUT_NAME Sigma
+		)
+	endif(WIN32)
+endif(BUILD_STATIC_Sigma)
+
+if(BUILD_SHARED_Sigma)
+	add_library(libSigma SHARED
+		${Sigma_ALL_SOURCE}
+		${Sigma_ALL_INCLUDES}
+		)
+	# Link the Sigma lib to all required external libraries
+	TARGET_LINK_LIBRARIES(libSigma ${Sigma_ALL_LIBS})
+	set_target_properties(libSigma PROPERTIES
+		OUTPUT_NAME Sigma
+		)
+endif(BUILD_SHARED_Sigma)
+
+if(BUILD_EXE_Sigma)
+	# add the test executable, include the test app source containing main()
+
+	# if we are building a library of Sigma just link that and the includes
+	FOREACH(TEST_CPP ${Sigma_SRC_TESTS_CPP})
+		GET_FILENAME_COMPONENT(TEST_NAME ${TEST_CPP} NAME_WE)
+		if(TEST_NAME STREQUAL "main")
+			SET(TEST_NAME "Sigma")
+		endif(TEST_NAME STREQUAL "main")
+
+		MESSAGE(STATUS "Processing: ${TEST_NAME}")
+
+		if(BUILD_STATIC_Sigma)
+			ADD_EXECUTABLE(${TEST_NAME}
+				${Sigma_ALL_INCLUDES}
+				${TEST_CPP}
+				)
+			TARGET_LINK_LIBRARIES(${TEST_NAME} libSigmas)
+
+		elseif(BUILD_SHARED_Sigma)
+			ADD_EXECUTABLE(${TEST_NAME}
+				${Sigma_ALL_INCLUDES}
+				${TEST_CPP}
+				)
+			TARGET_LINK_LIBRARIES(${TEST_NAME} libSigma)
+
+		else(BUILD_STATIC_Sigma)
+			# if just building an exe use all the source and libraries
+			ADD_EXECUTABLE(${TEST_NAME}
+				${Sigma_ALL_SOURCE}
+				${Sigma_ALL_INCLUDES}
+				${TEST_CPP}
+				)
+			# Link the executable to all required libraries
+			TARGET_LINK_LIBRARIES(${TEST_NAME} ${Sigma_ALL_LIBS})
+		endif(BUILD_STATIC_Sigma)
+	
+		ENDFOREACH(TEST_CPP)
+endif(BUILD_EXE_Sigma)
+

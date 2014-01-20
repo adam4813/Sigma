@@ -11,6 +11,8 @@
 #endif
 #include "glm/glm.hpp"
 #include "GLTransform.h"
+#include "IFactory.h"
+#include "ISystem.h"
 #include <memory>
 #include <vector>
 #include <map>
@@ -19,8 +21,7 @@
 #include "resources/ALBuffer.h"
 #include "resources/SoundFile.h"
 #include "components/ALSound.h"
-#include "IFactory.h"
-#include "ISystem.h"
+#include "Sigma.h"
 
 #define OPENAL_DEBUG
 #if defined(OPENAL_DEBUG)
@@ -33,9 +34,10 @@ namespace Sigma {
 	class OpenALSystem
 		: public Sigma::IFactory, public ISystem<IComponent> {
 		friend class ALSound;
+		friend class FactorySystem;
 	public:
-		OpenALSystem();
-		virtual ~OpenALSystem() {}
+		DLL_EXPORT OpenALSystem();
+		DLL_EXPORT virtual ~OpenALSystem();
 
 		/**
 		 * \brief Starts the OpenAL audio system.
@@ -43,7 +45,7 @@ namespace Sigma {
 		 * Starts the OpenAL system and sets up an audio context.
 		 * \return false on failure, true otherwise.
 		 */
-		bool Start();
+		DLL_EXPORT bool Start();
 
 		/**
 		 * \brief Shuts off the OpenAL audio system.
@@ -58,31 +60,30 @@ namespace Sigma {
 		 * Updates listener position and handles any queuing and/or streaming operations.
 		 * \return true if any audio processing was performed
 		 */
-		bool Update();
+		DLL_EXPORT bool Update();
 
-		IComponent* CreateALSource(const unsigned int, const std::vector<Property> &);
-		std::map<std::string,FactoryFunction> getFactoryFunctions();
+		DLL_EXPORT IComponent* CreateALSource(const id_t, const std::vector<Property> &);
 
 		/**
 		 * \brief Create an empty SoundFile resource.
 		 *
 		 * \return long index to SoundFile
 		 */
-		long CreateSoundFile();
+		DLL_EXPORT long CreateSoundFile();
 
 		/**
 		 * \brief Create an empty SoundFile resource with a name.
 		 *
 		 * \return long index to SoundFile
 		 */
-		long CreateSoundFile(std::string);
+		DLL_EXPORT long CreateSoundFile(std::string);
 
 		/**
 		 * \brief Create a SoundFile resource and load from a file.
 		 *
 		 * \return long index to SoundFile
 		 */
-		long LoadSoundFile(std::string);
+		DLL_EXPORT long LoadSoundFile(std::string);
 
 		/**
 		 * \brief Get the SoundFile resource at an index.
@@ -97,12 +98,13 @@ namespace Sigma {
 			return p;
 		}
 
-		void StopAll();
-		void UpdateTransform(GLTransform &t);
-		void UpdateTransform(glm::vec3 pos, glm::vec3 forward, glm::vec3 up);
+		DLL_EXPORT void StopAll();
+		DLL_EXPORT void UpdateTransform(GLTransform &t);
+		DLL_EXPORT void UpdateTransform(glm::vec3 pos, glm::vec3 forward, glm::vec3 up);
 
-		void test();
+		DLL_EXPORT void test();
 	private:
+		std::map<std::string,FactoryFunction> getFactoryFunctions();
 		int AllocateBuffer();
 		std::vector<std::unique_ptr<resource::ALBuffer>> buffers;
 		ALuint testsource;

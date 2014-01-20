@@ -1,7 +1,7 @@
 #pragma once
 
-#include "glm/glm.hpp"
-#include "glm/ext.hpp"
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
 
 namespace Sigma {
 	class GLTransform {
@@ -29,7 +29,7 @@ namespace Sigma {
 
 		void TranslateTo(float x, float y, float z) {
 			this->position = glm::vec3(x, y, z);
-			this->translateMatrix = glm::translate(x, y, z);
+			this->translateMatrix = glm::translate(glm::vec3(x, y, z));
 			this->MMhasChanged = true;
 		}
 
@@ -68,7 +68,7 @@ namespace Sigma {
 
 		void Scale(float x, float y, float z) {
 			this->scale = this->scale*glm::vec3(x, y, z);
-			this->scaleMatrix = glm::scale(this->scaleMatrix, x, y, z);
+			this->scaleMatrix = glm::scale(this->scaleMatrix, glm::vec3(x, y, z));
 			this->MMhasChanged = true;
 		}
 
