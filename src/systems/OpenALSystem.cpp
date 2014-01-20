@@ -86,7 +86,7 @@ namespace Sigma {
 		alListenerfv(AL_ORIENTATION, fo);
 	}
 
-	IComponent* OpenALSystem::CreateALSource(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* OpenALSystem::CreateALSource(const id_t entityID, const std::vector<Property> &properties) {
 		ALSound * sound = new ALSound(entityID, this);
 
 		sound->Generate();

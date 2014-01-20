@@ -2,7 +2,7 @@
 #include "components/ALSound.h"
 
 namespace Sigma {
-	ALSound::ALSound(int entityID,OpenALSystem *m)
+	ALSound::ALSound(id_t entityID,OpenALSystem *m)
 		: ISound(entityID), buffercount(0), bufferindex(0), master(m), sourceid(0), stream(false) { }
 	ALSound::~ALSound() {
 		Destroy();

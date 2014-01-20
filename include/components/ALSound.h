@@ -19,7 +19,7 @@ namespace Sigma {
 	public:
 		SET_COMPONENT_TYPENAME("ALSound");
 
-		DLL_EXPORT ALSound(int entityID,OpenALSystem *m);
+		DLL_EXPORT ALSound(id_t entityID,OpenALSystem *m);
 		DLL_EXPORT virtual ~ALSound();
 
 		DLL_EXPORT void Generate();
