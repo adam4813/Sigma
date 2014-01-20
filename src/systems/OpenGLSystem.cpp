@@ -59,6 +59,7 @@ namespace Sigma{
 	}
 
 	std::map<std::string, Sigma::resource::GLTexture> OpenGLSystem::textures;
+	std::map<std::string, Sigma::Mesh> OpenGLSystem::meshes;
 
 	OpenGLSystem::OpenGLSystem() : windowWidth(1024), windowHeight(768), deltaAccumulator(0.0),
 		framerate(60.0f), pointQuad(1000), ambientQuad(1001), spotQuad(1002) {}
@@ -71,7 +72,7 @@ namespace Sigma{
 		retval["GLSprite"] = std::bind(&OpenGLSystem::createGLSprite,this,_1,_2);
 		retval["GLIcoSphere"] = std::bind(&OpenGLSystem::createGLIcoSphere,this,_1,_2);
 		retval["GLCubeSphere"] = std::bind(&OpenGLSystem::createGLCubeSphere,this,_1,_2);
-		retval["Mesh"] = std::bind(&OpenGLSystem::createGLMesh,this,_1,_2);
+		retval["GLMesh"] = std::bind(&OpenGLSystem::createGLMesh,this,_1,_2);
 		retval["FPSCamera"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2);
 		retval["GLSixDOFView"] = std::bind(&OpenGLSystem::createGLView,this,_1,_2);
 		retval["PointLight"] = std::bind(&OpenGLSystem::createPointLight,this,_1,_2);
@@ -176,7 +177,6 @@ namespace Sigma{
 	}
 
 	IComponent* OpenGLSystem::createGLIcoSphere(const id_t entityID, const std::vector<Property> &properties) {
-		Sigma::GLIcoSphere* sphere = new Sigma::GLIcoSphere(entityID);
 		float scale = 1.0f;
 		float x = 0.0f;
 		float y = 0.0f;
@@ -184,6 +184,7 @@ namespace Sigma{
 
 		int componentID = 0;
 		std::string shader_name = "shaders/icosphere";
+		Renderable* renderable = new Renderable(entityID);
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			const Property*  p = &(*propitr);
@@ -210,20 +211,26 @@ namespace Sigma{
 				shader_name = p->Get<std::string>();
 			}
 			else if (p->GetName() == "lightEnabled") {
-				sphere->SetLightingEnabled(p->Get<bool>());
+				renderable->SetLightingEnabled(p->Get<bool>());
 			}
 		}
-		sphere->Transform()->Scale(scale,scale,scale);
-		sphere->Transform()->Translate(x,y,z);
-		sphere->LoadShader(shader_name);
-		sphere->InitializeBuffers();
-		sphere->SetCullFace("back");
-		this->addComponent(entityID,sphere);
-		return sphere;
+		GLIcoSphere sphere;
+		std::string meshname = "entity";
+		meshname += entityID;
+		meshname += "icosphere";
+		OpenGLSystem::meshes[meshname] = sphere;
+		renderable->SetMesh(&OpenGLSystem::meshes[meshname]);
+		renderable->Transform()->Scale(scale,scale,scale);
+		renderable->Transform()->Translate(x,y,z);
+		renderable->LoadShader(shader_name);
+		renderable->InitializeBuffers();
+		renderable->SetCullFace("back");
+		this->addComponent(entityID,renderable);
+		return renderable;
 	}
 
 	IComponent* OpenGLSystem::createGLCubeSphere(const id_t entityID, const std::vector<Property> &properties) {
-		Sigma::GLCubeSphere* sphere = new Sigma::GLCubeSphere(entityID);
+		Renderable* renderable = new Renderable(entityID);
 
 		std::string texture_name = "";
 		std::string shader_name = "shaders/cubesphere";
@@ -283,26 +290,33 @@ namespace Sigma{
 				fix_to_camera = p->Get<bool>();
 			}
 			else if (p->GetName() == "lightEnabled") {
-				sphere->SetLightingEnabled(p->Get<bool>());
+				renderable->SetLightingEnabled(p->Get<bool>());
 			}
 		}
 
-		sphere->SetSubdivisions(subdivision_levels);
-		sphere->SetFixToCamera(fix_to_camera);
-		sphere->SetCullFace(cull_face);
-		sphere->Transform()->Scale(scale,scale,scale);
-		sphere->Transform()->Rotate(rx,ry,rz);
-		sphere->Transform()->Translate(x,y,z);
-		sphere->LoadShader(shader_name);
-		sphere->LoadTexture(texture_name);
-		sphere->InitializeBuffers();
+		GLCubeSphere sphere;
+		std::string meshname = "entity";
+		meshname += entityID;
+		meshname += "cubesphere";
+		OpenGLSystem::meshes[meshname] = sphere;
+		renderable->SetMesh(&OpenGLSystem::meshes[meshname]);
+		static_cast<GLCubeSphere*>(&OpenGLSystem::meshes[meshname])->SetSubdivisions(subdivision_levels);
+		static_cast<GLCubeSphere*>(&OpenGLSystem::meshes[meshname])->SetFixToCamera(fix_to_camera);
+		static_cast<GLCubeSphere*>(&OpenGLSystem::meshes[meshname])->InitializeBuffers();
+		static_cast<GLCubeSphere*>(&OpenGLSystem::meshes[meshname])->LoadTexture(texture_name);
+		renderable->SetCullFace(cull_face);
+		renderable->Transform()->Scale(scale,scale,scale);
+		renderable->Transform()->Rotate(rx,ry,rz);
+		renderable->Transform()->Translate(x,y,z);
+		renderable->LoadShader(shader_name);
+		renderable->InitializeBuffers();
 
-		this->addComponent(entityID,sphere);
-		return sphere;
+		this->addComponent(entityID,renderable);
+		return renderable;
 	}
 
 	IComponent* OpenGLSystem::createGLMesh(const id_t entityID, const std::vector<Property> &properties) {
-		Sigma::Mesh* mesh = new Sigma::Mesh(entityID);
+		Renderable* renderable = new Renderable(entityID);
 
 		float scale = 1.0f;
 		float x = 0.0f;
@@ -314,6 +328,7 @@ namespace Sigma{
 		int componentID = 0;
 		std::string cull_face = "back";
 		std::string shaderfile = "";
+		std::string meshFIlename = "";
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			const Property*  p = &*propitr;
@@ -347,7 +362,7 @@ namespace Sigma{
 			}
 			else if (p->GetName() == "meshFile") {
 				std::cerr << "Loading mesh: " << p->Get<std::string>() << std::endl;
-				mesh->LoadObjMesh(p->Get<std::string>());
+				meshFIlename = p->Get<std::string>();
 			}
 			else if (p->GetName() == "shader") {
 				shaderfile = p->Get<std::string>();
@@ -359,32 +374,33 @@ namespace Sigma{
 				cull_face = p->Get<std::string>();
 			}
 			else if (p->GetName() == "lightEnabled") {
-				mesh->SetLightingEnabled(p->Get<bool>());
+				renderable->SetLightingEnabled(p->Get<bool>());
 			}
 			else if (p->GetName() == "parent") {
 				/* Only entities that have ControllableMove component can be parent */
 				const id_t parentID = p->Get<int>();
-				mesh->Transform()->SetParentID(parentID);
+				renderable->Transform()->SetParentID(parentID);
 			}
 		}
 
-		mesh->SetCullFace(cull_face);
-		mesh->Transform()->Scale(scale,scale,scale);
-		mesh->Transform()->Translate(x,y,z);
-		mesh->Transform()->Rotate(rx,ry,rz);
-		if(shaderfile != "") {
-			mesh->LoadShader(shaderfile);
-		}
-		else {
-			mesh->LoadShader(); // load default
-		}
-		mesh->InitializeBuffers();
-		this->addComponent(entityID,mesh);
-		return mesh;
+		Mesh mesh;
+		OpenGLSystem::meshes[meshFIlename] = mesh;
+		renderable->SetMesh(&OpenGLSystem::meshes[meshFIlename]);
+		OpenGLSystem::meshes[meshFIlename].LoadObjMesh(meshFIlename);
+
+		renderable->SetCullFace(cull_face);
+		renderable->Transform()->Scale(scale,scale,scale);
+		renderable->Transform()->Translate(x,y,z);
+		renderable->Transform()->Rotate(rx,ry,rz);
+		renderable->LoadShader(shaderfile);
+		
+		renderable->InitializeBuffers();
+		this->addComponent(entityID,renderable);
+		return renderable;
 	}
 
 	IComponent* OpenGLSystem::createScreenQuad(const id_t entityID, const std::vector<Property> &properties) {
-		Sigma::GLScreenQuad* quad = new Sigma::GLScreenQuad(entityID);
+		Renderable* renderable = new Renderable(entityID);
 
 		float x = 0.0f;
 		float y = 0.0f;
@@ -421,6 +437,7 @@ namespace Sigma{
 		// Check if the texture is loaded and load it if not.
 		if (textures.find(textureName) == textures.end()) {
 			Sigma::resource::GLTexture texture;
+			texture.GenerateGLTexture(1024, 768);
 			if (textureInMemory) { // We are using an in memory texture. It will be populated somewhere else
 				Sigma::OpenGLSystem::textures[textureName] = texture;
 			}
@@ -432,18 +449,27 @@ namespace Sigma{
 			}
 		}
 
+		GLScreenQuad quad;
+		quad.SetPosition(x, y);
+		quad.SetSize(w, h);
+		quad.InitializeBuffers();
+
 		// It should be loaded, but in case an error occurred double check for it.
 		if (textures.find(textureName) != textures.end()) {
-			quad->SetTexture(&Sigma::OpenGLSystem::textures[textureName]);
+			quad.SetTexture(&Sigma::OpenGLSystem::textures[textureName]);
 		}
 
-		quad->SetPosition(x, y);
-		quad->SetSize(w, h);
-		quad->LoadShader("shaders/quad");
-		quad->InitializeBuffers();
-		this->screensSpaceComp.push_back(std::unique_ptr<Renderable>(quad));
+		std::string meshname = "entity";
+		meshname += entityID;
+		meshname += "cubesphere";
+		OpenGLSystem::meshes[meshname] = quad;
 
-		return quad;
+		renderable->SetMesh(&OpenGLSystem::meshes[meshname]);
+		renderable->LoadShader("shaders/quad");
+		renderable->InitializeBuffers();
+		this->screensSpaceComp.push_back(std::unique_ptr<Renderable>(renderable));
+
+		return renderable;
 	}
 
 	IComponent* OpenGLSystem::createPointLight(const id_t entityID, const std::vector<Property> &properties) {
@@ -978,10 +1004,17 @@ namespace Sigma{
 		glEnable(GL_DEPTH_TEST);
 
 		// Setup a screen quad for deferred rendering
-		this->pointQuad.SetSize(1.0f, 1.0f);
-		this->pointQuad.SetPosition(0.0f, 0.0f);
+		GLScreenQuad pQuad;
+		pQuad.SetPosition(0.0f, 0.0f);
+		pQuad.SetSize(1.0f, 1.0f);
+		pQuad.Inverted(true);
+		pQuad.InitializeBuffers();
+		std::string meshname = "pointQuad";
+		OpenGLSystem::meshes[meshname] = pQuad;
+
+		this->pointQuad.SetMesh(&OpenGLSystem::meshes[meshname]);
+
 		this->pointQuad.LoadShader("shaders/pointlight");
-		this->pointQuad.Inverted(true);
 		this->pointQuad.InitializeBuffers();
 		this->pointQuad.SetCullFace("none");
 
@@ -996,10 +1029,17 @@ namespace Sigma{
 		this->pointQuad.GetShader()->AddUniform("depthBuffer");
 		this->pointQuad.GetShader()->UnUse();
 
-		this->spotQuad.SetSize(1.0f, 1.0f);
-		this->spotQuad.SetPosition(0.0f, 0.0f);
+		GLScreenQuad sQuad;
+		sQuad.SetPosition(0.0f, 0.0f);
+		sQuad.SetSize(1.0f, 1.0f);
+		sQuad.Inverted(true);
+		sQuad.InitializeBuffers();
+		meshname = "spotQuad";
+		OpenGLSystem::meshes[meshname] = sQuad;
+
+		this->spotQuad.SetMesh(&OpenGLSystem::meshes[meshname]);
+
 		this->spotQuad.LoadShader("shaders/spotlight");
-		this->spotQuad.Inverted(true);
 		this->spotQuad.InitializeBuffers();
 		this->spotQuad.SetCullFace("none");
 
@@ -1016,10 +1056,16 @@ namespace Sigma{
 		this->spotQuad.GetShader()->AddUniform("depthBuffer");
 		this->spotQuad.GetShader()->UnUse();
 
-		this->ambientQuad.SetSize(1.0f, 1.0f);
-		this->ambientQuad.SetPosition(0.0f, 0.0f);
+		GLScreenQuad aQuad;
+		aQuad.SetPosition(0.0f, 0.0f);
+		aQuad.SetSize(1.0f, 1.0f);
+		aQuad.Inverted(true);
+		aQuad.InitializeBuffers();
+		meshname = "ambientQuad";
+		OpenGLSystem::meshes[meshname] = aQuad;
+
+		this->ambientQuad.SetMesh(&OpenGLSystem::meshes[meshname]);
 		this->ambientQuad.LoadShader("shaders/ambient");
-		this->ambientQuad.Inverted(true);
 		this->ambientQuad.InitializeBuffers();
 		this->ambientQuad.SetCullFace("none");
 

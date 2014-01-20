@@ -1,4 +1,4 @@
-#include "components/Mesh.h"
+#include "resources/Mesh.h"
 
 #include "strutils.h"
 #include "systems/OpenGLSystem.h"

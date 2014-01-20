@@ -14,7 +14,7 @@
 
 #include "IFactory.h"
 #include "ISystem.h"
-#include "Renderable.h"
+#include "components/Renderable.h"
 #include "systems/IGLView.h"
 #include <vector>
 #include "resources/GLTexture.h"
@@ -164,6 +164,7 @@ namespace Sigma{
 		DLL_EXPORT GLTransform* GetTransformFor(const unsigned int entityID);
 
 		static std::map<std::string, Sigma::resource::GLTexture> textures;
+		static std::map<std::string, Sigma::Mesh> meshes;
 	private:
 		unsigned int windowWidth; // Store the width of our window
 		unsigned int windowHeight; // Store the height of our window
@@ -179,7 +180,7 @@ namespace Sigma{
 
 		// Utility quads for rendering
 		// TODO make this smarter, allow multiple shaders/materials per glcomponent
-		GLScreenQuad pointQuad, spotQuad, ambientQuad;
+		Renderable pointQuad, spotQuad, ambientQuad;
 
 		// Render targets to draw to
 		std::vector<std::unique_ptr<RenderTarget>> renderTargets;
