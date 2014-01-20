@@ -20,7 +20,7 @@ namespace Log {
 	/**
 	 * Logging levels
 	 */
-	enum class LogLevel {
+	enum LogLevel {
 		OFF = -1,
 		ERROR = 0,
 		WARN = 1,

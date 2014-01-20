@@ -177,8 +177,8 @@ set(Sigma_ALL_LIBS
 	${BULLET_LINEARMATH_LIBRARIES}
 	${BULLET_COLLISION_LIBRARIES}
 	${BULLET_DYNAMICS_LIBRARIES}
-	cef_dll_wrapper
-	cef
+	libcef_dll_wrapper
+	libcef
 	)
 
 # all source common to the library and test exe

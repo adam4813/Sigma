@@ -21,9 +21,9 @@ int main(int argCount, char **argValues) {
 	Sigma::WebGUISystem webguisys;
 
 	CefRefPtr<Sigma::WebGUISystem> app(&webguisys);
-#ifdef _WIN32
+#if _WIN32 == 1
 	CefMainArgs mainArgs(GetModuleHandle(NULL));
-	int exitCode = CefExecuteProcess(mainArgs, app.get(), nullptr);
+	int exitCode = CefExecuteProcess(mainArgs, app.get()/*, nullptr*/);
 #else
 	CefMainArgs mainArgs(argCount, argValues);
 	int exitCode = CefExecuteProcess(mainArgs, app.get());
@@ -237,11 +237,13 @@ int main(int argCount, char **argValues) {
 		bphys.Update(deltaSec);
 		webguisys.Update(deltaSec);
 
-		alsys.Update();
 
 		// Update the renderer and present
 		if (glsys.Update(deltaSec)) {
 			glfwos.SwapBuffers();
+
+			alsys.Update();
+			alsys.UpdateTransform(*glsys.GetView()->Transform());
 		}
 
 		glfwos.OSMessageLoop();

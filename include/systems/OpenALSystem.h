@@ -52,7 +52,7 @@ namespace Sigma {
 		 *
 		 * Stops all sounds on the OpenAL system and cleans up the audio context.
 		 */
-		void Shutdown();
+		DLL_EXPORT void Shutdown();
 
 		/**
 		 * \brief Update listener position and handle queuing.

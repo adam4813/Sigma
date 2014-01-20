@@ -24,7 +24,7 @@ namespace Sigma {
 		std::cout << "Setting up web view." << std::endl;
 		CefRefPtr<WebGUISystem> ourselves(this);
 		CefSettings settings;
-#ifdef _WIN32
+#if _WIN32 == 0
 		CefInitialize(mainArgs, settings, ourselves.get(), nullptr);
 #else
 		CefInitialize(mainArgs, settings, ourselves.get());
