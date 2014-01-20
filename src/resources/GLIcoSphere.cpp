@@ -1,4 +1,4 @@
-#include "components/GLIcoSphere.h"
+#include "resources/GLIcoSphere.h"
 
 #include <vector>
 

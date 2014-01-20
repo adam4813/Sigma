@@ -8,7 +8,7 @@
 #include "controllers/FPSCamera.h"
 #include "components/PhysicsController.h"
 #include "entities/BulletMover.h"
-#include "components/GLScreenQuad.h"
+#include "resources/GLScreenQuad.h"
 #include "SCParser.h"
 #include "systems/WebGUISystem.h"
 #include "OS.h"

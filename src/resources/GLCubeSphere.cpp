@@ -1,4 +1,4 @@
-#include "components/GLCubeSphere.h"
+#include "resources/GLCubeSphere.h"
 
 #include "SOIL/SOIL.h"
 

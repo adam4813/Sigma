@@ -14,11 +14,11 @@
 
 #include "IFactory.h"
 #include "ISystem.h"
-#include "IGLComponent.h"
+#include "Renderable.h"
 #include "systems/IGLView.h"
 #include <vector>
 #include "resources/GLTexture.h"
-#include "components/GLScreenQuad.h"
+#include "resources/GLScreenQuad.h"
 #include "Sigma.h"
 #include "components/PhysicalWorldLocation.h"
 

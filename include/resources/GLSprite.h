@@ -3,7 +3,7 @@
 #define GLSPRITE_H
 
 #include "../systems/GLSLShader.h"
-#include "../IGLComponent.h"
+#include "../Renderable.h"
 #include "Sigma.h"
 
 namespace Sigma{

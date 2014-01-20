@@ -1,4 +1,4 @@
-#include "components/GLSprite.h"
+#include "resources/GLSprite.h"
 #ifndef __APPLE__
 #include "GL/glew.h"
 #endif

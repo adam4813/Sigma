@@ -1,4 +1,4 @@
-#include "components/GLScreenQuad.h"
+#include "resources/GLScreenQuad.h"
 #include "resources/GLTexture.h"
 
 namespace Sigma {
