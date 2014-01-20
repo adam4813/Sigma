@@ -62,6 +62,13 @@ namespace Sigma {
 		 */
 		DLL_EXPORT bool Update();
 
+		/**
+		 * \brief Set master gain.
+		 *
+		 * Updates listener gain to the given multiplier, default is 1.0f.
+		 */
+		DLL_EXPORT void MasterGain(float);
+
 		DLL_EXPORT IComponent* CreateALSource(const id_t, const std::vector<Property> &);
 
 		/**

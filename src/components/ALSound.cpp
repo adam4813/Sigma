@@ -2,6 +2,11 @@
 #include "components/ALSound.h"
 
 namespace Sigma {
+	ALSound::ALSound(int entityID,OpenALSystem *m)
+		: ISound(entityID), buffercount(0), bufferindex(0), master(m), sourceid(0), stream(false) { }
+	ALSound::~ALSound() {
+		Destroy();
+	}
 	void ALSound::Generate() {
 		alGenSources(1, &this->sourceid);
 	}
@@ -174,6 +179,18 @@ namespace Sigma {
 
 	void ALSound::Gain(float mul) {
 		alSourcef(this->sourceid, AL_GAIN,mul);
+	}
+	void ALSound::Rolloff(float atten) {
+		alSourcef(this->sourceid, AL_ROLLOFF_FACTOR, atten);
+	}
+	void ALSound::ReferenceDistance(float r) {
+		alSourcef(this->sourceid, AL_REFERENCE_DISTANCE, r);
+	}
+	void ALSound::MaxDistance(float r) {
+		alSourcef(this->sourceid, AL_MAX_DISTANCE, r);
+	}
+	void ALSound::Pitch(float r) {
+		alSourcef(this->sourceid, AL_PITCH, r);
 	}
 
 	void ALSound::Position(float x, float y, float z) {

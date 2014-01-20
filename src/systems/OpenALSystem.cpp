@@ -66,6 +66,10 @@ namespace Sigma {
 		}
 	}
 
+	void OpenALSystem::MasterGain(float v) {
+		alListenerf(AL_GAIN, v);
+	}
+
 	void OpenALSystem::UpdateTransform(GLTransform &t) {
 		glm::vec3 pos, forward, up;
 		pos = t.GetPosition();
@@ -108,6 +112,18 @@ namespace Sigma {
 			else if (p->GetName() == "z") {
 				z = p->Get<float>();
 				continue;
+			}
+			else if (p->GetName() == "gain") {
+				sound->Gain(p->Get<float>());
+			}
+			else if (p->GetName() == "rolloff") {
+				sound->Rolloff(p->Get<float>());
+			}
+			else if (p->GetName() == "maxdist") {
+				sound->MaxDistance(p->Get<float>());
+			}
+			else if (p->GetName() == "refdist") {
+				sound->ReferenceDistance(p->Get<float>());
 			}
 			else if (p->GetName() == "loop") {
 				sound->PlayMode(ORDERING_NONE, PLAYBACK_LOOP);

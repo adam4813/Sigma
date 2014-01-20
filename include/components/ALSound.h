@@ -19,23 +19,28 @@ namespace Sigma {
 	public:
 		SET_COMPONENT_TYPENAME("ALSound");
 
-		ALSound(int entityID,OpenALSystem *m) : ISound(entityID), buffercount(0), bufferindex(0), master(m), sourceid(0), stream(false) { }
-		virtual ~ALSound() { Destroy(); }
+		DLL_EXPORT ALSound(int entityID,OpenALSystem *m);
+		DLL_EXPORT virtual ~ALSound();
 
-		void Generate();
-		void Destroy();
+		DLL_EXPORT void Generate();
+		DLL_EXPORT void Destroy();
 
-		void Play(PLAYBACK mode = PLAYBACK_NONE);
-		void Pause();
-		void Stop();
-		void PlayMode(ORDERING o = ORDERING_NONE, PLAYBACK mode = PLAYBACK_NONE);
+		DLL_EXPORT void Play(PLAYBACK mode = PLAYBACK_NONE);
+		DLL_EXPORT void Pause();
+		DLL_EXPORT void Stop();
+		DLL_EXPORT void PlayMode(ORDERING o = ORDERING_NONE, PLAYBACK mode = PLAYBACK_NONE);
 
-		void Gain(float mul);
+		DLL_EXPORT void Gain(float mul);
 
-		void Position(float x, float y, float z);
-		void Position(glm::vec3 v);
-		void Velocity(float x, float y, float z);
-		void Velocity(glm::vec3 v);
+		DLL_EXPORT void Rolloff(float atten);
+		DLL_EXPORT void ReferenceDistance(float r);
+		DLL_EXPORT void MaxDistance(float r);
+		DLL_EXPORT void Pitch(float r);
+
+		DLL_EXPORT void Position(float x, float y, float z);
+		DLL_EXPORT void Position(glm::vec3 v);
+		DLL_EXPORT void Velocity(float x, float y, float z);
+		DLL_EXPORT void Velocity(glm::vec3 v);
 
 		ALuint GetID() { return sourceid; }
 	protected:

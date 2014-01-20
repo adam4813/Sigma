@@ -182,8 +182,13 @@ int main(int argCount, char **argValues) {
 	
 	// Call now to clear the delta after startup.
 	glfwos.GetDeltaTime();
+
 	{
 		Sigma::ALSound *als = (Sigma::ALSound *)alsys.getComponent(200, Sigma::ALSound::getStaticComponentTypeName());
+		if(als) {
+			als->Play(Sigma::PLAYBACK_LOOP);
+		}
+		als = (Sigma::ALSound *)alsys.getComponent(201, Sigma::ALSound::getStaticComponentTypeName());
 		if(als) {
 			als->Play(Sigma::PLAYBACK_LOOP);
 		}
