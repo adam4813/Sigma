@@ -40,7 +40,7 @@ namespace Log {
 	 * If is a file, the external code must open it and close it
 	 */
 	static std::ostream* out;
-	
+
 	/**
 	 * Initializes the Logger
 	 * \param level Logger level. By default is at Debug level
@@ -50,7 +50,7 @@ namespace Log {
 		Log::log_level = level;
 		Log::out = &std::clog;
 	}
-			
+
 	/**
 	 * Initializes the Logger
 	 * \param level Logger level. By default is at Debug level
@@ -60,7 +60,7 @@ namespace Log {
 		Log::log_level = level;
 		Log::out = &sout;
 	}
-			
+
 	/**
 	 * Changes the actual logging level
 	 */
@@ -69,67 +69,67 @@ namespace Log {
 	}
 
 	class Print {
-		public:
+	public:
 
-			/**
-			 * /brief Builds a instance of the logger
-			 * /param level Logging level of the message
-			 */
-			Print( LogLevel level ) : 
-					output( level <= Log::log_level ), level(level) {
-				
+		/**
+		 * /brief Builds a instance of the logger
+		 * /param level Logging level of the message
+		 */
+		Print( LogLevel level ) : 
+				output( level <= Log::log_level ), level(level) {
+
+			if( output ) {
+				switch (level) {
+				case LogLevel::ERROR:
+					*Log::out << "[ERROR] ";
+					break;
+
+				case LogLevel::WARN:
+					*Log::out << "[WARNING] ";
+					break;
+
+				case LogLevel::INFO:
+					*Log::out << "[INFO] ";
+					break;
+
+				case LogLevel::DEBUG:
+					*Log::out << "[DEBUG] ";
+					break;
+
+				default:
+					break;
+				}
+				// Auto ident more if is more severe
+				//logger::out << std::string( static_cast<int>(logger::log_level) -
+				// static_cast<int>(level), '\t');
+			}
+		}
+
+		/**
+		 * \brief Dectructor of the class. Here writes the outpot
+		 */
+		~Print() {
+			if (output) {
+				*Log::out << std::endl;
+				Log::out->flush();
+			}
+		}
+
+		/**
+		 * \brief Opertaor << to write strings at the C++ way. Allow to chain multiple strings or values
+		 */
+		template<typename T>
+			Print& operator<<( T t) {
 				if( output ) {
-					switch (level) {
-						case LogLevel::ERROR:
-							*Log::out << "[ERROR] ";
-							break;
-
-						case LogLevel::WARN:
-							*Log::out << "[WARNING] ";
-							break;
-
-						case LogLevel::INFO:
-							*Log::out << "[INFO] ";
-							break;
-
-						case LogLevel::DEBUG:
-							*Log::out << "[DEBUG] ";
-							break;
-
-						default:
-							break;
-					}
-					// Auto ident more if is more severe
-					//logger::out << std::string( static_cast<int>(logger::log_level) -
-					// static_cast<int>(level), '\t');
-				}
-			}
-
-			/**
-			 * \brief Dectructor of the class. Here writes the outpot
-			 */
-			~Print() {
-				if (output) {
-					*Log::out << std::endl;
-					Log::out->flush();
-				}
-			}
-
-			/**
-			 * \brief Opertaor << to write strings at the C++ way. Allow to chain multiple strings or values
-			 */
-			template<typename T>
-				Print& operator<<( T t) {
-					if( output ) {
-						*Log::out << t;
-						return *this;
-					}
+					*Log::out << t;
 					return *this;
 				}
+				return *this;
+			}
 
-		private:
-			bool output;    /// Enable output ?
-			LogLevel level; /// Level of the message
+	private:
+		bool output;    /// Enable output ?
+		LogLevel level; /// Level of the message
 
 	};
 

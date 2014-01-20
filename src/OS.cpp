@@ -26,8 +26,8 @@ namespace Sigma {
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, glMinor);
 
 #ifdef __APPLE__
-        // Must use the Core Profile on OS X to get GL 3.2.
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		// Must use the Core Profile on OS X to get GL 3.2.
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #else
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 #endif
@@ -42,12 +42,12 @@ namespace Sigma {
 
 		this->width = width;
 		this->height = height;
-        
+
 #ifdef __APPLE__
-        // Force retina displays to create a 1x framebuffer so we don't choke our fillrate.
-        id cocoaWindow = glfwGetCocoaWindow(this->window);
-        id cocoaGLView = ((id (*)(id, SEL)) objc_msgSend)(cocoaWindow, sel_getUid("contentView"));
-        ((void (*)(id, SEL, bool)) objc_msgSend)(cocoaGLView, sel_getUid("setWantsBestResolutionOpenGLSurface:"), false);
+		// Force retina displays to create a 1x framebuffer so we don't choke our fillrate.
+		id cocoaWindow = glfwGetCocoaWindow(this->window);
+		id cocoaGLView = ((id (*)(id, SEL)) objc_msgSend)(cocoaWindow, sel_getUid("contentView"));
+		((void (*)(id, SEL, bool)) objc_msgSend)(cocoaGLView, sel_getUid("setWantsBestResolutionOpenGLSurface:"), false);
 #endif
 
 		// Make the window's context current.
