@@ -23,7 +23,7 @@
 #include "components/ALSound.h"
 #include "Sigma.h"
 
-#define OPENAL_DEBUG
+//#define OPENAL_DEBUG
 #if defined(OPENAL_DEBUG)
 #define ALDEBUG(a) a
 #else

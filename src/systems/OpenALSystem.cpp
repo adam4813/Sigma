@@ -116,6 +116,9 @@ namespace Sigma {
 			else if (p->GetName() == "gain") {
 				sound->Gain(p->Get<float>());
 			}
+			else if (p->GetName() == "rel") {
+				sound->Relative(p->Get<bool>());
+			}
 			else if (p->GetName() == "rolloff") {
 				sound->Rolloff(p->Get<float>());
 			}

@@ -37,6 +37,7 @@ namespace Sigma {
 		DLL_EXPORT void MaxDistance(float r);
 		DLL_EXPORT void Pitch(float r);
 
+		DLL_EXPORT void Relative(bool r);
 		DLL_EXPORT void Position(float x, float y, float z);
 		DLL_EXPORT void Position(glm::vec3 v);
 		DLL_EXPORT void Velocity(float x, float y, float z);
