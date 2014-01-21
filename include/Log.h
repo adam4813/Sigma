@@ -2,14 +2,14 @@
 #ifndef __LOGGER_H_
 #define __LOGGER_H_ 1
 /**
- * \brief Quick and dirty toy logger. Better that nothing
+ * \brief Quick and dirty toy logger. Better than nothing
  * 
  * Requires to call Init, to setup the logger.
- * Change the log level with SetLevel to any Log::LogLevel enumration value. By default is at Debug Level.
- * If the output stream is a file, is recomend to use RAII (opening it at the begin of the main function)
- * to avoid problems of not closing the file. The Logger not cloes the file or open it, only writes to it.
+ * Change the log level with SetLevel to any Log::LogLevel enumeration value. By default it is at Debug Level.
+ * If the output stream is a file, it is recommended to use RAII (opening it at the begin of the main function)
+ * to avoid problems of not closing the file. The Logger does not close the file or open it, only writes to it.
  *
- * Check src/tests/Log.cpp as a example of usage
+ * Check src/tests/Log.cpp for an example of usage
  */
 
 #include <iostream>
@@ -30,21 +30,21 @@ namespace Log {
 
 	/**
 	 * \brief Desired Logging level to show.
-	 * If N in "debug(N)" is <= log_level, when will be show
+	 * If N in "debug(N)" is <= log_level, then it will be shown
 	 * By default is at Debug level, displaying all log messages
 	 */
 	static LogLevel log_level = LogLevel::DEBUG;
 
 	/**
 	 * \brief Output stream to use
-	 * If is a file, the external code must open it and close it
+	 * If it is a file, the external code must open it and close it
 	 */
 	static std::ostream* out;
 
 	/**
 	 * Initializes the Logger
-	 * \param level Logger level. By default is at Debug level
-	 * \param sout Output Streambuffer were to write. By default uses std::clog
+	 * \param level Logger level. By default it is at Debug level
+	 * \param sout Output Streambuffer where to write. By default uses std::clog
 	 */
 	static void Init(LogLevel level = LogLevel::DEBUG) {
 		Log::log_level = level;
@@ -53,8 +53,8 @@ namespace Log {
 
 	/**
 	 * Initializes the Logger
-	 * \param level Logger level. By default is at Debug level
-	 * \param sout Output Streambuffer were to write. By default uses std::clog
+	 * \param level Logger level. By default it is at Debug level
+	 * \param sout Output Streambuffer where to write. By default uses std::clog
 	 */
 	static void Init(std::ostream& sout, LogLevel level = LogLevel::DEBUG) {
 		Log::log_level = level;
@@ -72,7 +72,7 @@ namespace Log {
 	public:
 
 		/**
-		 * /brief Builds a instance of the logger
+		 * /brief Builds an instance of the logger
 		 * /param level Logging level of the message
 		 */
 		Print( LogLevel level ) : 
@@ -106,7 +106,7 @@ namespace Log {
 		}
 
 		/**
-		 * \brief Dectructor of the class. Here writes the outpot
+		 * \brief Destructor of the class. Here writes the output
 		 */
 		~Print() {
 			if (output) {
@@ -116,7 +116,7 @@ namespace Log {
 		}
 
 		/**
-		 * \brief Opertaor << to write strings at the C++ way. Allow to chain multiple strings or values
+		 * \brief Operator << to write strings in the C++ way. Allows chaining multiple strings or values
 		 */
 		template<typename T>
 			Print& operator<<( T t) {
