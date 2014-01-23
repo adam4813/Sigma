@@ -37,10 +37,10 @@ You'll also need a [package of assets](http://wiki.trillek.org/wiki/Assets).  Un
 Make sure you use a binary release from [Adobe](http://www.cefbuilds.com). **Use the latest version that is NOT marked as dev (trunk).**
 
 1. Unzip the downloaded tarball.
-2. This step depends on your platform. 
+2. This step depends on your platform. **Make sure to use the Release build mode.**
     * __Windows__ build the included `libcef_dll_wrapper.vcxproj` project
     * __Linux__ run `make libcef_dll_wrapper BUILDTYPE=Release`
-    * __OS X__ use the `cefclient.xcodeproj` Xcode project. **Make sure to use the Release build mode.**
+    * __OS X__ use the `cefclient.xcodeproj` Xcode project.
 3. Make `cef/` and `cef/bin/` directories in `Sigma/`
 4. Copy the `out/Release/obj.target/libcef_dll_wrapper` directory, if any, and the contents of `Resources/` directories into `Sigma/cef/bin/`
 5. Copy the contents of include/ directory into Sigma's include/.
@@ -49,7 +49,7 @@ Make sure you use a binary release from [Adobe](http://www.cefbuilds.com). **Use
     * __Windows__ copy all the .dll files in `Release/` to `Sigma/cef/bin`, then copy the .lib file into `Sigma/cef/`
     * __Linux__ or __OS X__ copy the entire contents of `Release/` into `Sigma/cef/bin/`
 8. On Linux and OSX, make a symlink pointing to libcef.so (or .dylib) in the `cef/` directory.
-9. If you get the error "malformed archive" when building, make a symlink pointing to `libcef_dll_wrapper` directory in the `cef/` directory.
+9. Make a symlink pointing to `Sigma/cef/bin/libcef_dll_wrapper` in the `cef/` directory. `libcef_dll_wrapper` and `libcef_dll_wrapper.a` must appear in the same place, otherwise you will get a "Malformed Archive" error when linking.
 
 ## Building ##
 
