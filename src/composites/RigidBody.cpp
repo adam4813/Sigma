@@ -48,7 +48,7 @@ namespace Sigma {
 		}
 		else if (shape_type == "mesh") {
 			float scale = 1.0f;
-			GLMesh glmesh(0);
+			std::string meshFIlename = "";
 
 			for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 				const Property*  p = &*propitr;
@@ -57,17 +57,18 @@ namespace Sigma {
 				}
 				else if (p->GetName() == "meshFile") {
 					std::cerr << "Loading mesh: " << p->Get<std::string>() << std::endl;
-					GLMesh glmesh(0);
-					glmesh.LoadMesh(p->Get<std::string>());
+					meshFIlename = p->Get<std::string>();
 				}
 			}
 
+			auto mesh = OpenGLSystem::meshes[meshFIlename];
+
 			auto btmesh = new btTriangleMesh();
-			for (unsigned int i = 0; i < glmesh.GetFaceCount(); ++i) {
-				const Sigma::Face* f = glmesh.GetFace(i);
-				const Sigma::Vertex* v1 = glmesh.GetVertex(f->v1);
-				const Sigma::Vertex* v2 = glmesh.GetVertex(f->v2);
-				const Sigma::Vertex* v3 = glmesh.GetVertex(f->v3);
+			for (unsigned int i = 0; i < mesh.FaceCount(); ++i) {
+				const Sigma::Face* f = mesh.GetFace(i);
+				const Sigma::Vertex* v1 = mesh.GetVertex(f->v1);
+				const Sigma::Vertex* v2 = mesh.GetVertex(f->v2);
+				const Sigma::Vertex* v3 = mesh.GetVertex(f->v3);
 				btmesh->addTriangle(btVector3(v1->x, v1->y, v1->z), btVector3(v2->x, v2->y, v2->z), btVector3(v3->x, v3->y, v3->z));
 			}
 

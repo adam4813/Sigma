@@ -2,8 +2,8 @@
 #ifndef GLSPRITE_H
 #define GLSPRITE_H
 
-#include "../systems/GLSLShader.h"
-#include "../IGLComponent.h"
+#include "systems/GLSLShader.h"
+#include "components/Renderable.h"
 #include "Sigma.h"
 
 namespace Sigma{
@@ -11,7 +11,7 @@ namespace Sigma{
 		class GLTexture;
 	}
 
-    class GLSprite : public IGLComponent {
+    class GLSprite : public Renderable {
     public:
         SET_COMPONENT_TYPENAME("GLSprite");
         // We have a private ctor so the factory method must be used.

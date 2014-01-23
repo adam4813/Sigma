@@ -1,15 +1,13 @@
-#include "components/GLIcoSphere.h"
+#include "resources/GLIcoSphere.h"
 
 #include <vector>
 
 namespace Sigma{
-    GLIcoSphere::GLIcoSphere( const id_t entityID ) : GLMesh(entityID) {
+    GLIcoSphere::GLIcoSphere() {
         // all initialization handled by GLMesh
     }
 
     void GLIcoSphere::InitializeBuffers() {
-        srand(this->GetEntityID());
-
         // Create the verts to begin refining at.
         double t = (1.0 + glm::sqrt(5.0)) / 2.0;
         glm::vec2 coordPair = glm::normalize(glm::vec2(1,t));
@@ -71,7 +69,7 @@ namespace Sigma{
         // Refine the IcoSphere by 4 levels. This results in 20*4^4 = 5120 faces.
         Refine(4);
 
-        AddMeshGroupIndex(0);
+        AddMaterialGroupIndex(0);
 
         // compute vertex normals
         // the really nice thing about a sphere is that, if it is centered at the origin,
@@ -83,13 +81,7 @@ namespace Sigma{
             glm::vec3 norm = glm::normalize(radial_direction);
             AddVertexNormal(Vertex(norm.x, norm.y, norm.z));
         }
-
-        GLMesh::InitializeBuffers();
     } // function InitializeBuffers
-
-    void GLIcoSphere::Render(glm::mediump_float *view, glm::mediump_float *proj) {
-        GLMesh::Render(view, proj);
-    }
 
     Vertex GLIcoSphere::GetUnitSphereMidPoint(const Vertex &v1, const Vertex &v2) const {
         glm::vec3 midpoint_direction((v1.x + v2.x) / 2.0, (v1.y + v2.y) / 2.0, (v1.z + v2.z) / 2.0);

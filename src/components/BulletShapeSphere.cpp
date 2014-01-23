@@ -1,5 +1,5 @@
 #include "components/BulletShapeSphere.h"
-#include "components/GLMesh.h"
+#include "resources/Mesh.h"
 
 namespace Sigma {
 	void Sigma::BulletShapeSphere::SetRadius(float radius) {

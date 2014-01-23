@@ -1,8 +1,8 @@
-#include "components/GLScreenQuad.h"
+#include "resources/GLScreenQuad.h"
 #include "resources/GLTexture.h"
 
 namespace Sigma {
-	GLScreenQuad::GLScreenQuad(const id_t entityID) : GLMesh(entityID), texture(nullptr), x(0), y(0), w(0), h(0), inverted(false) {}
+	GLScreenQuad::GLScreenQuad() : texture(nullptr), x(0), y(0), w(0), h(0), inverted(false) {}
 	GLScreenQuad::~GLScreenQuad() {}
 
 	void GLScreenQuad::InitializeBuffers() {
@@ -34,45 +34,43 @@ namespace Sigma {
 		}
 
 		// Add the mesh group
-		this->AddMeshGroupIndex(0);
-
-		GLMesh::InitializeBuffers();
+		this->AddMaterialGroupIndex(0);
 	}
 
-	void GLScreenQuad::Render(glm::mediump_float *view, glm::mediump_float *proj) {
-		//this->shader->Use();
+	//void GLScreenQuad::Render(glm::mediump_float *view, glm::mediump_float *proj) {
+	//	//this->shader->Use();
 
-		glDisable(GL_CULL_FACE);
-		glDisable(GL_DEPTH_TEST);
-		glDepthMask(GL_FALSE);
+	//	glDisable(GL_CULL_FACE);
+	//	glDisable(GL_DEPTH_TEST);
+	//	glDepthMask(GL_FALSE);
 
-		glBindVertexArray(this->vao);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->GetBuffer(this->ElemBufIndex));
+	//	glBindVertexArray(this->vao);
+	//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->GetBuffer(this->ElemBufIndex));
 
-		if(this->texture) {
-			glUniform1i(glGetUniformLocation((*this->shader).GetProgram(), "in_Texture"), 0);
-			glBindTexture(GL_TEXTURE_2D, this->texture->GetID());
-			glActiveTexture(GL_TEXTURE0);
-		}
+	//	if(this->texture) {
+	//		glUniform1i(glGetUniformLocation((*this->shader).GetProgram(), "in_Texture"), 0);
+	//		glBindTexture(GL_TEXTURE_2D, this->texture->GetID());
+	//		glActiveTexture(GL_TEXTURE0);
+	//	}
 
-		size_t prev = 0;
-		for (int i = 0, cur = this->MeshGroup_ElementCount(0); cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
-			glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_INT, (void*)prev);
-		}
+	//	size_t prev = 0;
+	//	for (int i = 0, cur = this->MeshGroup_ElementCount(0); cur != 0; prev = cur, cur = this->MeshGroup_ElementCount(++i)) {
+	//		glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_INT, (void*)prev);
+	//	}
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
-		glBindVertexArray(0);
+	//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+	//	glBindVertexArray(0);
 
-		// Clear the texture for next frame
+	//	// Clear the texture for next frame
 
-		glBindTexture(GL_TEXTURE_2D, 0);
+	//	glBindTexture(GL_TEXTURE_2D, 0);
 
-		glEnable(GL_DEPTH_TEST);
-		glDepthMask(GL_TRUE);
-		glEnable(GL_CULL_FACE);
+	//	glEnable(GL_DEPTH_TEST);
+	//	glDepthMask(GL_TRUE);
+	//	glEnable(GL_CULL_FACE);
 
-		//this->shader->UnUse();
-	}
+	//	//this->shader->UnUse();
+	//}
 
 	unsigned int GLScreenQuad::GetTexture() {
 		if (this->texture) {

@@ -7,8 +7,8 @@
 #include <bullet/btBulletDynamicsCommon.h>
 #include "IComponent.h"
 #include "Property.h"
+#include "systems/OpenGLSystem.h"
 #include "components/BulletShapeMesh.h"
-#include "components/GLMesh.h"
 #include "components/Body.h"
 
 namespace Sigma {

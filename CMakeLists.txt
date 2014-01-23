@@ -19,6 +19,8 @@ FILE(GLOB Sigma_SRC "src/*.cpp")
 
 # find all the files in the includes directory
 FILE(GLOB Sigma_INCLUDES "include/*.h" "include/*.hpp")
+FILE(GLOB CEF "include/cef_*.h" "include/cef_*.hpp")
+LIST(REMOVE_ITEM Sigma_INCLUDES ${CEF})
 
 # Filter the source/header files for various groups of files
 # Put all component files into a filter
@@ -54,6 +56,8 @@ source_group("Source Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_CPP})
 # Put all Resource files into a filter
 file(GLOB Sigma_SRC_RESOURCES_H "include/resources/*.h")
 source_group("Header Files\\resources" FILES ${Sigma_SRC_RESOURCES_H})
+file(GLOB Sigma_SRC_RESOURCES_CPP "src/resources/*.cpp")
+source_group("Header Files\\resources" FILES ${Sigma_SRC_RESOURCES_CPP})
 
 # Put the Test files into a filter
 FILE(GLOB Sigma_SRC_TESTS_CPP "src/tests/*.cpp")
@@ -199,6 +203,7 @@ set(Sigma_ALL_SOURCE
 	${Sigma_SRC_COMPOSITE_CPP}
 	${Sigma_SRC_SYSTEM_CPP}
 	${Sigma_SRC_CONTROLLERS_CPP}
+	${Sigma_SRC_RESOURCES_CPP}
 	${Sigma_SRC_ENTITY_CPP}
 	)
 

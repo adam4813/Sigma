@@ -1,6 +1,6 @@
 #include "systems/BulletPhysics.h"
 #include "components/BulletShapeMesh.h"
-#include "components/GLMesh.h"
+#include "resources/Mesh.h"
 #include "components/BulletShapeSphere.h"
 #include "composites/PhysicalWorldLocation.h"
 
@@ -110,8 +110,8 @@ namespace Sigma {
 			}
 			else if (p->GetName() == "meshFile") {
 				std::cerr << "Loading mesh: " << p->Get<std::string>() << std::endl;
-				GLMesh meshFile(0);
-				meshFile.LoadMesh(p->Get<std::string>());
+				Mesh meshFile;
+				meshFile.LoadObjMesh(p->Get<std::string>());
 				mesh->SetMesh(&meshFile, scale);
 			}
 		}
