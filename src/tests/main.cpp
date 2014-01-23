@@ -21,11 +21,14 @@ int main(int argCount, char **argValues) {
 	Sigma::WebGUISystem webguisys;
 
 	CefRefPtr<Sigma::WebGUISystem> app(&webguisys);
-#if _WIN32 == 1
+#ifdef _WIN32
 	CefMainArgs mainArgs(GetModuleHandle(NULL));
-	int exitCode = CefExecuteProcess(mainArgs, app.get()/*, nullptr*/);
 #else
 	CefMainArgs mainArgs(argCount, argValues);
+#endif
+#ifdef CEFDEV
+	int exitCode = CefExecuteProcess(mainArgs, app.get(), nullptr);
+#else
 	int exitCode = CefExecuteProcess(mainArgs, app.get());
 #endif
 

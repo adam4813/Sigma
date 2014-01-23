@@ -2,11 +2,18 @@ CMAKE_MINIMUM_REQUIRED (VERSION 2.8)
 PROJECT (Sigma)
 
 # Set the include directory
-INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include")
-INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}")
+INCLUDE_DIRECTORIES(
+	${CMAKE_SOURCE_DIR}
+	${CMAKE_SOURCE_DIR}/include
+	${CMAKE_SOURCE_DIR}/cef
+	${CMAKE_SOURCE_DIR}/cef/include
+	)
 
 # Set the cmake search paths
-SET(CMAKE_INCLUDE_PATH ${CMAKE_SOURCE_DIR}/include)
+SET(CMAKE_INCLUDE_PATH
+	${CMAKE_SOURCE_DIR}/include
+	${CMAKE_SOURCE_DIR}/cef
+	)
 
 # change output directory of executable so that relative paths in the code are correct
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
@@ -110,6 +117,7 @@ FIND_PACKAGE(OpenAL REQUIRED)
 FIND_PACKAGE(Bullet REQUIRED)
 FIND_PACKAGE(SOIL REQUIRED)
 FIND_PACKAGE(GLM REQUIRED)
+FIND_PACKAGE(CEF REQUIRED)
 
 # Give these some dummy values and if the platform is LINUX or OSX they will be set accordingly.
 SET(X11_LIBRARIES "")
@@ -177,8 +185,7 @@ set(Sigma_ALL_LIBS
 	${BULLET_LINEARMATH_LIBRARIES}
 	${BULLET_COLLISION_LIBRARIES}
 	${BULLET_DYNAMICS_LIBRARIES}
-	libcef_dll_wrapper
-	libcef
+	${CEF_LIBRARIES}
 	)
 
 # all source common to the library and test exe
