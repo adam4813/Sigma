@@ -19,7 +19,7 @@
 
 int main(int argCount, char **argValues) {
 	Sigma::WebGUISystem webguisys;
-
+	/*
 	CefRefPtr<Sigma::WebGUISystem> app(&webguisys);
 #ifdef _WIN32
 	CefMainArgs mainArgs(GetModuleHandle(NULL));
@@ -35,7 +35,7 @@ int main(int argCount, char **argValues) {
 	if (exitCode >= 0) {
 		return exitCode;
 	}
-
+	*/
 	Sigma::OS glfwos;
 	Sigma::OpenGLSystem glsys;
 	Sigma::OpenALSystem alsys;
@@ -45,7 +45,7 @@ int main(int argCount, char **argValues) {
 	factory.register_Factory(glsys);
 	factory.register_Factory(alsys);
 	factory.register_Factory(bphys);
-	factory.register_Factory(webguisys);
+	//factory.register_Factory(webguisys);
 
 	if (!glfwos.InitializeWindow(1024, 768, "Sigma GLFW Test Window")) {
 		std::cerr << "Failed creating the window or context." << std::endl;
@@ -89,10 +89,10 @@ int main(int argCount, char **argValues) {
 	///////////////
 	// Setup GUI //
 	///////////////
-
+	/*
 	webguisys.Start(mainArgs);
 	webguisys.SetWindowSize(glfwos.GetWindowWidth(), glfwos.GetWindowHeight());
-
+	*/
 	/////////////////
 	// Setup Sound //
 	/////////////////
@@ -177,12 +177,12 @@ int main(int argCount, char **argValues) {
 	///////////////////
 	// Configure GUI //
 	///////////////////
-
+	/*
 	Sigma::event::handler::GUIController guicon;
 	guicon.SetGUI(webguisys.getComponent(100, Sigma::WebGUIView::getStaticComponentTypeName()));
 	glfwos.RegisterKeyboardEventHandler(&guicon);
 	glfwos.RegisterMouseEventHandler(&guicon);
-	
+	*/
 	// Call now to clear the delta after startup.
 	glfwos.GetDeltaTime();
 
@@ -259,7 +259,7 @@ int main(int argCount, char **argValues) {
 
 	// do a proper clean up
 	alsys.Shutdown();
-	CefShutdown();
+	//CefShutdown();
 
 	return 0;
 }
