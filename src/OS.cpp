@@ -182,7 +182,7 @@ namespace Sigma {
 			KeyboardEventSystem.KeyDown(key);
 		}
 		else if (action == GLFW_REPEAT) {
-			KeyboardEventSystem.KeyDown(key);
+			KeyboardEventSystem.KeyRepeat(key);
 		}
 		else if (action == GLFW_RELEASE) {
 			KeyboardEventSystem.KeyUp(key);

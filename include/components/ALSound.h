@@ -52,6 +52,7 @@ namespace Sigma {
 		int streamend;
 		int bufferindex;
 		int buffercount;
+		int bufferloaded;
 		resource::Decoder codec;
 		OpenALSystem *master;
 	};

@@ -21,6 +21,7 @@ namespace Sigma {
 			 * \param[in] KEY_STATE state The new state the key is in
 			 */
 			virtual void KeyStateChange(const unsigned int key, const KEY_STATE state) = 0;
+			virtual void KeyStateChange(const unsigned int key, const KEY_STATE state, const KEY_STATE laststate) { KeyStateChange(key,state); }
 			virtual void CharDown(const unsigned int c) { }
 			virtual void LostKeyboardFocus() { }
 			KeyboardInputSystem* keyboardSystem;
@@ -109,11 +110,11 @@ namespace Sigma {
 					for (auto itr = this->eventHandlers[key].begin(); itr != this->eventHandlers[key].end(); ++ itr) {
 						if (focusLock != nullptr) {
 							if ((*itr) == focusLock) {
-								(*itr)->KeyStateChange(key, KS_UP);
+								(*itr)->KeyStateChange(key, KS_UP, KS_DOWN);
 							}
 						}
 						else {
-							(*itr)->KeyStateChange(key, KS_UP);
+							(*itr)->KeyStateChange(key, KS_UP, KS_DOWN);
 						}
 					}
 				}
@@ -152,15 +153,37 @@ namespace Sigma {
 					for (auto itr = this->eventHandlers[key].begin(); itr != this->eventHandlers[key].end(); ++ itr) {
 						if (focusLock != nullptr) {
 							if ((*itr) == focusLock) {
-								(*itr)->KeyStateChange(key, KS_DOWN);
+								(*itr)->KeyStateChange(key, KS_DOWN, KS_UP);
 							}
 						}
 						else {
-							(*itr)->KeyStateChange(key, KS_DOWN);
+							(*itr)->KeyStateChange(key, KS_DOWN, KS_UP);
 						}
 					}
 				}
 			}
+
+			/**
+			 * \brief Key Repeat event.
+			 *
+			 * Loops through each event handler that is registered to the supplied key and calls its KeyStateChange method.
+			 * \param[in] const unsigned int key The key the is now down.
+			 */
+			void KeyRepeat(const unsigned int key) {
+				if (this->eventHandlers.find(key) != this->eventHandlers.end()) {
+					for (auto itr = this->eventHandlers[key].begin(); itr != this->eventHandlers[key].end(); ++ itr) {
+						if (focusLock != nullptr) {
+							if ((*itr) == focusLock) {
+								(*itr)->KeyStateChange(key, KS_DOWN, KS_DOWN);
+							}
+						}
+						else {
+							(*itr)->KeyStateChange(key, KS_DOWN, KS_DOWN);
+						}
+					}
+				}
+			}
+
 		private:
 			std::map<unsigned int, std::vector<IKeyboardEventHandler*> > eventHandlers;
 			std::map<unsigned int, std::vector<IKeyboardEventHandler*> > charHandlers;

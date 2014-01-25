@@ -3,7 +3,7 @@
 
 namespace Sigma {
 	ALSound::ALSound(id_t entityID,OpenALSystem *m)
-		: ISound(entityID), buffercount(0), bufferindex(0), master(m), sourceid(0), stream(false) { }
+		: ISound(entityID), buffercount(0), bufferindex(0), bufferloaded(0), master(m), sourceid(0), stream(false) { }
 	ALSound::~ALSound() {
 		Destroy();
 	}
@@ -110,7 +110,7 @@ namespace Sigma {
 			paused = false;
 			return;
 		}
-		if(playlist.size() > 0) {
+		if(playlist.size() > 0 && (stream || !bufferloaded)) {
 			if(playindex > playlist.size()) { playindex = 0; }
 			sfi = playlist[playindex];
 			sfp = std::shared_ptr<resource::SoundFile>(master->GetSoundFile(sfi));
@@ -155,6 +155,8 @@ namespace Sigma {
 				}
 				delete buf;
 				if(x > 0) {
+					bufferloaded = x;
+					alSourceUnqueueBuffers(this->sourceid, this->buffercount, albuf);
 					alSourceQueueBuffers(this->sourceid, x, albuf);
 					alSourcePlay(this->sourceid);
 					if(playloop == PLAYBACK_LOOP && !stream) {
@@ -169,6 +171,9 @@ namespace Sigma {
 				}
 				return;
 			}
+		}
+		else if(playlist.size() > 0 && (bufferloaded) && !stream) {
+			alSourcePlay(this->sourceid);
 		}
 	}
 	void ALSound::Pause() {
