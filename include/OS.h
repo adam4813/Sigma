@@ -126,6 +126,8 @@ namespace Sigma {
 		DLL_EXPORT void RegisterKeyboardEventHandler(event::IKeyboardEventHandler* handler);
 		DLL_EXPORT void RegisterMouseEventHandler(event::IMouseEventHandler* handler);
 
+		DLL_EXPORT bool HasKeyboardFocusLock();
+
 		DLL_EXPORT void ToggleMouseLock();
 		
 		DLL_EXPORT void SetMousePosition(double x, double y);

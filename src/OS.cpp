@@ -247,7 +247,10 @@ namespace Sigma {
 		glfwSetCursorPos(this->window, x, y);
 	}
 	
-	
+	bool OS::HasKeyboardFocusLock() {
+		return this->KeyboardEventSystem.HasFocusLock();
+	}
+
 	bool OS::CheckKeyState(event::KEY_STATE state, const int key) {
 		if (state == event::KS_DOWN) {
 			if (glfwGetKey(this->window, key) == GLFW_PRESS) {

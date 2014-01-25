@@ -352,6 +352,12 @@ namespace Sigma{
 			else if (p->GetName() == "shader") {
 				shaderfile = p->Get<std::string>();
 			}
+			else if (p->GetName() == "textureReplace") {
+				mesh->texReplace = p->Get<std::string>();
+			}
+			else if (p->GetName() == "replaceWith") {
+				mesh->texReplaceWith = p->Get<std::string>();
+			}
 			else if (p->GetName() == "id") {
 				componentID = p->Get<int>();
 			}

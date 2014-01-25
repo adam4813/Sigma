@@ -61,6 +61,10 @@ namespace Sigma {
 				}
 			}
 
+			bool HasFocusLock() {
+				return !(this->focusLock == nullptr);
+			}
+
 			/**
 			 * \brief Releases focus lock if the handler currently has the lock.
 			 *

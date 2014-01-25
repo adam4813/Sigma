@@ -491,21 +491,27 @@ namespace Sigma{
                         std::string filename;
 						s >> filename;
 						filename = trim(filename);
-						filename = convert_path(filename);
-						std::cerr << "Loading diffuse texture: " << path + filename << std::endl;
-						resource::GLTexture texture;
-						if (OpenGLSystem::textures.find(filename) == OpenGLSystem::textures.end()) {
-							texture.LoadDataFromFile(path + filename);
-							if (texture.GetID() != 0) {
-								OpenGLSystem::textures[filename] = texture;
+						if(filename.length() > 0 && texReplaceWith.length() > 0 && texReplace == filename) {
+							if (OpenGLSystem::textures.find(texReplaceWith) != OpenGLSystem::textures.end()) {
+								std::cerr << "Using diffuse texture: " << texReplaceWith << std::endl;
+								m.diffuseMap = Sigma::OpenGLSystem::textures[texReplaceWith].GetID();
+							}
+						} else {
+							filename = convert_path(filename);
+							std::cerr << "Loading diffuse texture: " << path + filename << std::endl;
+							resource::GLTexture texture;
+							if (OpenGLSystem::textures.find(filename) == OpenGLSystem::textures.end()) {
+								texture.LoadDataFromFile(path + filename);
+								if (texture.GetID() != 0) {
+									OpenGLSystem::textures[filename] = texture;
+								}
+							}
+
+							// Add the path to the filename to load it relative to the mtl file
+							if (OpenGLSystem::textures.find(filename) != OpenGLSystem::textures.end()) {
+								m.diffuseMap = Sigma::OpenGLSystem::textures[filename].GetID();
 							}
 						}
-
-						// Add the path to the filename to load it relative to the mtl file
-						if (OpenGLSystem::textures.find(filename) != OpenGLSystem::textures.end()) {
-							m.diffuseMap = Sigma::OpenGLSystem::textures[filename].GetID();
-						}
-
 						if (m.diffuseMap == 0) {
 							std::cerr << "Error loading diffuse texture: " << path + filename << std::endl;
 						}

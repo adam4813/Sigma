@@ -186,8 +186,10 @@ int main(int argCount, char **argValues) {
 	// Call now to clear the delta after startup.
 	glfwos.GetDeltaTime();
 
+	Sigma::ALSound *als;
+	bool soundflag = false, soundrunning = false;
 	{
-		Sigma::ALSound *als = (Sigma::ALSound *)alsys.getComponent(200, Sigma::ALSound::getStaticComponentTypeName());
+		als = (Sigma::ALSound *)alsys.getComponent(200, Sigma::ALSound::getStaticComponentTypeName());
 		if(als) {
 			als->Play(Sigma::PLAYBACK_LOOP);
 		}
@@ -195,6 +197,13 @@ int main(int argCount, char **argValues) {
 		if(als) {
 			als->Play(Sigma::PLAYBACK_LOOP);
 		}
+		als = (Sigma::ALSound *)alsys.getComponent(202, Sigma::ALSound::getStaticComponentTypeName());
+		if(als) {
+			als->Play(Sigma::PLAYBACK_LOOP);
+		}
+
+		// This one must be last
+		als = (Sigma::ALSound *)alsys.getComponent(203, Sigma::ALSound::getStaticComponentTypeName());
 	}
 
 	enum FlashlightState {
@@ -235,6 +244,30 @@ int main(int argCount, char **argValues) {
 				// Disable flashlight
 				fs=FL_OFF;
 			}
+		}
+
+		if(glfwos.CheckKeyState(Sigma::event::KS_DOWN, GLFW_KEY_W) ||
+			glfwos.CheckKeyState(Sigma::event::KS_DOWN, GLFW_KEY_A) ||
+			glfwos.CheckKeyState(Sigma::event::KS_DOWN, GLFW_KEY_D) ||
+			glfwos.CheckKeyState(Sigma::event::KS_DOWN, GLFW_KEY_S)
+			) {
+			soundflag = true;
+		}
+		else if(glfwos.CheckKeyState(Sigma::event::KS_UP, GLFW_KEY_W) ||
+			glfwos.CheckKeyState(Sigma::event::KS_UP, GLFW_KEY_A) ||
+			glfwos.CheckKeyState(Sigma::event::KS_UP, GLFW_KEY_D) ||
+			glfwos.CheckKeyState(Sigma::event::KS_UP, GLFW_KEY_S)
+			) {
+			soundflag = false;
+		}
+
+		if(als && (soundflag != soundrunning)) {
+			if(soundflag && !(glfwos.HasKeyboardFocusLock())) {
+				als->Play(Sigma::PLAYBACK_LOOP);
+			} else {
+				als->Stop();
+			}
+			soundrunning = soundflag;
 		}
 
 		///////////////////////
