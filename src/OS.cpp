@@ -81,6 +81,10 @@ namespace Sigma {
 		return true;
 	}
 
+	void OS::Terminate() {
+		glfwTerminate();
+	}
+
 	bool OS::Closing() {
 		return glfwWindowShouldClose(this->window) > 0;
 	}
