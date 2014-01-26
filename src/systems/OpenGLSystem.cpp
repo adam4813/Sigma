@@ -450,14 +450,15 @@ namespace Sigma{
 		}
 
 		GLScreenQuad quad;
-		quad.SetPosition(x, y);
-		quad.SetSize(w, h);
-		quad.InitializeBuffers();
 
 		// It should be loaded, but in case an error occurred double check for it.
 		if (textures.find(textureName) != textures.end()) {
 			quad.SetTexture(&Sigma::OpenGLSystem::textures[textureName]);
 		}
+
+		quad.SetPosition(x, y);
+		quad.SetSize(w, h);
+		quad.InitializeBuffers();
 
 		std::string meshname = "entity";
 		meshname += entityID;
@@ -467,6 +468,7 @@ namespace Sigma{
 		renderable->SetMesh(&OpenGLSystem::meshes[meshname]);
 		renderable->LoadShader("shaders/quad");
 		renderable->InitializeBuffers();
+		renderable->SetLightingEnabled(false);
 		this->screensSpaceComp.push_back(std::unique_ptr<Renderable>(renderable));
 
 		return renderable;

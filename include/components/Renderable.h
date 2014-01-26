@@ -29,6 +29,7 @@ namespace Sigma {
 			this->VertBufIndex = 0;
 			this->NormalBufIndex = 3;
 			this->UVBufIndex = 4;
+			this->cull_face = 0;
 		}
 		Renderable(const id_t entityID) : lightingEnabled(true), SpatialComponent(entityID) {
 			memset(&this->buffers, 0, sizeof(this->buffers));
@@ -39,6 +40,7 @@ namespace Sigma {
 			this->VertBufIndex = 0;
 			this->NormalBufIndex = 3;
 			this->UVBufIndex = 4;
+			this->cull_face = 0;
 		} // Ctor that sets the entity ID.
 
 		void SetMesh(Mesh* mesh) {

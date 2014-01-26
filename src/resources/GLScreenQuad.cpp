@@ -6,7 +6,6 @@ namespace Sigma {
 	GLScreenQuad::~GLScreenQuad() {}
 
 	void GLScreenQuad::InitializeBuffers() {
-
 		float left = this->x * 2.0f - 1.0f;
 		float top = this->y * -2.0f + 1.0f;
 		float right = (this->x + this->w) * 2.0f - 1.0f;
@@ -35,6 +34,13 @@ namespace Sigma {
 
 		// Add the mesh group
 		this->AddMaterialGroupIndex(0);
+
+		if (this->texture != nullptr) {
+			Material m;
+			m.ambientMap = this->texture->GetID();
+			this->materialGroups[0] = "default";
+			this->mats["default"] = m;
+		}
 	}
 
 	//void GLScreenQuad::Render(glm::mediump_float *view, glm::mediump_float *proj) {

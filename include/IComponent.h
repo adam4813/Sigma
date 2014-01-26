@@ -13,17 +13,17 @@ virtual const Sigma::IComponent::ComponentID getComponentTypeName() const overri
 static const Sigma::IComponent::ComponentID getComponentTypeName() {return ID;};
 
 namespace Sigma{
-    class IComponent {
-    public:
-        typedef std::string ComponentID;
-        IComponent(const id_t id = 0) : entityID(id) {}
-        virtual ~IComponent() {}
-        int GetEntityID() { return this->entityID; }
-        virtual const ComponentID getComponentTypeName() const =0;
-    private:
-        const id_t entityID; // The entity that owns this component.
+	class IComponent {
+	public:
+		typedef std::string ComponentID;
+		IComponent(const id_t id = 0) : entityID(id) {}
+		virtual ~IComponent() {}
+		int GetEntityID() { return this->entityID; }
+		virtual const ComponentID getComponentTypeName() const =0;
+	private:
+		const id_t entityID; // The entity that owns this component.
 
-    }; // class IComponent
+	}; // class IComponent
 } // namespace Sigma
 
 #endif // ICOMPONENT_H

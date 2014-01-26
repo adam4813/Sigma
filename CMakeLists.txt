@@ -51,7 +51,7 @@ source_group("Source Files\\controllers" FILES ${Sigma_SRC_CONTROLLERS_CPP})
 file(GLOB Sigma_SRC_RESOURCES_H "include/resources/*.h")
 source_group("Header Files\\resources" FILES ${Sigma_SRC_RESOURCES_H})
 file(GLOB Sigma_SRC_RESOURCES_CPP "src/resources/*.cpp")
-source_group("Header Files\\resources" FILES ${Sigma_SRC_RESOURCES_CPP})
+source_group("Source Files\\resources" FILES ${Sigma_SRC_RESOURCES_CPP})
 
 # Put the Test files into a filter
 FILE(GLOB Sigma_SRC_TESTS_CPP "src/tests/*.cpp")
