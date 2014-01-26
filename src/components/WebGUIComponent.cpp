@@ -24,8 +24,8 @@ namespace Sigma {
 			return false;
 		}
 		CefMouseEvent mouse_event;
-		mouse_event.x = (x - this->x) * this->windowWidth;
-		mouse_event.y = (y - this->y) * this->windowHeight;
+		mouse_event.x = static_cast<int>((x - this->x) * this->windowWidth);
+		mouse_event.y = static_cast<int>((y - this->y) * this->windowHeight);
 
 		if(this->mouseDown == 0) {
 			if ((x > this->x) && (x < (this->x + this->width))) {
@@ -51,8 +51,8 @@ namespace Sigma {
 		if ((x > this->x) && (x < (this->x + this->width))) {
 			if ((y > this->y) && (y < (this->y + this->height))) {
 				CefMouseEvent mouse_event;
-				mouse_event.x = (x - this->x) * this->windowWidth;
-				mouse_event.y = (y - this->y) * this->windowHeight;
+				mouse_event.x = static_cast<int>((x - this->x) * this->windowWidth);
+				mouse_event.y = static_cast<int>((y - this->y) * this->windowHeight);
 
 				this->browserHost->SendFocusEvent(true);
 				this->hasFocus = true;
@@ -70,8 +70,8 @@ namespace Sigma {
 	bool WebGUIView::InjectMouseUp(const Sigma::event::BUTTON btn, float x, float y) {
 		if (this->hasFocus) {
 			CefMouseEvent mouse_event;
-			mouse_event.x = (x - this->x) * this->windowWidth;
-			mouse_event.y = (y - this->y) * this->windowHeight;
+			mouse_event.x = static_cast<int>((x - this->x) * this->windowWidth);
+			mouse_event.y = static_cast<int>((y - this->y) * this->windowHeight);
 			this->browserHost->SendMouseClickEvent(mouse_event, btn == Sigma::event::BUTTON::LEFT ? MBT_LEFT : (btn == Sigma::event::BUTTON::MIDDLE ? MBT_MIDDLE : MBT_RIGHT), true, 1);
 			this->mouseDown = 0;
 			return true;

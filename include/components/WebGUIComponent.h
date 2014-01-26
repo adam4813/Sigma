@@ -59,10 +59,10 @@ namespace Sigma {
 
 		// CefRenderHandler
 		virtual bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect) OVERRIDE {
-			rect.x = this->x * this->windowWidth;
-			rect.y = this->y * this->windowHeight;
-			rect.width = this->width * this->windowWidth;
-			rect.height = this->height * this->windowHeight;
+			rect.x = static_cast<int>(this->x * this->windowWidth);
+			rect.y = static_cast<int>(this->y * this->windowHeight);
+			rect.width = static_cast<int>(this->width * this->windowWidth);
+			rect.height = static_cast<int>(this->height * this->windowHeight);
 			return true;
 		}
 

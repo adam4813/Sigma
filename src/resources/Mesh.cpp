@@ -30,6 +30,7 @@ namespace Sigma{
 			return (this->faces.size() - this->materialGroupIndex[group]) * 3;
 		}
 	}
+
 	bool operator ==(const VertexIndices &lhs, const VertexIndices &rhs) {
 		return (lhs.vertex==rhs.vertex &&
 				lhs.normal==rhs.normal &&
@@ -491,6 +492,7 @@ namespace Sigma{
 		if (index < this->vertNorms.size()) {
 			return &this->vertNorms[index];
 		}
+		return nullptr;
 	}
 
 	const size_t Mesh::VertexNormalCount() const {
@@ -524,10 +526,11 @@ namespace Sigma{
 		this->texCoords.push_back(t);
 	}
 
-	TexCoord& Mesh::GetTexCoord(const size_t index) {
+	const TexCoord* Mesh::GetTexCoord(const size_t index) {
 		if (index < this->texCoords.size()) {
-			return this->texCoords[index];
+			return &this->texCoords[index];
 		}
+		return nullptr;
 	}
 
 	const size_t Mesh::GetTexCoordCount() const {
@@ -542,20 +545,22 @@ namespace Sigma{
 		this->materialGroupIndex.push_back(index);
 	}
 
-	const std::string& Mesh::GetMaterialName(const size_t groupIndex) {
+	const std::string* Mesh::GetMaterialGroupName(const size_t groupIndex) {
 		if (this->materialGroups.find(groupIndex) != this->materialGroups.end()) {
-			return this->materialGroups[groupIndex];
+			return &this->materialGroups[groupIndex];
 		}
+		return nullptr;
 	}
 
 	const size_t Mesh::MaterialGroupsCount() {
 		return this->materialGroups.size();
 	}
 
-	Material& Mesh::GetMaterialName(const std::string& name) {
+	const Material* Mesh::GetMaterialGroup(const std::string& name) {
 		if (this->mats.find(name) != this->mats.end()) {
-			return this->mats[name];
+			return &this->mats[name];
 		}
+		return nullptr;
 	}
 
 	Material::Material() {

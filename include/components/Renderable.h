@@ -177,29 +177,29 @@ namespace Sigma {
 			size_t prev = 0;
 			for (int i = 0, cur = this->meshResource->MeshGroup_ElementCount(0); cur != 0; prev = cur, cur = this->meshResource->MeshGroup_ElementCount(++i)) {
 				if (this->meshResource->MaterialGroupsCount() > 0) {
-					Material& mat = this->meshResource->GetMaterialName(this->meshResource->GetMaterialName(prev));
+					const Material* mat = this->meshResource->GetMaterialGroup(*this->meshResource->GetMaterialGroupName(prev));
 
-					if (mat.ambientMap) {
+					if (mat->ambientMap) {
 						glUniform1i((*this->shader)("texEnabled"), 1);
 						glUniform1i((*this->shader)("ambientTexEnabled"), 1);
 						glUniform1i((*this->shader)("texAmb"), 1);
 						glActiveTexture(GL_TEXTURE1);
-						glBindTexture(GL_TEXTURE_2D, mat.ambientMap);
+						glBindTexture(GL_TEXTURE_2D, mat->ambientMap);
 					} else {
 						glUniform1i((*this->shader)("ambientTexEnabled"), 0);
 					}
 
-					if (mat.diffuseMap) {
+					if (mat->diffuseMap) {
 						glUniform1i((*this->shader)("texEnabled"), 1);
 						glUniform1i((*this->shader)("diffuseTexEnabled"), 1);
 						glUniform1i((*this->shader)("texDiff"), 0);
 						glActiveTexture(GL_TEXTURE0);
-						glBindTexture(GL_TEXTURE_2D, mat.diffuseMap);
+						glBindTexture(GL_TEXTURE_2D, mat->diffuseMap);
 					} else {
 						glUniform1i((*this->shader)("diffuseTexEnabled"), 0);
 					}
 
-					glUniform1f((*this->shader)("specularHardness"), mat.hardness);
+					glUniform1f((*this->shader)("specularHardness"), mat->hardness);
 				}
 				else {
 					glUniform1i((*this->shader)("texEnabled"), 0);
