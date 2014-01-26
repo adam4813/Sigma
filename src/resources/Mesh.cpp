@@ -570,6 +570,12 @@ namespace Sigma{
 		tr = 1.0f;
 		hardness = 64.0f;
 		illum = 1;
+		this->ambientMap = 0;
+		this->diffuseMap = 0;
+		this->specularMap = 0;
+		this->normalMap = 0;
+		this->cubeMap = 0;
+		this->cubeNormalMap = 0;
 	}
 
 } // namespace Sigma

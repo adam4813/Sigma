@@ -54,6 +54,8 @@ namespace Sigma{
 		GLuint diffuseMap;
 		GLuint specularMap;
 		GLuint normalMap;
+		GLuint cubeMap;
+		GLuint cubeNormalMap;
 	};
 
 	// Helper structs for OBJ loading

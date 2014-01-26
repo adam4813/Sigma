@@ -215,6 +215,7 @@ namespace Sigma{
 			}
 		}
 		GLIcoSphere sphere;
+		sphere.InitializeBuffers();
 		std::string meshname = "entity";
 		meshname += entityID;
 		meshname += "icosphere";
@@ -302,8 +303,8 @@ namespace Sigma{
 		renderable->SetMesh(&OpenGLSystem::meshes[meshname]);
 		static_cast<GLCubeSphere*>(&OpenGLSystem::meshes[meshname])->SetSubdivisions(subdivision_levels);
 		static_cast<GLCubeSphere*>(&OpenGLSystem::meshes[meshname])->SetFixToCamera(fix_to_camera);
-		static_cast<GLCubeSphere*>(&OpenGLSystem::meshes[meshname])->InitializeBuffers();
 		static_cast<GLCubeSphere*>(&OpenGLSystem::meshes[meshname])->LoadTexture(texture_name);
+		static_cast<GLCubeSphere*>(&OpenGLSystem::meshes[meshname])->InitializeBuffers();
 		renderable->SetCullFace(cull_face);
 		renderable->Transform()->Scale(scale,scale,scale);
 		renderable->Transform()->Rotate(rx,ry,rz);

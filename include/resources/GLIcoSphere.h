@@ -12,14 +12,12 @@ namespace Sigma{
 	public:
 		// We have a private ctor so the factory method must be used.
 		GLIcoSphere();
-		~GLIcoSphere(){}
+		~GLIcoSphere() { }
 
 		/**
 		 * \brief Creates a new GLSprite
 		 *
 		 * This is the factory method to create a new GLIcoSphere. This method creates all the required buffers and fills them.
-		 * \param entityID The entity this component belongs to
-		 * \return   GLIcoSphere* The newly creates GLIcoSphere
 		 */
 		void InitializeBuffers();
 

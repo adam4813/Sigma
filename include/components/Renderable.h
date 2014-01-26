@@ -141,6 +141,8 @@ namespace Sigma {
 			this->shader->AddUniform("diffuseTexEnabled");
 			this->shader->AddUniform("texAmb");
 			this->shader->AddUniform("texDiff");
+			this->shader->AddUniform("cubeMap");
+			this->shader->AddUniform("cubeMapNormal");
 			this->shader->AddUniform("specularHardness");
 			this->shader->UnUse();
 		}
@@ -173,7 +175,6 @@ namespace Sigma {
 				glCullFace(this->cull_face);
 			}
 
-			glActiveTexture(GL_TEXTURE0);
 			size_t prev = 0;
 			for (int i = 0, cur = this->meshResource->MeshGroup_ElementCount(0); cur != 0; prev = cur, cur = this->meshResource->MeshGroup_ElementCount(++i)) {
 				if (this->meshResource->MaterialGroupsCount() > 0) {
@@ -199,6 +200,18 @@ namespace Sigma {
 						glUniform1i((*this->shader)("diffuseTexEnabled"), 0);
 					}
 
+					if (mat->cubeMap) {
+						glActiveTexture(GL_TEXTURE0);
+						glUniform1i((*this->shader)("cubeMap"), 0);
+						glBindTexture(GL_TEXTURE_CUBE_MAP, mat->cubeMap);
+					}
+
+					if (mat->cubeNormalMap) {
+						glActiveTexture(GL_TEXTURE1);
+						glUniform1i((*this->shader)("cubeNormalMap"), 0);
+						glBindTexture(GL_TEXTURE_CUBE_MAP, mat->cubeNormalMap);
+					}
+
 					glUniform1f((*this->shader)("specularHardness"), mat->hardness);
 				}
 				else {
@@ -214,7 +227,14 @@ namespace Sigma {
 			glCullFace(GL_BACK);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 			glBindVertexArray(0);
+
+			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, 0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
 			this->shader->UnUse();
 		} // function Render
 

@@ -59,18 +59,23 @@ namespace Sigma {
 		// a cubesphere is a mesh, but it is only one mesh group.
 		AddMaterialGroupIndex(0);
 
+		Material m;
+		m.cubeMap = this->_cubeMap;
+		m.cubeNormalMap = this->_cubeNormalMap;
+		this->materialGroups[0] = "default";
+		this->mats["default"] = m;
+
 	} // function InitializeBuffers
 
 	bool GLCubeSphere::LoadTexture(std::string texture_name) {
-		// SOIL makes this straightforward..
-		char filename[100];
+		// SOIL makes this straightforward.
 		std::string filenames[6];
 		{
 			// LOAD CUBE VISUAL TEXTURES
 			std::cout << "Loading cube texture: " << texture_name << std::endl;
-			sprintf(filename, "%s.dds", texture_name.c_str());
+			std::string filename = texture_name + ".dds";
 
-			this->_cubeMap = SOIL_load_OGL_single_cubemap(filename, SOIL_DDS_CUBEMAP_FACE_ORDER, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+			this->_cubeMap = SOIL_load_OGL_single_cubemap(filename.c_str(), SOIL_DDS_CUBEMAP_FACE_ORDER, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
 
 			// if that didn't work, load individual files (much slower)
 			if(this->_cubeMap == 0) {
@@ -95,9 +100,9 @@ namespace Sigma {
 		{
 			std::cout << "Loading cube normal map: " << texture_name << "_nm" << std::endl;
 			// First try dds file
-			sprintf(filename, "%s_nm.dds", texture_name.c_str());
+			std::string filename = texture_name + "_nm.dds";
 
-			this->_cubeNormalMap = SOIL_load_OGL_single_cubemap(filename, SOIL_DDS_CUBEMAP_FACE_ORDER, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
+			this->_cubeNormalMap = SOIL_load_OGL_single_cubemap(filename.c_str(), SOIL_DDS_CUBEMAP_FACE_ORDER, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
 
 			if(this->_cubeNormalMap==0) {
 				// LOAD CUBE NORMAL TEXTURES
@@ -119,6 +124,7 @@ namespace Sigma {
 		if ((this->_cubeMap == 0) && (this->_cubeNormalMap == 0)) {
 			return false;
 		}
+
 		return true;
 	} // function LoadTexture
 
