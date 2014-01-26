@@ -76,14 +76,21 @@ namespace Sigma {
 			std::cerr << "Invalid URL" << std::endl;
 		}
 
-		Sigma::resource::GLTexture texture;
-		Sigma::OpenGLSystem::textures[textureName] = texture;
-		Sigma::OpenGLSystem::textures[textureName].Format(GL_BGRA);
-		Sigma::OpenGLSystem::textures[textureName].GenerateGLTexture(this->windowWidth, this->windowHeight);
+		// Check if the texture is loaded and load it if not.
+		if (Sigma::OpenGLSystem::textures.find(textureName) == Sigma::OpenGLSystem::textures.end()) {
+			Sigma::resource::GLTexture texture;
+			Sigma::OpenGLSystem::textures[textureName] = texture;
+			Sigma::OpenGLSystem::textures[textureName].Format(GL_BGRA);
+			Sigma::OpenGLSystem::textures[textureName].GenerateGLTexture(this->windowWidth, this->windowHeight);
+		}
+
+		// It should be loaded, but in case an error occurred double check for it.
+		if (Sigma::OpenGLSystem::textures.find(textureName) != Sigma::OpenGLSystem::textures.end()) {
+			webview->SetTexture(&Sigma::OpenGLSystem::textures[textureName]);
+		}
 
 		webview->SetCaputeArea(x, y, width, height);
 		webview->SetWindowSize(this->windowWidth, this->windowHeight);
-		webview->SetTexture(&Sigma::OpenGLSystem::textures[textureName]);
 		this->addComponent(entityID, webview);
 
 		CefWindowInfo windowInfo;

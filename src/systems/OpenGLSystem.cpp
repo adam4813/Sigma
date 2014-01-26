@@ -933,7 +933,6 @@ namespace Sigma{
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			for (auto citr = this->screensSpaceComp.begin(); citr != this->screensSpaceComp.end(); ++citr) {
-				citr->get()->GetShader()->Use();
 				citr->get()->Render(&viewMatrix[0][0], &this->ProjectionMatrix[0][0]);
 			}
 

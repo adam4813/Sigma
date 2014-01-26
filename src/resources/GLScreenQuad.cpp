@@ -37,7 +37,7 @@ namespace Sigma {
 
 		if (this->texture != nullptr) {
 			Material m;
-			m.ambientMap = this->texture->GetID();
+			m.diffuseMap = this->texture->GetID();
 			this->materialGroups[0] = "default";
 			this->mats["default"] = m;
 		}
