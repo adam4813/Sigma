@@ -5,6 +5,8 @@
 
 #include "cef_url.h"
 
+#include "Sigma.h"
+
 namespace Sigma {
 
 	// We need ctor and dstor to be exported to a dll even if they don't do anything
@@ -21,7 +23,7 @@ namespace Sigma {
 	}
 
 	bool WebGUISystem::Start(CefMainArgs& mainArgs) {
-		std::cout << "Setting up web view." << std::endl;
+		LOG << "Setting up web view.";
 		CefRefPtr<WebGUISystem> ourselves(this);
 		CefSettings settings;
 #ifdef _WIN32
@@ -73,7 +75,7 @@ namespace Sigma {
 		CefString cefurl(url);
 		CefURLParts parts;
 		if (!CefParseURL(cefurl, parts)) {
-			std::cerr << "Invalid URL" << std::endl;
+			LOG_WARN << "Invalid URL";
 		}
 
 		Sigma::resource::GLTexture texture;

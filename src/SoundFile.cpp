@@ -10,6 +10,8 @@ extern "C" {
 #include <string>
 #include "resources/SoundFile.h"
 
+#include "Sigma.h"
+
 struct OggLinkedPacket {
 	ogg_packet pack;
 	void * next;
@@ -129,7 +131,7 @@ namespace Sigma {
 							bytec = opdata->pack.bytes;
 							if(!offs) {
 								if(vorbis_synthesis_idheader(&opdata->pack) == 1) {
-									std::cerr << "\nVorbis ";
+									LOG << "\nVorbis ";
 									dataformat = Vorbis;
 								}
 							}
@@ -170,7 +172,7 @@ namespace Sigma {
 			}
 			if(lastlp) { lastlp->next = nullptr; }
 
-			std::cerr << datasz << " bytes loaded.";
+			LOG_DEBUG << datasz << " bytes loaded.";
 			ogg_stream_clear(&stream);
 			ogg_sync_clear(&sync);
 		}
@@ -456,8 +458,8 @@ namespace Sigma {
 						k = 0;
 						for(fidat = (float*)in, sodat = (short*)out; k++ < fcount; fidat++, sodat++) {
 							*(unsigned short*)sodat = static_cast<unsigned short>(((*fidat)+1.0f) * 16383.f);
-							if(*fidat < fmin) { std::cerr << "m" << *fidat; sodat--; }
-							if(*fidat > fmax) { std::cerr << "x" << *fidat; sodat--; }
+							if(*fidat < fmin) { LOG << "m" << *fidat; sodat--; }
+							if(*fidat > fmax) { LOG << "x" << *fidat; sodat--; }
 							if(chanadd) { fidat--; }
 							if(chancomp) { fidat++; }
 						}
@@ -487,15 +489,14 @@ namespace Sigma {
 				fh.read(fourcc.cvalue, 4); // read the id string
 				fh.seekg(0, std::ios::beg);
 				if(fourcc == FourCC('R','I','F','F')) {
-					std::cerr << "Loading Sound from WAV file: " << fn << '\n';
+					LOG << "Loading Sound from WAV file: " << fn << '\n';
 					LoadWAV(fh, sz);
 					ProcessMeta();
 				}
 				else if(fourcc == FourCC('O','g','g','S')) {
-					std::cerr << "Loading Sound from Ogg file: " << fn;
+					LOG << "Loading Sound from Ogg file: " << fn;
 					LoadOgg(fh, sz);
 					ProcessMeta();
-					std::cerr << '\n';
 				}
 				else {
 					data = (unsigned char*)malloc( (size_t)sz );

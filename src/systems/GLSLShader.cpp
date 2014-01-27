@@ -6,6 +6,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "Sigma.h"
+
 GLSLShader::GLSLShader(void)
 {
 	_totalShaders=0;
@@ -38,7 +40,7 @@ void GLSLShader::LoadFromString(GLenum type, const std::string source) {
 		glGetShaderiv (shader, GL_INFO_LOG_LENGTH, &infoLogLength);
 		GLchar *infoLog= new GLchar[infoLogLength];
 		glGetShaderInfoLog (shader, infoLogLength, NULL, infoLog);
-		std::cerr<<"Compile log: "<<infoLog<<std::endl;
+		LOG_WARN << "Compile log: " << infoLog;
 		delete [] infoLog;
 	}
 	_shaders[_totalShaders++]=shader;
@@ -73,7 +75,7 @@ void GLSLShader::CreateAndLinkProgram() {
 		glGetProgramiv (_program, GL_INFO_LOG_LENGTH, &infoLogLength);
 		GLchar *infoLog= new GLchar[infoLogLength];
 		glGetProgramInfoLog (_program, infoLogLength, NULL, infoLog);
-		std::cerr<<"Link log: "<<infoLog<<std::endl;
+		LOG_WARN << "Link log: " << infoLog;
 		delete [] infoLog;
 	}
 
@@ -118,6 +120,6 @@ void GLSLShader::LoadFromFile(GLenum whichShader, const std::string filename){
 		//copy to source
 		LoadFromString(whichShader, buffer);
 	} else {
-		std::cerr<<"Error loading shader: "<<filename<<std::endl;
+		LOG_ERROR << "Error loading shader: " << filename;
 	}
 }

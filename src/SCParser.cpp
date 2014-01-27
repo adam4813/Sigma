@@ -6,6 +6,8 @@
 #include <sstream>
 #include <locale.h>
 
+#include "Sigma.h"
+
 namespace Sigma {
 	namespace parser {
     /**
@@ -27,7 +29,7 @@ namespace Sigma {
 
 			// Some type of error opening the file
 			if (!in) {
-				std::cerr << "Cannot open sc file " << fname << std::endl;
+				LOG_ERROR << "Cannot open sc file " << fname;
 				return false;
 			}
 
@@ -99,7 +101,7 @@ namespace Sigma {
 						currentEntity->components.push_back(c);
 					}
 					else {
-						std::cerr << "Attempted to add component to undefined entity." << std::endl;
+						LOG_DEBUG << "Attempted to add component to undefined entity.";
 					}
 				}
 			}
