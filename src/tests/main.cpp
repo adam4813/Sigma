@@ -97,7 +97,7 @@ int main(int argCount, char **argValues) {
 	std::cout << "Initializing OpenAL system." << std::endl;
 	alsys.Start();
 	alsys.test(); // try sound
-	
+
 	////////////////
 	// Load scene //
 	////////////////
@@ -168,7 +168,7 @@ int main(int argCount, char **argValues) {
 	glfwos.RegisterKeyboardEventHandler(&theCamera);
 	glfwos.RegisterMouseEventHandler(&theCamera);
 	theCamera.os = &glfwos;
-	
+
 	// Sync bullet physics object with gl camera
 
 	///////////////////
@@ -179,7 +179,7 @@ int main(int argCount, char **argValues) {
 	guicon.SetGUI(webguisys.getComponent(100, Sigma::WebGUIView::getStaticComponentTypeName()));
 	glfwos.RegisterKeyboardEventHandler(&guicon);
 	glfwos.RegisterMouseEventHandler(&guicon);
-	
+
 	// Call now to clear the delta after startup.
 	glfwos.GetDeltaTime();
 	{
