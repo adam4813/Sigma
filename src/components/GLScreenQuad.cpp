@@ -1,6 +1,8 @@
 #include "components/GLScreenQuad.h"
 #include "resources/GLTexture.h"
 
+#include "Sigma.h"
+
 namespace Sigma {
 	GLScreenQuad::GLScreenQuad(const id_t  entityID) : GLMesh(entityID), texture(nullptr), x(0), y(0), w(0), h(0), inverted(false) {}
 	GLScreenQuad::~GLScreenQuad() {}

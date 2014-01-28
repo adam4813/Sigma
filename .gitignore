@@ -219,6 +219,7 @@ pip-log.txt
 ##################################
 ## Chromium Embedded Framework
 ##################################
+cef/
 include/capi/
 include/internal/
 include/wrapper/

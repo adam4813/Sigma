@@ -18,6 +18,8 @@
 #endif
 
 int main(int argCount, char **argValues) {
+	Log::Print::Init(); // Initiatin the Logger must the first thing
+
 	Sigma::WebGUISystem webguisys;
 
 #ifndef NO_CEF
@@ -51,7 +53,7 @@ int main(int argCount, char **argValues) {
 #endif
 
 	if (!glfwos.InitializeWindow(1024, 768, "Sigma test")) {
-		std::cerr << "Failed creating the window or context." << std::endl;
+		LOG_ERROR << "Failed creating the window or context.";
 		return -1;
 	}
 
@@ -59,17 +61,17 @@ int main(int argCount, char **argValues) {
 	// Start the openGL system //
 	/////////////////////////////
 
-	std::cout << "Initializing OpenGL system." << std::endl;
+	LOG << "Initializing OpenGL system.";
 	const int* version = glsys.Start();
 
 	glsys.SetViewportSize(glfwos.GetWindowWidth(), glfwos.GetWindowHeight());
 
 	if (version[0] == -1) {
-		std::cerr << "Error starting OpenGL!" << std::endl;
+		LOG_ERROR << "Error starting OpenGL!";
 		return -1;
 	}
 	else {
-		std::cout << "OpenGL version: " << version[0] << "." << version[1] << std::endl;
+		LOG << "OpenGL version: " << version[0] << "." << version[1];
 	}
 
 	//////////////////////////////
@@ -101,10 +103,10 @@ int main(int argCount, char **argValues) {
 	// Setup Sound //
 	/////////////////
 
-	std::cout << "Initializing OpenAL system." << std::endl;
+	LOG << "Initializing OpenAL system.";
 	alsys.Start();
 	alsys.test(); // try sound
-	
+
 	////////////////
 	// Load scene //
 	////////////////
@@ -112,12 +114,13 @@ int main(int argCount, char **argValues) {
 	// Parse the scene file to retrieve entities
 	Sigma::parser::SCParser parser;
 
-	std::cout << "Parsing test.sc scene file." << std::endl;
+	LOG << "Parsing test.sc scene file.";
 	if (!parser.Parse("test.sc")) {
-		assert(0 && "Failed to load entities from file.");
+		LOG_ERROR << "Failed to load entities from file.";
+		exit (-1);
 	}
 
-	std::cout << "Generating Entities." << std::endl;
+	LOG << "Generating Entities.";
 
 	// Create each entity's components
 	for (unsigned int i = 0; i < parser.EntityCount(); ++i) {
@@ -175,7 +178,7 @@ int main(int argCount, char **argValues) {
 	glfwos.RegisterKeyboardEventHandler(&theCamera);
 	glfwos.RegisterMouseEventHandler(&theCamera);
 	theCamera.os = &glfwos;
-	
+
 	// Sync bullet physics object with gl camera
 
 	///////////////////
@@ -206,7 +209,7 @@ int main(int argCount, char **argValues) {
 		if(als) {
 			als->Play(Sigma::PLAYBACK_LOOP);
 		}
-		
+
 		// This one must be last
 		als = (Sigma::ALSound *)alsys.getComponent(203, Sigma::ALSound::getStaticComponentTypeName());
 	}
@@ -220,6 +223,7 @@ int main(int argCount, char **argValues) {
 
 	FlashlightState fs = FL_OFF;
 
+	LOG << "Main loop begins ";
 	while (!glfwos.Closing()) {
 		// Get time in ms, store it in seconds too
 		double deltaSec = glfwos.GetDeltaTime();
@@ -254,17 +258,17 @@ int main(int argCount, char **argValues) {
 		}
 
 		if(glfwos.CheckKeyState(Sigma::event::KS_DOWN, GLFW_KEY_W) ||
-			glfwos.CheckKeyState(Sigma::event::KS_DOWN, GLFW_KEY_A) ||
-			glfwos.CheckKeyState(Sigma::event::KS_DOWN, GLFW_KEY_D) ||
-			glfwos.CheckKeyState(Sigma::event::KS_DOWN, GLFW_KEY_S)
+				glfwos.CheckKeyState(Sigma::event::KS_DOWN, GLFW_KEY_A) ||
+				glfwos.CheckKeyState(Sigma::event::KS_DOWN, GLFW_KEY_D) ||
+				glfwos.CheckKeyState(Sigma::event::KS_DOWN, GLFW_KEY_S)
 			) {
 			soundflag = true;
 		}
 		else if(glfwos.CheckKeyState(Sigma::event::KS_UP, GLFW_KEY_W) ||
-			glfwos.CheckKeyState(Sigma::event::KS_UP, GLFW_KEY_A) ||
-			glfwos.CheckKeyState(Sigma::event::KS_UP, GLFW_KEY_D) ||
-			glfwos.CheckKeyState(Sigma::event::KS_UP, GLFW_KEY_S)
-			) {
+				glfwos.CheckKeyState(Sigma::event::KS_UP, GLFW_KEY_A) ||
+				glfwos.CheckKeyState(Sigma::event::KS_UP, GLFW_KEY_D) ||
+				glfwos.CheckKeyState(Sigma::event::KS_UP, GLFW_KEY_S)
+				) {
 			soundflag = false;
 		}
 

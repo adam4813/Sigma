@@ -292,3 +292,9 @@ if(BUILD_EXE_Sigma)
 	ENDFOREACH(TEST_CPP)
 endif(BUILD_EXE_Sigma)
 
+# CEF has some files that need to be copied to ${CMAKE_BINARY_DIR}/bin
+ADD_CUSTOM_COMMAND(
+    TARGET Sigma POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${PROJECT_SOURCE_DIR}/cef/bin $<TARGET_FILE_DIR:Sigma>)
+

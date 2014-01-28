@@ -6,6 +6,8 @@
 #include <iostream>
 #include <sstream>
 
+#include "Sigma.h"
+
 const float epsilon = 0.0001f;
 
 // For std::find
@@ -87,7 +89,7 @@ namespace Sigma {
 		std::string filenames[6];
         {
             // LOAD CUBE VISUAL TEXTURES
-			std::cout << "Loading cube texture: " << texture_name << std::endl;
+			LOG << "Loading cube texture: " << texture_name ;
 			sprintf(filename, "%s.dds", texture_name.c_str());
 
 			this->_cubeMap = SOIL_load_OGL_single_cubemap(filename, SOIL_DDS_CUBEMAP_FACE_ORDER, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_DDS_LOAD_DIRECT);
@@ -108,12 +110,12 @@ namespace Sigma {
 													   SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
 
 				if( 0 == this->_cubeMap ) {
-					printf( "SOIL error loading cubemap: '%s'\n", SOIL_last_result() );
+					LOG_ERROR << "SOIL error loading cubemap: " << SOIL_last_result();
 				}
 			}
         }
         {
-			std::cout << "Loading cube normal map: " << texture_name << "_nm" << std::endl;
+			LOG << "Loading cube normal map: " << texture_name << "_nm" ;
 			// First try dds file
 			sprintf(filename, "%s_nm.dds", texture_name.c_str());
 

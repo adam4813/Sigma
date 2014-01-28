@@ -7,6 +7,8 @@
 #include "cef_url.h"
 #endif
 
+#include "Sigma.h"
+
 namespace Sigma {
 
 	// We need ctor and dstor to be exported to a dll even if they don't do anything
@@ -24,7 +26,7 @@ namespace Sigma {
 
 #ifndef NO_CEF
 	bool WebGUISystem::Start(CefMainArgs& mainArgs) {
-		std::cout << "Setting up web view." << std::endl;
+		LOG << "Setting up web view.";
 		CefRefPtr<WebGUISystem> ourselves(this);
 		CefSettings settings;
 #ifdef CEFDEV
@@ -78,7 +80,7 @@ namespace Sigma {
 		CefString cefurl(url);
 		CefURLParts parts;
 		if (!CefParseURL(cefurl, parts)) {
-			std::cerr << "Invalid URL" << std::endl;
+			LOG_WARN << "Invalid URL";
 		}
 #endif
 

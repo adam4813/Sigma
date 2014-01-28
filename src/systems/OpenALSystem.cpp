@@ -1,5 +1,7 @@
 #include "systems/OpenALSystem.h"
 
+#include "Sigma.h"
+
 namespace Sigma {
 
 	// We need ctor and dstor to be exported to a dll even if they don't do anything
@@ -22,7 +24,7 @@ namespace Sigma {
 		}
 		alcx = alcGetString(this->device, ALC_EXTENSIONS);
 		if( alcx != nullptr ) {
-			std::cerr << "OpenAL extentions: " << alcx << '\n';
+			LOG << "OpenAL extentions: " << alcx;
 		}
 		return true;
 	}
