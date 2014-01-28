@@ -3,19 +3,27 @@
 #include "../IComponent.h"
 #include "systems/KeyboardInputSystem.h"
 #include "systems/MouseInputSystem.h"
+#ifndef NO_CEF
 #include "cef_client.h"
+#endif
 #include "resources/GLTexture.h"
 #include "Sigma.h"
 
 namespace Sigma {
-	class WebGUIView : public Sigma::IComponent, public CefClient, public CefLifeSpanHandler, public CefRenderHandler {
+	class WebGUIView : public Sigma::IComponent
+#ifndef NO_CEF
+		, public CefClient, public CefLifeSpanHandler, public CefRenderHandler
+#endif
+	{
 	public:
 		SET_COMPONENT_TYPENAME("WebGUIView");
 		WebGUIView() : texture(nullptr), entity_id(0), mouseDown(0) { }
 		WebGUIView(const id_t entityID) : texture(nullptr), entity_id(entityID), mouseDown(0) { };
 		virtual ~WebGUIView() {
+#ifndef NO_CEF
 			this->browserHost->ParentWindowWillClose();
 			this->browserHost->CloseBrowser(true);
+#endif
 		};
 
 		void SetTexture(Sigma::resource::GLTexture* texture) {
@@ -42,6 +50,7 @@ namespace Sigma {
 		bool InjectMouseDown(const Sigma::event::BUTTON btn, float x, float y);
 		bool InjectMouseUp(const Sigma::event::BUTTON btn, float x, float y);
 
+#ifndef NO_CEF
 		// CefClient
 		virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() OVERRIDE {
 			return this;
@@ -77,8 +86,11 @@ namespace Sigma {
 				this->texture->LoadDataFromMemory((const unsigned char*) buffer, width, height);
 			}
 		}
+#endif
 	private:
+#ifndef NO_CEF
 		CefRefPtr<CefBrowserHost> browserHost;
+#endif
 		Sigma::resource::GLTexture* texture;
 
 		bool hasFocus;
@@ -90,6 +102,8 @@ namespace Sigma {
 
 		const id_t entity_id;
 
+#ifndef NO_CEF
 		IMPLEMENT_REFCOUNTING(WebGUIView);
+#endif
 	};
 }

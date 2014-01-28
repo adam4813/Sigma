@@ -101,11 +101,11 @@ IF (WIN32 AND NOT MINGW) # Windows
 	SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${CMAKE_SOURCE_DIR}/include/libraries)
 	INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include/libraries")
 	IF (CMAKE_CL_64)
-	LINK_DIRECTORIES("${CMAKE_SOURCE_DIR}/lib/x64/debug" "${CMAKE_SOURCE_DIR}/lib/x64/release")
-	SET(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x64/debug ${CMAKE_SOURCE_DIR}/lib/x64/release)
+		LINK_DIRECTORIES("${CMAKE_SOURCE_DIR}/lib/x64/debug" "${CMAKE_SOURCE_DIR}/lib/x64/release")
+		SET(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x64/debug ${CMAKE_SOURCE_DIR}/lib/x64/release)
 	ELSE (CMAKE_CL_64)
-	LINK_DIRECTORIES("${CMAKE_SOURCE_DIR}/lib/x86/debug" "${CMAKE_SOURCE_DIR}/lib/x86/release")
-	SET(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x86/debug ${CMAKE_SOURCE_DIR}/lib/x86/release)
+		LINK_DIRECTORIES("${CMAKE_SOURCE_DIR}/lib/x86/debug" "${CMAKE_SOURCE_DIR}/lib/x86/release")
+		SET(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x86/debug ${CMAKE_SOURCE_DIR}/lib/x86/release)
 	ENDIF (CMAKE_CL_64)
 ENDIF (WIN32 AND NOT MINGW)
 
@@ -120,9 +120,9 @@ FIND_PACKAGE(Bullet REQUIRED)
 FIND_PACKAGE(SOIL REQUIRED)
 FIND_PACKAGE(GLM REQUIRED)
 if(BUILD_LINK_CEF)
-FIND_PACKAGE(CEF REQUIRED)
+	FIND_PACKAGE(CEF REQUIRED)
 else(BUILD_LINK_CEF)
-add_definitions(-DNO_CEF)
+	add_definitions(-DNO_CEF)
 endif(BUILD_LINK_CEF)
 
 # Give these some dummy values and if the platform is LINUX or OSX they will be set accordingly.
@@ -140,8 +140,11 @@ IF (NOT APPLE) # X11 and GLEW are not needed on OSX.
 ENDIF (NOT APPLE)
 
 IF (UNIX AND NOT APPLE)
-	FIND_PACKAGE(GTK2 REQUIRED)
-	INCLUDE_DIRECTORIES("${GTK2_INCLUDE_DIRS}")
+	if(BUILD_LINK_CEF)
+		FIND_PACKAGE(GTK2 REQUIRED)
+		INCLUDE_DIRECTORIES("${GTK2_INCLUDE_DIRS}")
+	endif(BUILD_LINK_CEF)
+
 ENDIF (UNIX AND NOT APPLE)
 
 IF (APPLE) # Mac OSX
@@ -227,13 +230,13 @@ if(BUILD_STATIC_Sigma)
 	# Link the Sigma lib to all required external libraries
 	TARGET_LINK_LIBRARIES(libSigmas ${Sigma_ALL_LIBS})
 	if(WIN32)
-	set_target_properties(libSigmas PROPERTIES
-		OUTPUT_NAME Sigma_static
-		)
+		set_target_properties(libSigmas PROPERTIES
+			OUTPUT_NAME Sigma_static
+			)
 	else(WIN32)
-	set_target_properties(libSigmas PROPERTIES
-		OUTPUT_NAME Sigma
-		)
+		set_target_properties(libSigmas PROPERTIES
+			OUTPUT_NAME Sigma
+			)
 	endif(WIN32)
 endif(BUILD_STATIC_Sigma)
 
@@ -285,7 +288,7 @@ if(BUILD_EXE_Sigma)
 			# Link the executable to all required libraries
 			TARGET_LINK_LIBRARIES(${TEST_NAME} ${Sigma_ALL_LIBS})
 		endif(BUILD_STATIC_Sigma)
-	
-		ENDFOREACH(TEST_CPP)
+
+	ENDFOREACH(TEST_CPP)
 endif(BUILD_EXE_Sigma)
 
