@@ -22,13 +22,7 @@ namespace Log {
 	/**
 	 * Logging levels
 	 */
-	enum class LogLevel {
-		OFF = -1,
-		ERROR = 0,
-		WARN = 1,
-		INFO = 2,
-		DEBUG = 3,
-	};
+	enum LogLevel { OFF, LL_ERROR, LL_WARN, LL_INFO, LL_DEBUG };
 
 
 	class Print {
@@ -55,7 +49,7 @@ namespace Log {
 			 * \param level Logger level. By default is at Debug level
 			 * \param sout Output Streambuffer were to write. By default uses std::clog
 			 */
-			static void Init(LogLevel level = LogLevel::DEBUG) {
+			static void Init(LogLevel level = LogLevel::LL_DEBUG) {
 				log_level = level;
 				out = &std::clog;
 			}
@@ -65,7 +59,7 @@ namespace Log {
 			 * \param level Logger level. By default is at Debug level
 			 * \param sout Output Streambuffer were to write. By default uses std::clog
 			 */
-			static void Init(std::ostream& sout, LogLevel level = LogLevel::DEBUG) {
+			static void Init(std::ostream& sout, LogLevel level = LogLevel::LL_DEBUG) {
 				log_level = level;
 				out = &sout;
 			}
@@ -86,19 +80,19 @@ namespace Log {
 				
 				if( output ) {
 					switch (level) {
-						case LogLevel::ERROR:
+						case LogLevel::LL_ERROR:
 							*out << "[ERROR] ";
 							break;
 
-						case LogLevel::WARN:
+						case LogLevel::LL_WARN:
 							*out << "[WARNING] ";
 							break;
 
-						case LogLevel::INFO:
+						case LogLevel::LL_INFO:
 							*out << "[INFO] ";
 							break;
 
-						case LogLevel::DEBUG:
+						case LogLevel::LL_DEBUG:
 							*out << "[DEBUG] ";
 							break;
 
@@ -147,10 +141,10 @@ namespace Log {
 } // END OF NAMESPACE logger
 
 // Macros to type less
-#define LOG_DEBUG Log::Print(Log::LogLevel::DEBUG)
-#define LOG       Log::Print(Log::LogLevel::INFO)
-#define LOG_WARN  Log::Print(Log::LogLevel::WARN)
-#define LOG_ERROR Log::Print(Log::LogLevel::ERROR)
+#define LOG_DEBUG Log::Print(Log::LogLevel::LL_DEBUG)
+#define LOG       Log::Print(Log::LogLevel::LL_INFO)
+#define LOG_WARN  Log::Print(Log::LogLevel::LL_WARN)
+#define LOG_ERROR Log::Print(Log::LogLevel::LL_ERROR)
 
 
 #endif // __LOGGER_H_
