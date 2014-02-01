@@ -2,11 +2,18 @@ CMAKE_MINIMUM_REQUIRED (VERSION 2.8)
 PROJECT (Sigma)
 
 # Set the include directory
-INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include")
-INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}")
+INCLUDE_DIRECTORIES(
+	${CMAKE_SOURCE_DIR}
+	${CMAKE_SOURCE_DIR}/include
+	${CMAKE_SOURCE_DIR}/cef
+	${CMAKE_SOURCE_DIR}/cef/include
+	)
 
 # Set the cmake search paths
-SET(CMAKE_INCLUDE_PATH ${CMAKE_SOURCE_DIR}/include)
+SET(CMAKE_INCLUDE_PATH
+	${CMAKE_SOURCE_DIR}/include
+	${CMAKE_SOURCE_DIR}/cef
+	)
 
 # change output directory of executable so that relative paths in the code are correct
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
@@ -94,13 +101,15 @@ IF (WIN32 AND NOT MINGW) # Windows
 	SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${CMAKE_SOURCE_DIR}/include/libraries)
 	INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include/libraries")
 	IF (CMAKE_CL_64)
-	LINK_DIRECTORIES("${CMAKE_SOURCE_DIR}/lib/x64/debug" "${CMAKE_SOURCE_DIR}/lib/x64/release")
-	SET(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x64/debug ${CMAKE_SOURCE_DIR}/lib/x64/release)
+		LINK_DIRECTORIES("${CMAKE_SOURCE_DIR}/lib/x64/debug" "${CMAKE_SOURCE_DIR}/lib/x64/release")
+		SET(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x64/debug ${CMAKE_SOURCE_DIR}/lib/x64/release)
 	ELSE (CMAKE_CL_64)
-	LINK_DIRECTORIES("${CMAKE_SOURCE_DIR}/lib/x86/debug" "${CMAKE_SOURCE_DIR}/lib/x86/release")
-	SET(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x86/debug ${CMAKE_SOURCE_DIR}/lib/x86/release)
+		LINK_DIRECTORIES("${CMAKE_SOURCE_DIR}/lib/x86/debug" "${CMAKE_SOURCE_DIR}/lib/x86/release")
+		SET(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib/x86/debug ${CMAKE_SOURCE_DIR}/lib/x86/release)
 	ENDIF (CMAKE_CL_64)
 ENDIF (WIN32 AND NOT MINGW)
+
+set(BUILD_LINK_CEF FALSE CACHE BOOL "Build with Chromium Embedded Framework (CEF)")
 
 # Find all the libraries except GLEW and platform specific.
 FIND_PACKAGE(OpenGL REQUIRED)
@@ -110,6 +119,11 @@ FIND_PACKAGE(OpenAL REQUIRED)
 FIND_PACKAGE(Bullet REQUIRED)
 FIND_PACKAGE(SOIL REQUIRED)
 FIND_PACKAGE(GLM REQUIRED)
+if(BUILD_LINK_CEF)
+	FIND_PACKAGE(CEF REQUIRED)
+else(BUILD_LINK_CEF)
+	add_definitions(-DNO_CEF)
+endif(BUILD_LINK_CEF)
 
 # Give these some dummy values and if the platform is LINUX or OSX they will be set accordingly.
 SET(X11_LIBRARIES "")
@@ -126,8 +140,11 @@ IF (NOT APPLE) # X11 and GLEW are not needed on OSX.
 ENDIF (NOT APPLE)
 
 IF (UNIX AND NOT APPLE)
-	FIND_PACKAGE(GTK2 REQUIRED)
-	INCLUDE_DIRECTORIES("${GTK2_INCLUDE_DIRS}")
+	if(BUILD_LINK_CEF)
+		FIND_PACKAGE(GTK2 REQUIRED)
+		INCLUDE_DIRECTORIES("${GTK2_INCLUDE_DIRS}")
+	endif(BUILD_LINK_CEF)
+
 ENDIF (UNIX AND NOT APPLE)
 
 IF (APPLE) # Mac OSX
@@ -177,8 +194,7 @@ set(Sigma_ALL_LIBS
 	${BULLET_LINEARMATH_LIBRARIES}
 	${BULLET_COLLISION_LIBRARIES}
 	${BULLET_DYNAMICS_LIBRARIES}
-	cef_dll_wrapper
-	cef
+	${CEF_LIBRARIES}
 	)
 
 # all source common to the library and test exe
@@ -214,13 +230,13 @@ if(BUILD_STATIC_Sigma)
 	# Link the Sigma lib to all required external libraries
 	TARGET_LINK_LIBRARIES(libSigmas ${Sigma_ALL_LIBS})
 	if(WIN32)
-	set_target_properties(libSigmas PROPERTIES
-		OUTPUT_NAME Sigma_static
-		)
+		set_target_properties(libSigmas PROPERTIES
+			OUTPUT_NAME Sigma_static
+			)
 	else(WIN32)
-	set_target_properties(libSigmas PROPERTIES
-		OUTPUT_NAME Sigma
-		)
+		set_target_properties(libSigmas PROPERTIES
+			OUTPUT_NAME Sigma
+			)
 	endif(WIN32)
 endif(BUILD_STATIC_Sigma)
 
@@ -272,8 +288,8 @@ if(BUILD_EXE_Sigma)
 			# Link the executable to all required libraries
 			TARGET_LINK_LIBRARIES(${TEST_NAME} ${Sigma_ALL_LIBS})
 		endif(BUILD_STATIC_Sigma)
-	
-		ENDFOREACH(TEST_CPP)
+
+	ENDFOREACH(TEST_CPP)
 endif(BUILD_EXE_Sigma)
 
 # CEF has some files that need to be copied to ${CMAKE_BINARY_DIR}/bin

@@ -51,6 +51,8 @@ Make sure you use a binary release from [Adobe](http://www.cefbuilds.com). **Use
 8. On Linux and OSX, make a symlink pointing to libcef.so (or .dylib) in the `cef/` directory.
 9. Make a symlink pointing to `Sigma/cef/bin/libcef_dll_wrapper` in the `cef/` directory. `libcef_dll_wrapper` and `libcef_dll_wrapper.a` must appear in the same place, otherwise you will get a "Malformed Archive" error when linking.
 
+- If you get "Multiply defined symbols" errors building Sigma on Windows with Visual Studio, then make these changes in the libcef_dll_wrapper properties: C/C++ / Preprocessor, edit the definitions to set `_HAS_EXCEPTIONS=1` instead of 0; under C/C++ / Code generation, select the /MDd or /MD runtime library; rebuild and copy the libcef_dll_wrapper.lib to `cef/` directory.
+
 ## Building ##
 
 Use CMake to create makefiles or projects. The resulting executable will be saved in build/bin/.

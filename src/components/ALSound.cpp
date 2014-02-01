@@ -2,6 +2,11 @@
 #include "components/ALSound.h"
 
 namespace Sigma {
+	ALSound::ALSound(id_t entityID,OpenALSystem *m)
+		: ISound(entityID), buffercount(0), bufferindex(0), bufferloaded(0), master(m), sourceid(0), stream(false) { }
+	ALSound::~ALSound() {
+		Destroy();
+	}
 	void ALSound::Generate() {
 		alGenSources(1, &this->sourceid);
 	}
@@ -32,11 +37,15 @@ namespace Sigma {
 				sfp = std::shared_ptr<resource::SoundFile>(master->GetSoundFile(sfi));
 				if(stream) {
 					chancount = sfp->Channels();
-					samplecount = samplerate = sfp->Frequency(); // 1 sec buffers
+					samplerate = sfp->Frequency();
+					samplecount = samplerate * 2; // 2 sec buffers
 					buflen = chancount * samplecount;
 					bufbytes = buflen * sizeof(short);
 					buf = new short[buflen];
-					if(++this->bufferindex >= this->buffercount) { this->bufferindex = 0; }
+					if(++this->bufferindex >= this->buffercount) {
+						this->bufferindex = 0;
+						ALDEBUG(std::cerr << "ALSound: Buffer-set wrap around\n";)
+					}
 					i = codec.FetchBuffer(*sfp, buf, ((chancount == 1) ? resource::PCM_MONO16 : resource::PCM_STEREO16), samplecount);
 					alSourceUnqueueBuffers(this->sourceid, 1, &albuf);
 					if(i > 0) {
@@ -44,22 +53,27 @@ namespace Sigma {
 							buflen = chancount * i;
 							if(playloop == PLAYBACK_LOOP) {
 								this->codec.Rewind(*sfp);
-								bufbytes = i;
-								i = codec.FetchBuffer(*sfp, buf+bufbytes, ((chancount == 1) ? resource::PCM_MONO16 : resource::PCM_STEREO16), samplecount - i);
-								buflen = bufbytes+i;
+								ALDEBUG(std::cerr << "ALSound: Looping stream at sample: " << i << '\n';)
+								//bufbytes = i;
+								//i = codec.FetchBuffer(*sfp, buf+bufbytes, ((chancount == 1) ? resource::PCM_MONO16 : resource::PCM_STEREO16), samplecount - i);
+								//buflen = bufbytes+i;
+								buflen = i;
 								buflen *= chancount;
 							} else {
+								ALDEBUG(std::cerr << "ALSound: Playback done; at sample: " << i << '\n';)
 								playing = false;
 							}
 							bufbytes = buflen * sizeof(short);
+							ALDEBUG(std::cerr << "ALSound: Buffered " << albuf << "b + " << i << '/' << samplecount << " samples\n";)
 							alBufferData(albuf, ((chancount == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16), buf, bufbytes, samplerate);
-							
 						}
 						else {
+							ALDEBUG(std::cerr << "ALSound: Buffered " << albuf << "b + " << i << '/' << samplecount << " samples\n";)
 							alBufferData(albuf, ((chancount == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16), buf, bufbytes, samplerate);
 						}
 						alSourceQueueBuffers(this->sourceid, 1, &albuf);
 					} else {
+						ALDEBUG(std::cerr << "ALSound: Playback end " << albuf << "b + " << i << '/' << samplecount << "samples\n";)
 						if(playloop == PLAYBACK_LOOP) {
 							this->codec.Rewind(*sfp);
 						} else {
@@ -68,6 +82,10 @@ namespace Sigma {
 					}
 					delete buf;
 				}
+			}
+			else if(param == this->buffercount && stream) {
+				ALDEBUG(std::cerr << "ALSound: Playback underrun\n";)
+				alSourcei(this->sourceid, AL_LOOPING, AL_FALSE);
 			}
 		}
 	}
@@ -92,7 +110,7 @@ namespace Sigma {
 			paused = false;
 			return;
 		}
-		if(playlist.size() > 0) {
+		if(playlist.size() > 0 && (stream || !bufferloaded)) {
 			if(playindex > playlist.size()) { playindex = 0; }
 			sfi = playlist[playindex];
 			sfp = std::shared_ptr<resource::SoundFile>(master->GetSoundFile(sfi));
@@ -102,42 +120,60 @@ namespace Sigma {
 				}
 				this->bufferindex = 0;
 				chancount = sfp->Channels();
-				samplerate = samplecount = sfp->Frequency(); // 1 sec buffers
+				samplerate = sfp->Frequency();
+				samplecount = samplerate * 2; // 2 sec buffers
 				buflen = chancount * samplecount;
 				bufbytes = buflen * 2;
 				this->codec.Rewind(*sfp);
 				buf = new unsigned short[buflen];
+				ALDEBUG(std::cerr << "ALSound: Buffering Ch:" << chancount << " R:" << samplerate << " sz:" << bufbytes << "\n";)
 				x = 0;
 				while(x < this->buffercount && 0 < (i = codec.FetchBuffer(*sfp, buf, ((chancount == 1) ? resource::PCM_MONO16 : resource::PCM_STEREO16), samplecount))) {
 					albuf[x] = master->buffers[this->buffers[x]]->GetID();
 					if(i < samplecount) {
+						ALDEBUG(std::cerr << "ALSound: Buffered " << x << "b + " << i << '/' << samplecount << "samples\n";)
 						buflen = chancount * i;
 						stream = false;
 						bufbytes = buflen * sizeof(short);
+						if(playloop == PLAYBACK_LOOP) {
+							codec.Rewind(*sfp);
+							stream = true; // better looping results
+						}
 						alBufferData(albuf[x], ((chancount == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16), buf, bufbytes, samplerate);
-						break;
+						//break;
 					}
 					else {
+						ALDEBUG(std::cerr << "ALSound: Buffered " << x << "b + " << i << '/' << bufbytes << "\n";)
 						alBufferData(albuf[x], ((chancount == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16), buf, bufbytes, samplerate);
 						stream = true;
 					}
 					x++;
 				}
-				if(x < this->buffercount) { stream = false; }
+				if(x < this->buffercount) {
+					stream = false;
+					ALDEBUG(std::cerr << "ALSound: Only " << x << '/' << this->buffercount << " buffers used, not streaming.\n";)
+				}
 				delete buf;
 				if(x > 0) {
+					bufferloaded = x;
+					alSourceUnqueueBuffers(this->sourceid, this->buffercount, albuf);
 					alSourceQueueBuffers(this->sourceid, x, albuf);
 					alSourcePlay(this->sourceid);
 					if(playloop == PLAYBACK_LOOP && !stream) {
 						alSourcei(this->sourceid, AL_LOOPING, AL_TRUE);
+						ALDEBUG(std::cerr << "ALSound: Looping playback\n";)
 					} else {
 						alSourcei(this->sourceid, AL_LOOPING, AL_FALSE);
+						ALDEBUG(std::cerr << "ALSound: NOT looping playback, stream:" << stream << '\n';)
 					}
 					playing = true;
 					paused = false;
 				}
 				return;
 			}
+		}
+		else if(playlist.size() > 0 && (bufferloaded) && !stream) {
+			alSourcePlay(this->sourceid);
 		}
 	}
 	void ALSound::Pause() {
@@ -157,6 +193,21 @@ namespace Sigma {
 
 	void ALSound::Gain(float mul) {
 		alSourcef(this->sourceid, AL_GAIN,mul);
+	}
+	void ALSound::Rolloff(float atten) {
+		alSourcef(this->sourceid, AL_ROLLOFF_FACTOR, atten);
+	}
+	void ALSound::ReferenceDistance(float r) {
+		alSourcef(this->sourceid, AL_REFERENCE_DISTANCE, r);
+	}
+	void ALSound::MaxDistance(float r) {
+		alSourcef(this->sourceid, AL_MAX_DISTANCE, r);
+	}
+	void ALSound::Pitch(float r) {
+		alSourcef(this->sourceid, AL_PITCH, r);
+	}
+	void ALSound::Relative(bool r) {
+		alSourcei(this->sourceid, AL_SOURCE_RELATIVE, (r? AL_TRUE:AL_FALSE));
 	}
 
 	void ALSound::Position(float x, float y, float z) {

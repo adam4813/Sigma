@@ -9,6 +9,7 @@ extern "C" {
 #include <iostream>
 #include <string>
 #include "resources/SoundFile.h"
+#include "systems/OpenALSystem.h"
 
 #include "Sigma.h"
 
@@ -76,7 +77,7 @@ namespace Sigma {
 							if(this->data) { free(data); }
 							this->data = (unsigned char*)malloc(sizeof(WAVEHeader) + 4 + chk.size);
 							if(this->data == nullptr) { return; }
-							*((unsigned long*)this->data) = chk.size;
+							*((unsigned long*)this->data) = chk.size / (head.align);
 							memcpy(this->data + 4, &head, sizeof(WAVEHeader));
 							fh.read((char*)this->data + 4 + sizeof(WAVEHeader), chk.size);
 							readcount -= chk.size;
@@ -278,7 +279,7 @@ namespace Sigma {
 					samples = filelen - rs[0];
 				}
 				if(samples > 0) {
-					out = Resample(out, fmt, pcmdat, sf.pcmsize, samples);
+					out = Resample(out, fmt, pcmdat+(rs[0]*head->align), sf.pcmsize, samples);
 					rs[0] += samples;
 				}
 				return samples;
