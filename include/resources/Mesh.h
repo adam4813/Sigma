@@ -12,6 +12,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include "Sigma.h"
 
 namespace Sigma{
 	// A struct to store which index each of its verts are.
@@ -75,7 +76,7 @@ namespace Sigma{
 	class Mesh {
 	public:
 		Mesh();
-		virtual ~Mesh();
+		DLL_EXPORT virtual ~Mesh();
 
 		/**
 		 * \brief Returns the number of elements to draw for this component.
@@ -297,9 +298,6 @@ namespace Sigma{
 		 * \return const size_t The number of material groups.
 		 */
 		const size_t MaterialGroupsCount();
-
-		static const std::string DEFAULT_SHADER;
-
 	protected:
 		// Note that these values are protected, not private! Inheriting classes get access to these
 		//  basic drawing elements.

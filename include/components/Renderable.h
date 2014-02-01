@@ -30,6 +30,7 @@ namespace Sigma {
 			this->NormalBufIndex = 3;
 			this->UVBufIndex = 4;
 			this->cull_face = 0;
+			this->depthFunc = GL_LESS;
 		}
 		Renderable(const id_t entityID) : lightingEnabled(true), SpatialComponent(entityID) {
 			memset(&this->buffers, 0, sizeof(this->buffers));
@@ -41,6 +42,7 @@ namespace Sigma {
 			this->NormalBufIndex = 3;
 			this->UVBufIndex = 4;
 			this->cull_face = 0;
+			this->depthFunc = GL_LESS;
 		} // Ctor that sets the entity ID.
 
 		void SetMesh(Mesh* mesh) {
@@ -175,6 +177,8 @@ namespace Sigma {
 				glCullFace(this->cull_face);
 			}
 
+			glDepthFunc(this->depthFunc);
+
 			size_t prev = 0;
 			for (int i = 0, cur = this->meshResource->MeshGroup_ElementCount(0); cur != 0; prev = cur, cur = this->meshResource->MeshGroup_ElementCount(++i)) {
 				if (this->meshResource->MaterialGroupsCount() > 0) {
@@ -222,6 +226,8 @@ namespace Sigma {
 				glDrawElements(this->DrawMode(), cur, GL_UNSIGNED_INT, (void*)prev);
 			}
 
+			glDepthFunc(GL_LESS);
+
 			// reset defaults
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_BACK);
@@ -264,6 +270,20 @@ namespace Sigma {
 			}
 		};
 
+
+		/**
+		 * \brief Sets the face culling mode
+		 *
+		 */
+		virtual void SetDepthFunc(std::string depthFunc) {
+			if(depthFunc == "less") {
+				this->depthFunc = GL_LESS;
+			}
+			else if (depthFunc == "lequal") {
+				this->depthFunc = GL_LEQUAL;
+			}
+		};
+
 		/** \brief load the given shader
 		 *
 		 * \param filename the base name of the shader. loads filename.vert and filename.frag.
@@ -288,6 +308,7 @@ namespace Sigma {
 		unsigned int vao; // The VAO that describes this component's data.
 		unsigned int drawMode; // The current draw mode (ex. GL_TRIANGLES, GL_TRIANGLE_STRIP).
 		GLuint cull_face; // The current culling method for this component.
+		GLuint depthFunc;
 
 		std::shared_ptr<GLSLShader> shader; // shaders are shared among components
 		// name-->shader map to look up already-loaded shaders (so each can be loaded only once)

@@ -236,6 +236,7 @@ namespace Sigma{
 		std::string texture_name = "";
 		std::string shader_name = "shaders/cubesphere";
 		std::string cull_face = "back";
+		std::string depthFunc = "less";
 		int subdivision_levels = 1;
 		float rotation_speed = 0.0f;
 		bool fix_to_camera = false;
@@ -293,6 +294,9 @@ namespace Sigma{
 			else if (p->GetName() == "lightEnabled") {
 				renderable->SetLightingEnabled(p->Get<bool>());
 			}
+			else if (p->GetName() == "depthFunc") {
+				depthFunc = p->Get<std::string>();
+			}
 		}
 
 		GLCubeSphere sphere;
@@ -306,6 +310,7 @@ namespace Sigma{
 		static_cast<GLCubeSphere*>(&OpenGLSystem::meshes[meshname])->LoadTexture(texture_name);
 		static_cast<GLCubeSphere*>(&OpenGLSystem::meshes[meshname])->InitializeBuffers();
 		renderable->SetCullFace(cull_face);
+		renderable->SetDepthFunc(depthFunc);
 		renderable->Transform()->Scale(scale,scale,scale);
 		renderable->Transform()->Rotate(rx,ry,rz);
 		renderable->Transform()->Translate(x,y,z);
@@ -384,11 +389,16 @@ namespace Sigma{
 			}
 		}
 
-		Mesh mesh;
-		OpenGLSystem::meshes[meshFIlename] = mesh;
-		renderable->SetMesh(&OpenGLSystem::meshes[meshFIlename]);
-		OpenGLSystem::meshes[meshFIlename].LoadObjMesh(meshFIlename);
+		if (this->meshes.find(meshFIlename) == this->meshes.end()) {
+			Mesh mesh;
 
+			this->meshes.insert(std::make_pair(meshFIlename, mesh));
+			this->meshes[meshFIlename].LoadObjMesh(meshFIlename);
+		}
+
+		if (this->meshes.find(meshFIlename) != this->meshes.end()) {
+			renderable->SetMesh(&this->meshes[meshFIlename]);
+		}
 		renderable->SetCullFace(cull_face);
 		renderable->Transform()->Scale(scale,scale,scale);
 		renderable->Transform()->Translate(x,y,z);
