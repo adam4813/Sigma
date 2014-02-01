@@ -224,3 +224,5 @@ include/capi/
 include/internal/
 include/wrapper/
 include/cef_*
+cef/
+

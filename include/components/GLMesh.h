@@ -13,12 +13,12 @@
 namespace Sigma{
     // Helper structs for OBJ loading
     // Stores unique combinations of indices
-    struct VertexIndices {
-            unsigned int vertex;
-            unsigned int normal;
-            unsigned int uv;
-            unsigned int color;
-    };
+	struct VertexIndices {
+		unsigned int vertex;
+		unsigned int normal;
+		unsigned int uv;
+		unsigned int color;
+	};
 
     // Stores a face with all indices (also used for OBJ loading)
     struct FaceIndices {
@@ -63,16 +63,16 @@ namespace Sigma{
                 return 0;
             }
 
-            if ((group + 1) < (this->groupIndex.size())) {
-                return (this->groupIndex[group+1] - this->groupIndex[group]) * 3;
-            }
+			if ((group + 1) < (this->groupIndex.size())) {
+				return (this->groupIndex[group+1] - this->groupIndex[group]) * 3;
+			}
 			else if (group > (this->groupIndex.size() - 1)) {
-                return 0;
-            }
+				return 0;
+			}
 			else {
-                return (this->faces.size() - this->groupIndex[group]) * 3;
-            }
-        }
+				return (this->faces.size() - this->groupIndex[group]) * 3;
+			}
+		}
 
         bool LoadMesh(std::string fname);
 
@@ -182,31 +182,34 @@ namespace Sigma{
          * \param index The index of the color to get.
          * \return   const Color* The color at the index or nullptr if the index was invalid.
          */
-        const Color* GetVertexColor(const unsigned int index) const {
-            if (index < this->colors.size()) {
-                return &this->colors[index];
+		const Color* GetVertexColor(const unsigned int index) const {
+			if (index < this->colors.size()) {
+				return &this->colors[index];
 			}
-            return nullptr;
-        }
+			return nullptr;
+		}
 
 		/** \brief load the default shader "shaders/mesh" */
-        void LoadShader();
+		void LoadShader();
 
-        static const std::string DEFAULT_SHADER;
+		static const std::string DEFAULT_SHADER;
 
-    protected:
-        // Note that these values are protected, not private! Inheriting classes get access to these
-        //  basic drawing elements.
-        std::vector<unsigned int> groupIndex; // Stores which index in faces a group starts at.
-        std::vector<Face> faces; // Stores vectors of face groupings.
-        std::map<unsigned int, std::string> faceGroups; // Stores a mapping of material name to face grouping
-        std::vector<Vertex> verts; // The verts that the faces refers to. Can be used for later refinement.
-        std::vector<Vertex> vertNorms;  // The vertex normals for each vert. Note that by some sleight of hand,
-                                        // we are using a vertex as a vector, since both are just 3 floats..
-        std::vector<TexCoord> texCoords; // The texture coords for each vertex.
-        std::vector<Color> colors;
-        std::map<std::string, Material> mats;
-    }; // class GLMesh
+		std::string texReplace;
+		std::string texReplaceWith;
+	protected:
+		// Note that these values are protected, not private! Inheriting classes get access to these
+		//  basic drawing elements.
+		std::vector<unsigned int> groupIndex; // Stores which index in faces a group starts at.
+		std::vector<Face> faces; // Stores vectors of face groupings.
+		std::map<unsigned int, std::string> faceGroups; // Stores a mapping of material name to face grouping
+		std::vector<Vertex> verts; // The verts that the faces refers to. Can be used for later refinement.
+		std::vector<Vertex> vertNorms;  // The vertex normals for each vert. Note that by some sleight of hand,
+		                                // we are using a vertex as a vector, since both are just 3 floats..
+		std::vector<TexCoord> texCoords; // The texture coords for each vertex.
+		std::vector<Color> colors;
+		std::map<std::string, Material> mats;
+
+	}; // class GLMesh
 
 } // namespace Sigma
 

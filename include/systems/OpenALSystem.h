@@ -17,10 +17,18 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <iostream>
 #include "resources/ALBuffer.h"
 #include "resources/SoundFile.h"
 #include "components/ALSound.h"
 #include "Sigma.h"
+
+//#define OPENAL_DEBUG
+#if defined(OPENAL_DEBUG)
+#define ALDEBUG(a) a
+#else
+#define ALDEBUG(a)
+#endif
 
 namespace Sigma {
 	class OpenALSystem
@@ -40,12 +48,26 @@ namespace Sigma {
 		DLL_EXPORT bool Start();
 
 		/**
+		 * \brief Shuts off the OpenAL audio system.
+		 *
+		 * Stops all sounds on the OpenAL system and cleans up the audio context.
+		 */
+		DLL_EXPORT void Shutdown();
+
+		/**
 		 * \brief Update listener position and handle queuing.
 		 *
 		 * Updates listener position and handles any queuing and/or streaming operations.
 		 * \return true if any audio processing was performed
 		 */
 		DLL_EXPORT bool Update();
+
+		/**
+		 * \brief Set master gain.
+		 *
+		 * Updates listener gain to the given multiplier, default is 1.0f.
+		 */
+		DLL_EXPORT void MasterGain(float);
 
 		DLL_EXPORT IComponent* CreateALSource(const id_t, const std::vector<Property> &);
 

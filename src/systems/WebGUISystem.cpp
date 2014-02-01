@@ -3,7 +3,9 @@
 #include "components/WebGUIComponent.h"
 #include "systems/OpenGLSystem.h"
 
+#ifndef NO_CEF
 #include "cef_url.h"
+#endif
 
 #include "Sigma.h"
 
@@ -22,20 +24,23 @@ namespace Sigma {
 		return retval;
 	}
 
+#ifndef NO_CEF
 	bool WebGUISystem::Start(CefMainArgs& mainArgs) {
 		LOG << "Setting up web view.";
 		CefRefPtr<WebGUISystem> ourselves(this);
 		CefSettings settings;
-#ifdef _WIN32
+#ifdef CEFDEV
 		CefInitialize(mainArgs, settings, ourselves.get(), nullptr);
 #else
 		CefInitialize(mainArgs, settings, ourselves.get());
 #endif
 		return true;
 	}
-
+#endif
 	bool WebGUISystem::Update(const double delta) {
+#ifndef NO_CEF
 		CefDoMessageLoopWork();
+#endif
 		return true;
 	}
 
@@ -71,12 +76,13 @@ namespace Sigma {
 			}
 		}
 		WebGUIView* webview = new WebGUIView(entityID);
-
+#ifndef NO_CEF
 		CefString cefurl(url);
 		CefURLParts parts;
 		if (!CefParseURL(cefurl, parts)) {
 			LOG_WARN << "Invalid URL";
 		}
+#endif
 
 		Sigma::resource::GLTexture texture;
 		Sigma::OpenGLSystem::textures[textureName] = texture;
@@ -88,6 +94,7 @@ namespace Sigma {
 		webview->SetTexture(&Sigma::OpenGLSystem::textures[textureName]);
 		this->addComponent(entityID, webview);
 
+#ifndef NO_CEF
 		CefWindowInfo windowInfo;
 		windowInfo.SetAsOffScreen(nullptr);
 		windowInfo.SetTransparentPainting(transparent);
@@ -95,6 +102,7 @@ namespace Sigma {
 		CefBrowserSettings settings;
 		CefRefPtr<Sigma::WebGUIView> client(webview);
 		CefBrowserHost::CreateBrowser(windowInfo, client.get(), url, settings, nullptr);
+#endif
 		return webview;
 	}
 }

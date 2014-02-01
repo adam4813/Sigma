@@ -353,8 +353,28 @@ namespace Sigma{
 			else if (p->GetName() == "shader") {
 				shaderfile = p->Get<std::string>();
 			}
+			else if (p->GetName() == "textureReplace") {
+				mesh->texReplace = p->Get<std::string>();
+			}
+			else if (p->GetName() == "replaceWith") {
+				mesh->texReplaceWith = p->Get<std::string>();
+			}
 			else if (p->GetName() == "id") {
 				componentID = p->Get<int>();
+			}
+			else if (p->GetName() == "parent") {
+				GLTransform *th, *pr;
+				int index = p->Get<int>();
+				th = mesh->Transform();
+				if(index == -1) {
+					pr = this->GetView()->Transform();
+				}
+				else {
+					pr = this->GetTransformFor(index);
+				}
+				if(th && pr) {
+					th->SetParentTransform(pr);
+				}
 			}
 			else if (p->GetName() == "cullface") {
 				cull_face = p->Get<std::string>();
@@ -531,6 +551,14 @@ namespace Sigma{
 			else if (p->GetName() == "outerAngle") {
 				light->outerAngle = p->Get<float>();
 				light->cosOuterAngle = glm::cos(light->outerAngle);
+			}
+			else if (p->GetName() == "parent") {
+				GLTransform *th, *pr;
+				th = &light->transform;
+				pr = this->GetTransformFor(p->Get<int>());
+				if(th && pr) {
+					th->SetParentTransform(pr);
+				}
 			}
 		}
 
