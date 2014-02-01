@@ -2,7 +2,7 @@
 #ifndef PHSYICS_MOVER_H
 #define PHSYICS_MOVER_H
 
-#include "components/ControllableMove.h"
+#include "composites/ControllableMove.h"
 #include "Sigma.h"
 
 

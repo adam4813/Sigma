@@ -2,7 +2,7 @@
 #include "components/BulletShapeMesh.h"
 #include "resources/Mesh.h"
 #include "components/BulletShapeSphere.h"
-#include "components/PhysicalWorldLocation.h"
+#include "composites/PhysicalWorldLocation.h"
 
 namespace Sigma {
 	// We need ctor and dstor to be exported to a dll even if they don't do anything

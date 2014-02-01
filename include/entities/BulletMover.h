@@ -5,9 +5,9 @@
 
 #include "IBulletShape.h"
 #include "Property.h"
-#include "components/InterpolatedMovement.h"
-#include "components/ControllableMove.h"
-#include "components/RigidBody.h"
+#include "composites/InterpolatedMovement.h"
+#include "composites/ControllableMove.h"
+#include "composites/RigidBody.h"
 #include "GLTransform.h"
 #include "Sigma.h"
 #include "Property.h"

@@ -1,5 +1,5 @@
 #include "GLTransform.h"
-#include "components/PhysicalWorldLocation.h"
+#include "composites/PhysicalWorldLocation.h"
 
 namespace Sigma {
 	const glm::vec3 GLTransform::FORWARD_VECTOR(0.0f,0.0f,-1.0f);

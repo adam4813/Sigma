@@ -1,5 +1,5 @@
 #include "components/SigmaMotionState.h"
-#include "components/PhysicalWorldLocation.h"
+#include "composites/PhysicalWorldLocation.h"
 
 namespace Sigma {
 		void SigmaMotionState::setWorldTransform(const btTransform &worldTrans) {
