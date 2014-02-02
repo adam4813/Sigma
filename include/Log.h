@@ -17,17 +17,32 @@
 #include <memory>
 #include <cassert>
 
+// MS Visual C++ stuff
+#if defined(_MSC_VER)
+	// VC++ C compiler support : C89 thanks microsoft !
+	#define snprintf _snprintf 
+        
+	// Get bored of theses warnings
+	#pragma warning(disable : 4996) // Ni puñetera idea
+	#pragma warning(disable : 4333) // Shift warning execding output var size, data loss
+	#pragma warning(disable : 4018) // Comparation of signed and unsigned with auto conversion
+	#pragma warning(disable : 4244) // Conversion of variables with data loss
+
+  #pragma warning(disable : 4482) // Not standard extension : Using full name of a enumeration
+#endif
+
+
 namespace Log {
 
 	/**
 	 * Logging levels
 	 */
 	enum LogLevel {
-		OFF = -1,
-		ERROR = 0,
-		WARN = 1,
-		INFO = 2,
-		DEBUG = 3,
+		LOGG_OFF		= -1,
+		LOGG_ERROR = 0,
+		LOGG_WARN	= 1,
+		LOGG_INFO	= 2,
+		LOGG_DEBUG = 3,
 	};
 
 
@@ -55,7 +70,7 @@ namespace Log {
 			 * \param level Logger level. By default it is at Debug level
 			 * \param sout Output Streambuffer where to write. By default uses std::clog
 			 */
-			static void Init(LogLevel level = LogLevel::DEBUG) {
+			static void Init(LogLevel level = LogLevel::LOGG_DEBUG) {
 				log_level = level;
 				out = &std::clog;
 			}
@@ -65,7 +80,7 @@ namespace Log {
 			 * \param level Logger level. By default it is at Debug level
 			 * \param sout Output Streambuffer where to write. By default uses std::clog
 			 */
-			static void Init(std::ostream& sout, LogLevel level = LogLevel::DEBUG) {
+			static void Init(std::ostream& sout, LogLevel level = LogLevel::LOGG_DEBUG) {
 				log_level = level;
 				out = &sout;
 			}
@@ -86,19 +101,19 @@ namespace Log {
 
 					if( output ) {
 						switch (level) {
-							case LogLevel::ERROR:
+							case LogLevel::LOGG_ERROR:
 								*out << "[ERROR] ";
 								break;
 
-							case LogLevel::WARN:
+							case LogLevel::LOGG_WARN:
 								*out << "[WARNING] ";
 								break;
 
-							case LogLevel::INFO:
+							case LogLevel::LOGG_INFO:
 								*out << "[INFO] ";
 								break;
 
-							case LogLevel::DEBUG:
+							case LogLevel::LOGG_DEBUG:
 								*out << "[DEBUG] ";
 								break;
 
@@ -147,10 +162,10 @@ namespace Log {
 } // END OF NAMESPACE logger
 
 // Macros to type less
-#define LOG_DEBUG Log::Print(Log::LogLevel::DEBUG)
-#define LOG       Log::Print(Log::LogLevel::INFO)
-#define LOG_WARN  Log::Print(Log::LogLevel::WARN)
-#define LOG_ERROR Log::Print(Log::LogLevel::ERROR)
+#define LOG_DEBUG Log::Print(Log::LogLevel::LOGG_DEBUG)
+#define LOG       Log::Print(Log::LogLevel::LOGG_INFO)
+#define LOG_WARN  Log::Print(Log::LogLevel::LOGG_WARN)
+#define LOG_ERROR Log::Print(Log::LogLevel::LOGG_ERROR)
 
 
 #endif // __LOGGER_H_
