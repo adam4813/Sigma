@@ -34,6 +34,9 @@ namespace Sigma {
 			albuf = master->buffers[this->buffers[this->bufferindex]]->GetID();
 			if(param != 0 && playlist.size() > 0) {
 				sfi = playlist[playindex];
+				if(master->GetSoundFile(sfi).expired()) {
+					return;
+				}
 				sfp = std::shared_ptr<resource::SoundFile>(master->GetSoundFile(sfi));
 				if(stream) {
 					chancount = sfp->Channels();
@@ -44,7 +47,7 @@ namespace Sigma {
 					buf = new short[buflen];
 					if(++this->bufferindex >= this->buffercount) {
 						this->bufferindex = 0;
-						ALDEBUG(std::cerr << "ALSound: Buffer-set wrap around\n";)
+						LOG_DEBUG1 << "ALSound: Buffer-set wrap around";
 					}
 					i = codec.FetchBuffer(*sfp, buf, ((chancount == 1) ? resource::PCM_MONO16 : resource::PCM_STEREO16), samplecount);
 					alSourceUnqueueBuffers(this->sourceid, 1, &albuf);
@@ -53,27 +56,27 @@ namespace Sigma {
 							buflen = chancount * i;
 							if(playloop == PLAYBACK_LOOP) {
 								this->codec.Rewind(*sfp);
-								ALDEBUG(std::cerr << "ALSound: Looping stream at sample: " << i << '\n';)
+								LOG_DEBUG1 << "ALSound: Looping stream at sample: " << i;
 								//bufbytes = i;
 								//i = codec.FetchBuffer(*sfp, buf+bufbytes, ((chancount == 1) ? resource::PCM_MONO16 : resource::PCM_STEREO16), samplecount - i);
 								//buflen = bufbytes+i;
 								buflen = i;
 								buflen *= chancount;
 							} else {
-								ALDEBUG(std::cerr << "ALSound: Playback done; at sample: " << i << '\n';)
+								LOG_DEBUG1 << "ALSound: Playback done; at sample: " << i;
 								playing = false;
 							}
 							bufbytes = buflen * sizeof(short);
-							ALDEBUG(std::cerr << "ALSound: Buffered " << albuf << "b + " << i << '/' << samplecount << " samples\n";)
+							LOG_DEBUG1 << "ALSound: Buffered " << albuf << "b + " << i << '/' << samplecount << " samples";
 							alBufferData(albuf, ((chancount == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16), buf, bufbytes, samplerate);
 						}
 						else {
-							ALDEBUG(std::cerr << "ALSound: Buffered " << albuf << "b + " << i << '/' << samplecount << " samples\n";)
+							LOG_DEBUG1 << "ALSound: Buffered " << albuf << "b + " << i << '/' << samplecount << " samples";
 							alBufferData(albuf, ((chancount == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16), buf, bufbytes, samplerate);
 						}
 						alSourceQueueBuffers(this->sourceid, 1, &albuf);
 					} else {
-						ALDEBUG(std::cerr << "ALSound: Playback end " << albuf << "b + " << i << '/' << samplecount << "samples\n";)
+						LOG_DEBUG1 << "ALSound: Playback end " << albuf << "b + " << i << '/' << samplecount << "samples";
 						if(playloop == PLAYBACK_LOOP) {
 							this->codec.Rewind(*sfp);
 						} else {
@@ -84,7 +87,7 @@ namespace Sigma {
 				}
 			}
 			else if(param == this->buffercount && stream) {
-				ALDEBUG(std::cerr << "ALSound: Playback underrun\n";)
+				LOG_DEBUG1 << "ALSound: Playback underrun";
 				alSourcei(this->sourceid, AL_LOOPING, AL_FALSE);
 			}
 		}
@@ -126,12 +129,12 @@ namespace Sigma {
 				bufbytes = buflen * 2;
 				this->codec.Rewind(*sfp);
 				buf = new unsigned short[buflen];
-				ALDEBUG(std::cerr << "ALSound: Buffering Ch:" << chancount << " R:" << samplerate << " sz:" << bufbytes << "\n";)
+				LOG_DEBUG1 << "ALSound: Buffering Ch:" << chancount << " R:" << samplerate << " sz:" << bufbytes;
 				x = 0;
 				while(x < this->buffercount && 0 < (i = codec.FetchBuffer(*sfp, buf, ((chancount == 1) ? resource::PCM_MONO16 : resource::PCM_STEREO16), samplecount))) {
 					albuf[x] = master->buffers[this->buffers[x]]->GetID();
 					if(i < samplecount) {
-						ALDEBUG(std::cerr << "ALSound: Buffered " << x << "b + " << i << '/' << samplecount << "samples\n";)
+						LOG_DEBUG1 << "ALSound: Buffered " << x << "b + " << i << '/' << samplecount << "samples";
 						buflen = chancount * i;
 						stream = false;
 						bufbytes = buflen * sizeof(short);
@@ -143,7 +146,7 @@ namespace Sigma {
 						//break;
 					}
 					else {
-						ALDEBUG(std::cerr << "ALSound: Buffered " << x << "b + " << i << '/' << bufbytes << "\n";)
+						LOG_DEBUG1 << "ALSound: Buffered " << x << "b + " << i << '/' << bufbytes;
 						alBufferData(albuf[x], ((chancount == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16), buf, bufbytes, samplerate);
 						stream = true;
 					}
@@ -151,7 +154,7 @@ namespace Sigma {
 				}
 				if(x < this->buffercount) {
 					stream = false;
-					ALDEBUG(std::cerr << "ALSound: Only " << x << '/' << this->buffercount << " buffers used, not streaming.\n";)
+					LOG_DEBUG1 << "ALSound: Only " << x << '/' << this->buffercount << " buffers used, not streaming.";
 				}
 				delete buf;
 				if(x > 0) {
@@ -161,10 +164,10 @@ namespace Sigma {
 					alSourcePlay(this->sourceid);
 					if(playloop == PLAYBACK_LOOP && !stream) {
 						alSourcei(this->sourceid, AL_LOOPING, AL_TRUE);
-						ALDEBUG(std::cerr << "ALSound: Looping playback\n";)
+						LOG_DEBUG1 << "ALSound: Looping playback";
 					} else {
 						alSourcei(this->sourceid, AL_LOOPING, AL_FALSE);
-						ALDEBUG(std::cerr << "ALSound: NOT looping playback, stream:" << stream << '\n';)
+						LOG_DEBUG1 << "ALSound: NOT looping playback, stream:" << stream;
 					}
 					playing = true;
 					paused = false;

@@ -22,7 +22,7 @@ namespace Log {
 	/**
 	 * Logging levels
 	 */
-	enum LogLevel { OFF = -1, LL_ERROR = 0, LL_WARN = 1, LL_INFO = 2, LL_DEBUG = 3 };
+	enum LogLevel { OFF = -1, LL_ERROR = 0, LL_WARN = 1, LL_INFO = 2, LL_DEBUG = 3, LL_DEBUG1 };
 
 
 	class Print {
@@ -144,6 +144,6 @@ namespace Log {
 #define LOG       Log::Print(Log::LogLevel::LL_INFO)
 #define LOG_WARN  Log::Print(Log::LogLevel::LL_WARN)
 #define LOG_ERROR Log::Print(Log::LogLevel::LL_ERROR)
-
+#define LOG_DEBUG1 Log::Print(Log::LogLevel::LL_DEBUG1)
 
 #endif // __LOGGER_H_

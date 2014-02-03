@@ -76,13 +76,17 @@ namespace Sigma {
 						else if(chk.id == FourCC('d','a','t','a')) {
 							if(this->data) { free(data); }
 							this->data = (unsigned char*)malloc(sizeof(WAVEHeader) + 4 + chk.size);
-							if(this->data == nullptr) { return; }
+							if(this->data == nullptr) {
+								LOG_ERROR << errno << "] Memory can not allocate " << sizeof(WAVEHeader) + 4 + chk.size << " bytes";
+								return;
+							}
 							*((unsigned long*)this->data) = chk.size / (head.align);
 							memcpy(this->data + 4, &head, sizeof(WAVEHeader));
 							fh.read((char*)this->data + 4 + sizeof(WAVEHeader), chk.size);
 							readcount -= chk.size;
 						}
 						else {
+							LOG_DEBUG << "[WAV] Skip chunk " << chk.id.cvalue[0] << chk.id.cvalue[1] << chk.id.cvalue[2] << chk.id.cvalue[3];
 							fh.ignore(chk.size); // unknown chunks
 						}
 					}
@@ -107,7 +111,10 @@ namespace Sigma {
 			offs = 0;
 			if(this->data) { free(data); }
 			this->data = (unsigned char*)malloc(allosz);
-			if(this->data == nullptr) { return; }
+			if(this->data == nullptr) {
+				LOG_ERROR << errno << "] Memory can not allocate " << allosz << " bytes";
+				return;
+			}
 			opdata = (OggLinkedPacket*)this->data;
 
 			ogg_sync_init(&sync);
@@ -132,7 +139,7 @@ namespace Sigma {
 							bytec = opdata->pack.bytes;
 							if(!offs) {
 								if(vorbis_synthesis_idheader(&opdata->pack) == 1) {
-									LOG << "\nVorbis ";
+									LOG_DEBUG << "Vorbis";
 									dataformat = Vorbis;
 								}
 							}
@@ -154,6 +161,8 @@ namespace Sigma {
 								offs += sizeof(OggLinkedPacket) + bytec;
 								opdata = (OggLinkedPacket*)(this->data + offs);
 								datasz = ndatasz;
+							} else {
+								LOG_WARN << errno << "] Memory can not reallocate " << allosz << " bytes";
 							}
 						}
 					}
@@ -490,7 +499,7 @@ namespace Sigma {
 				fh.read(fourcc.cvalue, 4); // read the id string
 				fh.seekg(0, std::ios::beg);
 				if(fourcc == FourCC('R','I','F','F')) {
-					LOG << "Loading Sound from WAV file: " << fn << '\n';
+					LOG << "Loading Sound from WAV file: " << fn;
 					LoadWAV(fh, sz);
 					ProcessMeta();
 				}
