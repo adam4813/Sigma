@@ -164,7 +164,7 @@ namespace Sigma{
 		DLL_EXPORT GLTransform* GetTransformFor(const unsigned int entityID);
 
 		static std::map<std::string, Sigma::resource::GLTexture> textures;
-		static std::map<std::string, Sigma::Mesh> meshes;
+		static std::map<std::string, std::shared_ptr<Mesh>> meshes;
 	private:
 		unsigned int windowWidth; // Store the width of our window
 		unsigned int windowHeight; // Store the height of our window
