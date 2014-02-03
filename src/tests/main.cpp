@@ -18,7 +18,7 @@
 #endif
 
 int main(int argCount, char **argValues) {
-	Log::Print::Init(); // Initiatin the Logger must the first thing
+	Log::Print::Init(); // Initializing the Logger must be done first.
 
 	Sigma::WebGUISystem webguisys;
 

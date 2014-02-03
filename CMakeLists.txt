@@ -88,7 +88,7 @@ ELSEIF ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 			SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
 		ENDIF (XCODE_VERSION)
 	ENDIF (NOT (CLANG_VERSION VERSION_GREATER 3.3 OR CLANG_VERSION VERSION_EQUAL 3.3))
-ELSEIF (MSVC AND (MSVC10 OR MSVC11))
+ELSEIF (MSVC AND (MSVC_VERSION GREATER 1599))
 	MESSAGE("Supported Visual Studio!")
 ELSE ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
 	MESSAGE(FATAL_ERROR "Your C++ compiler does not support C++11.")
@@ -249,6 +249,9 @@ if(BUILD_SHARED_Sigma)
 	TARGET_LINK_LIBRARIES(libSigma ${Sigma_ALL_LIBS})
 	set_target_properties(libSigma PROPERTIES
 		OUTPUT_NAME Sigma
+		)
+	set_target_properties(libSigma PROPERTIES
+		PDB_NAME libSigma
 		)
 endif(BUILD_SHARED_Sigma)
 

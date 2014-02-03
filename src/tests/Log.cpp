@@ -17,7 +17,7 @@ int main () {
 		LOG_WARN	<< "Hello world!";
 		LOG_ERROR << "Hello world!";
 
-		Log::Print::Level(Log::LogLevel::LOGG_WARN);	
+		Log::Print::Level(Log::LogLevel::LL_WARN);	
 		LOG_DEBUG << "Hello world! 2";
 		LOG				<< "Hello world! 2";
 		LOG_WARN	<< "Hello world! 2";
@@ -54,7 +54,7 @@ int main () {
 	LOG_ERROR << "String : " << str1;
 	LOG_ERROR << "String : " << path << filename;
 
-	Log::Print::Level(Log::LogLevel::LOGG_WARN);	
+	Log::Print::Level(Log::LogLevel::LL_WARN);	
 	LOG_DEBUG << "You shouldn't see this";
 	LOG				<< "Too verbose...";
 	LOG_WARN	<< "Alarm!";

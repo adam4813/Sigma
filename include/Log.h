@@ -23,7 +23,7 @@
 	#define snprintf _snprintf 
         
 	// Get bored of theses warnings
-	#pragma warning(disable : 4996) // Ni puñetera idea
+	#pragma warning(disable : 4996) // Ni puï¿½etera idea
 	#pragma warning(disable : 4333) // Shift warning execding output var size, data loss
 	#pragma warning(disable : 4018) // Comparation of signed and unsigned with auto conversion
 	#pragma warning(disable : 4244) // Conversion of variables with data loss
@@ -37,13 +37,7 @@ namespace Log {
 	/**
 	 * Logging levels
 	 */
-	enum LogLevel {
-		LOGG_OFF		= -1,
-		LOGG_ERROR = 0,
-		LOGG_WARN	= 1,
-		LOGG_INFO	= 2,
-		LOGG_DEBUG = 3,
-	};
+	enum LogLevel { OFF = -1, LL_ERROR = 0, LL_WARN = 1, LL_INFO = 2, LL_DEBUG = 3, LL_DEBUG1 };
 
 
 	class Print {
@@ -70,7 +64,7 @@ namespace Log {
 			 * \param level Logger level. By default it is at Debug level
 			 * \param sout Output Streambuffer where to write. By default uses std::clog
 			 */
-			static void Init(LogLevel level = LogLevel::LOGG_DEBUG) {
+			static void Init(LogLevel level = LogLevel::LL_DEBUG) {
 				log_level = level;
 				out = &std::clog;
 			}
@@ -80,7 +74,7 @@ namespace Log {
 			 * \param level Logger level. By default it is at Debug level
 			 * \param sout Output Streambuffer where to write. By default uses std::clog
 			 */
-			static void Init(std::ostream& sout, LogLevel level = LogLevel::LOGG_DEBUG) {
+			static void Init(std::ostream& sout, LogLevel level = LogLevel::LL_DEBUG) {
 				log_level = level;
 				out = &sout;
 			}
@@ -96,35 +90,34 @@ namespace Log {
 			 * /brief Builds an instance of the logger
 			 * /param level Logging level of the message
 			 */
-			Print( LogLevel level ) : 
-				output( level <= log_level ), level(level) {
+			Print( LogLevel level ) : output( level <= log_level ), level(level) {
+				if( output ) {
+					// Last ditch effort to make sure out is valid and set it if it isn't.
+					if (!out) {
+						out = &std::clog;
+					}
+					switch (level) {
+					case LogLevel::LL_ERROR:
+						*out << "[ERROR] ";
+						break;
 
-					if( output ) {
-						switch (level) {
-							case LogLevel::LOGG_ERROR:
-								*out << "[ERROR] ";
-								break;
+					case LogLevel::LL_WARN:
+						*out << "[WARNING] ";
+						break;
 
-							case LogLevel::LOGG_WARN:
-								*out << "[WARNING] ";
-								break;
+					case LogLevel::LL_INFO:
+						*out << "[INFO] ";
+						break;
 
-							case LogLevel::LOGG_INFO:
-								*out << "[INFO] ";
-								break;
+					case LogLevel::LL_DEBUG:
+						*out << "[DEBUG] ";
+						break;
 
-							case LogLevel::LOGG_DEBUG:
-								*out << "[DEBUG] ";
-								break;
-
-							default:
-								break;
-						}
-						// Auto ident more if is more severe
-						//*out << std::string( static_cast<int>(logger::log_level) -
-						// static_cast<int>(level), '\t');
+					default:
+						break;
 					}
 				}
+			}
 
 			/**
 			 * \brief Destructor of the class. Here writes the output
@@ -147,7 +140,7 @@ namespace Log {
 			}
 
 			/**
-			 * \brief Opertaor << to write anything at the C++ way. Allow to chain multiple strings or values
+			 * \brief Operator << to write anything at the C++ way. Allow to chain multiple strings or values
 			 */
 			template<typename T>
 				Print& operator<<( T t) {
@@ -162,10 +155,10 @@ namespace Log {
 } // END OF NAMESPACE logger
 
 // Macros to type less
-#define LOG_DEBUG Log::Print(Log::LogLevel::LOGG_DEBUG)
-#define LOG       Log::Print(Log::LogLevel::LOGG_INFO)
-#define LOG_WARN  Log::Print(Log::LogLevel::LOGG_WARN)
-#define LOG_ERROR Log::Print(Log::LogLevel::LOGG_ERROR)
-
+#define LOG_DEBUG Log::Print(Log::LogLevel::LL_DEBUG)
+#define LOG       Log::Print(Log::LogLevel::LL_INFO)
+#define LOG_WARN  Log::Print(Log::LogLevel::LL_WARN)
+#define LOG_ERROR Log::Print(Log::LogLevel::LL_ERROR)
+#define LOG_DEBUG1 Log::Print(Log::LogLevel::LL_DEBUG1)
 
 #endif // __LOGGER_H_

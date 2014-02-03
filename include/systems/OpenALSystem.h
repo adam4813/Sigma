@@ -23,12 +23,6 @@
 #include "components/ALSound.h"
 #include "Sigma.h"
 
-//#define OPENAL_DEBUG
-#if defined(OPENAL_DEBUG)
-#define ALDEBUG(a) a
-#else
-#define ALDEBUG(a)
-#endif
 
 namespace Sigma {
 	class OpenALSystem
@@ -101,6 +95,8 @@ namespace Sigma {
 			std::weak_ptr<resource::SoundFile> p;
 			if (audiofiles.find(i) != audiofiles.end()) {
 				p = audiofiles[i];
+			} else {
+				LOG_WARN << "Invalid Sound index: " << i;
 			}
 			return p;
 		}

@@ -60,6 +60,7 @@ namespace Sigma {
 				this->audioindex[filename] = i;
 				return i;
 			} else {
+				LOG_WARN << "Failed to load sound from " << filename;
 				this->audiofiles.erase(i);
 				return 0;
 			}
