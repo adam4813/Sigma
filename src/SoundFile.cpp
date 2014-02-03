@@ -9,6 +9,9 @@ extern "C" {
 #include <iostream>
 #include <string>
 #include "resources/SoundFile.h"
+#include "systems/OpenALSystem.h"
+
+#include "Sigma.h"
 
 struct OggLinkedPacket {
 	ogg_packet pack;
@@ -73,13 +76,17 @@ namespace Sigma {
 						else if(chk.id == FourCC('d','a','t','a')) {
 							if(this->data) { free(data); }
 							this->data = (unsigned char*)malloc(sizeof(WAVEHeader) + 4 + chk.size);
-							if(this->data == nullptr) { return; }
-							*((unsigned long*)this->data) = chk.size;
+							if(this->data == nullptr) {
+								LOG_ERROR << errno << "] Memory can not allocate " << sizeof(WAVEHeader) + 4 + chk.size << " bytes";
+								return;
+							}
+							*((unsigned long*)this->data) = chk.size / (head.align);
 							memcpy(this->data + 4, &head, sizeof(WAVEHeader));
 							fh.read((char*)this->data + 4 + sizeof(WAVEHeader), chk.size);
 							readcount -= chk.size;
 						}
 						else {
+							LOG_DEBUG << "[WAV] Skip chunk " << chk.id.cvalue[0] << chk.id.cvalue[1] << chk.id.cvalue[2] << chk.id.cvalue[3];
 							fh.ignore(chk.size); // unknown chunks
 						}
 					}
@@ -104,7 +111,10 @@ namespace Sigma {
 			offs = 0;
 			if(this->data) { free(data); }
 			this->data = (unsigned char*)malloc(allosz);
-			if(this->data == nullptr) { return; }
+			if(this->data == nullptr) {
+				LOG_ERROR << errno << "] Memory can not allocate " << allosz << " bytes";
+				return;
+			}
 			opdata = (OggLinkedPacket*)this->data;
 
 			ogg_sync_init(&sync);
@@ -129,7 +139,7 @@ namespace Sigma {
 							bytec = opdata->pack.bytes;
 							if(!offs) {
 								if(vorbis_synthesis_idheader(&opdata->pack) == 1) {
-									std::cerr << "\nVorbis ";
+									LOG_DEBUG << "Vorbis";
 									dataformat = Vorbis;
 								}
 							}
@@ -151,6 +161,8 @@ namespace Sigma {
 								offs += sizeof(OggLinkedPacket) + bytec;
 								opdata = (OggLinkedPacket*)(this->data + offs);
 								datasz = ndatasz;
+							} else {
+								LOG_WARN << errno << "] Memory can not reallocate " << allosz << " bytes";
 							}
 						}
 					}
@@ -170,7 +182,7 @@ namespace Sigma {
 			}
 			if(lastlp) { lastlp->next = nullptr; }
 
-			std::cerr << datasz << " bytes loaded.";
+			LOG_DEBUG << datasz << " bytes loaded.";
 			ogg_stream_clear(&stream);
 			ogg_sync_clear(&sync);
 		}
@@ -276,7 +288,7 @@ namespace Sigma {
 					samples = filelen - rs[0];
 				}
 				if(samples > 0) {
-					out = Resample(out, fmt, pcmdat, sf.pcmsize, samples);
+					out = Resample(out, fmt, pcmdat+(rs[0]*head->align), sf.pcmsize, samples);
 					rs[0] += samples;
 				}
 				return samples;
@@ -456,8 +468,8 @@ namespace Sigma {
 						k = 0;
 						for(fidat = (float*)in, sodat = (short*)out; k++ < fcount; fidat++, sodat++) {
 							*(unsigned short*)sodat = static_cast<unsigned short>(((*fidat)+1.0f) * 16383.f);
-							if(*fidat < fmin) { std::cerr << "m" << *fidat; sodat--; }
-							if(*fidat > fmax) { std::cerr << "x" << *fidat; sodat--; }
+							if(*fidat < fmin) { LOG << "m" << *fidat; sodat--; }
+							if(*fidat > fmax) { LOG << "x" << *fidat; sodat--; }
 							if(chanadd) { fidat--; }
 							if(chancomp) { fidat++; }
 						}
@@ -487,15 +499,14 @@ namespace Sigma {
 				fh.read(fourcc.cvalue, 4); // read the id string
 				fh.seekg(0, std::ios::beg);
 				if(fourcc == FourCC('R','I','F','F')) {
-					std::cerr << "Loading Sound from WAV file: " << fn << '\n';
+					LOG << "Loading Sound from WAV file: " << fn;
 					LoadWAV(fh, sz);
 					ProcessMeta();
 				}
 				else if(fourcc == FourCC('O','g','g','S')) {
-					std::cerr << "Loading Sound from Ogg file: " << fn;
+					LOG << "Loading Sound from Ogg file: " << fn;
 					LoadOgg(fh, sz);
 					ProcessMeta();
-					std::cerr << '\n';
 				}
 				else {
 					data = (unsigned char*)malloc( (size_t)sz );

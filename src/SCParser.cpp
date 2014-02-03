@@ -6,41 +6,43 @@
 #include <sstream>
 #include <locale.h>
 
+#include "Sigma.h"
+
 namespace Sigma {
 	namespace parser {
-    /**
-     * Change locals to "C" for numbers inside the code block were is created as uses RAII
-     */
-    struct SetLocals {
-      SetLocals() {
-        setlocale(LC_NUMERIC, "C"); // We must parse numbers in a consistent way
-      }
+	/**
+	 * Change locals to "C" for numbers inside the code block were is created as uses RAII
+	 */
+	struct SetLocals {
+		SetLocals() {
+			setlocale(LC_NUMERIC, "C"); // We must parse numbers in a consistent way
+		}
 
-      ~SetLocals() {
-        setlocale(LC_ALL, ""); // Restores system local
-      }
-    };
+		~SetLocals() {
+			setlocale(LC_ALL, ""); // Restores system local
+		}
+	};
 
-		bool SCParser::Parse(const std::string& fname) {	
-      this->fname = fname;
+		bool SCParser::Parse(const std::string& fname) {
+			this->fname = fname;
 			std::ifstream in(this->fname, std::ios::in);
 
 			// Some type of error opening the file
 			if (!in) {
-				std::cerr << "Cannot open sc file " << fname << std::endl;
+				LOG_ERROR << "Cannot open sc file " << fname;
 				return false;
 			}
 
-      auto locals = SetLocals();
-  
-      std::string line;
+			auto locals = SetLocals();
+
+			std::string line;
 			Sigma::parser::Entity* currentEntity = nullptr;
 
 			while (getline(in, line)) {
-        // strip line's whitespace
-        line = rtrim(line);
-        // Strip C style comments
-        line = rcomment(line);
+				// strip line's whitespace
+				line = rtrim(line);
+				// Strip C style comments
+				line = rcomment(line);
 
 				char key[1];
 				key[0] = line.substr(0,1)[0];
@@ -59,8 +61,8 @@ namespace Sigma {
 					Sigma::parser::Component c;
 					c.type = line.substr(1);
 					while (getline(in, line)) {
-                        // strip line's whitespace
-                        line = rtrim(line);
+						// strip line's whitespace
+						line = rtrim(line);
 						if (line.substr(0,1) == ">") { // property line
 							std::string propName = line.substr(1, line.find("=") - 1);
 							std::string propValue = line.substr(line.find("=") + 1);
@@ -99,7 +101,7 @@ namespace Sigma {
 						currentEntity->components.push_back(c);
 					}
 					else {
-						std::cerr << "Attempted to add component to undefined entity." << std::endl;
+						LOG_DEBUG << "Attempted to add component to undefined entity.";
 					}
 				}
 			}

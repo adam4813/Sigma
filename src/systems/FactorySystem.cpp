@@ -1,7 +1,7 @@
 #include "systems/FactorySystem.h"
+#include "Sigma.h"
 
 namespace Sigma{
-
 	std::shared_ptr<FactorySystem> FactorySystem::_instance;
 
 	FactorySystem::FactorySystem(){
@@ -26,7 +26,7 @@ namespace Sigma{
 							   const id_t entityID,
 							   const std::vector<Property> &properties){
 		if(registeredFactoryFunctions.find(type) != registeredFactoryFunctions.end()){
-			std::cerr << "Creating component of type: " << type << std::endl;
+			LOG << "Creating component of type: " << type;
 			return registeredFactoryFunctions[type](entityID, properties);
 		}
 		else {
@@ -38,11 +38,11 @@ namespace Sigma{
 							const id_t entityID,
 							const std::vector<Property> &properties){
 		if(registeredECSFactoryFunctions.find(type) != registeredECSFactoryFunctions.end()){
-			std::cerr << "Creating ECS component of type: " << type << std::endl;
+			LOG << "Creating ECS component of type: " << type;
 			return registeredECSFactoryFunctions[type](entityID, properties);
 		}
 		else {
-			std::cerr << "Error: Couldn't find component: " << type << std::endl;
+			LOG_DEBUG << "Error: Couldn't find component: " << type;
 			return std::vector<std::unique_ptr<IECSComponent>>();
 		}
 	}
@@ -50,7 +50,7 @@ namespace Sigma{
 	void FactorySystem::register_Factory(IFactory& Factory){
 		const auto& factoryfunctions = Factory.getFactoryFunctions();
 		for(auto FactoryFunc = factoryfunctions.begin(); FactoryFunc != factoryfunctions.end(); ++FactoryFunc){
-			std::cerr << "Registering component factory of type: " << FactoryFunc->first << std::endl;
+			LOG << "Registering component factory of type: " << FactoryFunc->first;
 			registeredFactoryFunctions[FactoryFunc->first]=FactoryFunc->second;
 		}
 	}

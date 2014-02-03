@@ -1,5 +1,6 @@
 #include "systems/OpenALSystem.h"
-#include <iostream>
+
+#include "Sigma.h"
 
 namespace Sigma {
 
@@ -10,22 +11,28 @@ namespace Sigma {
 
 	bool OpenALSystem::Start() {
 		const char * alcx;
-		device = alcOpenDevice(nullptr);
-		if(device == nullptr) {
+		this->device = alcOpenDevice(nullptr);
+		if(this->device == nullptr) {
 			return false;
 		}
-		context = alcCreateContext(device, nullptr);
-		if(context == nullptr) {
+		this->context = alcCreateContext(device, nullptr);
+		if(this->context == nullptr) {
 			return false;
 		}
-		if(!alcMakeContextCurrent(context)) {
+		if(!alcMakeContextCurrent(this->context)) {
 			return false;
 		}
-		alcx = alcGetString(device, ALC_EXTENSIONS);
+		alcx = alcGetString(this->device, ALC_EXTENSIONS);
 		if( alcx != nullptr ) {
-			std::cerr << "OpenAL extentions: " << alcx << '\n';
+			LOG << "OpenAL extentions: " << alcx;
 		}
 		return true;
+	}
+	void OpenALSystem::Shutdown() {
+		this->StopAll();
+		alcMakeContextCurrent(nullptr);
+		alcDestroyContext(this->context);
+		alcCloseDevice(this->device);
 	}
 	long OpenALSystem::CreateSoundFile() {
 		std::shared_ptr<resource::SoundFile> sound(new resource::SoundFile);
@@ -53,12 +60,17 @@ namespace Sigma {
 				this->audioindex[filename] = i;
 				return i;
 			} else {
+				LOG_WARN << "Failed to load sound from " << filename;
 				this->audiofiles.erase(i);
 				return 0;
 			}
 		} else {
 			return this->audioindex[filename];
 		}
+	}
+
+	void OpenALSystem::MasterGain(float v) {
+		alListenerf(AL_GAIN, v);
 	}
 
 	void OpenALSystem::UpdateTransform(GLTransform &t) {
@@ -77,7 +89,7 @@ namespace Sigma {
 		alListenerfv(AL_ORIENTATION, fo);
 	}
 
-	IComponent* OpenALSystem::CreateALSource(const unsigned int entityID, const std::vector<Property> &properties) {
+	IComponent* OpenALSystem::CreateALSource(const id_t entityID, const std::vector<Property> &properties) {
 		ALSound * sound = new ALSound(entityID, this);
 
 		sound->Generate();
@@ -103,6 +115,21 @@ namespace Sigma {
 			else if (p->GetName() == "z") {
 				z = p->Get<float>();
 				continue;
+			}
+			else if (p->GetName() == "gain") {
+				sound->Gain(p->Get<float>());
+			}
+			else if (p->GetName() == "rel") {
+				sound->Relative(p->Get<bool>());
+			}
+			else if (p->GetName() == "rolloff") {
+				sound->Rolloff(p->Get<float>());
+			}
+			else if (p->GetName() == "maxdist") {
+				sound->MaxDistance(p->Get<float>());
+			}
+			else if (p->GetName() == "refdist") {
+				sound->ReferenceDistance(p->Get<float>());
 			}
 			else if (p->GetName() == "loop") {
 				sound->PlayMode(ORDERING_NONE, PLAYBACK_LOOP);

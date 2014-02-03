@@ -109,7 +109,7 @@ namespace Sigma {
 				rz = p->Get<float>();
 			}
 			else if (p->GetName() == "meshFile") {
-				std::cerr << "Loading mesh: " << p->Get<std::string>() << std::endl;
+				LOG << "Loading mesh: " << p->Get<std::string>();
 				Mesh meshFile;
 				meshFile.LoadObjMesh(p->Get<std::string>());
 				mesh->SetMesh(&meshFile, scale);

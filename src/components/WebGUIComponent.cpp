@@ -2,6 +2,7 @@
 
 namespace Sigma {
 	void WebGUIView::InjectKeyboardEvent(const unsigned int key, const Sigma::event::KEY_STATE state) {
+#ifndef NO_CEF
 		if (this->hasFocus) {
 			CefKeyEvent key_event;
 			memset(&key_event, 0, sizeof(CefKeyEvent));
@@ -17,9 +18,11 @@ namespace Sigma {
 				this->browserHost->SendKeyEvent(key_event);
 			}
 		}
+#endif
 	}
 
 	bool WebGUIView::InjectMouseMove(float x, float y) {
+#ifndef NO_CEF
 		if (!this->browserHost) {
 			return false;
 		}
@@ -43,10 +46,12 @@ namespace Sigma {
 			this->browserHost->SendMouseMoveEvent(mouse_event, false);
 			return true;
 		}
+#endif
 		return false;
 	}
 
 	bool WebGUIView::InjectMouseDown(const Sigma::event::BUTTON btn, float x, float y) {
+#ifndef NO_CEF
 		if (btn != Sigma::event::BUTTON::LEFT) { return false; }
 		if ((x > this->x) && (x < (this->x + this->width))) {
 			if ((y > this->y) && (y < (this->y + this->height))) {
@@ -63,11 +68,13 @@ namespace Sigma {
 			}
 		}
 		this->browserHost->SendFocusEvent(false);
+#endif
 		this->hasFocus = false;
 		return false;
 	}
 
 	bool WebGUIView::InjectMouseUp(const Sigma::event::BUTTON btn, float x, float y) {
+#ifndef NO_CEF
 		if (this->hasFocus) {
 			CefMouseEvent mouse_event;
 			mouse_event.x = static_cast<int>((x - this->x) * this->windowWidth);
@@ -77,11 +84,13 @@ namespace Sigma {
 			return true;
 		}
 		this->browserHost->SendFocusEvent(false);
+#endif
 		this->hasFocus = false;
 		return false;
 	}
 
 	void WebGUIView::InjectCharDown(const unsigned int c) {
+#ifndef NO_CEF
 		if (this->hasFocus) {
 			CefKeyEvent key_event;
 			memset(&key_event, 0, sizeof(CefKeyEvent));
@@ -99,5 +108,6 @@ namespace Sigma {
 				this->browserHost->SendKeyEvent(key_event);
 			}
 		}
+#endif
 	}
 }
