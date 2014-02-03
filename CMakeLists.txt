@@ -270,6 +270,9 @@ if(BUILD_SHARED_Sigma)
 	set_target_properties(libSigma PROPERTIES
 		OUTPUT_NAME Sigma
 		)
+	set_target_properties(libSigma PROPERTIES
+		PDB_NAME libSigma
+		)
 endif(BUILD_SHARED_Sigma)
 
 if(BUILD_EXE_Sigma)
