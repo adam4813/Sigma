@@ -5,7 +5,6 @@ namespace Sigma {
 	VectorMap<id_t, position_type> PhysicalWorldLocation::pphysical;
 	VectorMap<id_t, orientation_type> PhysicalWorldLocation::ophysical;
 	std::shared_ptr<BitArray<unsigned int>> PhysicalWorldLocation::updated_set = BitArray<unsigned int>::Create();
-    std::unordered_map<id_t, GLTransform> PhysicalWorldLocation::transform_map;
     std::unordered_map<id_t, std::shared_ptr<GLTransform>> PhysicalWorldLocation::transform_ptr_map;
 
     void PhysicalWorldLocation::UpdateTransform() {
@@ -23,12 +22,11 @@ namespace Sigma {
 				   coordinate_type z, const coordinate_type rx, const coordinate_type ry, const coordinate_type rz) {
 		pphysical[id] = position_type(x, y, z);
 		ophysical[id] = orientation_type(rx, ry, rz);
-		GLTransform transform;
+		std::shared_ptr<GLTransform> transform(new GLTransform);
 		// Set the view mover's view pointer.
-		transform.SetEuler(true);
-		transform.SetMaxRotation(glm::vec3(45.0f,0,0));
-		transform_map.insert(std::make_pair(id, transform));
-		transform_ptr_map.emplace(id, std::shared_ptr<GLTransform>(&transform_map.at(id)));
+		transform->SetEuler(true);
+		transform->SetMaxRotation(glm::vec3(45.0f,0,0));
+		transform_ptr_map.emplace(id, transform);
 		(*updated_set)[id] = true;
 		std::cout << "adding entity " << id << " (" << x << ", " << y << ", " << z << ")" << std::endl;
 		return std::vector<std::unique_ptr<IECSComponent>>();

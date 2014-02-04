@@ -65,7 +65,6 @@ namespace Sigma {
 		static void RemoveEntity(const id_t id) {
 			pphysical.clear(id);
 			ophysical.clear(id);
-			transform_map.erase(id);
 			transform_ptr_map.erase(id);
 		};
 
@@ -176,7 +175,6 @@ namespace Sigma {
 		static VectorMap<id_t, position_type> pphysical;
 		static VectorMap<id_t, orientation_type> ophysical;
 		static std::shared_ptr<BitArray<unsigned int>> updated_set;
-		static std::unordered_map<id_t, GLTransform> transform_map;
 		// we need this hack to keep a shared_ptr for each transform since SpatialComponent
 		// uses its own GLTransform or a shared one, so we must provide a shared_ptr
 		// TODO: SpatialComponent should be redefined (what is its purpose ?)
