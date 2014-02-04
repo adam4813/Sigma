@@ -20,10 +20,8 @@
 int main(int argCount, char **argValues) {
 	Log::Print::Init(); // Initializing the Logger must be done first.
 
-	Sigma::WebGUISystem webguisys;
-
 #ifndef NO_CEF
-	CefRefPtr<Sigma::WebGUISystem> app(&webguisys);
+	CefRefPtr<Sigma::WebGUISystem> app(new Sigma::WebGUISystem);
 #ifdef _WIN32
 	CefMainArgs mainArgs(GetModuleHandle(NULL));
 #else
@@ -49,7 +47,7 @@ int main(int argCount, char **argValues) {
 	factory.register_Factory(alsys);
 	factory.register_Factory(bphys);
 #ifndef NO_CEF
-	factory.register_Factory(webguisys);
+	factory.register_Factory(*app.get());
 #endif
 
 	if (!glfwos.InitializeWindow(1024, 768, "Sigma test")) {
@@ -95,8 +93,8 @@ int main(int argCount, char **argValues) {
 	// Setup GUI //
 	///////////////
 #ifndef NO_CEF
-	webguisys.Start(mainArgs);
-	webguisys.SetWindowSize(glfwos.GetWindowWidth(), glfwos.GetWindowHeight());
+	app->Start(mainArgs);
+	app->SetWindowSize(glfwos.GetWindowWidth(), glfwos.GetWindowHeight());
 #endif
 
 	/////////////////
@@ -186,7 +184,7 @@ int main(int argCount, char **argValues) {
 	///////////////////
 #ifndef NO_CEF
 	Sigma::event::handler::GUIController guicon;
-	guicon.SetGUI(webguisys.getComponent(100, Sigma::WebGUIView::getStaticComponentTypeName()));
+	guicon.SetGUI(app->getComponent(100, Sigma::WebGUIView::getStaticComponentTypeName()));
 	glfwos.RegisterKeyboardEventHandler(&guicon);
 	glfwos.RegisterMouseEventHandler(&guicon);
 #endif
@@ -287,7 +285,7 @@ int main(int argCount, char **argValues) {
 
 		// Pass in delta time in seconds
 		bphys.Update(deltaSec);
-		webguisys.Update(deltaSec);
+		app->Update(deltaSec);
 
 
 		// Update the renderer and present
