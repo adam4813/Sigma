@@ -26,117 +26,117 @@ namespace Log {
 
 
 	class Print {
-		private:
-			bool output;    /// Enable output ?
-			LogLevel level; /// Level of the message
+	private:
+		bool output;    /// Enable output ?
+		LogLevel level; /// Level of the message
 
-			/**
-			 * \brief Desired Logging level to show.
-			 * If N in "debug(N)" is <= log_level, then it will be shown
-			 * By default is at Debug level, displaying all log messages
-			 */
-			static LogLevel log_level;
+		/**
+			* \brief Desired Logging level to show.
+			* If N in "debug(N)" is <= log_level, then it will be shown
+			* By default is at Debug level, displaying all log messages
+			*/
+		static LogLevel log_level;
 
-			/**
-			 * \brief Output stream to use
-			 * If it is a file, the external code must open it and close it
-			 */
-			static std::ostream* out;
+		/**
+			* \brief Output stream to use
+			* If it is a file, the external code must open it and close it
+			*/
+		static std::ostream* out;
 
-		public:
-			/**
-			 * Initializes the Logger
-			 * \param level Logger level. By default it is at Debug level
-			 * \param sout Output Streambuffer where to write. By default uses std::clog
-			 */
-			static void Init(LogLevel level = LogLevel::LL_DEBUG) {
-				log_level = level;
-				out = &std::clog;
-			}
+	public:
+		/**
+			* Initializes the Logger
+			* \param level Logger level. By default it is at Debug level
+			* \param sout Output Streambuffer where to write. By default uses std::clog
+			*/
+		static void Init(LogLevel level = LogLevel::LL_DEBUG) {
+			log_level = level;
+			out = &std::clog;
+		}
 
-			/**
-			 * Initializes the Logger
-			 * \param level Logger level. By default it is at Debug level
-			 * \param sout Output Streambuffer where to write. By default uses std::clog
-			 */
-			static void Init(std::ostream& sout, LogLevel level = LogLevel::LL_DEBUG) {
-				log_level = level;
-				out = &sout;
-			}
+		/**
+			* Initializes the Logger
+			* \param level Logger level. By default it is at Debug level
+			* \param sout Output Streambuffer where to write. By default uses std::clog
+			*/
+		static void Init(std::ostream& sout, LogLevel level = LogLevel::LL_DEBUG) {
+			log_level = level;
+			out = &sout;
+		}
 
-			/**
-			 * Changes the actual logging level
-			 */
-			static void Level( LogLevel level) {
-				log_level = level;
-			}
+		/**
+			* Changes the actual logging level
+			*/
+		static void Level( LogLevel level) {
+			log_level = level;
+		}
 
-			/**
-			 * /brief Builds an instance of the logger
-			 * /param level Logging level of the message
-			 */
-			Print( LogLevel level ) : output( level <= log_level ), level(level) {
-				if( output ) {
-					// Last ditch effort to make sure out is valid and set it if it isn't.
-					if (!out) {
-						out = &std::clog;
-					}
-					switch (level) {
-					case LogLevel::LL_ERROR:
-						*out << "[ERROR] ";
-						break;
+		/**
+			* /brief Builds an instance of the logger
+			* /param level Logging level of the message
+			*/
+		Print( LogLevel level ) : output( level <= log_level ), level(level) {
+			if( output ) {
+				// Last ditch effort to make sure out is valid and set it if it isn't.
+				if (!out) {
+					out = &std::clog;
+				}
+				switch (level) {
+				case LogLevel::LL_ERROR:
+					*out << "[ERROR] ";
+					break;
 
-					case LogLevel::LL_WARN:
-						*out << "[WARNING] ";
-						break;
+				case LogLevel::LL_WARN:
+					*out << "[WARNING] ";
+					break;
 
-					case LogLevel::LL_INFO:
-						*out << "[INFO] ";
-						break;
+				case LogLevel::LL_INFO:
+					*out << "[INFO] ";
+					break;
 
-					case LogLevel::LL_DEBUG:
-						*out << "[DEBUG] ";
-						break;
+				case LogLevel::LL_DEBUG:
+					*out << "[DEBUG] ";
+					break;
 
-					default:
-						break;
-					}
+				default:
+					break;
 				}
 			}
+		}
 
-			/**
-			 * \brief Destructor of the class. Here writes the output
-			 */
-			~Print() {
-				if (output) {
-					*out << std::endl;
-					out->flush();
-				}
+		/**
+			* \brief Destructor of the class. Here writes the output
+			*/
+		~Print() {
+			if (output) {
+				*out << std::endl;
+				out->flush();
 			}
+		}
 
-			/**
-			 * \brief Operator << to write strings in the C++ way. Allows chaining multiple strings or values
-			 */
-			Print& operator<<(const std::string& str) {
-				if( output && out != nullptr ) {
-					*out << str;
-				}
-				return *this;
+		/**
+			* \brief Operator << to write strings in the C++ way. Allows chaining multiple strings or values
+			*/
+		Print& operator<<(const std::string& str) {
+			if( output && out != nullptr ) {
+				*out << str;
 			}
+			return *this;
+		}
 
-			/**
-			 * \brief Operator << to write anything at the C++ way. Allow to chain multiple strings or values
-			 */
-			template<typename T>
-				Print& operator<<( T t) {
-					if( output && out != nullptr ) {
-						*out << t;
-					}
-					return *this;
-				}
-
+		/**
+			* \brief Operator << to write anything at the C++ way. Allow to chain multiple strings or values
+			*/
+		template<typename T>
+		Print& operator<<( T t) {
+			if( output && out != nullptr ) {
+				*out << t;
+			}
+			return *this;
+		}
 	};
-
+	__declspec(selectany) LogLevel Print::log_level;
+	__declspec(selectany) std::ostream* Print::out;
 } // END OF NAMESPACE logger
 
 // Macros to type less

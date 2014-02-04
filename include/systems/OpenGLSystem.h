@@ -21,6 +21,7 @@
 #include "resources/GLScreenQuad.h"
 #include "Sigma.h"
 #include "composites/PhysicalWorldLocation.h"
+#include "ResourceSsytem.h"
 
 struct IGLView;
 
@@ -161,9 +162,6 @@ namespace Sigma{
 		}
 
 		DLL_EXPORT GLTransform* GetTransformFor(const unsigned int entityID);
-
-		static std::map<std::string, resource::Texture> textures;
-		static std::map<std::string, std::shared_ptr<resource::Mesh>> meshes;
 	private:
 		unsigned int windowWidth; // Store the width of our window
 		unsigned int windowHeight; // Store the height of our window
@@ -185,6 +183,8 @@ namespace Sigma{
 		std::vector<std::unique_ptr<RenderTarget>> renderTargets;
 
 		std::vector<std::unique_ptr<Renderable>> screensSpaceComp; // A vector that holds only screen space components. These are rendered separately.
+
+		std::shared_ptr<resource::ResourceSystem> resSystem;
 	}; // class OpenGLSystem
 } // namespace Sigma
 #endif // OPENGLSYSTEM_H

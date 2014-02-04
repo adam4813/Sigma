@@ -60,11 +60,12 @@ namespace Sigma{
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 	}
 
-	std::map<std::string, resource::Texture> OpenGLSystem::textures;
-	std::map<std::string, std::shared_ptr<resource::Mesh>> OpenGLSystem::meshes;
-
 	OpenGLSystem::OpenGLSystem() : windowWidth(1024), windowHeight(768), deltaAccumulator(0.0),
-		framerate(60.0f), pointQuad(1000), ambientQuad(1001), spotQuad(1002) {}
+		framerate(60.0f), pointQuad(1000), ambientQuad(1001), spotQuad(1002) {
+			this->resSystem = resource::ResourceSystem::GetInstace();
+			this->resSystem->CreateResourceLoader<resource::Mesh>();
+			this->resSystem->CreateResourceLoader<resource::Texture>();
+	}
 
 
 	std::map<std::string, IFactory::FactoryFunction> OpenGLSystem::getFactoryFunctions() {
@@ -157,19 +158,9 @@ namespace Sigma{
 			}
 		}
 
-		// Check if the texture is loaded and load it if not.
-		if (textures.find(textureFilename) == textures.end()) {
-			Sigma::resource::Texture texture;
-			texture.Load(textureFilename);
-			if (texture.GetID() != 0) {
-				Sigma::OpenGLSystem::textures[textureFilename] = texture;
-			}
-		}
+		std::shared_ptr<resource::Texture> texture = this->resSystem->Get<resource::Texture>(textureFilename);
 
-		// It should be loaded, but in case an error occurred double check for it.
-		if (textures.find(textureFilename) != textures.end()) {
-			spr->SetTexture(&Sigma::OpenGLSystem::textures[textureFilename]);
-		}
+		spr->SetTexture(texture);
 		spr->LoadShader();
 		spr->Transform()->Scale(glm::vec3(scale));
 		spr->Transform()->Translate(x,y,z);
@@ -221,7 +212,8 @@ namespace Sigma{
 		std::string meshname = "entity";
 		meshname += entityID;
 		meshname += "icosphere";
-		OpenGLSystem::meshes[meshname] = sphere;
+		this->resSystem->Add<resource::Mesh>(meshname, sphere);
+
 		renderable->SetMesh(sphere);
 		renderable->Transform()->Scale(scale,scale,scale);
 		renderable->Transform()->Translate(x,y,z);
@@ -309,7 +301,7 @@ namespace Sigma{
 		std::string meshname = "entity";
 		meshname += entityID;
 		meshname += "cubesphere";
-		OpenGLSystem::meshes[meshname] = sphere;
+		this->resSystem->Add<resource::Mesh>(meshname, sphere);
 
 		renderable->SetMesh(sphere);
 		renderable->SetCullFace(cull_face);
@@ -412,16 +404,8 @@ namespace Sigma{
 			}
 		}
 
-		std::shared_ptr<resource::Mesh> mesh;
-		if (this->meshes.find(meshFIlename) == this->meshes.end()) {
-			mesh.reset(new resource::Mesh());
-			mesh->Load(meshFIlename);
-			this->meshes[meshFIlename] = mesh;
-		}
-		else {
-			mesh = this->meshes[meshFIlename];
-		}
-			
+		std::shared_ptr<resource::Mesh> mesh = this->resSystem->Get<resource::Mesh>(meshFIlename);
+
 		renderable->SetMesh(mesh);
 		renderable->SetCullFace(cull_face);
 		renderable->Transform()->Scale(scale,scale,scale);
@@ -469,28 +453,11 @@ namespace Sigma{
 			}
 		}
 
-		// Check if the texture is loaded and load it if not.
-		if (textures.find(textureName) == textures.end()) {
-			Sigma::resource::Texture texture;
-			texture.GenerateGLTexture(1024, 768);
-			if (textureInMemory) { // We are using an in memory texture. It will be populated somewhere else
-				Sigma::OpenGLSystem::textures[textureName] = texture;
-			}
-			else { // The texture in on disk so load it.
-				texture.Load(textureName);
-				if (texture.GetID() != 0) {
-					Sigma::OpenGLSystem::textures[textureName] = texture;
-				}
-			}
-		}
+		std::shared_ptr<resource::Texture> texture = this->resSystem->Get<resource::Texture>(textureName);
 
 		std::shared_ptr<resource::GLScreenQuad> quad(new resource::GLScreenQuad());
 
-		// It should be loaded, but in case an error occurred double check for it.
-		if (textures.find(textureName) != textures.end()) {
-			quad->SetTexture(&Sigma::OpenGLSystem::textures[textureName]);
-		}
-
+		quad->SetTexture(texture);
 		quad->SetPosition(x, y);
 		quad->SetSize(w, h);
 		quad->InitializeBuffers();
@@ -498,7 +465,8 @@ namespace Sigma{
 		std::string meshname = "entity";
 		meshname += entityID;
 		meshname += "screenQuad";
-		OpenGLSystem::meshes[meshname] = quad;
+
+		this->resSystem->Add<resource::Mesh>(meshname, quad);
 
 		renderable->SetMesh(quad);
 		renderable->LoadShader("shaders/quad");
@@ -1047,7 +1015,8 @@ namespace Sigma{
 		pQuad->Inverted(true);
 		pQuad->InitializeBuffers();
 		std::string meshname = "pointQuad";
-		OpenGLSystem::meshes[meshname] = pQuad;
+
+		this->resSystem->Add<resource::Mesh>(meshname, pQuad);
 
 		this->pointQuad.SetMesh(pQuad);
 
@@ -1072,7 +1041,8 @@ namespace Sigma{
 		sQuad->Inverted(true);
 		sQuad->InitializeBuffers();
 		meshname = "spotQuad";
-		OpenGLSystem::meshes[meshname] = sQuad;
+
+		this->resSystem->Add<resource::Mesh>(meshname, sQuad);
 
 		this->spotQuad.SetMesh(sQuad);
 
@@ -1099,7 +1069,8 @@ namespace Sigma{
 		aQuad->Inverted(true);
 		aQuad->InitializeBuffers();
 		meshname = "ambientQuad";
-		OpenGLSystem::meshes[meshname] = aQuad;
+
+		this->resSystem->Add<resource::Mesh>(meshname, aQuad);
 
 		this->ambientQuad.SetMesh(aQuad);
 		this->ambientQuad.LoadShader("shaders/ambient");

@@ -2,7 +2,7 @@
 
 namespace Log {
 	// The Joker was here
-	LogLevel Print::log_level;
-	std::ostream* Print::out;
+	//LogLevel Print::log_level;
+	//std::ostream* Print::out;
 }
 

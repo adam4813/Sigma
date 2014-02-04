@@ -83,6 +83,7 @@ namespace Sigma {
 		float rx = 0.0f;
 		float ry = 0.0f;
 		float rz = 0.0f;
+		std::string meshFilename;
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			const Property*  p = &*propitr;
@@ -110,11 +111,12 @@ namespace Sigma {
 			}
 			else if (p->GetName() == "meshFile") {
 				LOG << "Loading mesh: " << p->Get<std::string>();
-				resource::Mesh meshFile;
-				meshFile.Load(p->Get<std::string>());
-				mesh->SetMesh(&meshFile, scale);
+				meshFilename = p->Get<std::string>();
 			}
 		}
+		std::shared_ptr<resource::Mesh> meshFile = resource::ResourceSystem::GetInstace()->Get<resource::Mesh>(meshFilename);
+		mesh->SetMesh(meshFile.get(), scale);
+
 		mesh->InitializeRigidBody(x, y, z, rx, ry, rz);
 
 		this->dynamicsWorld->addRigidBody(mesh->GetRigidBody());

@@ -29,6 +29,7 @@ namespace Sigma {
 		LOG << "Setting up web view.";
 		CefRefPtr<WebGUISystem> ourselves(this);
 		CefSettings settings;
+		settings.multi_threaded_message_loop = false;
 #ifdef CEFDEV
 		CefInitialize(mainArgs, settings, ourselves.get(), nullptr);
 #else
@@ -84,19 +85,13 @@ namespace Sigma {
 		}
 #endif
 
-		// Check if the texture is loaded and load it if not.
-		if (OpenGLSystem::textures.find(textureName) == OpenGLSystem::textures.end()) {
-			resource::Texture texture;
-			OpenGLSystem::textures[textureName] = texture;
-			OpenGLSystem::textures[textureName].Format(GL_BGRA);
-			OpenGLSystem::textures[textureName].GenerateGLTexture(this->windowWidth, this->windowHeight);
+		std::shared_ptr<resource::Texture> texture = resource::ResourceSystem::GetInstace()->Get<resource::Texture>(textureName);
+		if (texture->GetID() == 0) {
+			texture->Format(GL_BGRA);
+			texture->GenerateGLTexture(this->windowWidth, this->windowHeight);
 		}
-
-		// It should be loaded, but in case an error occurred double check for it.
-		if (OpenGLSystem::textures.find(textureName) != OpenGLSystem::textures.end()) {
-			webview->SetTexture(&OpenGLSystem::textures[textureName]);
-		}
-
+		
+		webview->SetTexture(texture);
 		webview->SetCaputeArea(x, y, width, height);
 		webview->SetWindowSize(this->windowWidth, this->windowHeight);
 		this->addComponent(entityID, webview);

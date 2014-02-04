@@ -9,6 +9,7 @@
 #include <cassert>
 
 #include "SOIL/SOIL.h"
+#include "systems/ResourceSsytem.h"
 
 namespace Sigma {
 	namespace resource {
@@ -18,9 +19,10 @@ namespace Sigma {
 		class Texture {
 		public:
 			Texture() : id(0), autogen_mipmaps(true) { 
+				glGenTextures(1, &this->id);
 				int_format = GL_RGBA8;           /// Internal format in the GPU
 
-				// Note: Prefered format of the GPU could be get using ARB_internalformat_query2 extension  :
+				// Note: Preferred format of the GPU could be get using ARB_internalformat_query2 extension  :
 				// glGetInternalFormativ(GL_TEXTURE_2D, GL_RGBA8, GL_TEXTURE_IMAGE_FORMAT, 1, &preferred_format)
 				// But using this could required adapting the Texture to this format
 				format     = GL_RGBA;            /// Pixel data format (format of the loaded data)
@@ -31,14 +33,19 @@ namespace Sigma {
 				wrap_r      = GL_REPEAT;          /// Sets the wrap parameter for texture
 
 				mag_filter  = GL_LINEAR;          /// Filter using when magnify texture
-				min_filter  = GL_LINEAR_MIPMAP_LINEAR;          /// Filter using when minmise texture
+				min_filter  = GL_LINEAR_MIPMAP_LINEAR;          /// Filter using when minimize texture
 
 			}
+
+			static unsigned int TypeID;
 
 			/**
 			 * Generates a empty texture of the desired size
 			 */
 			void GenerateGLTexture(unsigned int width, unsigned int height) {
+				if (this->id > 0) {
+					glDeleteTextures(1, &this->id);
+				}
 				glGenTextures(1, &this->id);
 				this->width = width;
 				this->height = height;
@@ -57,10 +64,6 @@ namespace Sigma {
 			 * \param height
 			 */
 			void LoadDataFromMemory(const unsigned char* data, unsigned int width, unsigned int height) {
-				if (id == 0) {
-					glGenTextures(1, &this->id);
-				}
-
 				this->width = width;
 				this->height = height;
 
@@ -105,7 +108,7 @@ namespace Sigma {
 			 * \param filename Path to the image file
 			 * \param options Struct that defines the format of the bitmap and how the GPU will interpret it
 			 */
-			void Load(const std::string& filename) {
+			bool Load(const std::string& filename) {
 				int width, height, channels;
 				unsigned char* data = SOIL_load_image(filename.c_str(), &width, &height, &channels, false);
 
@@ -133,6 +136,11 @@ namespace Sigma {
 					LoadDataFromMemory(data, width, height);
 					delete data;
 				}
+
+				if (id == 0) {
+					return false;
+				}
+				return true;
 			}
 
 			unsigned int GetID() const { return id; }
@@ -249,7 +257,8 @@ namespace Sigma {
 
 			GLint mag_filter;     /// Filter using when magnify texture
 			GLint min_filter;     /// Filter using when minimize texture
-
 		};
+
+		__declspec(selectany) unsigned int Texture::TypeID = 1001;
 	}
 }

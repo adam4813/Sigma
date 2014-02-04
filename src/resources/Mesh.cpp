@@ -1,20 +1,22 @@
 #include "resources/Mesh.h"
 
-#include "strutils.h"
-#include "systems/OpenGLSystem.h"
-
 #include <algorithm>
-#include <stdexcept>
-
 #include <fstream>
 #include <iostream>
 #include <sstream>
+
+#include "resources/Texture.h"
+#include "systems/ResourceSsytem.h"
+#include "strutils.h"
+#include "Sigma.h"
 
 namespace Sigma{
 	namespace resource {
 		Mesh::Mesh() { }
 
 		Mesh::~Mesh() { }
+
+		unsigned int Mesh::TypeID = 1000;
 
 		unsigned int Mesh::MeshGroup_ElementCount(const unsigned int group /*= 0*/) const {
 			if (this->materialGroupIndex.size() == 0) {
@@ -348,22 +350,12 @@ namespace Sigma{
 							s >> filename;
 							filename = trim(filename);
 							filename = convert_path(filename);
-							std::cerr << "Loading diffuse texture: " << path + filename << std::endl;
-							resource::Texture texture;
-							if (OpenGLSystem::textures.find(filename) == OpenGLSystem::textures.end()) {
-								texture.Load(path + filename);
-								if (texture.GetID() != 0) {
-									OpenGLSystem::textures[filename] = texture;
-								}
-							}
-
+							LOG << "Loading diffuse texture: " << path + filename;
 							// Add the path to the filename to load it relative to the mtl file
-							if (OpenGLSystem::textures.find(filename) != OpenGLSystem::textures.end()) {
-								m.diffuseMap = OpenGLSystem::textures[filename].GetID();
-							}
-
-							if (m.diffuseMap == 0) {
-								std::cerr << "Error loading diffuse texture: " << path + filename << std::endl;
+							std::shared_ptr<resource::Texture> texture = resource::ResourceSystem::GetInstace()->Get<resource::Texture>(path + filename);
+							m.diffuseMap = texture->GetID();
+							if (texture->GetID() == 0) {
+								LOG_ERROR << "Error loading diffuse texture: " << path + filename;
 							}
 						}
 						else if (label == "map_Ka") {
@@ -371,24 +363,12 @@ namespace Sigma{
 							s >> filename;
 							filename = trim(filename);
 							filename = convert_path(filename);
-							std::cerr << "Loading ambient texture: " << path + filename << std::endl;
+							LOG << "Loading ambient texture: " << path + filename;
 							// Add the path to the filename to load it relative to the mtl file
-							resource::Texture texture;
-							if (OpenGLSystem::textures.find(filename) == OpenGLSystem::textures.end()) {
-								texture.Load(path + filename);
-								if (texture.GetID() != 0) {
-									OpenGLSystem::textures[filename] = texture;
-								}
-							}
-
-							// It should be loaded, but in case an error occurred double check for it.
-							if (OpenGLSystem::textures.find(filename) != OpenGLSystem::textures.end()) {
-								m.ambientMap = OpenGLSystem::textures[filename].GetID();
-							}
-
-							// Add the path to the filename to load it relative to the mtl file
-							if (m.ambientMap == 0) {
-								std::cerr << "Error loading ambient texture: " << path + filename << std::endl;
+							std::shared_ptr<resource::Texture> texture = resource::ResourceSystem::GetInstace()->Get<resource::Texture>(path + filename);
+							m.ambientMap = texture->GetID();
+							if (texture->GetID() == 0) {
+								LOG_ERROR << "Error loading ambient texture: " << path + filename;
 							}
 						}
 						else if (label == "map_Bump") {
@@ -396,25 +376,14 @@ namespace Sigma{
 							s >> filename;
 							filename = trim(filename);
 							filename = convert_path(filename);
-							std::cerr << "Loading normal or bump texture: " << path + filename << std::endl;
+							LOG << "Loading normal or bump texture: " << path + filename;
 							// Add the path to the filename to load it relative to the mtl file
-							resource::Texture texture;
-							if (OpenGLSystem::textures.find(filename) == OpenGLSystem::textures.end()) {
-								texture.Load(path + filename);
-								if (texture.GetID() != 0) {
-									OpenGLSystem::textures[filename] = texture;
-								}
+							std::shared_ptr<resource::Texture> texture = resource::ResourceSystem::GetInstace()->Get<resource::Texture>(path + filename);
+							m.normalMap = texture->GetID();
+							if (texture->GetID() == 0) {
+								LOG_ERROR << "Error loading normal texture: " << path + filename;
 							}
-
-							// It should be loaded, but in case an error occurred double check for it.
-							if (OpenGLSystem::textures.find(filename) != OpenGLSystem::textures.end()) {
-								m.normalMap = OpenGLSystem::textures[filename].GetID();
-							}
-
-							// Add the path to the filename to load it relative to the mtl file
-							if (m.normalMap == 0) {
-								std::cerr << "Error loading normal texture: " << path + filename << std::endl;
-							}
+							
 						}
 						else {
 							// Blank line

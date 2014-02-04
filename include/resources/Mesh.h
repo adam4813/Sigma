@@ -8,11 +8,9 @@
 
 #include <vector>
 #include <map>
-#include <memory>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-#include "Sigma.h"
 
 namespace Sigma{
 	namespace resource {
@@ -77,7 +75,9 @@ namespace Sigma{
 		class Mesh {
 		public:
 			Mesh();
-			DLL_EXPORT virtual ~Mesh();
+			virtual ~Mesh();
+
+			static unsigned int TypeID;
 
 			/**
 			 * \brief Returns the number of elements to draw for this component.
