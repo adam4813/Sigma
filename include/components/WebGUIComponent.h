@@ -26,7 +26,7 @@ namespace Sigma {
 #endif
 		};
 
-		void SetTexture(resource::Texture* texture) {
+		void SetTexture(std::shared_ptr<resource::Texture> texture) {
 			this->texture = texture;
 		}
 
@@ -91,7 +91,7 @@ namespace Sigma {
 #ifndef NO_CEF
 		CefRefPtr<CefBrowserHost> browserHost;
 #endif
-		resource::Texture* texture;
+		std::shared_ptr<resource::Texture> texture;
 
 		bool hasFocus;
 		unsigned int mouseDown;

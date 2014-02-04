@@ -67,7 +67,7 @@ namespace Sigma{
 			std::ifstream in(fname, std::ios::in);
 
 			if (!in) {
-				std::cerr << "Cannot open mesh " << fname << std::endl;
+				LOG_ERROR << "Cannot open mesh " << fname;
 				return false;
 			}
 
@@ -190,7 +190,7 @@ namespace Sigma{
 				else { // Unknown
 					/* ignoring this line */
 					std::string test = line.substr(0, line.find(' '));
-					std::cerr << "Unrecognized line " << line << std::endl;
+					LOG << "Unrecognized line " << line;
 				}
 			}
 
@@ -293,7 +293,7 @@ namespace Sigma{
 			std::ifstream in(fname, std::ios::in);
 
 			if (!in) {
-				std::cerr << "Cannot open material " << fname << std::endl;
+				LOG_WARN << "Cannot open material " << fname;
 				return;
 			}
 

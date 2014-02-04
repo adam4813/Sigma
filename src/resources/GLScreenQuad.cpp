@@ -51,7 +51,7 @@ namespace Sigma {
 			return 0;
 		}
 
-		void GLScreenQuad::SetTexture(resource::Texture* texture) {
+		void GLScreenQuad::SetTexture(std::shared_ptr<resource::Texture> texture) {
 			this->texture = texture;
 		}
 	}

@@ -25,7 +25,7 @@ namespace Sigma {
 
 			DLL_EXPORT unsigned int GetTexture();
 
-			DLL_EXPORT void SetTexture(resource::Texture* texture);
+			DLL_EXPORT void SetTexture(std::shared_ptr<resource::Texture> texture);
 
 			int NearestPowerOf2(const float width, const float height) const {
 				unsigned int power = 0;
@@ -48,7 +48,7 @@ namespace Sigma {
 			DLL_EXPORT void Inverted(bool val) { inverted = val; }
 
 		protected:
-			resource::Texture* texture;
+			std::shared_ptr<resource::Texture> texture;
 			float x, y, w, h;
 			unsigned int texture_size;
 			bool inverted;

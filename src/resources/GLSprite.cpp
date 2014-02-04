@@ -116,7 +116,7 @@ namespace Sigma{
 		this->shader->UnUse();
 	}
 
-	void GLSprite::SetTexture(resource::Texture* texture) {
+	void GLSprite::SetTexture(std::shared_ptr<resource::Texture> texture) {
 		this->texture = texture;
 	}
 } // namespace Sigma

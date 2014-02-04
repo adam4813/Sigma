@@ -40,7 +40,7 @@ namespace Sigma{
 		 * \param[in] resource::Texture * texture
 		 * \return    void
 		 */
-		void SetTexture(resource::Texture* texture);
+		void SetTexture(std::shared_ptr<resource::Texture> texture);
 
 
 		// Load the default shader, "shaders/vert"
@@ -61,7 +61,7 @@ namespace Sigma{
 			return 6;
 		}
 	private:
-		resource::Texture* texture;
+		std::shared_ptr<resource::Texture> texture;
 	}; // class GLSprite
 
 } // namespace Sigma
