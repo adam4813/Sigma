@@ -77,7 +77,7 @@ namespace Sigma{
 			Mesh();
 			virtual ~Mesh();
 
-			static unsigned int TypeID;
+			static unsigned int const TypeID = 1000;
 
 			/**
 			 * \brief Returns the number of elements to draw for this component.

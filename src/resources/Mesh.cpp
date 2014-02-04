@@ -16,8 +16,6 @@ namespace Sigma{
 
 		Mesh::~Mesh() { }
 
-		unsigned int Mesh::TypeID = 1000;
-
 		unsigned int Mesh::MeshGroup_ElementCount(const unsigned int group /*= 0*/) const {
 			if (this->materialGroupIndex.size() == 0) {
 				return 0;
@@ -412,7 +410,7 @@ namespace Sigma{
 			this->verts.push_back(v);
 		}
 
-		const Vertex* Mesh::GetVertex(const unsigned int index) const {
+		const Vertex* Mesh::GetVertex(const size_t index) const {
 			if(index < this->verts.size()) {
 				return &this->verts[index];
 			}

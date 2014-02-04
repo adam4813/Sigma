@@ -37,7 +37,7 @@ namespace Sigma {
 
 			}
 
-			static unsigned int TypeID;
+			static unsigned int const TypeID = 1001;
 
 			/**
 			 * Generates a empty texture of the desired size
@@ -258,7 +258,5 @@ namespace Sigma {
 			GLint mag_filter;     /// Filter using when magnify texture
 			GLint min_filter;     /// Filter using when minimize texture
 		};
-
-		__declspec(selectany) unsigned int Texture::TypeID = 1001;
 	}
 }
