@@ -29,7 +29,7 @@ int main(int argCount, char **argValues) {
 #else
 	CefMainArgs mainArgs(argCount, argValues);
 #endif
-#ifdef CEFDEV
+#if defined(CEFDEV) || defined(__APPLE__) // OS X always uses the dev version for now.
 	int exitCode = CefExecuteProcess(mainArgs, app.get(), nullptr);
 #else
 	int exitCode = CefExecuteProcess(mainArgs, app.get());

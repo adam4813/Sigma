@@ -29,7 +29,7 @@ namespace Sigma {
 		LOG << "Setting up web view.";
 		CefRefPtr<WebGUISystem> ourselves(this);
 		CefSettings settings;
-#ifdef CEFDEV
+#if defined(CEFDEV) || defined(__APPLE__) // OS X always uses the dev version for now.
 		CefInitialize(mainArgs, settings, ourselves.get(), nullptr);
 #else
 		CefInitialize(mainArgs, settings, ourselves.get());

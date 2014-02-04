@@ -6,7 +6,7 @@ The Sigma game engine for creating games on multiple platforms. The name Sigma w
 Requires CMake and one of the following compilers:
 
 * GCC 4.8 or newer;
-* Clang 3.3 or newer;
+* Clang/LLVM 5.0 or newer;
 * Visual Studio 2010 or newer;
 
 Contributing
@@ -34,24 +34,33 @@ When building these libraries from source, always build them as shared objects (
 You'll also need a [package of assets](http://wiki.trillek.org/wiki/Assets).  Unpack it in the build/bin/ directory.
 
 ## Setting up Chromium Embedded Framework ###
-Make sure you use a binary release from [Adobe](http://www.cefbuilds.com). **Use the latest version that is NOT marked as dev (trunk).**
+Make sure you use a binary release from [Adobe](http://www.cefbuilds.com). **For Windows and Linux, use the latest version that is NOT marked as dev (trunk).  For OS X, use the latest Mac 32-bit from dev (trunk)**
+
+__(Windows/Linux)__
 
 1. Unzip the downloaded tarball.
 2. This step depends on your platform. **Make sure to use the Release build mode.**
     * __Windows__ build the included `libcef_dll_wrapper.vcxproj` project
     * __Linux__ run `make libcef_dll_wrapper BUILDTYPE=Release`
-    * __OS X__ use the `cefclient.xcodeproj` Xcode project.
 3. Make `cef/` and `cef/bin/` directories in `Sigma/`
 4. Copy the `out/Release/obj.target/libcef_dll_wrapper` directory, if any, and the contents of `Resources/` directories into `Sigma/cef/bin/`
 5. Copy the contents of include/ directory into Sigma's include/.
 6. Copy `out/Release/obj.target/libcef_dll_wrapper.a` (or .lib) to `Sigma/cef/`
 7. This step also depends on your platform.
     * __Windows__ copy all the .dll files in `Release/` to `Sigma/cef/bin`, then copy the .lib file into `Sigma/cef/`
-    * __Linux__ or __OS X__ copy the entire contents of `Release/` into `Sigma/cef/bin/`
-8. On Linux and OSX, make a symlink pointing to libcef.so (or .dylib) in the `cef/` directory.
+    * __Linux__ copy the entire contents of `Release/` into `Sigma/cef/bin/`
+8. On Linux, make a symlink pointing to libcef.so in the `cef/` directory.
 9. Make a symlink pointing to `Sigma/cef/bin/libcef_dll_wrapper` in the `cef/` directory. `libcef_dll_wrapper` and `libcef_dll_wrapper.a` must appear in the same place, otherwise you will get a "Malformed Archive" error when linking.
 
 - If you get "Multiply defined symbols" errors building Sigma on Windows with Visual Studio, then make these changes in the libcef_dll_wrapper properties: C/C++ / Preprocessor, edit the definitions to set `_HAS_EXCEPTIONS=1` instead of 0; under C/C++ / Code generation, select the /MDd or /MD runtime library; rebuild and copy the libcef_dll_wrapper.lib to `cef/` directory.
+
+
+__(OS X)__
+
+1. Unzip the downloaded tarball into the Sigma folder.  Name it `cef`.
+2. From a shell in the Sigma directory, use the following commands to build CEF.
+
+		xcodebuild -project cef/cefclient.xcodeproj -target All -configuration Release -sdk macosx MACOSX_DEPLOYMENT_TARGET=10.7 CLANG_CXX_LANGUAGE_STANDARD=c++11 CLANG_CXX_LIBRARY=libc++
 
 ## Building ##
 
