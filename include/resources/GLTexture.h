@@ -84,7 +84,7 @@ namespace Sigma {
 
 			/**
 			 * \brief Updates a texture data from a bitmap in RAM.
-			 * REQUIRES a previus call of LoadDataFromFile or LoadDataFromMemory
+			 * REQUIRES a previus call of Load or LoadDataFromMemory
 			 * The bitmap MUST have the same size that the texture.
 			 * \param data Ptr. to the bitmap
 			 */
@@ -105,7 +105,7 @@ namespace Sigma {
 			 * \param filename Path to the image file
 			 * \param options Struct that defines the format of the bitmap and how the GPU will interpret it
 			 */
-			void LoadDataFromFile(const std::string& filename) {
+			void Load(const std::string& filename) {
 				int width, height, channels;
 				unsigned char* data = SOIL_load_image(filename.c_str(), &width, &height, &channels, false);
 

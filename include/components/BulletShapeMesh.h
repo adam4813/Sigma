@@ -3,7 +3,9 @@
 #include "Sigma.h"
 
 namespace Sigma{
-	class Mesh;
+	namespace resource {
+		class Mesh;
+	}
 	class BulletShapeMesh : public IBulletShape {
 	public:
 		SET_COMPONENT_TYPENAME("BulletShapeMesh");
@@ -14,9 +16,9 @@ namespace Sigma{
 			}
 		}
 
-		void SetMesh(const Mesh* mesh, btVector3* scale);
-		void SetMesh(const Mesh* mesh, float scale);
-		void SetMesh(const Mesh* mesh);
+		void SetMesh(const resource::Mesh* mesh, btVector3* scale);
+		void SetMesh(const resource::Mesh* mesh, float scale);
+		void SetMesh(const resource::Mesh* mesh);
 
 	private:
 		btTriangleMesh* btmesh;

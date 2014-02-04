@@ -110,8 +110,8 @@ namespace Sigma {
 			}
 			else if (p->GetName() == "meshFile") {
 				LOG << "Loading mesh: " << p->Get<std::string>();
-				Mesh meshFile;
-				meshFile.LoadObjMesh(p->Get<std::string>());
+				resource::Mesh meshFile;
+				meshFile.Load(p->Get<std::string>());
 				mesh->SetMesh(&meshFile, scale);
 			}
 		}

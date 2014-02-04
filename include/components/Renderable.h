@@ -45,7 +45,7 @@ namespace Sigma {
 			this->depthFunc = GL_LESS;
 		} // Ctor that sets the entity ID.
 
-		void SetMesh(std::shared_ptr<Mesh> m) {
+		void SetMesh(std::shared_ptr<resource::Mesh> m) {
 			this->mesh = m;
 		}
 
@@ -86,7 +86,7 @@ namespace Sigma {
 
 			// Check if the mesh is valid and assign an empty one if it isn't.
 			if (!this->mesh) {
-				this->mesh.reset(new Mesh());
+				this->mesh.reset(new resource::Mesh());
 			}
 
 			if (this->mesh->VertexCount() > 0) {
@@ -94,7 +94,7 @@ namespace Sigma {
 					glGenBuffers(1, &this->buffers[this->VertBufIndex]); 	// Generate the vertex buffer.
 				}
 				glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->VertBufIndex]); // Bind the vertex buffer.
-				glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * this->mesh->VertexCount(), &this->mesh->GetVertexBuffer(), GL_STATIC_DRAW); // Stores the verts in the vertex buffer.
+				glBufferData(GL_ARRAY_BUFFER, sizeof(resource::Vertex) * this->mesh->VertexCount(), &this->mesh->GetVertexBuffer(), GL_STATIC_DRAW); // Stores the verts in the vertex buffer.
 				GLint posLocation = glGetAttribLocation((*shader).GetProgram(), "in_Position"); // Find the location in the shader where the vertex buffer data will be placed.
 				glVertexAttribPointer(posLocation, 3, GL_FLOAT, GL_FALSE, 0, 0); // Tell the VAO the vertex data will be stored at the location we just found.
 				glEnableVertexAttribArray(posLocation); // Enable the VAO line for vertex data.
@@ -104,7 +104,7 @@ namespace Sigma {
 					glGenBuffers(1, &this->buffers[this->UVBufIndex]); 	// Generate the vertex buffer.
 				}
 				glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->UVBufIndex]); // Bind the vertex buffer.
-				glBufferData(GL_ARRAY_BUFFER, sizeof(TexCoord) * this->mesh->GetTexCoordCount(), &this->mesh->GetTexCoordBuffer(), GL_STATIC_DRAW); // Stores the verts in the vertex buffer.
+				glBufferData(GL_ARRAY_BUFFER, sizeof(resource::TexCoord) * this->mesh->GetTexCoordCount(), &this->mesh->GetTexCoordBuffer(), GL_STATIC_DRAW); // Stores the verts in the vertex buffer.
 				GLint uvLocation = glGetAttribLocation((*shader).GetProgram(), "in_UV"); // Find the location in the shader where the vertex buffer data will be placed.
 				glVertexAttribPointer(uvLocation, 2, GL_FLOAT, GL_FALSE, 0, 0); // Tell the VAO the vertex data will be stored at the location we just found.
 				glEnableVertexAttribArray(uvLocation); // Enable the VAO line for vertex data.
@@ -114,7 +114,7 @@ namespace Sigma {
 					glGenBuffers(1, &this->buffers[this->ColorBufIndex]);
 				}
 				glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->ColorBufIndex]);
-				glBufferData(GL_ARRAY_BUFFER, sizeof(Color) * this->mesh->VertexColorCount(), &this->mesh->GetVertexColorBuffer(), GL_STATIC_DRAW);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(resource::Color) * this->mesh->VertexColorCount(), &this->mesh->GetVertexColorBuffer(), GL_STATIC_DRAW);
 				GLint colLocation = glGetAttribLocation((*shader).GetProgram(), "in_Color");
 				glVertexAttribPointer(colLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 				glEnableVertexAttribArray(colLocation);
@@ -124,14 +124,14 @@ namespace Sigma {
 					glGenBuffers(1, &this->buffers[this->ElemBufIndex]); // Generate the element buffer.
 				}
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buffers[this->ElemBufIndex]); // Bind the element buffer.
-				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Face) * this->mesh->FaceCount(), &this->mesh->GetFaceBuffer(), GL_STATIC_DRAW); // Store the faces in the element buffer.
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(resource::Face) * this->mesh->FaceCount(), &this->mesh->GetFaceBuffer(), GL_STATIC_DRAW); // Store the faces in the element buffer.
 			}
 			if (this->mesh->VertexNormalCount() > 0) {
 				if (this->buffers[this->NormalBufIndex] == 0) {
 					glGenBuffers(1, &this->buffers[this->NormalBufIndex]);
 				}
 				glBindBuffer(GL_ARRAY_BUFFER, this->buffers[this->NormalBufIndex]);
-				glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*this->mesh->VertexNormalCount(), &this->mesh->GetVertexNormalBuffer(), GL_STATIC_DRAW);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(resource::Vertex)*this->mesh->VertexNormalCount(), &this->mesh->GetVertexNormalBuffer(), GL_STATIC_DRAW);
 				GLint normalLocation = glGetAttribLocation((*shader).GetProgram(), "in_Normal");
 				glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 				glEnableVertexAttribArray(normalLocation);
@@ -187,7 +187,7 @@ namespace Sigma {
 			size_t prev = 0;
 			for (int i = 0, cur = this->mesh->MeshGroup_ElementCount(0); cur != 0; prev = cur, cur = this->mesh->MeshGroup_ElementCount(++i)) {
 				if (this->mesh->MaterialGroupsCount() > 0) {
-					const Material* mat = this->mesh->GetMaterialGroup(*this->mesh->GetMaterialGroupName(prev));
+					const resource::Material* mat = this->mesh->GetMaterialGroup(*this->mesh->GetMaterialGroupName(prev));
 
 					if (mat->ambientMap) {
 						glUniform1i((*this->shader)("texEnabled"), 1);
@@ -316,7 +316,7 @@ namespace Sigma {
 		GLuint depthFunc;
 
 		std::shared_ptr<GLSLShader> shader; // shaders are shared among components
-		std::shared_ptr<Mesh> mesh;
+		std::shared_ptr<resource::Mesh> mesh;
 		// name-->shader map to look up already-loaded shaders (so each can be loaded only once)
 		static ShaderMap loadedShaders;
 

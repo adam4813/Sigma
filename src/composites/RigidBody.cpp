@@ -65,10 +65,10 @@ namespace Sigma {
 
 			auto btmesh = new btTriangleMesh();
 			for (unsigned int i = 0; i < mesh->FaceCount(); ++i) {
-				const Sigma::Face* f = mesh->GetFace(i);
-				const Sigma::Vertex* v1 = mesh->GetVertex(f->v1);
-				const Sigma::Vertex* v2 = mesh->GetVertex(f->v2);
-				const Sigma::Vertex* v3 = mesh->GetVertex(f->v3);
+				const resource::Face* f = mesh->GetFace(i);
+				const resource::Vertex* v1 = mesh->GetVertex(f->v1);
+				const resource::Vertex* v2 = mesh->GetVertex(f->v2);
+				const resource::Vertex* v3 = mesh->GetVertex(f->v3);
 				btmesh->addTriangle(btVector3(v1->x, v1->y, v1->z), btVector3(v2->x, v2->y, v2->z), btVector3(v3->x, v3->y, v3->z));
 			}
 
