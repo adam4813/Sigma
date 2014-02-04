@@ -17,7 +17,7 @@
 #include "components/Renderable.h"
 #include "systems/IGLView.h"
 #include <vector>
-#include "resources/GLTexture.h"
+#include "resources/Texture.h"
 #include "resources/GLScreenQuad.h"
 #include "Sigma.h"
 #include "composites/PhysicalWorldLocation.h"
@@ -46,8 +46,7 @@ namespace Sigma{
 		void UnbindRead();
 	};
 
-	class OpenGLSystem
-		: public Sigma::IFactory, public ISystem<IComponent> {
+	class OpenGLSystem : public IFactory, public ISystem<IComponent> {
 	public:
 
 		DLL_EXPORT OpenGLSystem();
@@ -163,7 +162,7 @@ namespace Sigma{
 
 		DLL_EXPORT GLTransform* GetTransformFor(const unsigned int entityID);
 
-		static std::map<std::string, resource::GLTexture> textures;
+		static std::map<std::string, resource::Texture> textures;
 		static std::map<std::string, std::shared_ptr<resource::Mesh>> meshes;
 	private:
 		unsigned int windowWidth; // Store the width of our window

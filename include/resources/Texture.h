@@ -15,9 +15,9 @@ namespace Sigma {
 		/**
 		 * Represents a OpenGL Texture
 		 */
-		class GLTexture {
+		class Texture {
 		public:
-			GLTexture() : id(0), autogen_mipmaps(true) { 
+			Texture() : id(0), autogen_mipmaps(true) { 
 				int_format = GL_RGBA8;           /// Internal format in the GPU
 
 				// Note: Prefered format of the GPU could be get using ARB_internalformat_query2 extension  :
@@ -51,7 +51,7 @@ namespace Sigma {
 			}
 
 			/**
-			 * Loads and crete a texture from a bitmap in RAM
+			 * Loads and create a texture from a bitmap in RAM
 			 * \param data Ptr. to the bitmap
 			 * \param width
 			 * \param height
@@ -84,7 +84,7 @@ namespace Sigma {
 
 			/**
 			 * \brief Updates a texture data from a bitmap in RAM.
-			 * REQUIRES a previus call of Load or LoadDataFromMemory
+			 * REQUIRES a previous call of Load or LoadDataFromMemory
 			 * The bitmap MUST have the same size that the texture.
 			 * \param data Ptr. to the bitmap
 			 */
@@ -110,7 +110,7 @@ namespace Sigma {
 				unsigned char* data = SOIL_load_image(filename.c_str(), &width, &height, &channels, false);
 
 				if (data) {
-					// Invert Y (necesary!)
+					// Invert Y (necessary!)
 					int i, j;
 					for( j = 0; j*2 < height; ++j ) {
 						int index1 = j * width * channels;
@@ -248,7 +248,7 @@ namespace Sigma {
 			bool autogen_mipmaps; /// Should autogenerate mipmaps ?
 
 			GLint mag_filter;     /// Filter using when magnify texture
-			GLint min_filter;     /// Filter using when minmise texture
+			GLint min_filter;     /// Filter using when minimize texture
 
 		};
 	}

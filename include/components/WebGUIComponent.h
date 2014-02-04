@@ -6,11 +6,11 @@
 #ifndef NO_CEF
 #include "cef_client.h"
 #endif
-#include "resources/GLTexture.h"
+#include "resources/Texture.h"
 #include "Sigma.h"
 
 namespace Sigma {
-	class WebGUIView : public Sigma::IComponent
+	class WebGUIView : public IComponent
 #ifndef NO_CEF
 		, public CefClient, public CefLifeSpanHandler, public CefRenderHandler
 #endif
@@ -26,7 +26,7 @@ namespace Sigma {
 #endif
 		};
 
-		void SetTexture(Sigma::resource::GLTexture* texture) {
+		void SetTexture(resource::Texture* texture) {
 			this->texture = texture;
 		}
 
@@ -42,13 +42,13 @@ namespace Sigma {
 			this->windowHeight = heigit;
 		}
 
-		void InjectKeyboardEvent(const unsigned int key, const Sigma::event::KEY_STATE state);
+		void InjectKeyboardEvent(const unsigned int key, const event::KEY_STATE state);
 
 		void InjectCharDown(const unsigned int c);
 
 		bool InjectMouseMove(float x, float y);
-		bool InjectMouseDown(const Sigma::event::BUTTON btn, float x, float y);
-		bool InjectMouseUp(const Sigma::event::BUTTON btn, float x, float y);
+		bool InjectMouseDown(const event::BUTTON btn, float x, float y);
+		bool InjectMouseUp(const event::BUTTON btn, float x, float y);
 
 #ifndef NO_CEF
 		// CefClient
@@ -91,7 +91,7 @@ namespace Sigma {
 #ifndef NO_CEF
 		CefRefPtr<CefBrowserHost> browserHost;
 #endif
-		Sigma::resource::GLTexture* texture;
+		resource::Texture* texture;
 
 		bool hasFocus;
 		unsigned int mouseDown;

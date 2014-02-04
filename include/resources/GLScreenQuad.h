@@ -4,7 +4,7 @@
 #define GL_SCREEN_QUAD
 
 #include "resources/Mesh.h"
-#include "resources/GLTexture.h"
+#include "resources/Texture.h"
 #include "Sigma.h"
 
 namespace Sigma {
@@ -25,7 +25,7 @@ namespace Sigma {
 
 			DLL_EXPORT unsigned int GetTexture();
 
-			DLL_EXPORT void SetTexture(resource::GLTexture* texture);
+			DLL_EXPORT void SetTexture(resource::Texture* texture);
 
 			int NearestPowerOf2(const float width, const float height) const {
 				unsigned int power = 0;
@@ -39,7 +39,7 @@ namespace Sigma {
 				return dim;
 			}
 			/**
-			* \brief Set ti true if the texture is put in the buffer inverted (top to bottom), or false if it has already been flipped (botom to top).
+			* \brief Set to true if the texture is put in the buffer inverted (top to bottom), or false if it has already been flipped (bottom to top).
 			*
 			 * \param[in] bool val Werther the Quad should have inverted UVs or not.
 			 * \return void 
@@ -48,7 +48,7 @@ namespace Sigma {
 			DLL_EXPORT void Inverted(bool val) { inverted = val; }
 
 		protected:
-			resource::GLTexture* texture;
+			resource::Texture* texture;
 			float x, y, w, h;
 			unsigned int texture_size;
 			bool inverted;

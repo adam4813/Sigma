@@ -60,7 +60,7 @@ namespace Sigma{
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 	}
 
-	std::map<std::string, resource::GLTexture> OpenGLSystem::textures;
+	std::map<std::string, resource::Texture> OpenGLSystem::textures;
 	std::map<std::string, std::shared_ptr<resource::Mesh>> OpenGLSystem::meshes;
 
 	OpenGLSystem::OpenGLSystem() : windowWidth(1024), windowHeight(768), deltaAccumulator(0.0),
@@ -159,7 +159,7 @@ namespace Sigma{
 
 		// Check if the texture is loaded and load it if not.
 		if (textures.find(textureFilename) == textures.end()) {
-			Sigma::resource::GLTexture texture;
+			Sigma::resource::Texture texture;
 			texture.Load(textureFilename);
 			if (texture.GetID() != 0) {
 				Sigma::OpenGLSystem::textures[textureFilename] = texture;
@@ -471,7 +471,7 @@ namespace Sigma{
 
 		// Check if the texture is loaded and load it if not.
 		if (textures.find(textureName) == textures.end()) {
-			Sigma::resource::GLTexture texture;
+			Sigma::resource::Texture texture;
 			texture.GenerateGLTexture(1024, 768);
 			if (textureInMemory) { // We are using an in memory texture. It will be populated somewhere else
 				Sigma::OpenGLSystem::textures[textureName] = texture;

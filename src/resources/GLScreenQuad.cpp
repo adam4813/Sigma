@@ -1,5 +1,5 @@
 #include "resources/GLScreenQuad.h"
-#include "resources/GLTexture.h"
+#include "resources/Texture.h"
 
 namespace Sigma {
 	namespace resource {
@@ -51,7 +51,7 @@ namespace Sigma {
 			return 0;
 		}
 
-		void GLScreenQuad::SetTexture(resource::GLTexture* texture) {
+		void GLScreenQuad::SetTexture(resource::Texture* texture) {
 			this->texture = texture;
 		}
 	}

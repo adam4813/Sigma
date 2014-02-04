@@ -349,7 +349,7 @@ namespace Sigma{
 							filename = trim(filename);
 							filename = convert_path(filename);
 							std::cerr << "Loading diffuse texture: " << path + filename << std::endl;
-							resource::GLTexture texture;
+							resource::Texture texture;
 							if (OpenGLSystem::textures.find(filename) == OpenGLSystem::textures.end()) {
 								texture.Load(path + filename);
 								if (texture.GetID() != 0) {
@@ -373,7 +373,7 @@ namespace Sigma{
 							filename = convert_path(filename);
 							std::cerr << "Loading ambient texture: " << path + filename << std::endl;
 							// Add the path to the filename to load it relative to the mtl file
-							resource::GLTexture texture;
+							resource::Texture texture;
 							if (OpenGLSystem::textures.find(filename) == OpenGLSystem::textures.end()) {
 								texture.Load(path + filename);
 								if (texture.GetID() != 0) {
@@ -398,7 +398,7 @@ namespace Sigma{
 							filename = convert_path(filename);
 							std::cerr << "Loading normal or bump texture: " << path + filename << std::endl;
 							// Add the path to the filename to load it relative to the mtl file
-							resource::GLTexture texture;
+							resource::Texture texture;
 							if (OpenGLSystem::textures.find(filename) == OpenGLSystem::textures.end()) {
 								texture.Load(path + filename);
 								if (texture.GetID() != 0) {
