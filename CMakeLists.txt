@@ -74,20 +74,19 @@ IF ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
 	ENDIF (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
 ELSEIF ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 	# Clang 3.3 and up support c++11.  
-	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE CLANG_VERSION)
-	IF (NOT (CLANG_VERSION VERSION_GREATER 3.3 OR CLANG_VERSION VERSION_EQUAL 3.3))
-		# c++11 std only appears in clang 3.3 or higher. c++0x will work for lesser versions.
-		MESSAGE("clang ${CLANG_VERSION} does not support c++11, only c++0x. This may cause some problems in the future. We recommend upgrading to clang-3.3 or greater.")
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-	ELSE (NOT (CLANG_VERSION VERSION_GREATER 3.3 OR CLANG_VERSION VERSION_EQUAL 3.3))
-		# compiler is clang 3.3 or higher. Force c++11 and use libc++.
-		IF (XCODE_VERSION)
-			SET(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD c++11)
-			SET(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY libc++)
-		ELSE (XCODE_VERSION)
-			SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
-		ENDIF (XCODE_VERSION)
-	ENDIF (NOT (CLANG_VERSION VERSION_GREATER 3.3 OR CLANG_VERSION VERSION_EQUAL 3.3))
+	MESSAGE("Clang Version: " ${CMAKE_CXX_COMPILER_VERSION})
+ 	# Clang actually reports its version in terms of LLVM, which would be 5.0 in this case.
+ 	IF (NOT (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 5.0))
+ 		# clang 3.3 is the first release that completley implements the c++11 standard.
+ 		# However, most of c++11 was implemented in previous versions.
+ 		MESSAGE("clang ${CMAKE_CXX_COMPILER_VERSION} does not completely support c++11. This may cause some problems in the future. We recommend upgrading to clang-3.3 (LLVM 5.0) or greater.")
+ 	ENDIF (NOT (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 5.0))
+ 	IF (XCODE_VERSION)
+ 		SET(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD c++11)
+ 		SET(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY libc++)
+ 	ELSE (XCODE_VERSION)
+ 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
+ 	ENDIF (XCODE_VERSION)
 ELSEIF (MSVC AND (MSVC_VERSION GREATER 1599))
 	MESSAGE("Supported Visual Studio!")
 ELSE ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
@@ -144,13 +143,13 @@ IF (UNIX AND NOT APPLE)
 		FIND_PACKAGE(GTK2 REQUIRED)
 		INCLUDE_DIRECTORIES("${GTK2_INCLUDE_DIRS}")
 	endif(BUILD_LINK_CEF)
-
 ENDIF (UNIX AND NOT APPLE)
 
 IF (APPLE) # Mac OSX
 	SET(GLEW_LIBRARY "") # Set a dummy value for GLEW.
 
-	SET(CMAKE_OSX_ARCHITECTURES i386;x86_64)
+	# CEF 64-bit is experimental on OS X at this time.  Use 32-bit for now.
+	SET(CMAKE_OSX_ARCHITECTURES i386)
 	SET(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS "i386 x86_64")
 	SET(CMAKE_XCODE_ATTRIBUTE_SUPPORTED_PLATFORMS macosx)
 
@@ -217,10 +216,12 @@ set(Sigma_ALL_INCLUDES
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
-LINK_DIRECTORIES("${CMAKE_SOURCE_DIR}/cef")
-# For CEF these may or may not work depending on the platform/build config, including anyway
-LINK_DIRECTORIES("${CMAKE_BINARY_DIR}/bin")
-LINK_DIRECTORIES("${EXECUTABLE_OUTPUT_PATH}")
+if (NOT APPLE)
+	LINK_DIRECTORIES("${CMAKE_SOURCE_DIR}/cef")
+	# For CEF these may or may not work depending on the platform/build config, including anyway
+	LINK_DIRECTORIES("${CMAKE_BINARY_DIR}/bin")
+	LINK_DIRECTORIES("${EXECUTABLE_OUTPUT_PATH}")
+endif (NOT APPLE)
 
 if(BUILD_STATIC_Sigma)
 	add_library(libSigmas STATIC
@@ -253,6 +254,14 @@ if(BUILD_SHARED_Sigma)
 	set_target_properties(libSigma PROPERTIES
 		PDB_NAME libSigma
 		)
+	# On OS X, edit the path where libSigma looks for Chromium Embedded Framework.
+	if(APPLE AND BUILD_LINK_CEF)
+ 		get_target_property(LibSigma_LIBRARY_OUTPUT_DIRECTORY libSigma LIBRARY_OUTPUT_DIRECTORY)
+ 		get_target_property(LibSigma_OUTPUT_NAME libSigma OUTPUT_NAME)
+ 		add_custom_command(TARGET libSigma POST_BUILD
+ 			COMMAND install_name_tool -change "@executable_path/Chromium Embedded Framework" "@rpath/Chromium Embedded Framework.framework/Chromium Embedded Framework" "$<TARGET_FILE:libSigma>"
+ 		)
+	endif(APPLE AND BUILD_LINK_CEF)
 endif(BUILD_SHARED_Sigma)
 
 if(BUILD_EXE_Sigma)
@@ -290,14 +299,81 @@ if(BUILD_EXE_Sigma)
 				)
 			# Link the executable to all required libraries
 			TARGET_LINK_LIBRARIES(${TEST_NAME} ${Sigma_ALL_LIBS})
+
 		endif(BUILD_STATIC_Sigma)
 
 	ENDFOREACH(TEST_CPP)
 endif(BUILD_EXE_Sigma)
 
 # CEF has some files that need to be copied to ${CMAKE_BINARY_DIR}/bin
+if (NOT APPLE)
 ADD_CUSTOM_COMMAND(
     TARGET Sigma POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${PROJECT_SOURCE_DIR}/cef/bin $<TARGET_FILE_DIR:Sigma>)
+else (NOT APPLE) 
+	# OS X specific stuff for CEF
+	if (BUILD_EXE_Sigma AND BUILD_LINK_CEF)
+
+		# CEF on OS X must render out of process and it requires
+		# an app named X_Helper where X is the name of the main
+		# executable.
+		if(BUILD_STATIC_Sigma)
+ 			ADD_EXECUTABLE(Sigma_Helper
+ 				${Sigma_ALL_INCLUDES}
+ 				"src/tests/main.cpp"
+ 				)
+ 			TARGET_LINK_LIBRARIES(Sigma_Helper libSigmas)
+		elseif(BUILD_SHARED_Sigma)
+ 			ADD_EXECUTABLE(Sigma_Helper
+ 				${Sigma_ALL_INCLUDES}
+ 				"src/tests/main.cpp"
+ 				)
+ 			TARGET_LINK_LIBRARIES(Sigma_Helper libSigma)
+		else(BUILD_STATIC_Sigma)
+ 			ADD_EXECUTABLE(Sigma_Helper
+ 				${Sigma_ALL_SOURCE}
+ 				${Sigma_ALL_INCLUDES}
+ 				"src/tests/main.cpp"
+ 				)
+ 			TARGET_LINK_LIBRARIES(Sigma_Helper ${Sigma_ALL_LIBS})
+		endif(BUILD_STATIC_Sigma)
+
+		add_dependencies(Sigma 
+ 			Sigma_Helper
+ 			)
+ 		set_target_properties(Sigma PROPERTIES
+ 			MACOSX_BUNDLE TRUE
+ 			BUILD_WITH_INSTALL_RPATH TRUE
+ 			INSTALL_RPATH "@loader_path/../Frameworks"
+ 			)
+ 		set_target_properties(Sigma_Helper PROPERTIES
+ 			OUTPUT_NAME "Sigma Helper"
+ 			MACOSX_BUNDLE TRUE
+ 			BUILD_WITH_INSTALL_RPATH TRUE
+ 			INSTALL_RPATH "@loader_path/../../.."
+ 			MACOSX_BUNDLE_BUNDLE_NAME "Sigma Helper"
+ 			MACOSX_BUNDLE_GUI_IDENTIFIER "com.Sigma.Sigma_Helper"
+ 			)
+ 		add_custom_command(TARGET Sigma_Helper POST_BUILD
+ 			# Patch the binary so it can find CEF
+ 			COMMAND install_name_tool -change "@executable_path/Chromium Embedded Framework" "@rpath/Chromium Embedded Framework.framework/Chromium Embedded Framework" "$<TARGET_FILE:Sigma_Helper>"
+ 			# Add LSUIElement to the Info.plist
+ 			COMMAND defaults write "$<TARGET_FILE_DIR:Sigma_Helper>/../Info.plist" "LSUIElement" true
+ 			)
+ 		add_custom_command(TARGET Sigma POST_BUILD
+ 			# Patch the Sigma binary so it can find CEF
+ 			COMMAND install_name_tool -change "@executable_path/Chromium Embedded Framework" "@rpath/Chromium Embedded Framework.framework/Chromium Embedded Framework" "$<TARGET_FILE:Sigma>"
+ 			# Make a Frameworks directory
+ 			COMMAND mkdir -p "$<TARGET_FILE_DIR:Sigma>/../Frameworks"
+ 			# Copy the CEF and support frameworks
+ 			COMMAND cp -Rf "${CMAKE_SOURCE_DIR}/cef/Release/Chromium Embedded Framework.framework" "$<TARGET_FILE_DIR:Sigma>/../Frameworks/"
+ 			COMMAND cp -Rf "${CMAKE_SOURCE_DIR}/cef/Release/libplugin_carbon_interpose.dylib" "$<TARGET_FILE_DIR:Sigma>/../Frameworks/"
+			# Setup the helper apps
+ 			COMMAND rm -rf "$<TARGET_FILE_DIR:Sigma>/../Frameworks/Sigma Helper.app"
+ 			COMMAND cp -Rf "$<TARGET_FILE_DIR:Sigma>/../../../Sigma Helper.app" "$<TARGET_FILE_DIR:${TEST_NAME}>/../Frameworks/Sigma Helper.app"
+ 			COMMAND "BUILT_PRODUCTS_DIR=$<TARGET_FILE_DIR:Sigma>/../../.." "CONTENTS_FOLDER_PATH=Sigma.app/Contents" "${CMAKE_SOURCE_DIR}/cef/tools/make_more_helpers.sh" "Frameworks" "Sigma"
+ 			)
+ 	endif (BUILD_EXE_Sigma AND BUILD_LINK_CEF)
+ endif(NOT APPLE)
 
