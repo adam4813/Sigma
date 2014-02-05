@@ -6,7 +6,7 @@ The Sigma game engine for creating games on multiple platforms. The name Sigma w
 Requires CMake and one of the following compilers:
 
 * GCC 4.8 or newer;
-* Clang/LLVM 5.0 or newer;
+* Clang 3.3 or newer (Xcode 5.0 or newer on OS X);
 * Visual Studio 2010 or newer;
 
 Contributing
