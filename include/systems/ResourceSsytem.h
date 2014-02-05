@@ -7,6 +7,10 @@
 
 namespace Sigma {
 	namespace resource {
+		// Each reflected type must specialize this.
+		template <typename TYPE> const char* GetTypeName(void) { static_assert(0, "GetTypeName is undefined for a type."); }
+		template <typename TYPE> const unsigned int GetTypeID(void) { static_assert(0, "GetTypeID is undefined for a type."); }
+
 		// A simple base class used to store a non-template pointer in ResourceSystem::loaders.
 		class ResourceLoaderBase {
 		public:
@@ -106,8 +110,8 @@ namespace Sigma {
 			 */
 			template<class T>
 			void CreateResourceLoader() {
-				if (this->loaders.find(T::TypeID) == this->loaders.end()) {
-					this->loaders[T::TypeID].reset(new ResourceLoader<T>);
+				if (this->loaders.find(GetTypeID<T>()) == this->loaders.end()) {
+					this->loaders[GetTypeID<T>()].reset(new ResourceLoader<T>);
 				}
 			}
 
@@ -120,8 +124,8 @@ namespace Sigma {
 			 */
 			template<class T>
 			void AddResourceLoader(std::shared_ptr<ResourceLoader<T>> rl) {
-				if (this->loaders.find(T::TypeID) == this->loaders.end()) {
-					this->loaders[T::TypeID] = rl;
+				if (this->loaders.find(GetTypeID<T>()) == this->loaders.end()) {
+					this->loaders[GetTypeID<T>()] = rl;
 				}
 			}
 
@@ -133,8 +137,8 @@ namespace Sigma {
 			 */
 			template<class T>
 			void RemoveResourceLoader() {
-				if (this->loaders.find(T::TypeID) != this->loaders.end()) {
-					this->loaders.erase(T::TypeID);
+				if (this->loaders.find(GetTypeID<T>()) != this->loaders.end()) {
+					this->loaders.erase(GetTypeID<T>());
 				}
 			}
 
@@ -146,8 +150,8 @@ namespace Sigma {
 			 */
 			template<class T>
 			std::shared_ptr<ResourceLoader<T>> GetResourceLoader() const {
-				if (this->loaders.find(T::TypeID) != this->loaders.end()) {
-					return std::static_pointer_cast<ResourceLoader<T>>(this->loaders[T::TypeID].get());
+				if (this->loaders.find(GetTypeID<T>()) != this->loaders.end()) {
+					return std::static_pointer_cast<ResourceLoader<T>>(this->loaders[GetTypeID<T>()].get());
 				}
 			}
 
@@ -159,8 +163,8 @@ namespace Sigma {
 			 */
 			template<class T>
 			std::shared_ptr<T> Get(const std::string& name) {
-				if (this->loaders.find(T::TypeID) != this->loaders.end()) {
-					return static_cast<ResourceLoader<T>*>(this->loaders[T::TypeID].get())->Get(name);
+				if (this->loaders.find(GetTypeID<T>()) != this->loaders.end()) {
+					return static_cast<ResourceLoader<T>*>(this->loaders[GetTypeID<T>()].get())->Get(name);
 				}
 				return nullptr;
 			}
@@ -174,8 +178,8 @@ namespace Sigma {
 			 */
 			template<class T>
 			void Add(const std::string& name, std::shared_ptr<T> r) {
-				if (this->loaders.find(T::TypeID) != this->loaders.end()) {
-					static_cast<ResourceLoader<T>*>(this->loaders[T::TypeID].get())->Add(name, r);
+				if (this->loaders.find(GetTypeID<T>()) != this->loaders.end()) {
+					static_cast<ResourceLoader<T>*>(this->loaders[GetTypeID<T>()].get())->Add(name, r);
 				}
 			}
 
@@ -187,8 +191,8 @@ namespace Sigma {
 			 */
 			template<class T>
 			void Remove(const std::string& name) {
-				if (this->loaders.find(T::TypeID) != this->loaders.end()) {
-					static_cast<ResourceLoader<T>*>(this->loaders[T::TypeID].get())->Remove(name);
+				if (this->loaders.find(GetTypeID<T>()) != this->loaders.end()) {
+					static_cast<ResourceLoader<T>*>(this->loaders[GetTypeID<T>()].get())->Remove(name);
 				}
 			}
 
@@ -200,16 +204,17 @@ namespace Sigma {
 			 */
 			template<class T>
 			bool Exists(const std::string& name) const {
-				if (this->loaders.find(T::TypeID) != this->loaders.end()) {
-					return static_cast<ResourceLoader<T>*>(this->loaders[T::TypeID].get())->Exists(name);
+				if (this->loaders.find(GetTypeID<T>()) != this->loaders.end()) {
+					return static_cast<ResourceLoader<T>*>(this->loaders[GetTypeID<T>()].get())->Exists(name);
 				}
 				return false;
 			}
 		private:
 			std::map<unsigned int, std::shared_ptr<ResourceLoaderBase>> loaders; // Mapping of resource TypeID to loader.
 		};
-
+#ifdef _WIN32
 		__declspec(selectany) std::once_flag ResourceSystem::only_one;
 		__declspec(selectany) std::shared_ptr<ResourceSystem> ResourceSystem::instance = nullptr;
+#endif
 	}
 }

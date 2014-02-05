@@ -37,8 +37,6 @@ namespace Sigma {
 
 			}
 
-			static unsigned int const TypeID = 1001;
-
 			/**
 			 * Generates a empty texture of the desired size
 			 */
@@ -258,5 +256,8 @@ namespace Sigma {
 			GLint mag_filter;     /// Filter using when magnify texture
 			GLint min_filter;     /// Filter using when minimize texture
 		};
+
+		template <> inline const char* GetTypeName<Texture>() { return "Texture"; }
+		template <> inline const unsigned int GetTypeID<Texture>() { return 1001; }
 	}
 }

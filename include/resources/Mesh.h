@@ -11,9 +11,11 @@
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include "systems/ResourceSsytem.h"
 
-namespace Sigma{
+namespace Sigma {
 	namespace resource {
+
 		// A struct to store which index each of its verts are.
 		struct Face {
 			Face(unsigned int v1, unsigned int v2, unsigned int v3) : v1(v1), v2(v2), v3(v3) { }
@@ -76,8 +78,6 @@ namespace Sigma{
 		public:
 			Mesh();
 			virtual ~Mesh();
-
-			static unsigned int const TypeID = 1000;
 
 			/**
 			 * \brief Returns the number of elements to draw for this component.
@@ -312,6 +312,9 @@ namespace Sigma{
 			std::map<unsigned int, std::string> materialGroups; // Stores a mapping of material name to material (face) grouping.
 			std::vector<unsigned int> materialGroupIndex; // Stores which index each material (face) group starts at.
 		}; // class Mesh
+
+		template <> inline const char* GetTypeName<Mesh>() { return "Mesh"; }
+		template <> inline const unsigned int GetTypeID<Mesh>() { return 1000; }
 	}
 } // namespace Sigma
 

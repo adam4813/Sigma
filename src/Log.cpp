@@ -1,8 +1,9 @@
 #include "Log.h"
 
 namespace Log {
-	// The Joker was here
-	//LogLevel Print::log_level;
-	//std::ostream* Print::out;
+#ifndef _WIN32
+	LogLevel Print::log_level;
+	std::ostream* Print::out;
+#endif
 }
 

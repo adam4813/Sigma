@@ -135,8 +135,10 @@ namespace Log {
 			return *this;
 		}
 	};
+#ifdef _WIN32
 	__declspec(selectany) LogLevel Print::log_level;
 	__declspec(selectany) std::ostream* Print::out;
+#endif
 } // END OF NAMESPACE logger
 
 // Macros to type less
