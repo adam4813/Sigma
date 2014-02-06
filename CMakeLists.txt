@@ -27,7 +27,9 @@ FILE(GLOB Sigma_SRC "src/*.cpp")
 # find all the files in the includes directory
 FILE(GLOB Sigma_INCLUDES "include/*.h" "include/*.hpp")
 FILE(GLOB CEF "include/cef_*.h" "include/cef_*.hpp")
-LIST(REMOVE_ITEM Sigma_INCLUDES ${CEF})
+IF(CEF)
+	LIST(REMOVE_ITEM Sigma_INCLUDES ${CEF})
+ENDIF(CEF)
 
 # Filter the source/header files for various groups of files
 # Put all component files into a filter
@@ -124,7 +126,7 @@ IF (WIN32 AND NOT MINGW) # Windows
 	ENDIF (CMAKE_CL_64)
 ENDIF (WIN32 AND NOT MINGW)
 
-set(BUILD_LINK_CEF FALSE CACHE BOOL "Build with Chromium Embedded Framework (CEF)")
+set(BUILD_LINK_CEF TRUE CACHE BOOL "Build with Chromium Embedded Framework (CEF)")
 
 # Find all the libraries except GLEW and platform specific.
 FIND_PACKAGE(OpenGL REQUIRED)
