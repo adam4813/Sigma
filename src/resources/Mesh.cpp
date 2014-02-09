@@ -350,7 +350,12 @@ namespace Sigma{
 							filename = convert_path(filename);
 							LOG << "Loading diffuse texture: " << path + filename;
 							// Add the path to the filename to load it relative to the mtl file
-							std::shared_ptr<resource::Texture> texture = resource::ResourceSystem::GetInstace()->Get<resource::Texture>(path + filename);
+
+							std::vector<Property> props;
+							props.push_back(Property("filename", std::string(path + filename)));
+							
+							std::shared_ptr<resource::Texture> texture = resource::ResourceSystem::GetInstace()->Create<resource::Texture>(path + filename, props);
+						
 							m.diffuseMap = texture->GetID();
 							if (texture->GetID() == 0) {
 								LOG_ERROR << "Error loading diffuse texture: " << path + filename;
@@ -363,7 +368,12 @@ namespace Sigma{
 							filename = convert_path(filename);
 							LOG << "Loading ambient texture: " << path + filename;
 							// Add the path to the filename to load it relative to the mtl file
-							std::shared_ptr<resource::Texture> texture = resource::ResourceSystem::GetInstace()->Get<resource::Texture>(path + filename);
+							
+							std::vector<Property> props;
+							props.push_back(Property("filename", std::string(path + filename)));
+							
+							std::shared_ptr<resource::Texture> texture = resource::ResourceSystem::GetInstace()->Create<resource::Texture>(path + filename, props);
+							
 							m.ambientMap = texture->GetID();
 							if (texture->GetID() == 0) {
 								LOG_ERROR << "Error loading ambient texture: " << path + filename;
@@ -376,7 +386,12 @@ namespace Sigma{
 							filename = convert_path(filename);
 							LOG << "Loading normal or bump texture: " << path + filename;
 							// Add the path to the filename to load it relative to the mtl file
-							std::shared_ptr<resource::Texture> texture = resource::ResourceSystem::GetInstace()->Get<resource::Texture>(path + filename);
+							
+							std::vector<Property> props;
+							props.push_back(Property("filename", std::string(path + filename)));
+						
+							std::shared_ptr<resource::Texture> texture = resource::ResourceSystem::GetInstace()->Create<resource::Texture>(path + filename, props);
+							
 							m.normalMap = texture->GetID();
 							if (texture->GetID() == 0) {
 								LOG_ERROR << "Error loading normal texture: " << path + filename;

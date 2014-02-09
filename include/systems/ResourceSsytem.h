@@ -4,6 +4,8 @@
 #include <memory>
 #include <map>
 #include <mutex>
+#include <vector>
+#include "Property.h"
 
 namespace Sigma {
 	namespace resource {
@@ -28,14 +30,27 @@ namespace Sigma {
 			/**
 			 * \brief Returns a resource with the specified name.
 			 *
-			 * This method will load the resource if it isn't loaded already.
-			 * \param[in] std::string name Filename of the resource to load and return.
-			 * \return std::shared_ptr<T> The returned resource might be empty if it failed to load.
+			 * \param[in] std::string name Name of the resource to retrieve.
+			 * \return std::shared_ptr<T> Returns nullptr if the resource hasn't been created, otherwise the requested resource.
 			 */
 			std::shared_ptr<T> Get(const std::string& name) {
 				if (this->resources.find(name) == this->resources.end()) {
+					return nullptr;
+				}
+				return this->resources[name];
+			}
+
+			/**
+			 * \brief Returns a resource with the specified name.
+			 *
+			 * \param[in] const std::string& name The name of the resource to get.
+			 * \param[in] const std::vector<Property> &properties The creation properties for the resource.
+			 * \return std::shared_ptr<T> Returns nullptr if the resource hasn't been created, otherwise the created resource.
+			 */
+			std::shared_ptr<T> Create(const std::string& name, const std::vector<Property> &properties) {
+				if (this->resources.find(name) == this->resources.end()) {
 					this->resources[name].reset(new T());
-					this->resources[name]->Load(name);
+					this->resources[name]->Create(properties);
 				}
 				return this->resources[name];
 			}
@@ -43,8 +58,8 @@ namespace Sigma {
 			/**
 			 * \brief Used to add a resource created or copied from memory.
 			 *
-			 * \param[in] std::string name The name of the resource
-			 * \param[in] std::shared_ptr<T> r The resource to store
+			 * \param[in] std::string name The name of the resource.
+			 * \param[in] std::shared_ptr<T> r The resource to store.
 			 * \return void
 			 */
 			void Add(const std::string& name, std::shared_ptr<T> r) {
@@ -64,7 +79,7 @@ namespace Sigma {
 			/**
 			 * \brief Checks if a resource with the given name exists.
 			 *
-			 * \param[in] const std::string & name
+			 * \param[in] const std::string & name Name of the resource to check.
 			 * \return bool True if it exists.
 			 */
 			bool Exists(const std::string& name) const {
@@ -146,7 +161,7 @@ namespace Sigma {
 			 * \brief Returns a resource loader.
 			 *
 			 * The returned loader is based on the TypeID of the resource.
-			 * \return
+			 * \return The resource loader for the given TypeID.
 			 */
 			template<class T>
 			std::shared_ptr<ResourceLoader<T>> GetResourceLoader() const {
@@ -158,13 +173,28 @@ namespace Sigma {
 			/**
 			 * \brief Calls ResourceLoader::Get.
 			 *
-			 * \param[in] const std::string& name The name of the resource to get.
-			 * \return The returned resource might be empty if it failed to load
+			 * \param[in] const std::string& name Name of the resource to retrieve.
+			 * \return std::shared_ptr<T> Returns nullptr if the resource hasn't been created yet, otherwise the requested resource..
 			 */
 			template<class T>
 			std::shared_ptr<T> Get(const std::string& name) {
 				if (this->loaders.find(GetTypeID<T>()) != this->loaders.end()) {
 					return static_cast<ResourceLoader<T>*>(this->loaders[GetTypeID<T>()].get())->Get(name);
+				}
+				return nullptr;
+			}
+
+			/**
+			 * \brief Calls ResourceLoader::Create.
+			 *
+			 * \param[in] const std::string& name The name of the resource to create.
+			 * \param[in] const std::vector<Property> &properties The creation properties for the resource.
+			 * \return std::shared_ptr<T> Returns nullptr if it failed to be created, otherwise the created resource.
+			 */
+			template<class T>
+			std::shared_ptr<T> Create(const std::string& name, const std::vector<Property> &properties) {
+				if (this->loaders.find(GetTypeID<T>()) != this->loaders.end()) {
+					return static_cast<ResourceLoader<T>*>(this->loaders[GetTypeID<T>()].get())->Create(name, properties);
 				}
 				return nullptr;
 			}

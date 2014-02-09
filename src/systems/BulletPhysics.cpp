@@ -114,7 +114,9 @@ namespace Sigma {
 				meshFilename = p->Get<std::string>();
 			}
 		}
-		std::shared_ptr<resource::Mesh> meshFile = resource::ResourceSystem::GetInstace()->Get<resource::Mesh>(meshFilename);
+		std::vector<Property> props;
+		props.push_back(Property("filename", std::string(meshFilename)));
+		std::shared_ptr<resource::Mesh> meshFile = resource::ResourceSystem::GetInstace()->Create<resource::Mesh>(meshFilename, props);
 		mesh->SetMesh(meshFile.get(), scale);
 
 		mesh->InitializeRigidBody(x, y, z, rx, ry, rz);

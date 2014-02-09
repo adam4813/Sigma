@@ -7,9 +7,11 @@
 
 #include <string>
 #include <cassert>
+#include <vector>
 
 #include "SOIL/SOIL.h"
 #include "systems/ResourceSsytem.h"
+#include "Property.h"
 
 namespace Sigma {
 	namespace resource {
@@ -141,6 +143,56 @@ namespace Sigma {
 				return true;
 			}
 
+			virtual bool Create(const std::vector<Property> &properties) {
+				std::string fname = "";
+				std::string format = "GL_RGBA";
+				std::string wrapR = "GL_REPEAT", wrapS = "GL_REPEAT", wrapT = "GL_REPEAT";
+				bool inMemory = false;
+				bool autogenMipMap = true;
+
+				for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
+					const Property*  p = &(*propitr);
+					if (p->GetName() == "filename") {
+						fname = p->Get<std::string>();
+					}
+					else if (p->GetName() == "inMemory") {
+						inMemory = p->Get<bool>();
+					}
+					else if (p->GetName() == "width") {
+						this->width = p->Get<int>();
+					}
+					else if (p->GetName() == "height") {
+						this->height = p->Get<int>();
+					}
+					else if (p->GetName() == "format") {
+						format =  p->Get<std::string>();
+					}
+					else if (p->GetName() == "wrap_r") {
+						wrapR = p->Get<std::string>();
+					}
+					else if (p->GetName() == "wrap_S") {
+						wrapS = p->Get<std::string>();
+					}
+					else if (p->GetName() == "wrap_t") {
+						wrapT = p->Get<std::string>();
+					}
+					else if (p->GetName() == "autogen_mipmap") {
+						autogenMipMap = p->Get<bool>();
+					}
+				}
+				GenerateGLTexture(this->width, this->height);
+				Format(FormatValue(format));
+				WrapR(WrapValue(wrapR));
+				WrapS(WrapValue(wrapS));
+				WrapT(WrapValue(wrapT));
+				AutoGenMipMaps(autogenMipMap);
+
+				if (inMemory) {
+					return this->id > 0;
+				}
+				return Load(fname);
+			}
+
 			unsigned int GetID() const { return id; }
 
 			/**
@@ -152,6 +204,36 @@ namespace Sigma {
 			 * Sets OpenGL GPU internal format of the Texture
 			 */
 			void IntFormat(GLenum val)  { int_format = val; }
+			
+			/**
+			 * Changes the format value from string to GLint.
+			 */
+			GLint FormatValue(const std::string& val) {
+				if (val == "GL_RGBA") {
+					return GL_RGBA;
+				}
+				else if (val == "GL_BGRA") {
+					return GL_BGRA;
+				}
+				else if (val == "GL_RED") {
+					return GL_RED;
+				}
+				else if (val == "GL_RG") {
+					return GL_RG;
+				}
+				else if (val == "GL_RGB") {
+					return GL_RGB;
+				}
+				else if (val == "GL_BGR") {
+					return GL_BGR;
+				}
+				else if (val == "GL_DEPTH_COMPONENT") {
+					return GL_DEPTH_COMPONENT;
+				}
+				else if (val == "GL_STENCIL_INDEX") {
+					return GL_STENCIL_INDEX;
+				}
+			}
 
 			/**
 			 * Return loaded Pixel data format
@@ -172,6 +254,27 @@ namespace Sigma {
 			 * Sets Data Type per Pixel (float, byte, etc...)
 			 */
 			void Type(GLenum val)  { type = val; }
+
+			/**
+			 * Changes the wrap value from string to GLint.
+			 */
+			GLint WrapValue(const std::string& val) {
+				if (val == "GL_CLAMP_TO_EDGE") {
+					return GL_CLAMP_TO_EDGE;
+				}
+				else if (val == "GL_CLAMP_TO_BORDER") {
+					return GL_CLAMP_TO_BORDER;
+				}
+				else if (val == "GL_MIRRORED_REPEAT") {
+					return GL_MIRRORED_REPEAT;
+				}
+				else if (val == "GL_REPEAT") {
+					return GL_REPEAT;
+				}
+				else if (val == "GL_MIRROR_CLAMP_TO_EDGE") {
+					return GL_MIRROR_CLAMP_TO_EDGE;
+				}
+			}
 
 			GLint WrapS() const { return wrap_s; }
 

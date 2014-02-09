@@ -79,6 +79,19 @@ namespace Sigma {
 			Mesh();
 			virtual ~Mesh();
 
+			virtual bool Create(const std::vector<Property> &properties) {
+				std::string fname = "";
+
+				for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
+					const Property*  p = &(*propitr);
+					if (p->GetName() == "filename") {
+						fname = p->Get<std::string>();
+					}
+				}
+
+				return Load(fname);
+			}
+
 			/**
 			 * \brief Returns the number of elements to draw for this component.
 			 *

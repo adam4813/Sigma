@@ -329,7 +329,7 @@ namespace Sigma{
 		int componentID = 0;
 		std::string cull_face = "back";
 		std::string shaderfile = "";
-		std::string meshFIlename = "";
+		std::string meshFilename = "";
 
 		for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
 			const Property*  p = &*propitr;
@@ -363,7 +363,7 @@ namespace Sigma{
 			}
 			else if (p->GetName() == "meshFile") {
 				LOG << "Loading mesh: " << p->Get<std::string>();
-				meshFIlename = p->Get<std::string>();
+				meshFilename = p->Get<std::string>();
 			}
 			else if (p->GetName() == "shader") {
 				shaderfile = p->Get<std::string>();
@@ -404,7 +404,9 @@ namespace Sigma{
 			}
 		}
 
-		std::shared_ptr<resource::Mesh> mesh = this->resSystem->Get<resource::Mesh>(meshFIlename);
+		std::vector<Property> props;
+		props.push_back(Property("filename", std::string(meshFilename)));
+		std::shared_ptr<resource::Mesh> mesh = resource::ResourceSystem::GetInstace()->Create<resource::Mesh>(meshFilename, props);
 
 		renderable->SetMesh(mesh);
 		renderable->SetCullFace(cull_face);
