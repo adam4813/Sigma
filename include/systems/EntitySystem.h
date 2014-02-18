@@ -13,7 +13,7 @@ namespace Sigma {
 	class EntitySystem;
 
 	/** \brief An interface for entities
-     */
+	 */
 	class IEntity {
 	public:
 		IEntity(const id_t entityID) : entityID(entityID) {};
@@ -32,8 +32,8 @@ namespace Sigma {
 	};
 
 
-    /** \brief A system that manage the components of entities
-     */
+	/** \brief A system that manage the components of entities
+	 */
 	class EntitySystem {
 		typedef std::pair<ComponentID, std::unique_ptr<IECSComponent>> element_t;
 	public:
@@ -43,13 +43,13 @@ namespace Sigma {
 		template<class T>
 		T* getComponent(IEntity* e);
 
-        /** \brief Add a composite, i.e a set of predefined components, to an entity
-         *
-         * \param e IEntity* the entity
-         * \param fid const CompositeID& the composite ID
-         * \param properties const Property& the property object to initialize the composite
-         *
-         */
+		/** \brief Add a composite, i.e a set of predefined components, to an entity
+		 *
+		 * \param e IEntity* the entity
+		 * \param fid const CompositeID& the composite ID
+		 * \param properties const Property& the property object to initialize the composite
+		 *
+		 */
 		void addComposite(IEntity* e, const CompositeID& fid, const std::vector<Property>& properties);
 
 		void RemoveComposite(IEntity *e, const CompositeID& cid);

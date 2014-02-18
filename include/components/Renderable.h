@@ -9,7 +9,7 @@
 
 #include "components/SpatialComponent.h"
 #include "GLTransform.h"
-#include "systems/GLSLShader.h"
+#include "resources/Shader.h"
 #include <unordered_map>
 #include <memory>
 #include "Sigma.h"
@@ -49,7 +49,7 @@ namespace Sigma {
 			this->mesh = m;
 		}
 
-		typedef std::unordered_map<std::string, std::shared_ptr<GLSLShader>> ShaderMap;
+		typedef std::unordered_map<std::string, std::shared_ptr<resource::Shader>> ShaderMap;
 
 		/**
 		 * \brief Retrieves the specified buffer.
@@ -296,7 +296,7 @@ namespace Sigma {
 		 * \return void
 		 */
 		void LoadShader(const std::string& filename);
-		std::shared_ptr<GLSLShader> GetShader() { return this->shader; }
+		std::shared_ptr<resource::Shader> GetShader() { return this->shader; }
 
 		void SetLightingEnabled(bool enabled) { this->lightingEnabled = enabled; }
 		bool IsLightingEnabled() { return this->lightingEnabled; }
@@ -315,7 +315,7 @@ namespace Sigma {
 		GLuint cull_face; // The current culling method for this component.
 		GLuint depthFunc;
 
-		std::shared_ptr<GLSLShader> shader; // shaders are shared among components
+		std::shared_ptr<resource::Shader> shader; // shaders are shared among components
 		std::shared_ptr<resource::Mesh> mesh;
 		// name-->shader map to look up already-loaded shaders (so each can be loaded only once)
 		static ShaderMap loadedShaders;

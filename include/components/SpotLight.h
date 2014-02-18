@@ -5,7 +5,6 @@
 
 #include "glm/glm.hpp"
 #include "IComponent.h"
-#include "systems/GLSLShader.h"
 #include "GLTransform.h"
 #include "Sigma.h"
 

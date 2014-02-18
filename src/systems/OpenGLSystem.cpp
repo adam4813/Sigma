@@ -1,5 +1,5 @@
 #include "systems/OpenGLSystem.h"
-#include "systems/GLSLShader.h"
+#include "resources/Shader.h"
 #include "systems/GLSixDOFView.h"
 #include "controllers/FPSCamera.h"
 #include "resources/GLSprite.h"
@@ -796,7 +796,7 @@ namespace Sigma{
 			// Currently simple constant ambient light, could use SSAO here
 			glm::vec4 ambientLight(0.1f, 0.1f, 0.1f, 1.0f);
 
-			GLSLShader &shader = (*this->ambientQuad.GetShader().get());
+			resource::Shader &shader = (*this->ambientQuad.GetShader().get());
 			shader.Use();
 
 			// Load variables
@@ -823,7 +823,7 @@ namespace Sigma{
 					// If it is a point light, and it intersects the frustum, then render
 					if(light && this->GetView(0)->CameraFrustum.intersectsSphere(light->position, light->radius) ) {
 
-						GLSLShader &shader = (*this->pointQuad.GetShader().get());
+						resource::Shader &shader = (*this->pointQuad.GetShader().get());
 						shader.Use();
 
 						// Load variables
@@ -855,7 +855,7 @@ namespace Sigma{
 					SpotLight *spotLight = dynamic_cast<SpotLight *>(citr->second.get());
 
 					if(spotLight && spotLight->IsEnabled()) {
-						GLSLShader &shader = (*this->spotQuad.GetShader().get());
+						resource::Shader &shader = (*this->spotQuad.GetShader().get());
 						shader.Use();
 
 						glm::vec3 position = spotLight->transform.ExtractPosition();
