@@ -1,4 +1,4 @@
-#include "systems/ResourceSsytem.h"
+#include "systems/ResourceSystem.h"
 
 namespace Sigma {
 	namespace resource {

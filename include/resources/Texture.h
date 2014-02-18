@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "SOIL/SOIL.h"
-#include "systems/ResourceSsytem.h"
+#include "systems/ResourceSystem.h"
 #include "Property.h"
 
 namespace Sigma {
@@ -233,6 +233,8 @@ namespace Sigma {
 				else if (val == "GL_STENCIL_INDEX") {
 					return GL_STENCIL_INDEX;
 				}
+
+				return GL_RGBA;
 			}
 
 			/**
@@ -274,6 +276,8 @@ namespace Sigma {
 				else if (val == "GL_MIRROR_CLAMP_TO_EDGE") {
 					return GL_MIRROR_CLAMP_TO_EDGE;
 				}
+
+				return GL_REPEAT;
 			}
 
 			GLint WrapS() const { return wrap_s; }

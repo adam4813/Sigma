@@ -6,7 +6,6 @@
 #include <sstream>
 
 #include "resources/Texture.h"
-#include "systems/ResourceSsytem.h"
 #include "strutils.h"
 #include "Sigma.h"
 

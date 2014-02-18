@@ -21,7 +21,7 @@
 #include "resources/GLScreenQuad.h"
 #include "Sigma.h"
 #include "composites/PhysicalWorldLocation.h"
-#include "ResourceSsytem.h"
+#include "ResourceSystem.h"
 
 struct IGLView;
 

@@ -11,7 +11,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-#include "systems/ResourceSsytem.h"
+#include "systems/ResourceSystem.h"
 
 namespace Sigma {
 	namespace resource {
