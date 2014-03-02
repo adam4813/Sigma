@@ -109,7 +109,7 @@ namespace Sigma {
 			else if (p->GetName() == "rz") {
 				rz = p->Get<float>();
 			}
-			else if (p->GetName() == "meshFile") {
+			else if (p->GetName() == "mesh") {
 				LOG << "Loading mesh: " << p->Get<std::string>();
 				meshFilename = p->Get<std::string>();
 			}
