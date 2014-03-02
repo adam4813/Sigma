@@ -1,5 +1,4 @@
 #include "gtest/gtest.h"
-#include "tests/EntityManagerTest.h"
 #include "tests/PropertyTest.h"
 
 int main(int argc, char **argv) {
