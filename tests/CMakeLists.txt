@@ -10,6 +10,22 @@ ENDIF(MINGW OR UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin/tests)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
 
+SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${CMAKE_SOURCE_DIR}/include)
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include")
+
+LINK_DIRECTORIES("${CMAKE_SOURCE_DIR}/lib" "${CMAKE_SOURCE_DIR}/lib")
+SET(CMAKE_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/lib ${CMAKE_SOURCE_DIR}/lib)
+
+
+set(SigmaIncludeDir CACHE PATH "Sigma's include directory.")
+
+IF (NOT IS_DIRECTORY ${SigmaIncludeDir})
+message(SEND_ERROR "Please set the Sigma include directory")
+ENDIF (NOT IS_DIRECTORY ${SigmaIncludeDir})
+
+SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${SigmaIncludeDir})
+INCLUDE_DIRECTORIES(${SigmaIncludeDir})
+
 set(SigmaTests_SRC "${CMAKE_SOURCE_DIR}")
 
 file(GLOB SigmaTests_SRC "tests/*.h" "main.cpp")
