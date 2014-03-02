@@ -26,7 +26,6 @@ namespace Sigma{
 		/**
 		 * \brief Renders a GLSprite.
 		 *
-		 *
 		 * \param[in] glm::mediump_float * view The current view matrix.
 		 * \param[in] glm::mediump_float * proj The current projection matrix.
 		 * \exception
@@ -40,11 +39,6 @@ namespace Sigma{
 		 * \return    void
 		 */
 		void SetTexture(std::shared_ptr<resource::Texture> texture);
-
-
-		// Load the default shader, "shaders/vert"
-		void LoadShader();
-		static const std::string DEFAULT_SHADER;
 
 		/**
 		 * \brief Returns the number of elements to draw for this component.

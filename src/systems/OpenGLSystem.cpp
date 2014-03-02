@@ -65,6 +65,7 @@ namespace Sigma{
 			this->resSystem = resource::ResourceSystem::GetInstace();
 			this->resSystem->Register<resource::Mesh>();
 			this->resSystem->Register<resource::Texture>();
+			this->resSystem->Register<resource::Shader>();
 	}
 
 
@@ -161,7 +162,6 @@ namespace Sigma{
 		std::shared_ptr<resource::Texture> texture = this->resSystem->Get<resource::Texture>(textureFilename);
 
 		spr->SetTexture(texture);
-		spr->LoadShader();
 		spr->Transform()->Scale(glm::vec3(scale));
 		spr->Transform()->Translate(x,y,z);
 		spr->InitializeBuffers();
@@ -217,7 +217,12 @@ namespace Sigma{
 		renderable->SetMesh(sphere);
 		renderable->Transform()->Scale(scale,scale,scale);
 		renderable->Transform()->Translate(x,y,z);
-		renderable->LoadShader(shader_name);
+
+		std::vector<Property> props;
+		props.push_back(Property("filename", std::string(shader_name)));
+		std::shared_ptr<resource::Shader> shader = this->resSystem->Create<resource::Shader>(shader_name, props);
+		renderable->SetShader(shader);
+
 		renderable->InitializeBuffers();
 		renderable->SetCullFace("back");
 		this->addComponent(entityID,renderable);
@@ -309,7 +314,12 @@ namespace Sigma{
 		renderable->Transform()->Scale(scale,scale,scale);
 		renderable->Transform()->Rotate(rx,ry,rz);
 		renderable->Transform()->Translate(x,y,z);
-		renderable->LoadShader(shader_name);
+
+		std::vector<Property> props;
+		props.push_back(Property("filename", std::string(shader_name)));
+		std::shared_ptr<resource::Shader> shader = this->resSystem->Create<resource::Shader>(shader_name, props);
+
+		renderable->SetShader(shader);
 		renderable->InitializeBuffers();
 
 		this->addComponent(entityID,renderable);
@@ -406,14 +416,18 @@ namespace Sigma{
 
 		std::vector<Property> props;
 		props.push_back(Property("filename", std::string(meshFilename)));
-		std::shared_ptr<resource::Mesh> mesh = resource::ResourceSystem::GetInstace()->Create<resource::Mesh>(meshFilename, props);
+		std::shared_ptr<resource::Mesh> mesh = this->resSystem->Create<resource::Mesh>(meshFilename, props);
+		props.pop_back();
 
 		renderable->SetMesh(mesh);
 		renderable->SetCullFace(cull_face);
 		renderable->Transform()->Scale(scale,scale,scale);
 		renderable->Transform()->Translate(x,y,z);
 		renderable->Transform()->Rotate(rx,ry,rz);
-		renderable->LoadShader(shaderfile);
+
+		props.push_back(Property("filename", std::string(shaderfile)));
+		std::shared_ptr<resource::Shader> shader = this->resSystem->Create<resource::Shader>(shaderfile, props);
+		renderable->SetShader(shader);
 		
 		renderable->InitializeBuffers();
 		this->addComponent(entityID,renderable);
@@ -471,7 +485,12 @@ namespace Sigma{
 		this->resSystem->Add<resource::Mesh>(meshname, quad);
 
 		renderable->SetMesh(quad);
-		renderable->LoadShader("shaders/quad");
+
+		std::vector<Property> props;
+		props.push_back(Property("filename", std::string("shaders/quad")));
+		std::shared_ptr<resource::Shader> shader = this->resSystem->Create<resource::Shader>("shaders/quad", props);
+		renderable->SetShader(shader);
+
 		renderable->InitializeBuffers();
 		renderable->SetLightingEnabled(false);
 		this->screensSpaceComp.push_back(std::unique_ptr<Renderable>(renderable));
@@ -1017,12 +1036,18 @@ namespace Sigma{
 		pQuad->Inverted(true);
 		pQuad->InitializeBuffers();
 		std::string meshname = "pointQuad";
+		
 
 		this->resSystem->Add<resource::Mesh>(meshname, pQuad);
 
 		this->pointQuad.SetMesh(pQuad);
 
-		this->pointQuad.LoadShader("shaders/pointlight");
+		std::vector<Property> props;
+		props.push_back(Property("filename", std::string("shaders/pointlight")));
+		std::shared_ptr<resource::Shader> pshader = this->resSystem->Create<resource::Shader>("shaders/pointlight", props);
+		props.pop_back();
+		this->pointQuad.SetShader(pshader);
+
 		this->pointQuad.InitializeBuffers();
 		this->pointQuad.SetCullFace("none");
 
@@ -1048,7 +1073,11 @@ namespace Sigma{
 
 		this->spotQuad.SetMesh(sQuad);
 
-		this->spotQuad.LoadShader("shaders/spotlight");
+		props.push_back(Property("filename", std::string("shaders/spotlight")));
+		std::shared_ptr<resource::Shader> sshader = this->resSystem->Create<resource::Shader>("shaders/spotlight", props);
+		props.pop_back();
+		this->spotQuad.SetShader(pshader);
+
 		this->spotQuad.InitializeBuffers();
 		this->spotQuad.SetCullFace("none");
 
@@ -1075,7 +1104,11 @@ namespace Sigma{
 		this->resSystem->Add<resource::Mesh>(meshname, aQuad);
 
 		this->ambientQuad.SetMesh(aQuad);
-		this->ambientQuad.LoadShader("shaders/ambient");
+
+		props.push_back(Property("filename", std::string("shaders/ambient")));
+		std::shared_ptr<resource::Shader> ashader = this->resSystem->Create<resource::Shader>("shaders/ambient", props);
+		this->ambientQuad.SetShader(pshader);
+
 		this->ambientQuad.InitializeBuffers();
 		this->ambientQuad.SetCullFace("none");
 

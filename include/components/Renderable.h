@@ -49,7 +49,7 @@ namespace Sigma {
 			this->mesh = m;
 		}
 
-		typedef std::unordered_map<std::string, std::shared_ptr<resource::Shader>> ShaderMap;
+		//typedef std::unordered_map<std::string, std::shared_ptr<resource::Shader>> ShaderMap;
 
 		/**
 		 * \brief Retrieves the specified buffer.
@@ -289,14 +289,10 @@ namespace Sigma {
 			}
 		};
 
-		/** \brief load the given shader
-		 *
-		 * \param filename the base name of the shader. loads filename.vert and filename.frag.
-		 *  filename should be a relative path, like "shaders/mesh"
-		 * \return void
-		 */
-		void LoadShader(const std::string& filename);
 		std::shared_ptr<resource::Shader> GetShader() { return this->shader; }
+		void SetShader(std::shared_ptr<resource::Shader> s) {
+			this->shader = s;
+		}
 
 		void SetLightingEnabled(bool enabled) { this->lightingEnabled = enabled; }
 		bool IsLightingEnabled() { return this->lightingEnabled; }
@@ -317,8 +313,6 @@ namespace Sigma {
 
 		std::shared_ptr<resource::Shader> shader; // shaders are shared among components
 		std::shared_ptr<resource::Mesh> mesh;
-		// name-->shader map to look up already-loaded shaders (so each can be loaded only once)
-		static ShaderMap loadedShaders;
 
 		bool lightingEnabled;
 	}; // class Renderable
