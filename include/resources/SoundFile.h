@@ -3,6 +3,7 @@
 #include <memory>
 #include <fstream>
 #include <math.h>
+#include "systems/ResourceSystem.h"
 
 namespace Sigma {
 	namespace resource {
@@ -66,11 +67,14 @@ namespace Sigma {
 			bool decoderinit;
 		};
 
-		class SoundFile {
+		class SoundFile : public ResourceBase {
 			friend class Decoder;
 		public:
 			SoundFile() : data(nullptr), dataformat(Null), pcmsize(PCM_MONO16), freq(0), chann(0), hasmeta(false) { }
 			~SoundFile();
+
+			virtual bool Initialize(const std::vector<Property> &properties);
+
 			bool isLoaded() { return (this->data != nullptr); }
 			void LoadFromFile(std::string fn);
 			void LoadWAV(std::ifstream &fh, std::ifstream::pos_type sz);
@@ -97,6 +101,7 @@ namespace Sigma {
 				Decoder d;
 				d.ProcessMeta(*this);
 			}
+
 		protected:
 			unsigned char* data;
 			AUDIO_CODEC dataformat;
@@ -105,5 +110,8 @@ namespace Sigma {
 			int chann;
 			bool hasmeta;
 		};
+
+		template <> inline const char* GetTypeName<SoundFile>() { return "Sound"; }
+		template <> inline const unsigned int GetTypeID<SoundFile>() { return 1003; }
 	}
 }

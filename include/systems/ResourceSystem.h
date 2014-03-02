@@ -44,7 +44,7 @@ namespace Sigma {
 			static std::once_flag only_one;
 			static std::shared_ptr<ResourceSystem> instance;
 		public:
-			static std::shared_ptr<ResourceSystem> GetInstace() {
+			static std::shared_ptr<ResourceSystem> GetInstance() {
 				std::call_once(ResourceSystem::only_one, [] () { 
 						ResourceSystem::instance.reset(new ResourceSystem()); 
 

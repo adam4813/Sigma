@@ -62,7 +62,7 @@ namespace Sigma{
 
 	OpenGLSystem::OpenGLSystem() : windowWidth(1024), windowHeight(768), deltaAccumulator(0.0),
 		framerate(60.0f), pointQuad(1000), ambientQuad(1001), spotQuad(1002) {
-			this->resSystem = resource::ResourceSystem::GetInstace();
+			this->resSystem = resource::ResourceSystem::GetInstance();
 			this->resSystem->Register<resource::Mesh>();
 			this->resSystem->Register<resource::Texture>();
 			this->resSystem->Register<resource::Shader>();
