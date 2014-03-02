@@ -11,6 +11,10 @@
 #include "gtest/gtest.h"
 
     class VectorMapTest: public ::testing::Test {
+	public:
+		VectorMapTest() : wp16(16), seed((unsigned long int) std::chrono::system_clock::now().time_since_epoch().count()), random(seed) {
+			this->original = 1.0;
+		}
     protected:
         virtual void SetUp() {};
 
@@ -39,12 +43,12 @@
         }
 
         Sigma::VectorMap<unsigned int, double> wp256;     // default capacity is 256 elements
-        double original = 1.0;
-        Sigma::VectorMap<unsigned int, double> wp16{16}; // initial capacity of 16 elements
+        double original;
+        Sigma::VectorMap<unsigned int, double> wp16; // initial capacity of 16 elements
         std::vector<double> witness;
         std::vector<std::weak_ptr<double>> stored;
-        unsigned long int seed = (unsigned long int) std::chrono::system_clock::now().time_since_epoch().count();
-        std::default_random_engine random{seed};
+        unsigned long int seed;
+        std::default_random_engine random;
     };
 
 using Sigma::VectorMap;

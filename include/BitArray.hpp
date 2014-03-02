@@ -264,7 +264,7 @@ namespace Sigma {
 					#if defined(__GNUG__)
 					sum += __builtin_popcountll(*i);
 					#elif defined(_MSC_VER)
-					sum += __popcnt64(*i);
+					sum += __popcnt(*i);
 					#endif
 				}
 			#else
