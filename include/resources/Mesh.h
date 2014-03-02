@@ -74,12 +74,12 @@ namespace Sigma {
 			VertexIndices v[3];
 		};
 
-		class Mesh {
+		class Mesh : public ResourceBase {
 		public:
 			Mesh();
 			virtual ~Mesh();
 
-			virtual bool Create(const std::vector<Property> &properties) {
+			bool Initialize(const std::vector<Property> &properties) {
 				std::string fname = "";
 
 				for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
@@ -312,6 +312,7 @@ namespace Sigma {
 			 * \return const size_t The number of material groups.
 			 */
 			const size_t MaterialGroupsCount();
+
 		protected:
 			// Note that these values are protected, not private! Inheriting classes get access to these
 			//  basic drawing elements.

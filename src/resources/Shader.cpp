@@ -25,6 +25,27 @@ namespace Sigma {
 			_uniformLocationList.clear();
 		}
 
+		bool Shader::Initialize(const std::vector<Property> &properties) {
+			std::string filename = "";
+
+			for (auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
+				const Property*  p = &(*propitr);
+				if (p->GetName() == "filename") {
+					filename = p->Get<std::string>();
+				}
+			}
+
+			// need to create and save the shader
+			std::string vertFilename = filename + ".vert";
+			std::string fragFilename = filename + ".frag";
+
+			LoadFromFile(GL_VERTEX_SHADER, vertFilename);
+			LoadFromFile(GL_FRAGMENT_SHADER, fragFilename);
+			CreateAndLinkProgram();
+
+			return isLoaded();
+		}
+
 		void Shader::LoadFromString(GLenum type, const std::string source) {
 			GLuint shader = glCreateShader (type);
 

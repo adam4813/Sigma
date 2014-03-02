@@ -13,80 +13,18 @@ namespace Sigma {
 		template <typename TYPE> const char* GetTypeName(void) { static_assert(0, "GetTypeName is undefined for a type."); }
 		template <typename TYPE> const unsigned int GetTypeID(void) { static_assert(0, "GetTypeID is undefined for a type."); }
 
-		// A simple base class used to store a non-template pointer in ResourceSystem::loaders.
-		class ResourceLoaderBase {
+		class ResourceBase {
 		public:
-			ResourceLoaderBase() { }
-			virtual ~ResourceLoaderBase() { }
-		};
-
-		// The template parameter is the type of the resource this system is used for.
-		template<class T>
-		class ResourceLoader : public ResourceLoaderBase {
-		public:
-			ResourceLoader() { }
-			~ResourceLoader() { }
+			ResourceBase() { }
+			~ResourceBase() { }
 
 			/**
 			 * \brief Returns a resource with the specified name.
 			 *
-			 * \param[in] std::string name Name of the resource to retrieve.
-			 * \return std::shared_ptr<T> Returns nullptr if the resource hasn't been created, otherwise the requested resource.
-			 */
-			std::shared_ptr<T> Get(const std::string& name) {
-				if (this->resources.find(name) == this->resources.end()) {
-					return nullptr;
-				}
-				return this->resources[name];
-			}
-
-			/**
-			 * \brief Returns a resource with the specified name.
-			 *
-			 * \param[in] const std::string& name The name of the resource to get.
 			 * \param[in] const std::vector<Property> &properties The creation properties for the resource.
-			 * \return std::shared_ptr<T> Returns nullptr if the resource hasn't been created, otherwise the created resource.
+			 * \return bool True if initialization finished with no errors.
 			 */
-			std::shared_ptr<T> Create(const std::string& name, const std::vector<Property> &properties) {
-				if (this->resources.find(name) == this->resources.end()) {
-					this->resources[name].reset(new T());
-					this->resources[name]->Create(properties);
-				}
-				return this->resources[name];
-			}
-
-			/**
-			 * \brief Used to add a resource created or copied from memory.
-			 *
-			 * \param[in] std::string name The name of the resource.
-			 * \param[in] std::shared_ptr<T> r The resource to store.
-			 * \return void
-			 */
-			void Add(const std::string& name, std::shared_ptr<T> r) {
-				this->resources[name] = r;
-			}
-
-			/**
-			 * \brief Removes a resource with the given name.
-			 *
-			 * \param[in] const std::string & name Name of the resource to remove.
-			 * \return void
-			 */
-			void Remove(const std::string& name) {
-				this->resources.erase(name);
-			}
-
-			/**
-			 * \brief Checks if a resource with the given name exists.
-			 *
-			 * \param[in] const std::string & name Name of the resource to check.
-			 * \return bool True if it exists.
-			 */
-			bool Exists(const std::string& name) const {
-				return this->resources.find(name) != this->resources.end();
-			}
-		private:
-			std::map<const std::string, std::shared_ptr<T>> resources; // Mapping of resource name to resource type.
+			virtual bool Initialize(const std::vector<Property> &properties) = 0;
 		};
 
 		// Singleton approach derived from http://silviuardelean.ro/2012/06/05/few-singleton-approaches/ .
@@ -107,10 +45,16 @@ namespace Sigma {
 			static std::shared_ptr<ResourceSystem> instance;
 		public:
 			static std::shared_ptr<ResourceSystem> GetInstace() {
-				std::call_once(ResourceSystem::only_one, [] ()
-				{ 
-					ResourceSystem::instance.reset(new ResourceSystem()); 
-				}
+				std::call_once(ResourceSystem::only_one, [] () { 
+						ResourceSystem::instance.reset(new ResourceSystem()); 
+
+						// Set up the default factory for an unknown type to return false.
+						auto lambda = [] (const std::string& name, const std::vector<Property> &properties) {
+							return nullptr;
+						};
+
+						ResourceSystem::instance->factories[0] = lambda;
+					}
 				);
 
 				return ResourceSystem::instance;
@@ -118,74 +62,68 @@ namespace Sigma {
 			~ResourceSystem() { }
 
 			/**
-			 * \brief Creates a new resource loader with the given type.
+			 * \brief Register a type to be available for factory calls.
 			 *
-			 * The resource must have a static member TypeID and provide a bool Load(std::string) method.
 			 * \return void
 			 */
 			template<class T>
-			void CreateResourceLoader() {
-				if (this->loaders.find(GetTypeID<T>()) == this->loaders.end()) {
-					this->loaders[GetTypeID<T>()].reset(new ResourceLoader<T>);
-				}
+			void Register() {
+				// Store the type ID associated with the type name.
+				this->resTypeID[GetTypeName<T>()] = GetTypeID<T>();
+
+				// Create a lambda function that calls Create with the correct template type.
+				auto lambda = [this] (const std::string& name, const std::vector<Property> &properties) {
+					return this->Create<T>(name, properties);
+				};
+
+				this->factories[GetTypeID<T>()] = lambda;
 			}
 
 			/**
-			 * \brief Add a resource loader created externally to the list of loaders.
+			 * \brief Returns a type ID associated with the given name.
 			 *
-			 * The resource must have a static member TypeID and provide a bool Load(std::string) method.
-			 * \param[in] std::shared_ptr<ResourceLoader<T>> rl The resource loader to add.
-			 * \return void
+			 * \param[in] const std::string & type_Name The name to look for a type ID.
+			 * \return unsigned int Returns 0 if the name doesn't exist.
 			 */
-			template<class T>
-			void AddResourceLoader(std::shared_ptr<ResourceLoader<T>> rl) {
-				if (this->loaders.find(GetTypeID<T>()) == this->loaders.end()) {
-					this->loaders[GetTypeID<T>()] = rl;
+			unsigned int GetTypeIDFromName(const std::string& type_Name) {
+				if (this->resTypeID.find(type_Name) == this->resTypeID.end()) {
+					return 0;
 				}
+				return this->resTypeID.find(type_Name)->second;
 			}
 
 			/**
-			 * \brief Remove a resource loader.
+			 * \brief Loads a resource when the type isn't known.
 			 *
-			 * Removal is based on the TypeID of the resource.
-			 * \return void
+			 * \param[in] const unsigned int type_ID The ID of the type to load. This is used to select the correct factory.
+			 * \param[in] const std::string & name What the loaded resource will be named.
+			 * \param[in] const std::vector<Property> & properties Creation properties.
+			 * \return bool True if the resource loaded successfully.
 			 */
-			template<class T>
-			void RemoveResourceLoader() {
-				if (this->loaders.find(GetTypeID<T>()) != this->loaders.end()) {
-					this->loaders.erase(GetTypeID<T>());
+			bool Load(const unsigned int type_ID, const std::string& name, const std::vector<Property> &properties) {
+				if (this->factories.find(type_ID) != this->factories.end()) {
+					return this->factories[type_ID](name, properties) != nullptr;
 				}
+				return false;
 			}
 
 			/**
-			 * \brief Returns a resource loader.
-			 *
-			 * The returned loader is based on the TypeID of the resource.
-			 * \return The resource loader for the given TypeID.
-			 */
-			template<class T>
-			std::shared_ptr<ResourceLoader<T>> GetResourceLoader() const {
-				if (this->loaders.find(GetTypeID<T>()) != this->loaders.end()) {
-					return std::static_pointer_cast<ResourceLoader<T>>(this->loaders[GetTypeID<T>()].get());
-				}
-			}
-
-			/**
-			 * \brief Calls ResourceLoader::Get.
+			 * \brief Gets a resource by the given name.
 			 *
 			 * \param[in] const std::string& name Name of the resource to retrieve.
 			 * \return std::shared_ptr<T> Returns nullptr if the resource hasn't been created yet, otherwise the requested resource..
 			 */
 			template<class T>
 			std::shared_ptr<T> Get(const std::string& name) {
-				if (this->loaders.find(GetTypeID<T>()) != this->loaders.end()) {
-					return static_cast<ResourceLoader<T>*>(this->loaders[GetTypeID<T>()].get())->Get(name);
+				unsigned int typeID = GetTypeID<T>();
+				if (this->resources[typeID].find(name) == this->resources[typeID].end()) {
+					return nullptr;
 				}
-				return nullptr;
+				return std::static_pointer_cast<T>(this->resources[typeID][name]);
 			}
 
 			/**
-			 * \brief Calls ResourceLoader::Create.
+			 * \brief Creates a resource with the given name and initializes it.
 			 *
 			 * \param[in] const std::string& name The name of the resource to create.
 			 * \param[in] const std::vector<Property> &properties The creation properties for the resource.
@@ -193,14 +131,19 @@ namespace Sigma {
 			 */
 			template<class T>
 			std::shared_ptr<T> Create(const std::string& name, const std::vector<Property> &properties) {
-				if (this->loaders.find(GetTypeID<T>()) != this->loaders.end()) {
-					return static_cast<ResourceLoader<T>*>(this->loaders[GetTypeID<T>()].get())->Create(name, properties);
+				unsigned int typeID = GetTypeID<T>();
+				if (this->resources[typeID].find(name) == this->resources[typeID].end()) {
+					this->resources[typeID][name] = std::make_shared<T>();
+					if (!this->resources[typeID][name]->Initialize(properties)) {
+						this->resources[typeID].erase(name);
+						return nullptr;
+					}
 				}
-				return nullptr;
+				return std::static_pointer_cast<T>(this->resources[typeID][name]);
 			}
 
 			/**
-			 * \brief Calls ResourceLoader::Add.
+			 * \brief Adds a resource to be managed by the system.
 			 *
 			 * \param[in] const std::string& name The name of the resource.
 			 * \param[in] std::shared_ptr<T> r The resource to add.
@@ -208,39 +151,44 @@ namespace Sigma {
 			 */
 			template<class T>
 			void Add(const std::string& name, std::shared_ptr<T> r) {
-				if (this->loaders.find(GetTypeID<T>()) != this->loaders.end()) {
-					static_cast<ResourceLoader<T>*>(this->loaders[GetTypeID<T>()].get())->Add(name, r);
-				}
+				unsigned int typeID = GetTypeID<T>();
+				resources[typeID][name] = r;
 			}
 
 			/**
-			 * \brief Calls ResourceLoader::Remove
+			 * \brief Removes a resources managed by the system.
+			 * This doesn't invalidate any held pointers to the resource.
 			 *
 			 * \param[in] const std::string& name Name of the resource to remove.
 			 * \return void
 			 */
 			template<class T>
 			void Remove(const std::string& name) {
-				if (this->loaders.find(GetTypeID<T>()) != this->loaders.end()) {
-					static_cast<ResourceLoader<T>*>(this->loaders[GetTypeID<T>()].get())->Remove(name);
+				unsigned int typeID = GetTypeID<T>();
+				if (this->resources[typeID].find(name) != this->resources[typeID].end()) {
+					this->resources[typeID].erase(name);
 				}
 			}
 
 			/**
-			 * \brief Calls ResourceLoader::Exists,
+			 * \brief Checks if a resource exists with the given name.
 			 *
 			 * \param[in] const std::string& name Name of the resource to check if it exists.
 			 * \return bool True if the resource exists.
 			 */
 			template<class T>
 			bool Exists(const std::string& name) const {
-				if (this->loaders.find(GetTypeID<T>()) != this->loaders.end()) {
-					return static_cast<ResourceLoader<T>*>(this->loaders[GetTypeID<T>()].get())->Exists(name);
+				unsigned int typeID = GetTypeID<T>();
+				if (this->resources[typeID].find(name) != this->resources[typeID].end()) {
+					return true;
 				}
 				return false;
 			}
 		private:
-			std::map<unsigned int, std::shared_ptr<ResourceLoaderBase>> loaders; // Mapping of resource TypeID to loader.
+			std::map<unsigned int, std::map<std::string, std::shared_ptr<ResourceBase>>> resources; // Mapping of resource TypeID to loaded resources
+			std::map<std::string, unsigned int> resTypeID; // Stores a mapping of TypeName to TypeID
+
+			std::map<unsigned int, std::function<std::shared_ptr<ResourceBase>(const std::string& name, const std::vector<Property> &properties)>> factories; // Mapping of type ID to factory function.
 		};
 #ifdef _WIN32
 		__declspec(selectany) std::once_flag ResourceSystem::only_one;

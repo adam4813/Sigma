@@ -14,10 +14,13 @@
 
 namespace Sigma {
 	namespace resource {
-		class Shader {
+		class Shader : public ResourceBase  {
 		public:
 			Shader(void);
 			~Shader(void);
+
+			virtual bool Initialize(const std::vector<Property> &properties);
+
 			void LoadFromString(GLenum whichShader, const std::string source);
 			void LoadFromFile(GLenum whichShader, const std::string filename);
 			void CreateAndLinkProgram();

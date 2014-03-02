@@ -18,7 +18,7 @@ namespace Sigma {
 		/**
 		 * Represents a OpenGL Texture
 		 */
-		class Texture {
+		class Texture : public ResourceBase  {
 		public:
 			Texture() : id(0), autogen_mipmaps(true) { 
 				glGenTextures(1, &this->id);
@@ -143,7 +143,7 @@ namespace Sigma {
 				return true;
 			}
 
-			virtual bool Create(const std::vector<Property> &properties) {
+			bool Initialize(const std::vector<Property> &properties) {
 				std::string fname = "";
 				std::string format = "GL_RGBA";
 				std::string wrapR = "GL_REPEAT", wrapS = "GL_REPEAT", wrapT = "GL_REPEAT";
