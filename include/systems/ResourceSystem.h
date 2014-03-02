@@ -10,8 +10,8 @@
 namespace Sigma {
 	namespace resource {
 		// Each reflected type must specialize this.
-		template <typename TYPE> const char* GetTypeName(void) { static_assert(0, "GetTypeName is undefined for a type."); }
-		template <typename TYPE> const unsigned int GetTypeID(void) { static_assert(0, "GetTypeID is undefined for a type."); }
+		template <typename TYPE> const char* GetTypeName(void) { /*static_assert(0, "GetTypeName is undefined for a type.");*/ }
+		template <typename TYPE> const unsigned int GetTypeID(void) { /*static_assert(0, "GetTypeID is undefined for a type.");*/ }
 
 		class ResourceBase {
 		public:
