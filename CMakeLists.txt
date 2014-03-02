@@ -19,7 +19,7 @@ SET(CMAKE_INCLUDE_PATH
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 
 # Set the directory of Find<Library>.cmake modules
-SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/modules")
 
 # find all source files in the src directory
 FILE(GLOB Sigma_SRC "src/*.cpp")

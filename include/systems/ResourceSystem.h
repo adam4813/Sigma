@@ -177,7 +177,7 @@ namespace Sigma {
 			 * \return bool True if the resource exists.
 			 */
 			template<class T>
-			bool Exists(const std::string& name) const {
+			bool Exists(const std::string& name) {
 				unsigned int typeID = GetTypeID<T>();
 				if (this->resources[typeID].find(name) != this->resources[typeID].end()) {
 					return true;
