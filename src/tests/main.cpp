@@ -285,7 +285,9 @@ int main(int argCount, char **argValues) {
 
 		// Pass in delta time in seconds
 		bphys.Update(deltaSec);
+#ifndef NO_CEF
 		app->Update(deltaSec);
+#endif
 
 
 		// Update the renderer and present
