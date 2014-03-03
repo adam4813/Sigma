@@ -17,10 +17,7 @@
 #include "components/Renderable.h"
 #include "systems/IGLView.h"
 #include <vector>
-#include "resources/Texture.h"
-#include "resources/GLScreenQuad.h"
 #include "Sigma.h"
-#include "composites/PhysicalWorldLocation.h"
 #include "ResourceSystem.h"
 
 struct IGLView;
@@ -29,7 +26,6 @@ int printOglError(const std::string &file, int line);
 #define printOpenGLError() printOglError(__FILE__, __LINE__)
 
 namespace Sigma{
-
 	struct RenderTarget {
 		std::vector<GLuint> texture_ids;
 		GLuint fbo_id;

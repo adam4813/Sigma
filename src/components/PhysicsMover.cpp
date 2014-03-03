@@ -3,7 +3,7 @@
 
 namespace Sigma {
 	PhysicsMover::PhysicsMover(const id_t entityID) : IComponent(entityID) {
-		Sigma::ControllableMove::AddEntity(entityID);
+		ControllableMove::AddEntity(entityID);
 	}
 
 	void PhysicsMover::ApplyForces(const id_t id, const double delta) {
@@ -11,7 +11,7 @@ namespace Sigma {
 
 		// Rotation forces first
 		// TODO : use the id parameter
-		auto rotationForces = Sigma::ControllableMove::getRotationForces(this->GetEntityID());
+		auto rotationForces = ControllableMove::getRotationForces(this->GetEntityID());
 		if (rotationForces == nullptr) {
 				assert(0 && "id does not exist");
 		}
@@ -22,7 +22,7 @@ namespace Sigma {
 
 		// Directional forces second, as Move depends on transform.orientation
 		// TODO : use the id parameter
-		auto forces = Sigma::ControllableMove::getForces(this->GetEntityID());
+		auto forces = ControllableMove::getForces(this->GetEntityID());
 		if (forces == nullptr) {
 				assert(0 && "id does not exist");
 		}

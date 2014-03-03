@@ -1,5 +1,5 @@
-
 #include "components/ALSound.h"
+#include "resources/SoundFile.h"
 
 namespace Sigma {
 	ALSound::ALSound(id_t entityID,OpenALSystem *m)

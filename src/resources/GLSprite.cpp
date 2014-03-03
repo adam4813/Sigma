@@ -3,6 +3,7 @@
 #include "GL/glew.h"
 #endif
 #include "resources/Texture.h"
+#include "resources/Shader.h"
 
 namespace Sigma{
 	GLSprite::GLSprite( const id_t entityID /*= 0*/ ) : Renderable(entityID), texture(nullptr)  {

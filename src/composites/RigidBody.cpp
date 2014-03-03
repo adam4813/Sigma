@@ -1,5 +1,7 @@
 #include "composites/RigidBody.h"
 #include "composites/PhysicalWorldLocation.h"
+#include "resources/Mesh.h"
+#include "systems/ResourceSystem.h"
 
 namespace Sigma {
 	std::unordered_map<id_t, std::shared_ptr<btRigidBody>> RigidBody::body_map;

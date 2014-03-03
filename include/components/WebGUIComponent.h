@@ -6,10 +6,13 @@
 #ifndef NO_CEF
 #include "cef_client.h"
 #endif
-#include "resources/Texture.h"
 #include "Sigma.h"
 
 namespace Sigma {
+	namespace resource {
+		class Texture;
+	}
+
 	class WebGUIView : public IComponent
 #ifndef NO_CEF
 		, public CefClient, public CefLifeSpanHandler, public CefRenderHandler

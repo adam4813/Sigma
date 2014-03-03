@@ -6,9 +6,11 @@
 #include "resources/GLIcoSphere.h"
 #include "resources/GLCubeSphere.h"
 #include "resources/Mesh.h"
+#include "resources/Texture.h"
 #include "resources/GLScreenQuad.h"
 #include "components/PointLight.h"
 #include "components/SpotLight.h"
+#include "composites/PhysicalWorldLocation.h"
 
 #include "Sigma.h"
 

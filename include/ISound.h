@@ -3,7 +3,6 @@
 #include <memory>
 #include <vector>
 #include "IComponent.h"
-#include "resources/SoundFile.h"
 
 namespace Sigma {
 

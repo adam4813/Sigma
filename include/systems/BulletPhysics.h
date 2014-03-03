@@ -12,7 +12,6 @@
 #include "components/PhysicsController.h"
 
 class Property;
-class IMoverComponent;
 struct GLFPSView;
 
 namespace Sigma {

@@ -7,10 +7,10 @@
 
 
 namespace Sigma {
-	class PhysicsMover : public Sigma::IComponent {
+	class PhysicsMover : public IComponent {
 	public:
 		SET_COMPONENT_TYPENAME("PhysicsMover");
-		PhysicsMover() : Sigma::IComponent(0) { }
+		PhysicsMover() : IComponent(0) { }
 		PhysicsMover(const id_t entityID);
 
 		/**

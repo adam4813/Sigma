@@ -1,4 +1,5 @@
 #include "components/WebGUIComponent.h"
+#include "resources/Texture.h"
 
 namespace Sigma {
 	void WebGUIView::InjectKeyboardEvent(const unsigned int key, const Sigma::event::KEY_STATE state) {

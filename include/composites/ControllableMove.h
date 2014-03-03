@@ -7,7 +7,6 @@
 
 #include "glm/glm.hpp"
 #include "Sigma.h"
-#include "Property.h"
 #include "IECSComponent.h"
 #include "IComponent.h"
 #include "GLTransform.h"
@@ -29,7 +28,7 @@ namespace Sigma {
 	public:
 		SET_STATIC_COMPONENT_TYPENAME("ControllableMove");
 
-		/* All functions are static for convenience purpose (be accesssible from everywhere).
+		/* All functions are static for convenience purpose (be accessible from everywhere).
 		 * A component must be able to be pure static except special cases.
 		 * Making the component pure static is a good practice (I think...)
 		 */
@@ -42,7 +41,7 @@ namespace Sigma {
 		ControllableMove& operator=(ControllableMove& cm); // copy assignment
 		ControllableMove& operator=(ControllableMove&& cm); // move assignment
 	public:
-		// Note that all data have the same lifecycle : created at once, deleted at once
+		// Note that all data have the same life cycle : created at once, deleted at once
 		// If this is not the case, split the component
 		static std::vector<std::unique_ptr<IECSComponent>> AddEntity(const id_t id) {
 			if (getForces(id) == nullptr && getRotationForces(id) == nullptr) {
