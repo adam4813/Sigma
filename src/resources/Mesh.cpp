@@ -353,7 +353,7 @@ namespace Sigma{
 							std::vector<Property> props;
 							props.push_back(Property("filename", std::string(path + filename)));
 							
-							std::shared_ptr<resource::Texture> texture = resource::ResourceSystem::GetInstace()->Create<resource::Texture>(path + filename, props);
+							std::shared_ptr<resource::Texture> texture = resource::ResourceSystem::GetInstance()->Create<resource::Texture>(path + filename, props);
 						
 							m.diffuseMap = texture->GetID();
 							if (texture->GetID() == 0) {
@@ -371,7 +371,7 @@ namespace Sigma{
 							std::vector<Property> props;
 							props.push_back(Property("filename", std::string(path + filename)));
 							
-							std::shared_ptr<resource::Texture> texture = resource::ResourceSystem::GetInstace()->Create<resource::Texture>(path + filename, props);
+							std::shared_ptr<resource::Texture> texture = resource::ResourceSystem::GetInstance()->Create<resource::Texture>(path + filename, props);
 							
 							m.ambientMap = texture->GetID();
 							if (texture->GetID() == 0) {
@@ -389,7 +389,7 @@ namespace Sigma{
 							std::vector<Property> props;
 							props.push_back(Property("filename", std::string(path + filename)));
 						
-							std::shared_ptr<resource::Texture> texture = resource::ResourceSystem::GetInstace()->Create<resource::Texture>(path + filename, props);
+							std::shared_ptr<resource::Texture> texture = resource::ResourceSystem::GetInstance()->Create<resource::Texture>(path + filename, props);
 							
 							m.normalMap = texture->GetID();
 							if (texture->GetID() == 0) {

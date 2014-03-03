@@ -63,28 +63,17 @@ namespace Sigma {
 		 */
 		DLL_EXPORT void MasterGain(float);
 
+		/**
+		 * Factory function to create ALSources and load their sound resources
+		 */
 		DLL_EXPORT IComponent* CreateALSource(const id_t, const std::vector<Property> &);
 
 		/**
-		 * \brief Create an empty SoundFile resource.
+		 * \brief Insert a SoundFile resource into the index table.
 		 *
 		 * \return long index to SoundFile
 		 */
-		DLL_EXPORT long CreateSoundFile();
-
-		/**
-		 * \brief Create an empty SoundFile resource with a name.
-		 *
-		 * \return long index to SoundFile
-		 */
-		DLL_EXPORT long CreateSoundFile(std::string);
-
-		/**
-		 * \brief Create a SoundFile resource and load from a file.
-		 *
-		 * \return long index to SoundFile
-		 */
-		DLL_EXPORT long LoadSoundFile(std::string);
+		DLL_EXPORT long InsertSoundFile(std::weak_ptr<resource::SoundFile>);
 
 		/**
 		 * \brief Get the SoundFile resource at an index.
@@ -120,6 +109,7 @@ namespace Sigma {
 		ALCdevice* device;
 		ALCcontext* context;
 
+		std::shared_ptr<resource::ResourceSystem> resSystem;
 	}; // class OpenALSystem
 } // namespace Sigma
 

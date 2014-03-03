@@ -116,7 +116,12 @@ namespace Sigma {
 		if(playlist.size() > 0 && (stream || !bufferloaded)) {
 			if(playindex > playlist.size()) { playindex = 0; }
 			sfi = playlist[playindex];
-			sfp = std::shared_ptr<resource::SoundFile>(master->GetSoundFile(sfi));
+			if(!master->GetSoundFile(sfi).expired()) {
+				sfp = std::shared_ptr<resource::SoundFile>(master->GetSoundFile(sfi));
+			}
+			else {
+				return;
+			}
 			if(sfp->isStream()) {
 				while(this->buffercount < ALSOUND_BUFFERS) {
 					this->buffers[this->buffercount++] = master->AllocateBuffer();

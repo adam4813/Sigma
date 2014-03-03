@@ -6,7 +6,10 @@ namespace Sigma {
 
 	// We need ctor and dstor to be exported to a dll even if they don't do anything
 	// this avoids needing to export getFactoryFunctions() which is only used by Sigma
-	OpenALSystem::OpenALSystem() : nextindex(1), device(nullptr), context(nullptr) { }
+	OpenALSystem::OpenALSystem() : nextindex(1), device(nullptr), context(nullptr) {
+		this->resSystem = resource::ResourceSystem::GetInstance();
+		this->resSystem->Register<resource::SoundFile>();
+	}
 	OpenALSystem::~OpenALSystem() { }
 
 	bool OpenALSystem::Start() {
@@ -34,39 +37,14 @@ namespace Sigma {
 		alcDestroyContext(this->context);
 		alcCloseDevice(this->device);
 	}
-	long OpenALSystem::CreateSoundFile() {
-		std::shared_ptr<resource::SoundFile> sound(new resource::SoundFile);
+	long OpenALSystem::InsertSoundFile(std::weak_ptr<resource::SoundFile> wksound) {
+		if(wksound.expired()) {
+			return 0;
+		}
+		std::shared_ptr<resource::SoundFile> sound(wksound);
 		long currentindex = nextindex++;
 		this->audiofiles[currentindex] = sound;
 		return currentindex;
-	}
-	long OpenALSystem::CreateSoundFile(std::string name) {
-		if (audioindex.find(name) == audioindex.end()) {
-			std::weak_ptr<resource::SoundFile> sound;
-			long i = OpenALSystem::CreateSoundFile();
-			this->audioindex[name] = i;
-			return i;
-		} else {
-			return this->audioindex[name];
-		}
-	}
-	long OpenALSystem::LoadSoundFile(std::string filename) {
-		if (audioindex.find(filename) == audioindex.end()) {
-			std::shared_ptr<resource::SoundFile> sound;
-			long i = OpenALSystem::CreateSoundFile();
-			sound = this->audiofiles[i];
-			sound->LoadFromFile(filename);
-			if (sound->isLoaded()) {
-				this->audioindex[filename] = i;
-				return i;
-			} else {
-				LOG_WARN << "Failed to load sound from " << filename;
-				this->audiofiles.erase(i);
-				return 0;
-			}
-		} else {
-			return this->audioindex[filename];
-		}
 	}
 
 	void OpenALSystem::MasterGain(float v) {
@@ -96,7 +74,6 @@ namespace Sigma {
 
 		std::string soundFilename;
 
-		long index;
 		float x, y, z;
 		bool loop = false;
 		x = y = z = 0.0f;
@@ -137,8 +114,17 @@ namespace Sigma {
 			}
 			else if (p->GetName() == "soundFilename") {
 				soundFilename = p->Get<std::string>();
-				index = LoadSoundFile(soundFilename);
-				sound->AddSound(index);
+				{
+					long index;
+					std::weak_ptr<resource::SoundFile> soundres;
+					std::vector<Property> props;
+					props.push_back(Property("filename", std::string(soundFilename)));
+					soundres = this->resSystem->Create<resource::SoundFile>(soundFilename, props);
+					index = this->InsertSoundFile(soundres);
+					if(index > 0) {
+						sound->AddSound(index);
+					}
+				}
 				loop = false;
 				continue;
 			}

@@ -85,7 +85,7 @@ namespace Sigma {
 		}
 #endif
 
-		std::shared_ptr<resource::Texture> texture = resource::ResourceSystem::GetInstace()->Get<resource::Texture>(textureName);
+		std::shared_ptr<resource::Texture> texture = resource::ResourceSystem::GetInstance()->Get<resource::Texture>(textureName);
 		if (texture->GetID() == 0) {
 			texture->Format(GL_BGRA);
 			texture->GenerateGLTexture(this->windowWidth, this->windowHeight);

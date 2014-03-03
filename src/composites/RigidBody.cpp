@@ -61,7 +61,7 @@ namespace Sigma {
 				}
 			}
 
-			std::shared_ptr<resource::Mesh> mesh = resource::ResourceSystem::GetInstace()->Get<resource::Mesh>(meshFilename);
+			std::shared_ptr<resource::Mesh> mesh = resource::ResourceSystem::GetInstance()->Get<resource::Mesh>(meshFilename);
 
 			auto btmesh = new btTriangleMesh();
 			for (unsigned int i = 0; i < mesh->FaceCount(); ++i) {

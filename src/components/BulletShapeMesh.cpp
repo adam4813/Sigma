@@ -3,6 +3,9 @@
 
 namespace Sigma {
 	void BulletShapeMesh::SetMesh(const resource::Mesh* mesh, btVector3* scale) {
+		if(!mesh) {
+			return;
+		}
 		this->btmesh = new btTriangleMesh();
 		for (unsigned int i = 0; i < mesh->FaceCount(); ++i) {
 			const resource::Face* f = mesh->GetFace(i);

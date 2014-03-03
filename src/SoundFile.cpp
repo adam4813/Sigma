@@ -48,6 +48,24 @@ namespace Sigma {
 			}
 		}
 
+		bool SoundFile::Initialize(const std::vector<Property> &properties) {
+			std::string soundFilename;
+
+			for(auto propitr = properties.begin(); propitr != properties.end(); ++propitr) {
+				const Property*  p = &(*propitr);
+				if(p->GetName() == "filename") {
+					soundFilename = p->Get<std::string>();
+				}
+			}
+			LoadFromFile(soundFilename);
+			if(this->isLoaded()) {
+				return true;
+			}
+			else {
+				LOG_WARN << "Failed to load sound from " << soundFilename;
+				return false;
+			}
+		}
 		// Note: WAV files can get huge!
 		// ogg can offer basically the same quality in less space
 		// both in memory and on disk.
@@ -516,6 +534,9 @@ namespace Sigma {
 					}
 				}
 				fh.close();
+			}
+			else {
+				LOG_ERROR << "Opening file failed: " << fn;
 			}
 		}
 	}
