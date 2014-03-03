@@ -7,6 +7,7 @@
 
 namespace Sigma {
 	namespace resource {
+
 		// A class to hold an audio stream in its (possibly compressed) raw format
 		enum AUDIO_CODEC {
 			Null,
@@ -110,8 +111,10 @@ namespace Sigma {
 			int chann;
 			bool hasmeta;
 		};
+	}
 
-		template <> inline const char* GetTypeName<SoundFile>() { return "Sound"; }
-		template <> inline const unsigned int GetTypeID<SoundFile>() { return 1003; }
+	namespace reflection {
+		template <> inline const char* GetTypeName<resource::SoundFile>() { return "Sound"; }
+		template <> inline const unsigned int GetTypeID<resource::SoundFile>() { return 1003; }
 	}
 }

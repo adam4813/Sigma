@@ -46,8 +46,10 @@ namespace Sigma {
 			std::map<std::string,GLuint> _attributeList;
 			std::map<std::string,GLuint> _uniformLocationList;
 		};
+	}
 
-		template <> inline const char* GetTypeName<Shader>() { return "Shader"; }
-		template <> inline const unsigned int GetTypeID<Shader>() { return 1002; }
+	namespace reflection {
+		template <> inline const char* GetTypeName<resource::Shader>() { return "Shader"; }
+		template <> inline const unsigned int GetTypeID<resource::Shader>() { return 1002; }
 	}
 }

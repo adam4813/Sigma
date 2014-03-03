@@ -6,12 +6,13 @@
 #include <mutex>
 #include <vector>
 #include "Property.h"
+#include "Sigma.h"
 
 namespace Sigma {
 	namespace resource {
 		// Each reflected type must specialize this.
-		template <typename TYPE> const char* GetTypeName(void) { /*static_assert(0, "GetTypeName is undefined for a type.");*/ }
-		template <typename TYPE> const unsigned int GetTypeID(void) { /*static_assert(0, "GetTypeID is undefined for a type.");*/ }
+		//template <typename TYPE> const char* GetTypeName(void) { /*static_assert(0, "GetTypeName is undefined for a type.");*/ }
+		//template <typename TYPE> const unsigned int GetTypeID(void) { /*static_assert(0, "GetTypeID is undefined for a type.");*/ }
 
 		class ResourceBase {
 		public:
@@ -69,14 +70,14 @@ namespace Sigma {
 			template<class T>
 			void Register() {
 				// Store the type ID associated with the type name.
-				this->resTypeID[GetTypeName<T>()] = GetTypeID<T>();
+				this->resTypeID[reflection::GetTypeName<T>()] = reflection::GetTypeID<T>();
 
 				// Create a lambda function that calls Create with the correct template type.
 				auto lambda = [this] (const std::string& name, const std::vector<Property> &properties) {
 					return this->Create<T>(name, properties);
 				};
 
-				this->factories[GetTypeID<T>()] = lambda;
+				this->factories[reflection::GetTypeID<T>()] = lambda;
 			}
 
 			/**
@@ -115,7 +116,7 @@ namespace Sigma {
 			 */
 			template<class T>
 			std::shared_ptr<T> Get(const std::string& name) {
-				unsigned int typeID = GetTypeID<T>();
+				unsigned int typeID = reflection::GetTypeID<T>();
 				if (this->resources[typeID].find(name) == this->resources[typeID].end()) {
 					return nullptr;
 				}
@@ -131,7 +132,7 @@ namespace Sigma {
 			 */
 			template<class T>
 			std::shared_ptr<T> Create(const std::string& name, const std::vector<Property> &properties) {
-				unsigned int typeID = GetTypeID<T>();
+				unsigned int typeID = reflection::GetTypeID<T>();
 				if (this->resources[typeID].find(name) == this->resources[typeID].end()) {
 					this->resources[typeID][name] = std::make_shared<T>();
 					if (!this->resources[typeID][name]->Initialize(properties)) {
@@ -151,7 +152,7 @@ namespace Sigma {
 			 */
 			template<class T>
 			void Add(const std::string& name, std::shared_ptr<T> r) {
-				unsigned int typeID = GetTypeID<T>();
+				unsigned int typeID = reflection::GetTypeID<T>();
 				resources[typeID][name] = r;
 			}
 
@@ -164,7 +165,7 @@ namespace Sigma {
 			 */
 			template<class T>
 			void Remove(const std::string& name) {
-				unsigned int typeID = GetTypeID<T>();
+				unsigned int typeID = reflection::GetTypeID<T>();
 				if (this->resources[typeID].find(name) != this->resources[typeID].end()) {
 					this->resources[typeID].erase(name);
 				}
@@ -178,7 +179,7 @@ namespace Sigma {
 			 */
 			template<class T>
 			bool Exists(const std::string& name) {
-				unsigned int typeID = GetTypeID<T>();
+				unsigned int typeID = reflection::GetTypeID<T>();
 				if (this->resources[typeID].find(name) != this->resources[typeID].end()) {
 					return true;
 				}

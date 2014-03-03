@@ -363,8 +363,10 @@ namespace Sigma {
 			GLint mag_filter;     /// Filter using when magnify texture
 			GLint min_filter;     /// Filter using when minimize texture
 		};
+	}
 
-		template <> inline const char* GetTypeName<Texture>() { return "Texture"; }
-		template <> inline const unsigned int GetTypeID<Texture>() { return 1001; }
+	namespace reflection {
+		template <> inline const char* GetTypeName<resource::Texture>() { return "Texture"; }
+		template <> inline const unsigned int GetTypeID<resource::Texture>() { return 1001; }
 	}
 }

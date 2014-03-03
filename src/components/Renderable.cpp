@@ -2,7 +2,6 @@
 
 #include "resources/Mesh.h"
 #include "resources/Shader.h"
-#include "Sigma.h"
 
 namespace Sigma{
 	Renderable::Renderable() : lightingEnabled(true), SpatialComponent(0) {

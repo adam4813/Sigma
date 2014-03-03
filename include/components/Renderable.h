@@ -10,6 +10,7 @@
 #include "components/SpatialComponent.h"
 #include <unordered_map>
 #include <memory>
+#include "Sigma.h"
 
 namespace Sigma {
 	namespace resource {
@@ -103,6 +104,11 @@ namespace Sigma {
 
 		bool lightingEnabled;
 	}; // class Renderable
+
+	namespace reflection {
+		template <> inline const char* GetTypeName<Renderable>() { return "Renderable"; }
+		template <> inline const unsigned int GetTypeID<Renderable>() { return 2000; }
+	}
 } // namespace Sigma
 
 #endif // IGLCOMPONENT_H

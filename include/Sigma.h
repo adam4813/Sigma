@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include "Log.h"
+#include "Property.h"
 
 // Put in this header all the things shared by all code
 namespace Sigma {
@@ -13,6 +14,13 @@ namespace Sigma {
 	// A composite is a set of predefined components that are strongly dependent
 	// for example the rotational and directional forces are grouped in ControllableMove
 	typedef std::string CompositeID;
+
+	namespace reflection {
+		// Template methods that can be used for reflection.
+		// To use them just call GetTypeName<MyType>() to retrieve the name for the specified type.
+		template <typename TYPE> const char* GetTypeName(void) { }
+		template <typename TYPE> const unsigned int GetTypeID(void) { }
+	}
 }
 
 #ifdef libSigma_EXPORTS
