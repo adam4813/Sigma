@@ -1,5 +1,5 @@
 #ifndef ENTITYSYSTEM_H_INCLUDED
-#define ENTITYSYSTEM__H_INCLUDED
+#define ENTITYSYSTEM_H_INCLUDED
 
 #include <vector>
 #include <memory>
